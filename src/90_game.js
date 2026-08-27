@@ -17,7 +17,7 @@ function load() {
     SAVE.o = a[3] | 0;
     SAVE.m = a[4] ? 1 : 0;
     SAVE.t = a[5] ? 1 : 0;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < CATS; i++) {
       const v = a[6 + i] | 0;
       SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
     }
@@ -36,15 +36,19 @@ function startRun(sd) {
   chain = 0; chainN = 0; chainT = 0; fullSpec = 0; combo = 0; comboT = 0;
   deadT = 0; slow = 0; vault = null; shake = 0; flash = 0;
   pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
-  boostT = [0, 0];
+  boostT = [0, 0, 0, 0, 0, 0, 0];
   strokes = []; parts = []; trail = []; pops = []; nodes = [];
-  drawing = null;
-  P.x = 0; P.y = -320; P.vx = rf(-70, 70); P.vy = 300; P.a = PI / 2;
+  drawing = null; wheel = null;
+  P.x = 0; P.y = -320; P.vy = 300; P.a = PI / 2;
   P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300;
   Gx = 0; Gy = GRAV;
   C.x = P.x; C.y = P.y; C.z = 1;
   pal = regPal(0);
   worldReset(sd);
+  // After the seed is set, never before: otherwise the opening drift is drawn
+  // from whatever PRNG state the previous run happened to leave behind and a
+  // seeded replay is not actually reproducible.
+  P.vx = rf(-70, 70);
   hint = SAVE.t ? 3 : 0; hintT = 0;
   mStep = 0; if (AC) mNext = AC.currentTime + .05;
   sndRail(0);
@@ -115,7 +119,7 @@ function update(dt) {
 
   // timers
   regShow -= dt; dryT -= dt; fullSpec -= dt;
-  boostT[0] -= dt; boostT[1] -= dt;
+  for (let i = 0; i < 7; i++) boostT[i] -= dt;
   if (comboT > 0 && (comboT -= dt) <= 0) combo = 0;
   if (chainT > 0 && (chainT -= dt) <= 0) { chain = 0; chainN = 0; }
   flash = mx(0, flash - dt * 2.4);
@@ -167,6 +171,7 @@ function draw() {
   }
   if (st > 1) [0, 0, screenPause, screenResults, screenStore][st]();
   else if (!st) screenTitle();
+  if (wheel && st === 1) prismWheel(); else wheel = null;
   cursor();
   if (DEBUG) {
     txt('seed ' + seed + '  v ' + (P.sp | 0) + '  chunks ' + chunks.length + '  parts ' + parts.length +

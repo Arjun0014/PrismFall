@@ -62,11 +62,20 @@ const BRK_R = 400;       // ... while Red-charged
 // -- items ------------------------------------------------------------------
 const I_COIN = 0, I_CROWN = 1, I_PIG = 2, I_WELL = 3, I_BOOST = 4;
 
-// -- boosters: [allCostMul, redMul, duration] -------------------------------
+// -- boosters ---------------------------------------------------------------
+// [colour amplified (7 = every colour's pigment cost), strength, seconds].
+// Entirely parameter driven: a booster is a multiplier looked up by the verb
+// that cares about it, so adding one is a table row, never a new subsystem.
 const BOOST = [
-  [1, 1.45, 10],    // 0 Red Overdrive - bigger kick, cheaper destruction
-  [.4, 1, 12],      // 1 White Efficiency - every colour costs less
+  [0, 1.5, 10],     // Red Overdrive  - bigger kick, cheaper destruction
+  [2, 1.5, 11],     // Yellow Supercoil - amplified rebound
+  [3, 1.7, 12],     // Green Reach    - longer, stronger tether
+  [4, 2, 12],       // Blue Superrail - the rail holds far longer
+  [5, 1.9, 11],     // Indigo Flux    - gravity stays bent
+  [6, 1.9, 11],     // Violet Echo    - longer phase, longer warp
+  [7, .4, 12],      // White Efficiency - every colour costs less
 ];
+const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split(' ');
 
 // -- localStorage namespace -------------------------------------------------
 const LS = 'pf26_save';

@@ -65,11 +65,20 @@ const BRK_R = 400;       // ... while Red-charged
 // -- items ------------------------------------------------------------------
 const I_COIN = 0, I_CROWN = 1, I_PIG = 2, I_WELL = 3, I_BOOST = 4;
 
-// -- boosters: [allCostMul, redMul, duration] -------------------------------
+// -- boosters ---------------------------------------------------------------
+// [colour amplified (7 = every colour's pigment cost), strength, seconds].
+// Entirely parameter driven: a booster is a multiplier looked up by the verb
+// that cares about it, so adding one is a table row, never a new subsystem.
 const BOOST = [
-  [1, 1.45, 10],    // 0 Red Overdrive - bigger kick, cheaper destruction
-  [.4, 1, 12],      // 1 White Efficiency - every colour costs less
+  [0, 1.5, 10],     // Red Overdrive  - bigger kick, cheaper destruction
+  [2, 1.5, 11],     // Yellow Supercoil - amplified rebound
+  [3, 1.7, 12],     // Green Reach    - longer, stronger tether
+  [4, 2, 12],       // Blue Superrail - the rail holds far longer
+  [5, 1.9, 11],     // Indigo Flux    - gravity stays bent
+  [6, 1.9, 11],     // Violet Echo    - longer phase, longer warp
+  [7, .4, 12],      // White Efficiency - every colour costs less
 ];
+const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split(' ');
 
 // -- localStorage namespace -------------------------------------------------
 const LS = 'pf26_save';
@@ -180,7 +189,7 @@ let mult = 1;
 let depth = 0;             // max depth reached
 let reg = 0;               // current region index
 let regShow = 0;           // region banner timer
-let boostT = [0, 0];       // booster timers
+let boostT = [];           // per-booster remaining seconds
 let combo = 0, comboT = 0; // coin chain
 
 // -- containers -------------------------------------------------------------
@@ -192,14 +201,16 @@ let pops = [];     // floating score/text pops
 let nodes = [];    // prism-node sparkles from stroke fusion
 
 // -- persistent -------------------------------------------------------------
-const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0], m: 0, t: 0 };
+const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
 // c total coins, b best score, d best depth, o owned cosmetics bitmask,
-// e equipped [body, trail, impact], m muted, t tutorial seen
+// e equipped [body, horn, trail, impact], m muted, t tutorial seen
 
 // -- input ------------------------------------------------------------------
 let pmx = 0, pmy = 0;           // pointer in screen px
 let mwx = 0, mwy = 0;         // pointer in world units
 let drawing = null;           // stroke being drawn
+let wheel = null;             // radial Prism Wheel anchor [x, y] in screen px
+let wsel = 0;                 // wedge the pointer is currently over
 let hint = 0;                 // onboarding step
 let hintT = 0;
 
@@ -452,7 +463,7 @@ function shaft(c, L, Rr, wdt, cx, b, dif) {
   if (rp(.6)) {
     const ox = sx < cx ? Rr - 70 : L + 70;
     const bp = rp(.45);
-    c.i.push(item(bp ? I_PIG : I_BOOST, ox, c.y + c.h * .5, bp ? pick(aff(c.rg)) : ri(0, 1)));
+    c.i.push(item(bp ? I_PIG : I_BOOST, ox, c.y + c.h * .5, bp ? pick(aff(c.rg)) : ri(0, 6)));
   }
 }
 
@@ -540,8 +551,8 @@ function rewards(c, L, Rr, rg, dif) {
   // Pigment biased to the region affinity, but never exclusive to it.
   if (rp(.62)) place(I_PIG, rp(.7) ? pick(af) : ri(0, 6), .15, .85);
   // Upward temptation, above the entry line.
-  if (rp(.3)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 1), .02, .16);
-  if (rp(.16)) place(I_BOOST, ri(0, 1), .3, .8);
+  if (rp(.3)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 6), .02, .16);
+  if (rp(.16)) place(I_BOOST, ri(0, 6), .3, .8);
   // Destruction cache: coins sealed behind breakable panels.
   if (rp(.24)) {
     const x = rp(.5) ? L + 90 : Rr - 90, y = c.y + rf(.25, .7) * c.h;
@@ -660,9 +671,20 @@ function tetherConstrain() {
 }
 
 // --- item pickup -----------------------------------------------------------
-function items() {
-  for (const c of NC) for (const it of c.i)
-    if (!it.g && hyp(P.x - it.x, P.y - it.y) < R + 26) grab(it);
+// At a high style multiplier loose coins arc toward the unicorn. It is a
+// reward for keeping a chain alive, never a substitute for aim: the radius
+// only opens up once the multiplier is already high, and it pulls coins only.
+function items(h) {
+  const mag = mult > 4 ? 60 + mult * 24 : 0;
+  for (const c of NC) for (const it of c.i) {
+    if (it.g) continue;
+    const dx = P.x - it.x, dy = P.y - it.y, d = hyp(dx, dy);
+    if (d < R + 26) { grab(it); continue; }
+    if (mag && !it.t && d < mag) {
+      const k = mn(1, 700 * h / d);
+      it.x += dx * k; it.y += dy * k;
+    }
+  }
 }
 
 // --- obstacle collision ----------------------------------------------------
@@ -727,7 +749,7 @@ function hitOb(o) {
   clampV();
 
   const imp = -vn;
-  sndHit(imp, damp ? 1 : bump ? 2 : 0);
+  sndHit(imp, damp ? 1 : bump ? 2 : 0, o.x + o.y);
   shake = mn(26, shake + imp * (bump ? .006 : .0035));
   const n = clamp(imp * .012, 1, 14) | 0;
   burst(px, py, n, 1, mn(imp * .35, 420), geoHue(o));
@@ -781,7 +803,7 @@ function physics(h) {
     else { P.x += P.vx * hh; P.y += P.vy * hh; }
     if (P.te) tetherConstrain();
     collideAll(hh);
-    items();
+    items(hh);
   }
 
   // Absolute containment: no effect (warp included) may leave the column.
@@ -812,7 +834,13 @@ function physics(h) {
 let chainT = 0;     // seconds left before the colour chain lapses
 let dryC = -1, dryT = 0;   // "out of pigment" HUD flash
 
-const costMul = () => boostT[1] > 0 ? BOOST[1][0] : 1;
+// Booster lookup: the strength multiplier currently applied to colour c, or 1.
+// Colour 7 is the pigment-cost booster.
+function bst(c) {
+  for (let i = 0; i < 7; i++) if (boostT[i] > 0 && BOOST[i][0] === c) return BOOST[i][1];
+  return 1;
+}
+const costMul = () => bst(7);
 
 // --- drawing ---------------------------------------------------------------
 // A stroke may only begin within SREACH of the unicorn; further clicks clamp
@@ -889,7 +917,8 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
   // the exit angle rotates your velocity; alone it is a phase dash that passes
   // straight through the next obstacle. Fused with Blue it phases a whole rail.
   if (b & 64) {
-    if (b & 16) P.ph = .8;
+    const vb = bst(6);
+    if (b & 16) P.ph = .8 * vb;
     else {
       let o2 = 0;
       for (const o of strokes) if (o !== s && !o.u && o.e & 64) { o2 = o; break; }
@@ -907,11 +936,12 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
         // standstill, straight off the face of the stroke, so Violet is also an
         // escape tool rather than a no-op when you need it most.
         const sp = hyp(P.vx, P.vy);
-        if (sp < 60) { P.x += nx * 300; P.y += ny * 300; P.vx = nx * 460; P.vy = ny * 460; }
-        else { const k = 300 / sp; P.x += P.vx * k; P.y += P.vy * k; }
+        const reach = 300 * vb;
+        if (sp < 60) { P.x += nx * reach; P.y += ny * reach; P.vx = nx * 460; P.vy = ny * 460; }
+        else { const k = reach / sp; P.x += P.vx * k; P.y += P.vy * k; }
       }
       P.x = clamp(P.x, -WMAX + R, WMAX - R);
-      P.ph = .34; P.vx *= 1.07; P.vy *= 1.07;
+      P.ph = .34 * vb; P.vx *= 1.07; P.vy *= 1.07;
       warpFX(P.x, P.y);
     }
     sndWarp();
@@ -921,6 +951,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
   if (b & 16) {
     if (P.te) releaseTether();
     P.ra = s; P.rt = t;
+    s.l = mx(s.l, SLIFE * bst(4));
     P.rs = nx * -uy + ny * ux >= 0 ? 1 : -1;
     const sp = mx(hyp(P.vx, P.vy), 420);
     const dir = P.vx * ux + P.vy * uy >= 0 ? 1 : -1;
@@ -929,14 +960,14 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
     sndRail(1);
   } else if (b & 8) {
     if (P.ra) detachRail(0);
-    const d = hyp(P.x - px, P.y - py);
-    P.te = { x: px, y: py, l: clamp(d, 62, 195), t: 1.2 };
+    const d = hyp(P.x - px, P.y - py), gb = bst(3);
+    P.te = { x: px, y: py, l: clamp(d, 62, 195) * gb, t: 1.2 * gb };
     sndTether(1);
   }
 
   // 3 --- GRAVITY (Indigo) --------------------------------------------------
   if (b & 32) {
-    Gx = nx * GRAV; Gy = ny * GRAV; P.gt = 2.9;
+    Gx = nx * GRAV; Gy = ny * GRAV; P.gt = 2.9 * bst(5);
     sndGrav(ny);
     burst(px, py, 10, 3, 150, HUE[5]);
   }
@@ -949,7 +980,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
     P.vx = ux * ns; P.vy = uy * ns;
     sndVector(sprB);
   } else if (sprB) {
-    const vn = P.vx * nx + P.vy * ny, e = 1.85;
+    const vn = P.vx * nx + P.vy * ny, e = 1.85 * bst(2);
     P.vx -= (1 + e) * vn * nx; P.vy -= (1 + e) * vn * ny;
     // The floor scales with the impact so a spring stays impact-driven: it pops
     // you off on a glancing hit, but it can never rescue a dead-stopped unicorn.
@@ -967,7 +998,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
   // it can't fire the unicorn back into it, then injects a fixed amount of
   // energy. That is why Red still works from a dead stop and Yellow does not.
   if (b & 1) {
-    const rk = boostT[0] > 0 ? BOOST[0][1] : 1;
+    const rk = bst(0);
     let sp = hyp(P.vx, P.vy), dxn, dyn;
     if (sp < 50) { dxn = nx; dyn = ny; sp = 0; }
     else {
@@ -1044,7 +1075,7 @@ function grab(it) {
     sndWell();
   } else {
     boostT[it.c] = BOOST[it.c][2];
-    pop(it.x, it.y, BN[it.c], BH[it.c]);
+    pop(it.x, it.y, BNAME[it.c], BOOST[it.c][0] > 6 ? -1 : HUE[BOOST[it.c][0]]);
     sndPower();
   }
 }
@@ -1139,12 +1170,19 @@ function N(dur, pk, ft, f0, f1, q, dest, t0) {
 // --- collision / material --------------------------------------------------
 // Impact: one noise transient scaled by impulse, plus a body tone. kind 1 is a
 // dampener (dull thud), kind 2 a bumper (bright ping).
-function sndHit(imp, kind) {
+function sndHit(imp, kind, tune) {
   if (!ok() || imp < 60) return;
   const v = clamp(imp / 2200, .04, .55);
   N(.03 + v * .12, v * .7, 'lowpass', 300 + imp * 1.6, 140, 1);
   if (imp > 380) O('triangle', 120 + imp * .05, 44, .1 + v * .12, v * .8);
-  if (kind) O('sine', kind > 1 ? 520 + imp * .18 : 90, kind > 1 ? 260 : 42, kind > 1 ? .12 : .25, v * .5);
+  if (kind > 1) {
+    // The Organ: every bumper is tuned by its own position, in the current
+    // region's mode, so a column of them plays a phrase as you fall through it.
+    const sc = SCALE[reg % 4], q = abs(tune | 0);
+    const n = 64 + sc[(q >> 5) % sc.length] + 12 * (q >> 9 & 1);
+    O('sine', NOTE(n), NOTE(n) * 1.5, .17, v * .55);
+    O('triangle', NOTE(n + 12), 0, .1, v * .3);
+  } else if (kind) O('sine', 90, 42, .25, v * .5);
 }
 
 function sndBreak() {
@@ -1325,7 +1363,7 @@ function pt(x, y, vx, vy, l, h, k, s) {
 function burst(x, y, n, k, spd, hue, vx, vy) {
   const h = hue === undefined ? HUE[sel] : hue;
   // k===1 is a generic world impact — the equipped Impact cosmetic restyles it.
-  const kk = k === 1 ? SAVE.e[2] : k;
+  const kk = k === 1 ? SAVE.e[3] : k;
   for (let i = 0; i < n; i++) {
     const a = rf(0, TAU), v = rf(.3, 1) * spd;
     pt(x, y, (vx || 0) + cos(a) * v, (vy || 0) + sin(a) * v,
@@ -1526,11 +1564,13 @@ function drawItem(it) {
     return;
   }
   const cr = t === I_CROWN, pg = t === I_PIG;
+  // Boosters wear the colour of the verb they amplify; White Efficiency is white.
+  const bc = pg ? it.c : BOOST[it.c][0];
   const n = cr ? 10 : pg ? 6 : 3, rad = (cr ? 16 : pg ? 12 : 15) * s * b;
   X.save(); X.translate(x, y);
   X.rotate(T * (cr ? .8 : pg ? 1.4 : -1) + it.c);
-  POLY(n, cr ? UG : pg ? chsl(it.c, 58) : it.c ? '#fff' : hsl(0, 100, 60),
-    pg ? chsl(it.c, 86) : '#fff', mx(1, 2 * s), (i) => {
+  POLY(n, cr ? UG : pg ? chsl(bc, 58) : bc > 6 ? '#fff' : chsl(bc, 60),
+    pg ? chsl(bc, 86) : '#fff', mx(1, 2 * s), (i) => {
       const a = i / n * TAU, q = rad * (cr && i & 1 ? .44 : 1);
       VTX(i, cos(a) * q, sin(a) * q);
     });
@@ -1597,7 +1637,7 @@ function pushTrail() {
 }
 
 function drawTrail() {
-  const n = trail.length, style = SAVE.e[1];
+  const n = trail.length, style = SAVE.e[2];
   X.lineCap = 'round';
   for (let i = 1; i < n; i++) {
     if (style === 1 && i % 2) continue;
@@ -1610,7 +1650,7 @@ function drawTrail() {
 
 // The unicorn, drawn in local units under the current transform. Shared by
 // gameplay and the store preview so there is exactly one unicorn in the game.
-function unicornBody(body, tint, white) {
+function unicornBody(body, tint, white, horn) {
   const main = white ? '#fff' : body === 1 ? 'hsl(268 40% 12%)' : body === 2 ? 'hsl(190 100% 72%)' : 'hsl(300 40% 96%)';
   const line = white ? chsl(flr(T * 6) % 7, 70) : body === 2 ? 'hsl(300 100% 70%)' : 'hsl(280 45% 62%)';
   const gal = sin(T * 13), rb = flr(T * 5);
@@ -1641,11 +1681,21 @@ function unicornBody(body, tint, white) {
     SK(3.4, chsl((rb + i) % 7, 66));
   }
 
+  // Horn: 0 spiral, 1 long lance, 2 star tip. Purely decorative — the body is
+  // a circle of radius R whatever is equipped.
   X.save(); X.translate(26, -12); X.rotate(-.62);
-  const hl = 15;
+  const hl = horn === 1 ? 24 : 15;
   const hg = X.createLinearGradient(0, 0, 0, -hl);
   hg.addColorStop(0, chsl(0, 65)); hg.addColorStop(1, chsl(tint, 82));
   POLY(3, hg, '#fff', 1.2, (i) => VTX(i, [-3, 3, 0][i], [0, 0, -hl][i]));
+  if (!horn) for (let i = 0; i < 4; i++) {
+    const q = i / 4;
+    LIN(-3 + q * 6 * .5, -hl * q, 3 - q * 6 * .5, -hl * q - 2, 1.1, chsl((rb + i) % 7, 84));
+  }
+  if (horn === 2) POLY(10, '#fff', chsl(tint, 88), 1, (i) => {
+    const a = i / 10 * TAU + T * 2, q = (i & 1 ? 2.4 : 6);
+    VTX(i, cos(a) * q, -hl + sin(a) * q);
+  });
   X.restore();
 
   CIR(26, -8, 1.7, st === 1 && P.st > STALLW ? '#f44' : '#2a1836');
@@ -1655,7 +1705,7 @@ function drawUnicorn() {
   const s = SC, x = w2sx(P.x), y = w2sy(P.y);
   X.save();
   X.translate(x, y); X.rotate(P.a); X.scale(s, s);
-  unicornBody(SAVE.e[0], sel, fullSpec > 0 || P.ph > 0);
+  unicornBody(SAVE.e[0], sel, fullSpec > 0 || P.ph > 0, SAVE.e[1]);
   X.restore();
 
   // Selected-colour halo, tinted red while Red-charged: world-space feedback
@@ -1677,12 +1727,12 @@ function drawUnicorn() {
 // every distinct colour string and layout number costs compressed bytes.
 // ---------------------------------------------------------------------------
 
-// Three cosmetic categories of three variants; variant 0 is always owned.
+// Four cosmetic categories of three variants; variant 0 is always owned.
 // Cosmetics are render-only: they never touch collision, pigment or scoring.
-const COSN = 'CLOUD SHADOW NEON RAINBOW DASHED COMET SPARKS SHARDS RINGS'.split(' ');
+const COSN = ('CLOUD SHADOW NEON SPIRAL LANCE STARTIP ' +
+  'RAINBOW DASHED COMET SPARKS SHARDS RINGS').split(' ');
 const COSP = [0, 180, 420];
-const BN = ['RED OVERDRIVE', 'EFFICIENCY'];
-const BH = [0, -1];
+const CATS = 4;
 const owned = (c, i) => !i || (SAVE.o >> (c * 3 + i)) & 1;
 
 // fixed UI palette
@@ -1738,9 +1788,10 @@ function hud() {
 
   prismBar();
 
-  for (let i = 0; i < 2; i++) if (boostT[i] > 0)
-    txt(BN[i] + ' ' + boostT[i].toFixed(1), W - p, p + (30 + i * 16) * U, 12,
-      BH[i] < 0 ? W9 : hsl(BH[i], 100, 70), 'right', 1);
+  let brow = 0;
+  for (let i = 0; i < 7; i++) if (boostT[i] > 0)
+    txt(BNAME[i] + ' ' + boostT[i].toFixed(1), W - p, p + (30 + brow++ * 16) * U, 12,
+      BOOST[i][0] > 6 ? W9 : chsl(BOOST[i][0], 70), 'right', 1);
 
   if (regShow > 0)
     txt(REG[reg][0], W / 2, H * .3, 42,
@@ -1777,6 +1828,35 @@ function prismBar() {
     btns.push({ hot: hot(cx, y, w, h), fn: () => setSel(i) });
   }
   if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 'center', 1);
+}
+
+// --- radial Prism Wheel ----------------------------------------------------
+// Held on the right mouse button, anchored where the pointer already is, so the
+// player never looks away from the unicorn. Flick toward a wedge, release to
+// commit. The game keeps running underneath it.
+function prismWheel() {
+  const r = 84 * U, cx = wheel[0], cy = wheel[1];
+  const dx = pmx - cx, dy = pmy - cy, d = hyp(dx, dy);
+  // Inside the dead zone the current colour stays selected.
+  wsel = d < 22 * U ? sel : flr(((at2(dy, dx) + PI * 2.5 + PI / 7) % TAU) / TAU * 7) % 7;
+  CIR(cx, cy, r * 1.06, 'hsl(272 45% 6% / .72)');
+  for (let i = 0; i < 7; i++) {
+    const a0 = i / 7 * TAU - PI / 2 - PI / 7, a1 = a0 + TAU / 7, on = i === wsel;
+    BP();
+    MT(cx, cy);
+    AR(cx, cy, on ? r * 1.1 : r, a0 + .02, a1 - .02);
+    X.closePath();
+    FL(chsl(i, on ? 58 : 30, on ? 1 : .8));
+    SK(on ? 2.6 * U : 1 * U, on ? W9 : chsl(i, 46, .7));
+    const am = (a0 + a1) / 2, tr = r * (on ? .8 : .72);
+    txt('ROYGBIV'[i], cx + cos(am) * tr, cy + sin(am) * tr, on ? 17 : 13, on ? W9 : W6, 'center', 1);
+    // Pigment left in this reservoir, as a ring arc — the wheel doubles as a gauge.
+    BP();
+    AR(cx, cy, r * .34, a0 + .04, lerp(a0 + .04, a1 - .04, pig[i] / PMAX));
+    SK(5 * U, chsl(i, 62));
+  }
+  CIR(cx, cy, 20 * U, 'hsl(272 45% 8% / .9)', W3, 1.5 * U);
+  txt(pig[wsel] | 0, cx, cy, 12, W6, 'center', 1);
 }
 
 // --- cursor ----------------------------------------------------------------
@@ -1828,8 +1908,10 @@ function screenTitle() {
     'DRAG a short rail near the unicorn · 1-7 or SCROLL picks a colour',
     'R push · O aim · Y spring · G tether · B rail · I gravity · V warp',
   ].forEach((l, i) => txt(l, W / 2, H - 100 * U + i * 20 * U, 13, i ? W6 : W9, 'center', !i));
+  // Below the buttons, not at a fixed offset from the title: at 16:9 heights
+  // the old position landed straight on top of PLAY.
   if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm   COINS ' + SAVE.c,
-    W / 2, cy + 128 * U, 14, W3);
+    W / 2, H / 2 + 82 * U, 14, W3);
 }
 
 function screenResults() {
@@ -1848,38 +1930,41 @@ function screenResults() {
 }
 
 function screenPause() {
-  modal(340, 250, 'PAUSED', [], [
-    [0, -16, 200, 'RESUME', () => { st = 1; }],
-    [0, 32, 200, SAVE.m ? 'UNMUTE' : 'MUTE', mute],
-    [0, 80, 200, 'QUIT RUN', () => { endRun(); st = 3; }],
+  modal(340, 296, 'PAUSED', [], [
+    [0, -40, 200, 'RESUME', () => { st = 1; }],
+    [0, 8, 200, 'RESTART  (R)', startRun],
+    [0, 56, 200, SAVE.m ? 'UNMUTE' : 'MUTE', mute],
+    [0, 104, 200, 'QUIT RUN', () => { endRun(); st = 3; }],
   ]);
 }
 
 // --- store -----------------------------------------------------------------
 let prevCat = -1, prevIt = -1;
 function screenStore() {
-  modal(560, 430, 'PRISM STORE', [SAVE.c + ' COINS  ·  cosmetics only, never power'],
-    [[0, 178, 150, 'BACK', back]], 14);
+  modal(560, 470, 'PRISM STORE', [SAVE.c + ' COINS  ·  cosmetics only, never power'],
+    [[0, 198, 150, 'BACK', back]], 14);
   prevCat = -1;
   const x0 = W / 2 - 240 * U;
-  for (let n = 0; n < 9; n++) {
+  for (let n = 0; n < CATS * 3; n++) {
     const c = n / 3 | 0, i = n % 3;
-    const x = x0 + i * 150 * U, y = H / 2 - 108 * U + c * 52 * U;
-    const own = owned(c, i), eq = SAVE.e[c] === i, o = hot(x + 66 * U, y, 140 * U, 42 * U);
+    const x = x0 + i * 150 * U, y = H / 2 - 118 * U + c * 48 * U;
+    const own = owned(c, i), eq = SAVE.e[c] === i, o = hot(x + 66 * U, y, 140 * U, 38 * U);
     if (o) { prevCat = c; prevIt = i; }
-    RR(x, y - 21 * U, 140 * U, 42 * U, 7 * U);
+    RR(x, y - 19 * U, 140 * U, 38 * U, 7 * U);
     FL(eq ? UE : own ? UB : 'hsl(275 25% 10%)');
     SK((eq ? 2.4 : 1) * U, eq || o ? W9 : W3);
-    txt(COSN[n], x + 66 * U, y - 6 * U, 11, own ? W9 : W6, 'center', 1);
+    txt(COSN[n], x + 66 * U, y - 5 * U, 11, own ? W9 : W6, 'center', 1);
     txt(own ? (eq ? 'EQUIPPED' : 'EQUIP') : COSP[i] + 'c', x + 66 * U, y + 9 * U, 10,
       own ? W3 : SAVE.c < COSP[i] ? 'hsl(0 60% 60%)' : UG);
     btns.push({ hot: o, fn: () => buyEquip(c, i) });
   }
   // Live preview through the real unicorn renderer.
   X.save();
-  X.translate(W / 2, H / 2 + 112 * U);
+  X.translate(W / 2, H / 2 + 130 * U);
   X.scale(2.2 * U, 2.2 * U);
-  unicornBody(prevCat ? SAVE.e[0] : prevIt, flr(T * 3) % 7);
+  // Preview the hovered variant in place, everything else as equipped.
+  unicornBody(prevCat === 0 ? prevIt : SAVE.e[0], flr(T * 3) % 7, 0,
+    prevCat === 1 ? prevIt : SAVE.e[1]);
   X.restore();
 }
 
@@ -1933,14 +2018,17 @@ addEventListener('pointermove', (e) => { ptr(e); if (drawing) moveStroke(); });
 addEventListener('pointerdown', (e) => {
   audioInit();
   ptr(e);
-  // Right button steps backwards through the prism; left draws / clicks UI.
-  if (e.button === 2) { if (st === 1) setSel(sel - 1); return; }
+  // Right button opens the radial Prism Wheel; left draws / clicks UI.
+  if (e.button === 2) { if (st === 1) { wheel = [pmx, pmy]; wsel = sel; } return; }
   if (e.button) return;
   if (!uiClick() && st === 1) startStroke();
 });
 
-addEventListener('pointerup', () => { drawing = null; });
-addEventListener('blur', () => { drawing = null; if (st === 1) st = 2; });
+addEventListener('pointerup', (e) => {
+  if (e.button === 2) { if (wheel) { setSel(wsel); wheel = null; } return; }
+  drawing = null;
+});
+addEventListener('blur', () => { drawing = null; wheel = null; if (st === 1) st = 2; });
 
 addEventListener('wheel', (e) => {
   if (st !== 1) return;
@@ -1983,7 +2071,7 @@ function load() {
     SAVE.o = a[3] | 0;
     SAVE.m = a[4] ? 1 : 0;
     SAVE.t = a[5] ? 1 : 0;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < CATS; i++) {
       const v = a[6 + i] | 0;
       SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
     }
@@ -2002,15 +2090,19 @@ function startRun(sd) {
   chain = 0; chainN = 0; chainT = 0; fullSpec = 0; combo = 0; comboT = 0;
   deadT = 0; slow = 0; vault = null; shake = 0; flash = 0;
   pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
-  boostT = [0, 0];
+  boostT = [0, 0, 0, 0, 0, 0, 0];
   strokes = []; parts = []; trail = []; pops = []; nodes = [];
-  drawing = null;
-  P.x = 0; P.y = -320; P.vx = rf(-70, 70); P.vy = 300; P.a = PI / 2;
+  drawing = null; wheel = null;
+  P.x = 0; P.y = -320; P.vy = 300; P.a = PI / 2;
   P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300;
   Gx = 0; Gy = GRAV;
   C.x = P.x; C.y = P.y; C.z = 1;
   pal = regPal(0);
   worldReset(sd);
+  // After the seed is set, never before: otherwise the opening drift is drawn
+  // from whatever PRNG state the previous run happened to leave behind and a
+  // seeded replay is not actually reproducible.
+  P.vx = rf(-70, 70);
   hint = SAVE.t ? 3 : 0; hintT = 0;
   mStep = 0; if (AC) mNext = AC.currentTime + .05;
   sndRail(0);
@@ -2081,7 +2173,7 @@ function update(dt) {
 
   // timers
   regShow -= dt; dryT -= dt; fullSpec -= dt;
-  boostT[0] -= dt; boostT[1] -= dt;
+  for (let i = 0; i < 7; i++) boostT[i] -= dt;
   if (comboT > 0 && (comboT -= dt) <= 0) combo = 0;
   if (chainT > 0 && (chainT -= dt) <= 0) { chain = 0; chainN = 0; }
   flash = mx(0, flash - dt * 2.4);
@@ -2133,6 +2225,7 @@ function draw() {
   }
   if (st > 1) [0, 0, screenPause, screenResults, screenStore][st]();
   else if (!st) screenTitle();
+  if (wheel && st === 1) prismWheel(); else wheel = null;
   cursor();
   if (DEBUG) {
     txt('seed ' + seed + '  v ' + (P.sp | 0) + '  chunks ' + chunks.length + '  parts ' + parts.length +

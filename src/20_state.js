@@ -50,7 +50,7 @@ let mult = 1;
 let depth = 0;             // max depth reached
 let reg = 0;               // current region index
 let regShow = 0;           // region banner timer
-let boostT = [0, 0];       // booster timers
+let boostT = [];           // per-booster remaining seconds
 let combo = 0, comboT = 0; // coin chain
 
 // -- containers -------------------------------------------------------------
@@ -62,13 +62,15 @@ let pops = [];     // floating score/text pops
 let nodes = [];    // prism-node sparkles from stroke fusion
 
 // -- persistent -------------------------------------------------------------
-const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0], m: 0, t: 0 };
+const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
 // c total coins, b best score, d best depth, o owned cosmetics bitmask,
-// e equipped [body, trail, impact], m muted, t tutorial seen
+// e equipped [body, horn, trail, impact], m muted, t tutorial seen
 
 // -- input ------------------------------------------------------------------
 let pmx = 0, pmy = 0;           // pointer in screen px
 let mwx = 0, mwy = 0;         // pointer in world units
 let drawing = null;           // stroke being drawn
+let wheel = null;             // radial Prism Wheel anchor [x, y] in screen px
+let wsel = 0;                 // wedge the pointer is currently over
 let hint = 0;                 // onboarding step
 let hintT = 0;

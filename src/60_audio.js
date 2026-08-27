@@ -87,12 +87,19 @@ function N(dur, pk, ft, f0, f1, q, dest, t0) {
 // --- collision / material --------------------------------------------------
 // Impact: one noise transient scaled by impulse, plus a body tone. kind 1 is a
 // dampener (dull thud), kind 2 a bumper (bright ping).
-function sndHit(imp, kind) {
+function sndHit(imp, kind, tune) {
   if (!ok() || imp < 60) return;
   const v = clamp(imp / 2200, .04, .55);
   N(.03 + v * .12, v * .7, 'lowpass', 300 + imp * 1.6, 140, 1);
   if (imp > 380) O('triangle', 120 + imp * .05, 44, .1 + v * .12, v * .8);
-  if (kind) O('sine', kind > 1 ? 520 + imp * .18 : 90, kind > 1 ? 260 : 42, kind > 1 ? .12 : .25, v * .5);
+  if (kind > 1) {
+    // The Organ: every bumper is tuned by its own position, in the current
+    // region's mode, so a column of them plays a phrase as you fall through it.
+    const sc = SCALE[reg % 4], q = abs(tune | 0);
+    const n = 64 + sc[(q >> 5) % sc.length] + 12 * (q >> 9 & 1);
+    O('sine', NOTE(n), NOTE(n) * 1.5, .17, v * .55);
+    O('triangle', NOTE(n + 12), 0, .1, v * .3);
+  } else if (kind) O('sine', 90, 42, .25, v * .5);
 }
 
 function sndBreak() {

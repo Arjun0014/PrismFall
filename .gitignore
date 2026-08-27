@@ -1,3 +1,5 @@
 node_modules/
-build/ect-*.zip
+build/
+dist/
 reports/shots/
+!build/roadroller.json

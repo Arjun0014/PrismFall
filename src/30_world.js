@@ -246,7 +246,7 @@ function shaft(c, L, Rr, wdt, cx, b, dif) {
   if (rp(.6)) {
     const ox = sx < cx ? Rr - 70 : L + 70;
     const bp = rp(.45);
-    c.i.push(item(bp ? I_PIG : I_BOOST, ox, c.y + c.h * .5, bp ? pick(aff(c.rg)) : ri(0, 1)));
+    c.i.push(item(bp ? I_PIG : I_BOOST, ox, c.y + c.h * .5, bp ? pick(aff(c.rg)) : ri(0, 6)));
   }
 }
 
@@ -334,8 +334,8 @@ function rewards(c, L, Rr, rg, dif) {
   // Pigment biased to the region affinity, but never exclusive to it.
   if (rp(.62)) place(I_PIG, rp(.7) ? pick(af) : ri(0, 6), .15, .85);
   // Upward temptation, above the entry line.
-  if (rp(.3)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 1), .02, .16);
-  if (rp(.16)) place(I_BOOST, ri(0, 1), .3, .8);
+  if (rp(.3)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 6), .02, .16);
+  if (rp(.16)) place(I_BOOST, ri(0, 6), .3, .8);
   // Destruction cache: coins sealed behind breakable panels.
   if (rp(.24)) {
     const x = rp(.5) ? L + 90 : Rr - 90, y = c.y + rf(.25, .7) * c.h;

@@ -121,18 +121,20 @@ export function boot(opts = {}) {
   const src = bundle(true);
   const names = ('P C X CV st T slow shake flash pig sel chain chainN fullSpec coins score mult depth reg ' +
     'chunks strokes parts trail pops nodes SAVE Gx Gy W H SC U drawing pmx pmy mwx mwy hint boostT combo ' +
-    'seed nextY vault NC').split(' ');
+    'seed nextY vault NC wheel wsel chainT hitCd AC mg sfxG musG lpF windG windF railG railF railO voices mStep mNext').split(' ');
   const fns = ('physics update draw frame startRun endRun die worldReset worldUpdate genChunk nearChunks ' +
     'startStroke moveStroke fuse hitStroke applyStroke chainAdd fullSpectrum grab setSel resize ptr ' +
     'audioInit audioFrame load save camUpdate palUpdate partStep pushTrail solidNear regAt difAt loopAt ' +
     'burst pop clampV detachRail railStep releaseTether tetherConstrain items collideAll hitOb shatter ' +
-    'buyEquip owned uiClick btn modal hud prismBar cursor screenTitle screenResults screenStore screenPause ' +
+    'buyEquip owned uiClick btn modal hud prismBar cursor screenTitle screenResults screenStore screenPause prismWheel bst decorate ' +
     'srnd rr rf ri rp pick clamp lerp approach hyp hsl chsl segT segX regPal aff bias mat rewards ' +
-    'sndHit sndBoost sndCoin musicTick unicornBody drawWorld drawItem drawStrokes drawParts drawTrail ' +
+    'sndHit sndBreak sndBoost sndVector sndSpring sndTether sndRail sndGrav sndWarp sndCoin sndCrown '+
+    'sndPig sndWell sndSpectrum sndFuse sndRefund sndPower sndEmpty sndStall sndDeath sndUI sndGate '+
+    'musicTick audioFrame O N ARP NOTE unicornBody drawWorld drawItem drawStrokes drawParts drawTrail ' +
     'drawUnicorn background motif obStyle obT obVel strokeColor railStep').split(' ');
   const consts = ('R GRAV VMAX VFAST VH COL WMAX SMAX SREACH SLIFE SLIM ST PMAX PC STALLV STALLT STALLW ' +
     'HUE CBIT ALL7 M_BUMP M_DAMP M_BREAK M_PHASE M_ANCH M_RAIL CHUNKS REGD BRK_E BRK_R ' +
-    'I_COIN I_CROWN I_PIG I_WELL I_BOOST BOOST LS REG BIAS AFF MOT COSN COSP MSTY').split(' ');
+    'I_COIN I_CROWN I_PIG I_WELL I_BOOST BOOST BNAME LS REG BIAS AFF MOT COSN COSP MSTY').split(' ');
 
   const uniq = [...new Set([...names, ...fns, ...consts])];
   const body = src + '\nreturn {' + uniq.map((n) => 'get ' + n + '(){return typeof ' + n + '=="undefined"?undefined:' + n + '}').join(',') +

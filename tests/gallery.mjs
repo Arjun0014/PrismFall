@@ -45,6 +45,35 @@ for (let r = 0; r < 7; r++) {
   await page.screenshot({ path: join(DIR, 'region-' + r + '-' + NAMES[r] + '.png') });
   console.log('  region ' + r + ' ' + NAMES[r]);
 }
+// Radial Prism Wheel: hold the right button, flick to a wedge, release.
+await page.keyboard.press('r');
+await page.waitForTimeout(500);
+await page.mouse.move(800, 500);
+await page.mouse.down({ button: 'right' });
+await page.mouse.move(880, 420, { steps: 5 });
+await page.waitForTimeout(220);
+await page.screenshot({ path: join(DIR, 'prism-wheel.png') });
+await page.mouse.up({ button: 'right' });
+await page.waitForTimeout(180);
+console.log('  prism wheel');
+await page.keyboard.press('Escape');
+await page.waitForTimeout(300);
+await page.screenshot({ path: join(DIR, 'pause.png') });
+await page.keyboard.press('Escape');
+await page.waitForTimeout(200);
+// Store, reached from the title screen with plenty of coins banked.
+await page.evaluate(() => { try { localStorage.pf26_save = '5000,900,9000,0,0,1,0,0,0,0'; } catch (e) {} });
+await page.reload();
+await page.waitForTimeout(800);
+await page.screenshot({ path: join(DIR, 'title.png') });
+// STORE sits left of centre, one row below PLAY.
+await page.mouse.move(800 - 105, 450 + 26);
+await page.mouse.down(); await page.mouse.up();
+await page.waitForTimeout(500);
+await page.mouse.move(700, 372);
+await page.waitForTimeout(350);
+await page.screenshot({ path: join(DIR, 'store.png') });
+console.log('  store');
 console.log(errors.length ? 'ERRORS: ' + errors.slice(0, 4).join(' | ') : 'no console errors');
 await b.close();
 server.close();

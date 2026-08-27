@@ -11,7 +11,10 @@
     "test": "node tools/build.mjs && node tests/run.mjs",
     "test:sim": "node tests/sim.mjs",
     "test:gen": "node tests/gen.mjs",
+    "test:audio": "node tests/audio.mjs",
     "test:browser": "node tests/browser.mjs",
+    "test:shots": "node tests/shots.mjs",
+    "test:gallery": "node tools/build.mjs --dev && node tests/gallery.mjs",
     "serve": "node tools/serve.mjs"
   },
   "devDependencies": {

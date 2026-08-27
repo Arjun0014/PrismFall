@@ -37,7 +37,7 @@ function pt(x, y, vx, vy, l, h, k, s) {
 function burst(x, y, n, k, spd, hue, vx, vy) {
   const h = hue === undefined ? HUE[sel] : hue;
   // k===1 is a generic world impact — the equipped Impact cosmetic restyles it.
-  const kk = k === 1 ? SAVE.e[2] : k;
+  const kk = k === 1 ? SAVE.e[3] : k;
   for (let i = 0; i < n; i++) {
     const a = rf(0, TAU), v = rf(.3, 1) * spd;
     pt(x, y, (vx || 0) + cos(a) * v, (vy || 0) + sin(a) * v,
@@ -238,11 +238,13 @@ function drawItem(it) {
     return;
   }
   const cr = t === I_CROWN, pg = t === I_PIG;
+  // Boosters wear the colour of the verb they amplify; White Efficiency is white.
+  const bc = pg ? it.c : BOOST[it.c][0];
   const n = cr ? 10 : pg ? 6 : 3, rad = (cr ? 16 : pg ? 12 : 15) * s * b;
   X.save(); X.translate(x, y);
   X.rotate(T * (cr ? .8 : pg ? 1.4 : -1) + it.c);
-  POLY(n, cr ? UG : pg ? chsl(it.c, 58) : it.c ? '#fff' : hsl(0, 100, 60),
-    pg ? chsl(it.c, 86) : '#fff', mx(1, 2 * s), (i) => {
+  POLY(n, cr ? UG : pg ? chsl(bc, 58) : bc > 6 ? '#fff' : chsl(bc, 60),
+    pg ? chsl(bc, 86) : '#fff', mx(1, 2 * s), (i) => {
       const a = i / n * TAU, q = rad * (cr && i & 1 ? .44 : 1);
       VTX(i, cos(a) * q, sin(a) * q);
     });
@@ -309,7 +311,7 @@ function pushTrail() {
 }
 
 function drawTrail() {
-  const n = trail.length, style = SAVE.e[1];
+  const n = trail.length, style = SAVE.e[2];
   X.lineCap = 'round';
   for (let i = 1; i < n; i++) {
     if (style === 1 && i % 2) continue;
@@ -322,7 +324,7 @@ function drawTrail() {
 
 // The unicorn, drawn in local units under the current transform. Shared by
 // gameplay and the store preview so there is exactly one unicorn in the game.
-function unicornBody(body, tint, white) {
+function unicornBody(body, tint, white, horn) {
   const main = white ? '#fff' : body === 1 ? 'hsl(268 40% 12%)' : body === 2 ? 'hsl(190 100% 72%)' : 'hsl(300 40% 96%)';
   const line = white ? chsl(flr(T * 6) % 7, 70) : body === 2 ? 'hsl(300 100% 70%)' : 'hsl(280 45% 62%)';
   const gal = sin(T * 13), rb = flr(T * 5);
@@ -353,11 +355,21 @@ function unicornBody(body, tint, white) {
     SK(3.4, chsl((rb + i) % 7, 66));
   }
 
+  // Horn: 0 spiral, 1 long lance, 2 star tip. Purely decorative — the body is
+  // a circle of radius R whatever is equipped.
   X.save(); X.translate(26, -12); X.rotate(-.62);
-  const hl = 15;
+  const hl = horn === 1 ? 24 : 15;
   const hg = X.createLinearGradient(0, 0, 0, -hl);
   hg.addColorStop(0, chsl(0, 65)); hg.addColorStop(1, chsl(tint, 82));
   POLY(3, hg, '#fff', 1.2, (i) => VTX(i, [-3, 3, 0][i], [0, 0, -hl][i]));
+  if (!horn) for (let i = 0; i < 4; i++) {
+    const q = i / 4;
+    LIN(-3 + q * 6 * .5, -hl * q, 3 - q * 6 * .5, -hl * q - 2, 1.1, chsl((rb + i) % 7, 84));
+  }
+  if (horn === 2) POLY(10, '#fff', chsl(tint, 88), 1, (i) => {
+    const a = i / 10 * TAU + T * 2, q = (i & 1 ? 2.4 : 6);
+    VTX(i, cos(a) * q, -hl + sin(a) * q);
+  });
   X.restore();
 
   CIR(26, -8, 1.7, st === 1 && P.st > STALLW ? '#f44' : '#2a1836');
@@ -367,7 +379,7 @@ function drawUnicorn() {
   const s = SC, x = w2sx(P.x), y = w2sy(P.y);
   X.save();
   X.translate(x, y); X.rotate(P.a); X.scale(s, s);
-  unicornBody(SAVE.e[0], sel, fullSpec > 0 || P.ph > 0);
+  unicornBody(SAVE.e[0], sel, fullSpec > 0 || P.ph > 0, SAVE.e[1]);
   X.restore();
 
   // Selected-colour halo, tinted red while Red-charged: world-space feedback

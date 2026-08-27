@@ -9,7 +9,13 @@
 let chainT = 0;     // seconds left before the colour chain lapses
 let dryC = -1, dryT = 0;   // "out of pigment" HUD flash
 
-const costMul = () => boostT[1] > 0 ? BOOST[1][0] : 1;
+// Booster lookup: the strength multiplier currently applied to colour c, or 1.
+// Colour 7 is the pigment-cost booster.
+function bst(c) {
+  for (let i = 0; i < 7; i++) if (boostT[i] > 0 && BOOST[i][0] === c) return BOOST[i][1];
+  return 1;
+}
+const costMul = () => bst(7);
 
 // --- drawing ---------------------------------------------------------------
 // A stroke may only begin within SREACH of the unicorn; further clicks clamp
@@ -86,7 +92,8 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
   // the exit angle rotates your velocity; alone it is a phase dash that passes
   // straight through the next obstacle. Fused with Blue it phases a whole rail.
   if (b & 64) {
-    if (b & 16) P.ph = .8;
+    const vb = bst(6);
+    if (b & 16) P.ph = .8 * vb;
     else {
       let o2 = 0;
       for (const o of strokes) if (o !== s && !o.u && o.e & 64) { o2 = o; break; }
@@ -104,11 +111,12 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
         // standstill, straight off the face of the stroke, so Violet is also an
         // escape tool rather than a no-op when you need it most.
         const sp = hyp(P.vx, P.vy);
-        if (sp < 60) { P.x += nx * 300; P.y += ny * 300; P.vx = nx * 460; P.vy = ny * 460; }
-        else { const k = 300 / sp; P.x += P.vx * k; P.y += P.vy * k; }
+        const reach = 300 * vb;
+        if (sp < 60) { P.x += nx * reach; P.y += ny * reach; P.vx = nx * 460; P.vy = ny * 460; }
+        else { const k = reach / sp; P.x += P.vx * k; P.y += P.vy * k; }
       }
       P.x = clamp(P.x, -WMAX + R, WMAX - R);
-      P.ph = .34; P.vx *= 1.07; P.vy *= 1.07;
+      P.ph = .34 * vb; P.vx *= 1.07; P.vy *= 1.07;
       warpFX(P.x, P.y);
     }
     sndWarp();
@@ -118,6 +126,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
   if (b & 16) {
     if (P.te) releaseTether();
     P.ra = s; P.rt = t;
+    s.l = mx(s.l, SLIFE * bst(4));
     P.rs = nx * -uy + ny * ux >= 0 ? 1 : -1;
     const sp = mx(hyp(P.vx, P.vy), 420);
     const dir = P.vx * ux + P.vy * uy >= 0 ? 1 : -1;
@@ -126,14 +135,14 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
     sndRail(1);
   } else if (b & 8) {
     if (P.ra) detachRail(0);
-    const d = hyp(P.x - px, P.y - py);
-    P.te = { x: px, y: py, l: clamp(d, 62, 195), t: 1.2 };
+    const d = hyp(P.x - px, P.y - py), gb = bst(3);
+    P.te = { x: px, y: py, l: clamp(d, 62, 195) * gb, t: 1.2 * gb };
     sndTether(1);
   }
 
   // 3 --- GRAVITY (Indigo) --------------------------------------------------
   if (b & 32) {
-    Gx = nx * GRAV; Gy = ny * GRAV; P.gt = 2.9;
+    Gx = nx * GRAV; Gy = ny * GRAV; P.gt = 2.9 * bst(5);
     sndGrav(ny);
     burst(px, py, 10, 3, 150, HUE[5]);
   }
@@ -146,7 +155,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
     P.vx = ux * ns; P.vy = uy * ns;
     sndVector(sprB);
   } else if (sprB) {
-    const vn = P.vx * nx + P.vy * ny, e = 1.85;
+    const vn = P.vx * nx + P.vy * ny, e = 1.85 * bst(2);
     P.vx -= (1 + e) * vn * nx; P.vy -= (1 + e) * vn * ny;
     // The floor scales with the impact so a spring stays impact-driven: it pops
     // you off on a glancing hit, but it can never rescue a dead-stopped unicorn.
@@ -164,7 +173,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
   // it can't fire the unicorn back into it, then injects a fixed amount of
   // energy. That is why Red still works from a dead stop and Yellow does not.
   if (b & 1) {
-    const rk = boostT[0] > 0 ? BOOST[0][1] : 1;
+    const rk = bst(0);
     let sp = hyp(P.vx, P.vy), dxn, dyn;
     if (sp < 50) { dxn = nx; dyn = ny; sp = 0; }
     else {
@@ -241,7 +250,7 @@ function grab(it) {
     sndWell();
   } else {
     boostT[it.c] = BOOST[it.c][2];
-    pop(it.x, it.y, BN[it.c], BH[it.c]);
+    pop(it.x, it.y, BNAME[it.c], BOOST[it.c][0] > 6 ? -1 : HUE[BOOST[it.c][0]]);
     sndPower();
   }
 }

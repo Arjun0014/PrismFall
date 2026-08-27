@@ -6,12 +6,12 @@
 // every distinct colour string and layout number costs compressed bytes.
 // ---------------------------------------------------------------------------
 
-// Three cosmetic categories of three variants; variant 0 is always owned.
+// Four cosmetic categories of three variants; variant 0 is always owned.
 // Cosmetics are render-only: they never touch collision, pigment or scoring.
-const COSN = 'CLOUD SHADOW NEON RAINBOW DASHED COMET SPARKS SHARDS RINGS'.split(' ');
+const COSN = ('CLOUD SHADOW NEON SPIRAL LANCE STARTIP ' +
+  'RAINBOW DASHED COMET SPARKS SHARDS RINGS').split(' ');
 const COSP = [0, 180, 420];
-const BN = ['RED OVERDRIVE', 'EFFICIENCY'];
-const BH = [0, -1];
+const CATS = 4;
 const owned = (c, i) => !i || (SAVE.o >> (c * 3 + i)) & 1;
 
 // fixed UI palette
@@ -67,9 +67,10 @@ function hud() {
 
   prismBar();
 
-  for (let i = 0; i < 2; i++) if (boostT[i] > 0)
-    txt(BN[i] + ' ' + boostT[i].toFixed(1), W - p, p + (30 + i * 16) * U, 12,
-      BH[i] < 0 ? W9 : hsl(BH[i], 100, 70), 'right', 1);
+  let brow = 0;
+  for (let i = 0; i < 7; i++) if (boostT[i] > 0)
+    txt(BNAME[i] + ' ' + boostT[i].toFixed(1), W - p, p + (30 + brow++ * 16) * U, 12,
+      BOOST[i][0] > 6 ? W9 : chsl(BOOST[i][0], 70), 'right', 1);
 
   if (regShow > 0)
     txt(REG[reg][0], W / 2, H * .3, 42,
@@ -106,6 +107,35 @@ function prismBar() {
     btns.push({ hot: hot(cx, y, w, h), fn: () => setSel(i) });
   }
   if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 'center', 1);
+}
+
+// --- radial Prism Wheel ----------------------------------------------------
+// Held on the right mouse button, anchored where the pointer already is, so the
+// player never looks away from the unicorn. Flick toward a wedge, release to
+// commit. The game keeps running underneath it.
+function prismWheel() {
+  const r = 84 * U, cx = wheel[0], cy = wheel[1];
+  const dx = pmx - cx, dy = pmy - cy, d = hyp(dx, dy);
+  // Inside the dead zone the current colour stays selected.
+  wsel = d < 22 * U ? sel : flr(((at2(dy, dx) + PI * 2.5 + PI / 7) % TAU) / TAU * 7) % 7;
+  CIR(cx, cy, r * 1.06, 'hsl(272 45% 6% / .72)');
+  for (let i = 0; i < 7; i++) {
+    const a0 = i / 7 * TAU - PI / 2 - PI / 7, a1 = a0 + TAU / 7, on = i === wsel;
+    BP();
+    MT(cx, cy);
+    AR(cx, cy, on ? r * 1.1 : r, a0 + .02, a1 - .02);
+    X.closePath();
+    FL(chsl(i, on ? 58 : 30, on ? 1 : .8));
+    SK(on ? 2.6 * U : 1 * U, on ? W9 : chsl(i, 46, .7));
+    const am = (a0 + a1) / 2, tr = r * (on ? .8 : .72);
+    txt('ROYGBIV'[i], cx + cos(am) * tr, cy + sin(am) * tr, on ? 17 : 13, on ? W9 : W6, 'center', 1);
+    // Pigment left in this reservoir, as a ring arc — the wheel doubles as a gauge.
+    BP();
+    AR(cx, cy, r * .34, a0 + .04, lerp(a0 + .04, a1 - .04, pig[i] / PMAX));
+    SK(5 * U, chsl(i, 62));
+  }
+  CIR(cx, cy, 20 * U, 'hsl(272 45% 8% / .9)', W3, 1.5 * U);
+  txt(pig[wsel] | 0, cx, cy, 12, W6, 'center', 1);
 }
 
 // --- cursor ----------------------------------------------------------------
@@ -157,8 +187,10 @@ function screenTitle() {
     'DRAG a short rail near the unicorn · 1-7 or SCROLL picks a colour',
     'R push · O aim · Y spring · G tether · B rail · I gravity · V warp',
   ].forEach((l, i) => txt(l, W / 2, H - 100 * U + i * 20 * U, 13, i ? W6 : W9, 'center', !i));
+  // Below the buttons, not at a fixed offset from the title: at 16:9 heights
+  // the old position landed straight on top of PLAY.
   if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm   COINS ' + SAVE.c,
-    W / 2, cy + 128 * U, 14, W3);
+    W / 2, H / 2 + 82 * U, 14, W3);
 }
 
 function screenResults() {
@@ -177,38 +209,41 @@ function screenResults() {
 }
 
 function screenPause() {
-  modal(340, 250, 'PAUSED', [], [
-    [0, -16, 200, 'RESUME', () => { st = 1; }],
-    [0, 32, 200, SAVE.m ? 'UNMUTE' : 'MUTE', mute],
-    [0, 80, 200, 'QUIT RUN', () => { endRun(); st = 3; }],
+  modal(340, 296, 'PAUSED', [], [
+    [0, -40, 200, 'RESUME', () => { st = 1; }],
+    [0, 8, 200, 'RESTART  (R)', startRun],
+    [0, 56, 200, SAVE.m ? 'UNMUTE' : 'MUTE', mute],
+    [0, 104, 200, 'QUIT RUN', () => { endRun(); st = 3; }],
   ]);
 }
 
 // --- store -----------------------------------------------------------------
 let prevCat = -1, prevIt = -1;
 function screenStore() {
-  modal(560, 430, 'PRISM STORE', [SAVE.c + ' COINS  ·  cosmetics only, never power'],
-    [[0, 178, 150, 'BACK', back]], 14);
+  modal(560, 470, 'PRISM STORE', [SAVE.c + ' COINS  ·  cosmetics only, never power'],
+    [[0, 200, 150, 'BACK', back]], 14);
   prevCat = -1;
   const x0 = W / 2 - 240 * U;
-  for (let n = 0; n < 9; n++) {
+  for (let n = 0; n < CATS * 3; n++) {
     const c = n / 3 | 0, i = n % 3;
-    const x = x0 + i * 150 * U, y = H / 2 - 108 * U + c * 52 * U;
-    const own = owned(c, i), eq = SAVE.e[c] === i, o = hot(x + 66 * U, y, 140 * U, 42 * U);
+    const x = x0 + i * 150 * U, y = H / 2 - 118 * U + c * 48 * U;
+    const own = owned(c, i), eq = SAVE.e[c] === i, o = hot(x + 66 * U, y, 140 * U, 38 * U);
     if (o) { prevCat = c; prevIt = i; }
-    RR(x, y - 21 * U, 140 * U, 42 * U, 7 * U);
+    RR(x, y - 19 * U, 140 * U, 38 * U, 7 * U);
     FL(eq ? UE : own ? UB : 'hsl(275 25% 10%)');
     SK((eq ? 2.4 : 1) * U, eq || o ? W9 : W3);
-    txt(COSN[n], x + 66 * U, y - 6 * U, 11, own ? W9 : W6, 'center', 1);
+    txt(COSN[n], x + 66 * U, y - 5 * U, 11, own ? W9 : W6, 'center', 1);
     txt(own ? (eq ? 'EQUIPPED' : 'EQUIP') : COSP[i] + 'c', x + 66 * U, y + 9 * U, 10,
       own ? W3 : SAVE.c < COSP[i] ? 'hsl(0 60% 60%)' : UG);
     btns.push({ hot: o, fn: () => buyEquip(c, i) });
   }
   // Live preview through the real unicorn renderer.
   X.save();
-  X.translate(W / 2, H / 2 + 112 * U);
-  X.scale(2.2 * U, 2.2 * U);
-  unicornBody(prevCat ? SAVE.e[0] : prevIt, flr(T * 3) % 7);
+  X.translate(W / 2, H / 2 + 122 * U);
+  X.scale(1.9 * U, 1.9 * U);
+  // Preview the hovered variant in place, everything else as equipped.
+  unicornBody(prevCat === 0 ? prevIt : SAVE.e[0], flr(T * 3) % 7, 0,
+    prevCat === 1 ? prevIt : SAVE.e[1]);
   X.restore();
 }
 

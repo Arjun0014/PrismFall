@@ -37,14 +37,17 @@ addEventListener('pointermove', (e) => { ptr(e); if (drawing) moveStroke(); });
 addEventListener('pointerdown', (e) => {
   audioInit();
   ptr(e);
-  // Right button steps backwards through the prism; left draws / clicks UI.
-  if (e.button === 2) { if (st === 1) setSel(sel - 1); return; }
+  // Right button opens the radial Prism Wheel; left draws / clicks UI.
+  if (e.button === 2) { if (st === 1) { wheel = [pmx, pmy]; wsel = sel; } return; }
   if (e.button) return;
   if (!uiClick() && st === 1) startStroke();
 });
 
-addEventListener('pointerup', () => { drawing = null; });
-addEventListener('blur', () => { drawing = null; if (st === 1) st = 2; });
+addEventListener('pointerup', (e) => {
+  if (e.button === 2) { if (wheel) { setSel(wsel); wheel = null; } return; }
+  drawing = null;
+});
+addEventListener('blur', () => { drawing = null; wheel = null; if (st === 1) st = 2; });
 
 addEventListener('wheel', (e) => {
   if (st !== 1) return;

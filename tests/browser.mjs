@@ -74,12 +74,17 @@ async function runBrowser(name, launcher) {
     await page.mouse.up();
     await page.waitForTimeout(90);
   }
-  // right-drag radial wheel
-  await page.mouse.move(w / 2, h / 2);
-  await page.mouse.down({ button: 'right' });
-  await page.mouse.move(w / 2 + 70, h / 2 - 70, { steps: 4 });
-  await page.mouse.up({ button: 'right' });
+  // Radial Prism Wheel: hold right, flick to each wedge, release.
+  for (let k = 0; k < 7; k++) {
+    const a = k / 7 * Math.PI * 2 - Math.PI / 2;
+    await page.mouse.move(w / 2, h / 2);
+    await page.mouse.down({ button: 'right' });
+    await page.mouse.move(w / 2 + Math.cos(a) * 80, h / 2 + Math.sin(a) * 80, { steps: 3 });
+    await page.waitForTimeout(60);
+    await page.mouse.up({ button: 'right' });
+  }
   await page.mouse.wheel(0, 120);
+  await page.mouse.wheel(0, -120);
   await page.waitForTimeout(200);
 
   const state = await page.evaluate(() => ({
@@ -109,6 +114,41 @@ async function runBrowser(name, launcher) {
   if (SHOTS) await page.screenshot({ path: join(ROOT, 'reports', 'shots', name + '-pause.png') });
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
+
+  // Store: open it, hover every tile, buy and equip what is affordable.
+  await page.evaluate(() => { try { localStorage.pf26_save = '9000,500,4000,0,0,1,0,0,0,0'; } catch (e) {} });
+  await page.reload();
+  await page.waitForTimeout(700);
+  await page.mouse.click(w / 2 - 105 * (w / 1280), h / 2 + 26 * (w / 1280));
+  await page.waitForTimeout(400);
+  const U0 = Math.min(w / 1280, h / 720);
+  for (let n = 0; n < 12; n++) {
+    const c = (n / 3) | 0, i = n % 3;
+    await page.mouse.click(w / 2 - 240 * U0 + i * 150 * U0 + 66 * U0, h / 2 - 118 * U0 + c * 48 * U0);
+    await page.waitForTimeout(90);
+  }
+  const saved = await page.evaluate(() => { try { return localStorage.pf26_save; } catch (e) { return ''; } });
+  ok(/^\d+(,-?\d+)+$/.test(saved), 'store writes a well-formed save (' + saved + ')');
+  ok(saved.split(',').slice(6).some((v) => +v > 0), 'purchases actually equip (' + saved + ')');
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(400);
+
+  // Frame budget: the packed build must hold 60fps in a dense region.
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(500);
+  const perf = await page.evaluate(() => new Promise((res) => {
+    const t = [];
+    let last = performance.now(), n = 0;
+    const tick = () => {
+      const now = performance.now();
+      t.push(now - last); last = now;
+      if (++n < 240) requestAnimationFrame(tick);
+      else { t.sort((a, b) => a - b); res({ med: t[t.length >> 1], p95: t[(t.length * .95) | 0], worst: t[t.length - 1] }); }
+    };
+    requestAnimationFrame(tick);
+  }));
+  ok(perf.med < 20, 'median frame under 20ms (' + perf.med.toFixed(1) + 'ms)');
+  ok(perf.p95 < 34, '95th percentile frame under 34ms (' + perf.p95.toFixed(1) + 'ms)');
 
   // Soak: leave it running to catch runaway allocation / audio node leaks.
   await page.waitForTimeout(6000);

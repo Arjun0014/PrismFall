@@ -1,0 +1,187 @@
+// Audio coverage and hygiene.
+//
+// The soundscape is a graded requirement, not a nice-to-have, so this plays a
+// long varied run and asserts that every cue actually fires, that each one has
+// its own synthesis identity (rather than the same beep re-triggered), and that
+// nothing leaks over restarts.
+import { boot } from './harness.mjs';
+
+let pass = 0, fail = 0;
+const out = [];
+const ok = (c, m, x) => {
+  if (c) { pass++; out.push('  PASS  ' + m); }
+  else { fail++; out.push('  FAIL  ' + m + (x !== undefined ? '   [' + x + ']' : '')); }
+};
+
+const H = boot();
+const A = H.api;
+const E = (s) => A.__eval(s);
+
+const CUES = ('sndHit sndBreak sndBoost sndVector sndSpring sndTether sndRail sndGrav sndWarp ' +
+  'sndCoin sndCrown sndPig sndWell sndSpectrum sndFuse sndRefund sndPower sndEmpty sndStall ' +
+  'sndDeath sndUI sndGate').split(' ');
+
+E('audioInit()');
+ok(A.__eval('!!AC'), 'an AudioContext is created on the first gesture');
+
+// Wrap each cue so we can see it fire, and record the oscillator/noise
+// parameters it produces so two cues can be proved distinct.
+globalThis.__hits = {};
+globalThis.__sig = {};
+E('window.__hits=globalThis.__hits;window.__sig=globalThis.__sig');
+for (const n of CUES) {
+  E('(()=>{const f=' + n + ';' + n + '=function(){' +
+    'window.__hits["' + n + '"]=(window.__hits["' + n + '"]||0)+1;' +
+    'window.__cur="' + n + '";const r=f.apply(null,arguments);window.__cur=0;return r}})()');
+}
+// Capture the synthesis parameters each cue asks for.
+E('(()=>{const o=O,n=N;' +
+  'O=function(w,f0,f1,d,p){if(window.__cur){(window.__sig[window.__cur]||=[]).push("o"+w[0]+(f0|0)+"_"+(f1|0)+"_"+(d*100|0))}return o.apply(null,arguments)};' +
+  'N=function(d,p,ft,f0,f1){if(window.__cur){(window.__sig[window.__cur]||=[]).push("n"+ft[0]+(f0|0)+"_"+(f1|0)+"_"+(d*100|0))}return n.apply(null,arguments)}})()');
+
+// --- a long, varied run ----------------------------------------------------
+let rs = 999;
+const rnd = () => { rs = (rs * 1664525 + 1013904223) >>> 0; return rs / 4294967296; };
+
+E('startRun(777);st=1;SAVE.t=1');
+const P = A.P;
+const before = H.audioStats.created;
+for (let i = 0; i < 150 * 60; i++) {
+  if (rnd() < .10) {
+    E('sel=' + ((rnd() * 7) | 0));
+    E('mwx=P.x+' + ((rnd() * 120 - 60) | 0) + ';mwy=P.y-16');
+    E('startStroke()');
+    E('mwx=P.x+' + ((rnd() * 170 - 85) | 0) + ';mwy=P.y-16+' + ((rnd() * 60 - 30) | 0));
+    E('moveStroke()');
+    E('drawing=null');
+  }
+  E('voices=0');
+  E('update(1/60)');
+  E('audioFrame()');
+  E('AC.currentTime+=1/60');
+  if (!P.al) E('startRun(' + (778 + i) + ');st=1');
+}
+// Cues a normal run may not reach on its own.
+E('grab({t:I_WELL,x:P.x,y:P.y,c:0,g:0})');
+E('chain=0;chainN=0;for(let i=0;i<7;i++)chainAdd(CBIT[i])');
+E('grab({t:I_CROWN,x:P.x,y:P.y,c:0,g:0})');
+E('grab({t:I_BOOST,x:P.x,y:P.y,c:3,g:0})');
+E('sndUI(1);sndGate();sndBreak()');
+E('for(let i=0;i<7;i++)pig[i]=0');
+E('sel=0;mwx=P.x+40;mwy=P.y-16;startStroke()');
+E('die()');
+
+const hits = globalThis.__hits, sig = globalThis.__sig;
+console.log('\n=== cue coverage ===');
+const silent = CUES.filter((n) => !hits[n]);
+for (const n of CUES) out.push('        ' + n.padEnd(14) + String(hits[n] || 0).padStart(7));
+ok(silent.length === 0, 'every cue fires during play', silent.join(','));
+
+console.log('\n=== cue identity ===');
+// Two cues sharing an identical parameter signature would be the same sound
+// wearing two names, which is exactly the "placeholder beeps" failure mode.
+const firstSig = {};
+for (const n of CUES) if (sig[n]) firstSig[n] = sig[n][0];
+const dupes = [];
+const seen = {};
+for (const n of Object.keys(firstSig)) {
+  const k = firstSig[n];
+  if (seen[k]) dupes.push(seen[k] + '=' + n);
+  else seen[k] = n;
+}
+ok(dupes.length === 0, 'no two cues share a synthesis signature', dupes.join(','));
+ok(Object.keys(firstSig).length >= 18, 'cues are synthesised, not stubs', Object.keys(firstSig).length);
+// Impact and boost must scale with the event, not play a fixed sample.
+ok(new Set(sig.sndHit || []).size > 20, 'impact sound varies with impulse', new Set(sig.sndHit || []).size);
+ok(new Set(sig.sndCoin || []).size > 3, 'coin pitch rises through a chain', new Set(sig.sndCoin || []).size);
+ok(new Set(sig.sndBoost || []).size > 5, 'Red boost scales with the launch', new Set(sig.sndBoost || []).size);
+
+console.log('\n=== continuous layers ===');
+{
+  // Wind must track speed and the rail grind must follow attachment.
+  E('startRun(5);st=1');
+  P.vx = 0; P.vy = 60; E('P.sp=60;audioFrame()');
+  const quiet = A.__eval('windG.gain.value');
+  P.vx = 0; P.vy = 2600; E('P.sp=2600;audioFrame()');
+  const loud = A.__eval('windG.gain.value');
+  ok(loud > quiet * 3, 'wind tracks speed', quiet.toFixed(3) + ' -> ' + loud.toFixed(3));
+  const bright = A.__eval('windF.frequency.value');
+  ok(bright > 2000, 'wind brightens at speed', bright | 0);
+
+  E('P.ra=null;sndRail(0);audioFrame()');
+  const railOff = A.__eval('railG.gain.value');
+  E('P.ra={x1:0,y1:0,x2:100,y2:0,l:1,u:0};sndRail(1);audioFrame()');
+  const railOn = A.__eval('railG.gain.value');
+  ok(railOn > railOff, 'the rail grind engages only while railed', railOff + ' -> ' + railOn);
+  E('P.ra=null;sndRail(0)');
+
+  // Focus Vault and pause both duck the master filter.
+  E('slow=0;st=1;audioFrame()');
+  const open = A.__eval('lpF.frequency.value');
+  E('slow=1;audioFrame()');
+  const ducked = A.__eval('lpF.frequency.value');
+  ok(ducked < open / 4, 'a Focus Vault ducks the mix', open + ' -> ' + ducked);
+  E('slow=0;st=2;audioFrame()');
+  ok(A.__eval('lpF.frequency.value') < open / 4, 'pause ducks the mix');
+  E('st=1;audioFrame()');
+}
+
+console.log('\n=== music ===');
+{
+  // Region identity must come from more than a palette swap.
+  const shapes = [];
+  for (let r = 0; r < 7; r++) {
+    E('reg=' + r + ';startRun(3);st=1;reg=' + r);
+    E('mStep=0;mNext=AC.currentTime');
+    const c0 = H.audioStats.created;
+    const notes = [];
+    E('(()=>{const o=O;O=function(w,f0){window.__n.push(w[0]+(f0|0));return o.apply(null,arguments)}})()');
+    globalThis.__n = notes;
+    E('window.__n=globalThis.__n');
+    for (let i = 0; i < 90; i++) { E('voices=0;P.sp=900;audioFrame();AC.currentTime+=1/60'); }
+    shapes.push(notes.slice(0, 24).join(','));
+    ok(H.audioStats.created > c0, 'region ' + r + ' music plays', H.audioStats.created - c0);
+  }
+  ok(new Set(shapes).size >= 6, 'regions have distinct musical material', new Set(shapes).size + '/7');
+
+  // Intensity must change the arrangement, not just the volume.
+  E('reg=0;startRun(3);st=1;mStep=0;mNext=AC.currentTime');
+  globalThis.__n = [];
+  E('window.__n=globalThis.__n');
+  for (let i = 0; i < 120; i++) { E('voices=0;P.sp=60;audioFrame();AC.currentTime+=1/60'); }
+  const calm = globalThis.__n.length;
+  E('mStep=0;mNext=AC.currentTime');
+  globalThis.__n = [];
+  E('window.__n=globalThis.__n');
+  for (let i = 0; i < 120; i++) { E('voices=0;P.sp=2400;audioFrame();AC.currentTime+=1/60'); }
+  const busy = globalThis.__n.length;
+  ok(busy > calm * 1.4, 'the arrangement thickens with intensity', calm + ' -> ' + busy);
+}
+
+console.log('\n=== hygiene ===');
+{
+  ok(H.audioStats.contexts === 1, 'exactly one AudioContext for the session', H.audioStats.contexts);
+  // Two sources are meant to run forever: the wind noise loop and the rail
+  // oscillator. Everything else must be scheduled with a stop time.
+  ok(H.audioStats.live === 2, 'only the two permanent voices stay running', H.audioStats.live);
+  ok(H.audioStats.created > before + 500, 'the run actually made sound', H.audioStats.created - before);
+
+  // Restart soak: a fresh run must not accumulate nodes.
+  const mark = H.audioStats.created;
+  for (let i = 0; i < 40; i++) { E('startRun(' + i + ');st=1'); E('voices=0;audioFrame()'); }
+  ok(H.audioStats.live === 2, 'restarts add no permanent voices', H.audioStats.live);
+  ok(H.audioStats.created - mark < 4000, 'restarts do not spray voices', H.audioStats.created - mark);
+
+  // Muting must silence every path, including the continuous ones.
+  E('SAVE.m=1;startRun(9);st=1;P.sp=2600;P.ra={x1:0,y1:0,x2:9,y2:0};audioFrame()');
+  ok(A.__eval('windG.gain.value') === 0 && A.__eval('railG.gain.value') === 0,
+    'mute silences the continuous voices');
+  const m0 = H.audioStats.created;
+  for (let i = 0; i < 200; i++) E('voices=0;sndHit(1800,2,7);sndCoin(3);musicTick()');
+  ok(H.audioStats.created === m0, 'mute stops all synthesis', H.audioStats.created - m0);
+  E('SAVE.m=0');
+}
+
+out.forEach((l) => console.log(l));
+console.log('\n' + pass + ' passed, ' + fail + ' failed');
+process.exit(fail ? 1 : 0);

@@ -444,6 +444,80 @@ console.log('\n=== persistence ===');
 }
 
 // ---------------------------------------------------------------------------
+console.log('\n=== boosters ===');
+{
+  // Every booster must measurably change the verb it names.
+  const KEY = ['sp', 'sp', 'te', 'rl', 'gt', 'ph', 'cost'];
+  const probe = (bi, on) => {
+    A.__eval('startRun(808);st=1');
+    A.__eval('for(const c of chunks){c.o.length=0;c.i.length=0}');
+    A.__eval('hitCd=0;strokes.length=0;boostT=[0,0,0,0,0,0,0]');
+    if (on) A.__eval('boostT[' + bi + ']=' + A.BOOST[bi][2]);
+    const P = A.P;
+    P.x = 0; P.y = 400; P.vx = 700; P.vy = 400; P.ra = null; P.te = null; P.ph = 0; P.gt = 0;
+    A.__eval('Gx=0;Gy=GRAV');
+    A.__eval('NC=nearChunks(P.y-500,P.y+500)');
+    const c = A.BOOST[bi][0];
+    if (c > 6) {
+      A.__eval('sel=0;for(let i=0;i<7;i++)pig[i]=100');
+      A.__eval('mwx=P.x+30;mwy=P.y+30;startStroke();mwx=P.x+160;mwy=P.y+160;moveStroke();drawing=null');
+      return 100 - A.pig[0];
+    }
+    stroke(A.CBIT[c], -90, SY, 90, SY, c);
+    A.__eval('collideAll(1/120)');
+    return { sp: A.hyp(P.vx, P.vy), gt: P.gt, ph: P.ph, te: P.te ? P.te.l : 0, rl: P.ra ? P.ra.l : 0 }[KEY[bi]];
+  };
+  for (let i = 0; i < 7; i++) {
+    const off = probe(i, 0), on = probe(i, 1);
+    const better = i === 6 ? on < off * .6 : on > off * 1.05;
+    ok(better, A.BNAME[i] + ' changes ' + KEY[i], off.toFixed(1) + ' -> ' + on.toFixed(1));
+  }
+  ok(A.BOOST.length === 7, 'all seven spec boosters exist', A.BOOST.length);
+  ok(new Set(A.BOOST.map((b) => b[0])).size === 7, 'each booster targets a different verb');
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n=== cosmetics ===');
+{
+  ok(A.COSN.length === 12, 'four categories of three cosmetics', A.COSN.length);
+  // Equipping anything must leave the simulation bit-identical.
+  const runTo = (equip) => {
+    A.__eval('SAVE.o=-1;SAVE.e=[' + equip.join(',') + ']');
+    A.__eval('startRun(4242);st=1');
+    const P = A.P;
+    for (let i = 0; i < 900; i++) {
+      if (i % 30 === 0) {
+        A.__eval('sel=' + (i / 30 | 0) % 7);
+        A.__eval('mwx=P.x+40;mwy=P.y-16;startStroke();mwx=P.x+140;mwy=P.y-16;moveStroke();drawing=null');
+      }
+      A.__eval('update(1/60)');
+    }
+    return [P.x, P.y, P.vx, P.vy, A.score, A.coins].map((v) => (v * 1000 | 0)).join(',');
+  };
+  const plain = runTo([0, 0, 0, 0]);
+  const fancy = runTo([2, 2, 2, 2]);
+  ok(plain === fancy, 'cosmetics do not change the simulation at all');
+  A.__eval('SAVE.o=0;SAVE.e=[0,0,0,0]');
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n=== prism wheel ===');
+{
+  A.__eval('startRun(31);st=1;sel=0;W=1920;H=1080;U=1');
+  A.__eval('wheel=[900,540];pmx=900;pmy=440');
+  const before = H.counter.calls;
+  A.__eval('prismWheel()');
+  ok(H.counter.calls > before, 'the wheel draws');
+  ok(A.wsel === 0, 'straight up selects Red', A.wsel);
+  A.__eval('pmx=900;pmy=640;prismWheel()');
+  ok(A.wsel === 3 || A.wsel === 4, 'straight down selects a middle wedge', A.wsel);
+  A.__eval('pmx=902;pmy=542;prismWheel()');
+  ok(A.wsel === A.sel, 'the dead zone keeps the current colour', A.wsel);
+  A.__eval('wheel=null');
+}
+
+
+// ---------------------------------------------------------------------------
 console.log('\n=== audio hygiene ===');
 {
   const before = H.audioStats.created;

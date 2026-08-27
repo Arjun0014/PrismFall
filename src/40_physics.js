@@ -74,9 +74,20 @@ function tetherConstrain() {
 }
 
 // --- item pickup -----------------------------------------------------------
-function items() {
-  for (const c of NC) for (const it of c.i)
-    if (!it.g && hyp(P.x - it.x, P.y - it.y) < R + 26) grab(it);
+// At a high style multiplier loose coins arc toward the unicorn. It is a
+// reward for keeping a chain alive, never a substitute for aim: the radius
+// only opens up once the multiplier is already high, and it pulls coins only.
+function items(h) {
+  const mag = mult > 4 ? 60 + mult * 24 : 0;
+  for (const c of NC) for (const it of c.i) {
+    if (it.g) continue;
+    const dx = P.x - it.x, dy = P.y - it.y, d = hyp(dx, dy);
+    if (d < R + 26) { grab(it); continue; }
+    if (mag && !it.t && d < mag) {
+      const k = mn(1, 700 * h / d);
+      it.x += dx * k; it.y += dy * k;
+    }
+  }
 }
 
 // --- obstacle collision ----------------------------------------------------
@@ -141,7 +152,7 @@ function hitOb(o) {
   clampV();
 
   const imp = -vn;
-  sndHit(imp, damp ? 1 : bump ? 2 : 0);
+  sndHit(imp, damp ? 1 : bump ? 2 : 0, o.x + o.y);
   shake = mn(26, shake + imp * (bump ? .006 : .0035));
   const n = clamp(imp * .012, 1, 14) | 0;
   burst(px, py, n, 1, mn(imp * .35, 420), geoHue(o));
@@ -195,7 +206,7 @@ function physics(h) {
     else { P.x += P.vx * hh; P.y += P.vy * hh; }
     if (P.te) tetherConstrain();
     collideAll(hh);
-    items();
+    items(hh);
   }
 
   // Absolute containment: no effect (warp included) may leave the column.
