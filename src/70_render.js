@@ -71,10 +71,14 @@ function partStep(h) {
 // --- camera ----------------------------------------------------------------
 function camUpdate(h) {
   const v = vault;
-  C.x = approach(C.x, v ? v.cx : P.x + clamp(P.vx * .16, -240, 240), v ? 3.5 : 7.5, h);
+  C.x = approach(C.x, v ? v.cx : P.x + clamp(P.vx * .12, -180, 180), v ? 3.5 : 7.5, h);
   C.y = approach(C.y, v ? v.cy : P.y + clamp(P.vy * .24, -.19 * VH, .25 * VH), v ? 3.5 : 7.5, h);
   C.z = approach(C.z, v ? .82 : 1 / (1 + P.sp / 5200), 4, h);
   SC = mn(H / VH, W / (COL * 2 + 46)) * C.z;
+  // Keep the play column framed. Without this the velocity lead walks the
+  // camera off the side of the world and half the screen becomes dead rock.
+  const lim = mx(0, WMAX + 66 - W / 2 / SC);
+  C.x = clamp(C.x, -lim, lim);
   shake = mx(0, shake - shake * 7 * h - 4 * h);
   const s = mn(shake, 24);
   shX = rf(-s, s); shY = rf(-s, s);
@@ -89,9 +93,12 @@ const alerp = (a, b, r, h) => (a + (((b - a + 540) % 360) - 180) * (1 - M.exp(-r
 
 // Target palette derived from the region's three numbers:
 // [bgTopH, bgTopS, bgTopL, bgBotH, bgBotS, bgBotL, geoH, geoL]
+// Geometry takes the complement of the background's midpoint hue. Deriving the
+// obstacle colour from the same hue as the sky made every region a monotone
+// wash where nothing you could hit stood out from what you couldn't.
 const regPal = (r) => {
-  const hu = REG[r][1], sp = REG[r][2];
-  return [hu, r > 5 ? 0 : 62, 12 - r * 1.4, hu + sp, 55, 27 - r * 1.6, hu + sp * .62, REG[r][3]];
+  const q = REG[r], hu = q[1], sp = q[2], bl = q[4];
+  return [hu, 56, bl, hu + sp, 64, bl + 23, hu + sp / 2 + 165, q[3]];
 };
 function palUpdate(h) {
   const t = regPal(reg);
@@ -103,7 +110,7 @@ function palUpdate(h) {
 // Two parallax layers of a region motif, placed on an infinite hashed grid so
 // the scenery is endless and costs no storage.
 function background() {
-  const g = X.createLinearGradient(0, 0, W * .25, H);
+  const g = X.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, hsl(pal[0] | 0, pal[1] | 0, pal[2] | 0));
   g.addColorStop(1, hsl(pal[3] | 0, pal[4] | 0, pal[5] | 0));
   X.fillStyle = g; X.fillRect(0, 0, W, H);
@@ -171,8 +178,8 @@ function obStyle(o) {
   const i = m & M_DAMP ? 0 : m & M_BREAK ? 1 : m & M_PHASE ? 2 : m & M_RAIL ? 3 : m & M_ANCH ? 4 : -1;
   if (i < 0) {
     const b = m & M_BUMP;
-    return [hsl(pal[6] + (b ? 30 : 0) | 0, b ? 90 : 38, b ? 46 : mx(16, pal[7] * .32) | 0),
-      hsl(pal[6] + (b ? 40 : 0) | 0, b ? 100 : 55, b ? 78 : pal[7] | 0)];
+    return [hsl(pal[6] + (b ? 30 : 0) | 0, b ? 90 : 46, b ? 46 : mx(26, pal[7] * .46) | 0),
+      hsl(pal[6] + (b ? 40 : 0) | 0, b ? 100 : 68, b ? 78 : pal[7] | 0)];
   }
   const s = MSTY[i];
   return [hsl(s[0], s[1], s[2]), hsl(s[0], s[3], s[4])];
@@ -181,7 +188,7 @@ function obStyle(o) {
 function drawWorld() {
   const y0 = s2wy(0) - 200, y1 = s2wy(H) + 200;
   const wide = mx(2, (ST * 2 + 3) * SC), thin = mx(1, ST * SC);
-  const mass = hsl(pal[6] | 0, 45, mx(3, pal[7] * .1) | 0);
+  const mass = hsl(pal[6] | 0, 34, mx(4, pal[2] * .42) | 0);
   X.lineCap = 'round';
   for (const c of chunks) {
     if (c.y + c.h < y0 || c.y > y1) continue;

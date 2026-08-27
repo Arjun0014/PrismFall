@@ -10,32 +10,43 @@
 // the same builder with different parameters, so seven situations cost six.
 // 0 PEG  1 FUNNEL  2 BOWL  3 SHAFT  4 ROTOR  5 SIEVE  6 CHAMBER
 
-// Region row — deliberately tiny. Everything a region needs beyond these four
+// Region row — deliberately tiny. Everything a region needs beyond these five
 // numbers is derived, which costs far fewer compressed bytes than a table:
 //   0 name
 //   1 base hue        background gradient starts here
 //   2 hue spread      gradient end + geometry hue are offsets from the base
 //   3 geometry light
-//   4 archetype weights (one char per draw)
-//   5 material bias, packed as five hex nibbles [break,phase,damp,bump,move]/16
+//   4 background light
+//   5 archetype weights (one char per draw), straight from the world spec
+//   6 filler density  extra scattered geometry per chunk
 // Affinity colours come from AFF, music from formulas in 60_audio.js.
+// 0 PEG  1 FUNNEL  2 BOWL  3 SHAFT  4 ROTOR  5 SIEVE  6 CHAMBER
 const REG = [
-  ['CLOUDBREAK', 232, 90, 80, '0015501566'],
-  ['SUNFORGE', 14, 20, 64, '4464464146'],
-  ['VERDANT COIL', 172, -64, 62, '2622622062'],
-  ['CRYSTAL CURRENT', 236, -46, 70, '3353531335'],
-  ['PRISM MINE', 272, 30, 58, '6161665106'],
-  ['INVERSION TEMPLE', 282, -34, 74, '6363436365'],
-  ['RAINBOW ENGINE', 300, -28, 84, '0123456546'],
+  // peg fields, wide gaps, bumpers, gentle funnels
+  ['CLOUDBREAK', 206, 74, 88, 26, '0001002105', 5],
+  // breakable panels, crushers, rotors, moving gates
+  ['SUNFORGE', 12, 34, 72, 19, '4414564146', 6],
+  // tether anchors, circular chambers, spring pods
+  ['VERDANT COIL', 152, -74, 74, 17, '2262262622', 7],
+  // long guide rails, narrow shafts, S-curves, precision exits
+  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3335331353', 5],
+  // breakable shortcuts, hidden rooms, phase barriers, high reward density
+  ['PRISM MINE', 276, -28, 62, 10, '6616065166', 8],
+  // gravity inversion chambers, phase walls, looping routes
+  ['INVERSION TEMPLE', 264, 52, 80, 13, '6462646326', 6],
+  // compound rooms built from every prior geometry
+  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456246', 8],
 ];
 // Material bias per region: [break, phase, damp, bump, move] as hex nibbles/16.
-const BIAS = [0x00182, 0x60149, 0x10254, 0x11233, 0x75323, 0x26335, 0x53258];
-// Two affinity colours per region, one digit each.
-const AFF = '12011932144656';
+const BIAS = [0x00193, 0x80149, 0x10275, 0x01243, 0xa5324, 0x2a336, 0x63359];
+// Two affinity colours per region, one digit each, straight from the world spec:
+// Cloudbreak O+Y, Sunforge R+O, Verdant G+Y, Crystal B+O, Mine R+V, Temple I+V.
+const AFF = '120132410656';
 const regHue = (r) => REG[r][1];
 const bias = (r) => BIAS[r];
 const bit = (b, i) => (b >> (16 - i * 4) & 15) / 16;
-const aff = (r) => [+AFF[r * 2], +AFF[r * 2 + 1]];
+// The Rainbow Engine's affinity is "all colours", so it rolls fresh each time.
+const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]];
 
 let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
 let vault = null;   // chunk currently focusing the camera
@@ -95,14 +106,16 @@ const regAt = (y) => { const i = flr(mx(y, 0) / REGD); return i < 7 ? i : i % 7;
 const loopAt = (y) => flr(flr(mx(y, 0) / REGD) / 7);
 const difAt = (y) => clamp(flr(mx(y, 0) / REGD) * .085 + loopAt(y) * .3, 0, 2.4);
 
-// --- solidity probe (also used by the generator tests) ---------------------
+// --- solidity probe --------------------------------------------------------
+// Deliberately measured against each obstacle's *base* pose, not its animated
+// one: placement has to be deterministic for a seed, and a moving arm sweeping
+// over a coin is the intended risk rather than a bad spawn.
 function solidNear(c, x, y, rad) {
   for (const o of c.o) {
-    obT(o);
-    if (!o.t) { if (hyp(x - _cx, y - _cy) < o.r + rad) return 1; continue; }
-    const cg = cos(_cg) * o.L, sg2 = sin(_cg) * o.L;
-    const ax = _cx - cg, ay = _cy - sg2;
-    const t = segT(ax, ay, _cx + cg, _cy + sg2, x, y);
+    if (!o.t) { if (hyp(x - o.x, y - o.y) < o.r + rad) return 1; continue; }
+    const cg = cos(o.g) * o.L, sg2 = sin(o.g) * o.L;
+    const ax = o.x - cg, ay = o.y - sg2;
+    const t = segT(ax, ay, o.x + cg, o.y + sg2, x, y);
     if (hyp(x - (ax + cg * 2 * t), y - (ay + sg2 * 2 * t)) < ST + rad) return 1;
   }
   return 0;
@@ -132,14 +145,18 @@ function genChunk() {
   if (boundary) buildGate(c, L, Rr, rg, dif);
   else if (cIdx > 2 && rp(.1)) { c.v = 1; buildVault(c, L, Rr, rg); }
   else {
-    const k = +REG[rg][4][ri(0, 9)];
+    const k = +REG[rg][5][ri(0, 9)];
     c.k = k;
     if (k === 1 || k === 5)
       barrier(c, L, Rr, wdt, b, dif, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 210),
         c.y + c.h * rf(.34, .6), 0);
     else [pegField, 0, bowl, shaft, rotor, 0, chamber][k](c, L, Rr, wdt, cx, b, dif);
+    decorate(c, L, Rr, b, REG[rg][6] + (dif * 1.6 | 0));
     rewards(c, L, Rr, rg, dif);
   }
+
+  // Nothing is allowed to spawn inside solid geometry, whichever builder placed it.
+  c.i = c.i.filter((it) => !solidNear(c, it.x, it.y, R * .6));
 
   prevL = l; prevR = r; nextY = y + h; cIdx++;
   chunks.push(c);
@@ -147,14 +164,42 @@ function genChunk() {
   return c;
 }
 
+// Region-flavoured filler. Every archetype leaves gaps; this scatters small
+// interactive geometry into them so a screen always has something to hit,
+// which is what makes the game read as pinball rather than as empty shafts.
+// It refuses any spot that would crowd existing geometry, so it can never seal
+// a route it did not create.
+function decorate(c, L, Rr, b, n) {
+  // Keep trying until the quota is met: shaft and rotor chunks reject most
+  // candidates, and those are exactly the chunks that read as empty.
+  for (let tries = n * 6; n > 0 && tries--;) {
+    const x = rf(L + 44, Rr - 44), y = c.y + rf(.07, .93) * c.h;
+    const cir = rp(.58), rad = rf(13, 25), hl = rf(30, 76), a = rf(0, PI);
+    // Every extremity must clear existing geometry by more than the unicorn's
+    // diameter. That keeps the filler from ever closing a route: splitting a
+    // wide gap in two still leaves both halves passable.
+    const need = 48 + (cir ? rad : ST);
+    if (solidNear(c, x, y, need)) continue;
+    if (!cir) {
+      const dx = cos(a) * hl, dy = sin(a) * hl;
+      if (solidNear(c, x + dx, y + dy, need) || solidNear(c, x - dx, y - dy, need)) continue;
+    }
+    n--;
+    c.o.push(cir
+      ? ci(x, y, rad, mat(b, 0) | (rp(.42) ? M_BUMP : 0), moving(b, 74))
+      : sg(x, y, hl, a, mat(b, 1) | (rp(.2) ? M_ANCH : 0), moving(b, 62)));
+  }
+}
+
 // --- archetypes ------------------------------------------------------------
 function pegField(c, L, Rr, wdt, cx, b, dif) {
-  const rows = ri(3, 5), gap = c.h / (rows + 1);
+  const rows = ri(4, 6), gap = c.h / (rows + 1);
   for (let r = 0; r < rows; r++) {
-    const yy = c.y + gap * (r + 1), n = ri(3, 5);
+    const yy = c.y + gap * (r + 1), n = ri(4, 7);
     for (let i = 0; i < n; i++) {
       const t = (i + (r & 1 ? .5 : 0)) / (n - .35);
-      c.o.push(ci(L + 50 + t * (wdt - 100), yy, rf(15, 27), mat(b, 0), moving(b, 60)));
+      c.o.push(ci(L + 44 + t * (wdt - 88), yy, rf(14, 27),
+        mat(b, 0) | (rp(.3) ? M_BUMP : 0), moving(b, 60)));
     }
   }
 }
@@ -221,11 +266,19 @@ function chamber(c, L, Rr, wdt, cx, b, dif) {
   const top = c.y + c.h * .16, bot = c.y + c.h * .86;
   barrier(c, L, Rr, wdt, b, dif, 1, 0, top, 1);
   barrier(c, L, Rr, wdt, b, dif, 1, 0, bot, 1);
-  const n = ri(2, 4);
+  const n = ri(4, 7);
   for (let i = 0; i < n; i++) {
-    const ix = L + rf(.15, .85) * wdt, iy = lerp(top + 70, bot - 70, rr());
+    const ix = L + rf(.12, .88) * wdt, iy = lerp(top + 60, bot - 60, rr());
+    if (solidNear(c, ix, iy, 66)) continue;
     if (rp(.45)) c.o.push(ci(ix, iy, rf(16, 30), rp(.5) ? M_BUMP : M_ANCH, moving(b, 80)));
-    else c.o.push(sg(ix, iy, rf(50, 110), rf(0, PI), mat(b, 1) | (rp(.3) ? M_RAIL : 0), moving(b, 70)));
+    else c.o.push(sg(ix, iy, rf(46, 96), rf(0, PI), mat(b, 1) | (rp(.3) ? M_RAIL : 0), moving(b, 70)));
+  }
+  // A ring of orbit fodder around the middle: this is the archetype the Green
+  // tether and the Yellow spring are meant to be used in.
+  const mx2 = (L + Rr) / 2, my = (top + bot) / 2, rr2 = mn(wdt * .3, 190);
+  for (let i = 0; i < 4; i++) {
+    const a = i / 4 * TAU + rf(0, 1), ix = mx2 + cos(a) * rr2, iy = my + sin(a) * rr2 * .7;
+    if (!solidNear(c, ix, iy, 62)) c.o.push(ci(ix, iy, rf(13, 21), M_BUMP, moving(b, 56)));
   }
   // Side pocket with the good stuff
   c.i.push(item(rp(.25) ? I_CROWN : I_PIG, rp(.5) ? L + 55 : Rr - 55, (top + bot) / 2, pick(aff(c.rg))));

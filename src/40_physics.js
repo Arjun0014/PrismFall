@@ -121,13 +121,23 @@ function hitOb(o) {
   if (vn >= 0) return;
 
   const bump = o.m & M_BUMP, damp = o.m & M_DAMP;
-  const e = bump ? 1.2 : damp ? .1 : .44;
-  const fr = damp ? .6 : .1;
-  rvx -= (1 + e) * vn * nx; rvy -= (1 + e) * vn * ny;
+  // A bumper's restitution falls off with speed: it kicks hard when you are
+  // slow (a genuine rescue) and bleeds energy when you are already flying.
+  // Without this the world is a closed energy pump and every run saturates at
+  // VMAX, which reads as noise rather than pinball.
+  const e = bump ? 1.32 - clamp(P.sp / VMAX, 0, 1) * .72 : damp ? .12 : .44;
+  const j = (1 + e) * -vn;                 // normal impulse magnitude
+  rvx += j * nx; rvy += j * ny;
+
+  // Coulomb friction: the tangential loss is capped by the normal impulse, not
+  // taken as a flat fraction of sliding speed. Resting contact therefore barely
+  // scrubs speed, so surfaces stop behaving like glue and a grazing skim keeps
+  // its momentum. The flat-fraction version stopped a 440-unit launch in three
+  // frames and made every ledge an unescapable trap.
   const tx = -ny, ty = nx, vt = rvx * tx + rvy * ty;
-  rvx -= vt * fr * tx; rvy -= vt * fr * ty;
+  const dv = mn(abs(vt), (damp ? 1.15 : .3) * j) * (vt < 0 ? -1 : 1);
+  rvx -= dv * tx; rvy -= dv * ty;
   P.vx = rvx + _cvx; P.vy = rvy + _cvy;
-  if (damp) { P.vx *= .5; P.vy *= .5; }
   clampV();
 
   const imp = -vn;
@@ -166,7 +176,18 @@ function physics(h) {
   }
   clampV();
 
-  const sp = hyp(P.vx, P.vy);
+  // Drag above the "fast" reference speed. Bumpers, rotors and Red together
+  // form an open energy pump, and without this the run spends half its life
+  // pinned to VMAX -- the hard clamp ends up setting the pace of the game
+  // instead of the player. Below VFAST there is no drag at all, so recovering
+  // from a stall is never taxed.
+  let sp = hyp(P.vx, P.vy);
+  if (sp > VFAST) {
+    const d = mx(0, 1 - (sp / VFAST - 1) * 1.5 * h);
+    P.vx *= d; P.vy *= d;
+    sp *= d;
+  }
+
   const k = clamp(M.ceil(sp * h / (R * .55)), 1, 8);
   const hh = h / k;
   for (let i = 0; i < k; i++) {

@@ -19,6 +19,7 @@ function startStroke() {
   if (pig[sel] <= .5) { dryC = sel; dryT = .5; sndEmpty(); return; }
   const dx = mwx - P.x, dy = mwy - P.y, k = mn(1, SREACH / (hyp(dx, dy) || 1));
   const sx = P.x + dx * k, sy = P.y + dy * k;
+  if (!hint) { hint = 1; hintT = 0; }
   drawing = { x1: sx, y1: sy, x2: sx, y2: sy, e: CBIT[sel], c: sel, l: SLIFE, u: 0, paid: 0 };
   strokes.push(drawing);
   while (strokes.length > SLIM) if (P.ra === strokes.shift()) detachRail(0);
@@ -99,8 +100,12 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
         P.y = (o2.y1 + o2.y2) / 2 + vy * k;
         o2.u = 1; o2.l = .12;
       } else {
-        const k = 300 / (hyp(P.vx, P.vy) || 1);
-        P.x += P.vx * k; P.y += P.vy * k;
+        // A lone Violet stroke is a dash along the current heading — or, from a
+        // standstill, straight off the face of the stroke, so Violet is also an
+        // escape tool rather than a no-op when you need it most.
+        const sp = hyp(P.vx, P.vy);
+        if (sp < 60) { P.x += nx * 300; P.y += ny * 300; P.vx = nx * 460; P.vy = ny * 460; }
+        else { const k = 300 / sp; P.x += P.vx * k; P.y += P.vy * k; }
       }
       P.x = clamp(P.x, -WMAX + R, WMAX - R);
       P.ph = .34; P.vx *= 1.07; P.vy *= 1.07;

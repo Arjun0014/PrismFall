@@ -1,0 +1,2168 @@
+<!doctype html><meta charset=utf-8><title>PRISMFALL</title><canvas id=a></canvas><script>(()=>{
+const DEBUG=1;
+// ==== 00_config.js ====
+// ---------------------------------------------------------------------------
+// PRISMFALL — tuning constants.
+//
+// World units: 1 unit ~= 1 screen pixel at 1280x720 with zoom 1.
+// The unicorn is a circle of radius R; everything else is built from
+// circles, segments and arcs so the collision kernel stays tiny.
+// ---------------------------------------------------------------------------
+
+const PI = Math.PI;
+const TAU = PI * 2;
+const M = Math;
+const abs = M.abs, mn = M.min, mx = M.max, sin = M.sin, cos = M.cos,
+      at2 = M.atan2, hyp = M.hypot, flr = M.floor, rnd = M.random;
+
+// -- body / motion ----------------------------------------------------------
+const R = 17;          // unicorn collision radius
+const GRAV = 1250;     // default gravity magnitude (units/s^2)
+const VMAX = 2900;     // hard velocity clamp, keeps the sim sane
+const VFAST = 1400;    // "fast" reference speed for camera/audio/score curves
+
+// -- framing ----------------------------------------------------------------
+const VH = 620;        // logical view height in world units
+const COL = 400;       // standard play-column half width (near-4:3 zone)
+const WMAX = 545;      // absolute wall half width (side rooms)
+
+// -- strokes ----------------------------------------------------------------
+const SMAX = 150;      // max stroke length
+const SREACH = 305;    // max distance from the unicorn a stroke may start
+const SLIFE = 1.8;     // stroke lifetime in seconds
+const SLIM = 3;        // simultaneous live strokes
+const ST = 5;          // stroke half-thickness for collision
+
+// -- pigment ----------------------------------------------------------------
+const PMAX = 100;                                  // per-reservoir capacity
+const PC = [.088, .055, .062, .07, .05, .076, .095]; // cost per world unit drawn
+
+// -- stall ------------------------------------------------------------------
+const STALLV = 118;    // simulation speed below which the stall clock runs
+const STALLT = 2.4;    // seconds of stall before the run ends
+const STALLW = 0.9;    // stall seconds before the warning kicks in
+
+// -- colours ----------------------------------------------------------------
+// Red Orange Yellow Green Blue Indigo Violet — order never changes.
+const HUE = [0, 32, 54, 140, 200, 258, 296];
+const CBIT = [1, 2, 4, 8, 16, 32, 64];
+const ALL7 = 127;
+
+// -- material bits ----------------------------------------------------------
+const M_BUMP = 1;    // high restitution
+const M_DAMP = 2;    // void / dampener, eats speed — the main stall threat
+const M_BREAK = 4;   // shatters above an impact-energy threshold
+const M_PHASE = 8;   // solid unless the unicorn is phased (Violet)
+const M_ANCH = 16;   // drawn as a Green tether anchor
+const M_RAIL = 32;   // drawn as a Blue guide rail
+
+// -- world ------------------------------------------------------------------
+const CHUNKS = 26;       // retained chunk ring size
+const REGD = 15000;      // depth of one region
+const BRK_E = 1180;      // impact speed needed to break a panel
+const BRK_R = 400;       // ... while Red-charged
+
+// -- items ------------------------------------------------------------------
+const I_COIN = 0, I_CROWN = 1, I_PIG = 2, I_WELL = 3, I_BOOST = 4;
+
+// -- boosters: [allCostMul, redMul, duration] -------------------------------
+const BOOST = [
+  [1, 1.45, 10],    // 0 Red Overdrive - bigger kick, cheaper destruction
+  [.4, 1, 12],      // 1 White Efficiency - every colour costs less
+];
+
+// -- localStorage namespace -------------------------------------------------
+const LS = 'pf26_save';
+
+// ==== 10_util.js ====
+// ---------------------------------------------------------------------------
+// Math helpers + the deterministic PRNG used by every generator.
+// ---------------------------------------------------------------------------
+
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, t) => a + (b - a) * t;
+// Frame-rate independent exponential approach.
+const approach = (a, b, r, h) => lerp(a, b, 1 - M.exp(-r * h));
+
+// mulberry32 — 3 lines, good enough, fully seedable for regression replays.
+let _rs = 1;
+function srnd(s) { _rs = s >>> 0; }
+function rr() {
+  _rs = (_rs + 0x6d2b79f5) | 0;
+  let t = M.imul(_rs ^ (_rs >>> 15), 1 | _rs);
+  t = (t + M.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+const rf = (a, b) => a + rr() * (b - a);
+const ri = (a, b) => flr(a + rr() * (b - a + 1));
+const rp = (p) => rr() < p;
+const pick = (a) => a[flr(rr() * a.length)];
+// Random sign.
+const rs = () => (rr() < .5 ? -1 : 1);
+
+// Stateless hash for background motifs — infinite scenery with zero storage.
+function hsh(x, y) {
+  let h = M.imul(x | 0, 374761393) + M.imul(y | 0, 668265263);
+  h = M.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+
+// Closest point on segment (ax,ay)-(bx,by) to (px,py). Returns param 0..1.
+function segT(ax, ay, bx, by, px, py) {
+  const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy;
+  return l ? clamp(((px - ax) * dx + (py - ay) * dy) / l, 0, 1) : 0;
+}
+
+// Segment/segment intersection point, or null. Used for Prism Node fusion.
+function segX(ax, ay, bx, by, cx, cy, dx, dy) {
+  const r1 = bx - ax, r2 = by - ay, s1 = dx - cx, s2 = dy - cy;
+  const d = r1 * s2 - r2 * s1;
+  if (!d) return null;
+  const t = ((cx - ax) * s2 - (cy - ay) * s1) / d;
+  const u = ((cx - ax) * r2 - (cy - ay) * r1) / d;
+  return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [ax + r1 * t, ay + r2 * t] : null;
+}
+
+// hsl helpers — every colour in the game comes from these two.
+const hsl = (h, s, l, a) => 'hsl(' + h + ' ' + s + '% ' + l + '%' + (a === undefined ? '' : ' / ' + a) + ')';
+const chsl = (c, l, a) => hsl(HUE[c], 100, l, a);
+
+// ==== 20_state.js ====
+// ---------------------------------------------------------------------------
+// Global mutable state. Short property names are deliberate: they survive
+// minification (Terser will not rename properties) and compress well.
+// ---------------------------------------------------------------------------
+
+const CV = document.getElementById('a');
+const X = CV.getContext('2d');
+let W = 0, H = 0, SC = 1;      // canvas pixel size, world->screen scale
+
+// -- game / scene state -----------------------------------------------------
+// 0 title  1 playing  2 paused  3 results  4 store  5 how-to
+let st = 0;
+let T = 0;        // wall-clock seconds since load (drives animation)
+let slow = 0;     // 0..1 focus-vault time dilation blend
+let shake = 0;    // camera shake energy
+let flash = 0;    // full-screen flash energy
+let flashH = 0;   // flash hue
+
+// -- the unicorn ------------------------------------------------------------
+const P = {
+  x: 0, y: 0, vx: 0, vy: 0,
+  a: 0,          // render heading
+  sp: 0,         // cached speed
+  ra: null,      // attached Blue rail (stroke)
+  rt: 0,         // rail param along the stroke
+  rs: 1,         // rail side (+1/-1)
+  te: null,      // Green tether {x,y,l,t}
+  ph: 0,         // Violet phase timer (ignores solids)
+  rp: 0,         // Red power timer (cheap destruction)
+  st: 0,         // stall timer
+  gt: 0,         // gravity-override timer
+  al: 1,         // alive
+};
+
+// gravity vector (mutable — Indigo and regions both write here)
+let Gx = 0, Gy = GRAV;
+
+// -- camera -----------------------------------------------------------------
+const C = { x: 0, y: 0, z: 1, tz: 1 };
+
+// -- run data ---------------------------------------------------------------
+let pig = [];              // seven pigment reservoirs
+let sel = 1;               // selected colour index
+let chain = 0;             // bitmask of colours successfully used in the chain
+let chainN = 0;            // popcount of chain
+let fullSpec = 0;          // Full Spectrum glow timer
+let coins = 0;             // coins earned this run
+let score = 0;
+let mult = 1;
+let depth = 0;             // max depth reached
+let reg = 0;               // current region index
+let regShow = 0;           // region banner timer
+let boostT = [0, 0];       // booster timers
+let combo = 0, comboT = 0; // coin chain
+
+// -- containers -------------------------------------------------------------
+let chunks = [];   // active world chunks
+let strokes = [];  // live player strokes
+let parts = [];    // particles
+let trail = [];    // unicorn trail samples
+let pops = [];     // floating score/text pops
+let nodes = [];    // prism-node sparkles from stroke fusion
+
+// -- persistent -------------------------------------------------------------
+const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0], m: 0, t: 0 };
+// c total coins, b best score, d best depth, o owned cosmetics bitmask,
+// e equipped [body, trail, impact], m muted, t tutorial seen
+
+// -- input ------------------------------------------------------------------
+let pmx = 0, pmy = 0;           // pointer in screen px
+let mwx = 0, mwy = 0;         // pointer in world units
+let drawing = null;           // stroke being drawn
+let hint = 0;                 // onboarding step
+let hintT = 0;
+
+// ==== 30_world.js ====
+// ---------------------------------------------------------------------------
+// World: region table, chunk grammar, obstacle + reward generation.
+//
+// The world is a ring of vertical chunks. Every chunk picks an archetype from
+// its region's weight string and decorates it with region material bias, so
+// world identity is systematic instead of seven separate generators.
+// ---------------------------------------------------------------------------
+
+// Archetype ids used inside the region weight strings. Funnel and Sieve are
+// the same builder with different parameters, so seven situations cost six.
+// 0 PEG  1 FUNNEL  2 BOWL  3 SHAFT  4 ROTOR  5 SIEVE  6 CHAMBER
+
+// Region row — deliberately tiny. Everything a region needs beyond these five
+// numbers is derived, which costs far fewer compressed bytes than a table:
+//   0 name
+//   1 base hue        background gradient starts here
+//   2 hue spread      gradient end + geometry hue are offsets from the base
+//   3 geometry light
+//   4 background light
+//   5 archetype weights (one char per draw), straight from the world spec
+//   6 filler density  extra scattered geometry per chunk
+// Affinity colours come from AFF, music from formulas in 60_audio.js.
+// 0 PEG  1 FUNNEL  2 BOWL  3 SHAFT  4 ROTOR  5 SIEVE  6 CHAMBER
+const REG = [
+  // peg fields, wide gaps, bumpers, gentle funnels
+  ['CLOUDBREAK', 206, 74, 88, 26, '0001002105', 5],
+  // breakable panels, crushers, rotors, moving gates
+  ['SUNFORGE', 12, 34, 72, 19, '4414564146', 6],
+  // tether anchors, circular chambers, spring pods
+  ['VERDANT COIL', 152, -74, 74, 17, '2262262622', 7],
+  // long guide rails, narrow shafts, S-curves, precision exits
+  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3335331353', 5],
+  // breakable shortcuts, hidden rooms, phase barriers, high reward density
+  ['PRISM MINE', 276, -28, 62, 10, '6616065166', 8],
+  // gravity inversion chambers, phase walls, looping routes
+  ['INVERSION TEMPLE', 264, 52, 80, 13, '6462646326', 6],
+  // compound rooms built from every prior geometry
+  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456246', 8],
+];
+// Material bias per region: [break, phase, damp, bump, move] as hex nibbles/16.
+const BIAS = [0x00193, 0x80149, 0x10275, 0x01243, 0xa5324, 0x2a336, 0x63359];
+// Two affinity colours per region, one digit each, straight from the world spec:
+// Cloudbreak O+Y, Sunforge R+O, Verdant G+Y, Crystal B+O, Mine R+V, Temple I+V.
+const AFF = '120132410656';
+const regHue = (r) => REG[r][1];
+const bias = (r) => BIAS[r];
+const bit = (b, i) => (b >> (16 - i * 4) & 15) / 16;
+// The Rainbow Engine's affinity is "all colours", so it rolls fresh each time.
+const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]];
+
+let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
+let vault = null;   // chunk currently focusing the camera
+
+// --- obstacle constructors (t: 0 circle, 1 segment, 2 arc) ------------------
+const ci = (x, y, r, m, e) => Object.assign({ t: 0, x, y, r, m: m | 0 }, e);
+const sg = (x, y, L, g, m, e) => Object.assign({ t: 1, x, y, L, g, m: m | 0 }, e);
+// segment from A to B
+const sgAB = (ax, ay, bx, by, m, e) =>
+  sg((ax + bx) / 2, (ay + by) / 2, hyp(bx - ax, by - ay) / 2, at2(by - ay, bx - ax), m, e);
+
+const item = (t, x, y, c) => ({ t, x, y, c: c | 0, g: 0 });
+
+// Arcs are built from straight segments, so the collision kernel only ever
+// deals with circles and segments — and the facets suit the geometric look.
+function arcSegs(c, x, y, r, a0, a1, m) {
+  const n = mx(3, (a1 - a0) * r / 80 | 0);
+  for (let i = 0; i < n; i++) {
+    const b0 = lerp(a0, a1, i / n), b1 = lerp(a0, a1, (i + 1) / n);
+    c.o.push(sgAB(x + cos(b0) * r, y + sin(b0) * r, x + cos(b1) * r, y + sin(b1) * r, m));
+  }
+}
+
+// --- current transform of an obstacle --------------------------------------
+// Results land in scratch globals to avoid per-frame allocation.
+let _cx = 0, _cy = 0, _cvx = 0, _cvy = 0, _cg = 0;
+function obT(o) {
+  _cx = o.x; _cy = o.y; _cvx = 0; _cvy = 0; _cg = o.g;
+  if (o.os) {
+    const p = o.os * T + o.op, s = sin(p), c = cos(p) * o.os;
+    _cx += o.ox * s; _cy += o.oy * s;
+    _cvx = o.ox * c; _cvy = o.oy * c;
+  }
+  if (o.w) _cg += o.w * T;
+}
+// Surface velocity of obstacle o at world point (px,py).
+function obVel(o, px, py) {
+  if (o.w) { _cvx += -o.w * (py - _cy); _cvy += o.w * (px - _cx); }
+}
+
+// --- material roll ---------------------------------------------------------
+function mat(b, allowBreak) {
+  return rp(bit(b, 2)) ? M_DAMP
+    : allowBreak && rp(bit(b, 0)) ? M_BREAK
+      : rp(bit(b, 1)) ? M_PHASE
+        : rp(bit(b, 3)) ? M_BUMP : 0;
+}
+// Optional motion decoration: a straight oscillation along a random axis.
+function moving(b, amp) {
+  if (!rp(bit(b, 4))) return null;
+  const a = rf(0, TAU);
+  return { ox: cos(a) * amp, oy: sin(a) * amp * .6, os: rf(.7, 2.1), op: rf(0, TAU) };
+}
+
+// --- region helpers --------------------------------------------------------
+const regAt = (y) => { const i = flr(mx(y, 0) / REGD); return i < 7 ? i : i % 7; };
+const loopAt = (y) => flr(flr(mx(y, 0) / REGD) / 7);
+const difAt = (y) => clamp(flr(mx(y, 0) / REGD) * .085 + loopAt(y) * .3, 0, 2.4);
+
+// --- solidity probe --------------------------------------------------------
+// Deliberately measured against each obstacle's *base* pose, not its animated
+// one: placement has to be deterministic for a seed, and a moving arm sweeping
+// over a coin is the intended risk rather than a bad spawn.
+function solidNear(c, x, y, rad) {
+  for (const o of c.o) {
+    if (!o.t) { if (hyp(x - o.x, y - o.y) < o.r + rad) return 1; continue; }
+    const cg = cos(o.g) * o.L, sg2 = sin(o.g) * o.L;
+    const ax = o.x - cg, ay = o.y - sg2;
+    const t = segT(ax, ay, o.x + cg, o.y + sg2, x, y);
+    if (hyp(x - (ax + cg * 2 * t), y - (ay + sg2 * 2 * t)) < ST + rad) return 1;
+  }
+  return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Chunk generation
+// ---------------------------------------------------------------------------
+function genChunk() {
+  const y = nextY;
+  const rg = regAt(y), dif = difAt(y), b = bias(rg);
+  const boundary = flr((y + 1400) / REGD) > flr(y / REGD) && y > 200;
+
+  // Wall profile: side pockets widen the column, shafts narrow it.
+  const wide = rp(.26) ? 120 : 0;
+  const l = clamp(-COL + rf(-90, 70) - wide, -WMAX, -300);
+  const r = clamp(COL + rf(-70, 90) + wide, 300, WMAX);
+  const h = boundary ? 1240 : ri(760, 1080);
+
+  const c = { y, h, l, r, pl: prevL, pr: prevR, o: [], i: [], rg, k: 0, v: 0 };
+
+  // Walls, drawn as chunk-to-chunk segments so the column is continuous.
+  c.o.push(sgAB(prevL, y, l, y + h, 0), sgAB(prevR, y, r, y + h, 0));
+
+  const L = mx(prevL, l) + 30, Rr = mn(prevR, r) - 30, wdt = Rr - L, cx = (L + Rr) / 2;
+
+  if (boundary) buildGate(c, L, Rr, rg, dif);
+  else if (cIdx > 2 && rp(.1)) { c.v = 1; buildVault(c, L, Rr, rg); }
+  else {
+    const k = +REG[rg][5][ri(0, 9)];
+    c.k = k;
+    if (k === 1 || k === 5)
+      barrier(c, L, Rr, wdt, b, dif, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 210),
+        c.y + c.h * rf(.34, .6), 0);
+    else [pegField, 0, bowl, shaft, rotor, 0, chamber][k](c, L, Rr, wdt, cx, b, dif);
+    decorate(c, L, Rr, b, REG[rg][6] + (dif * 1.6 | 0));
+    rewards(c, L, Rr, rg, dif);
+  }
+
+  // Nothing is allowed to spawn inside solid geometry, whichever builder placed it.
+  c.i = c.i.filter((it) => !solidNear(c, it.x, it.y, R * .6));
+
+  prevL = l; prevR = r; nextY = y + h; cIdx++;
+  chunks.push(c);
+  if (chunks.length > CHUNKS) chunks.shift();
+  return c;
+}
+
+// Region-flavoured filler. Every archetype leaves gaps; this scatters small
+// interactive geometry into them so a screen always has something to hit,
+// which is what makes the game read as pinball rather than as empty shafts.
+// It refuses any spot that would crowd existing geometry, so it can never seal
+// a route it did not create.
+function decorate(c, L, Rr, b, n) {
+  // Keep trying until the quota is met: shaft and rotor chunks reject most
+  // candidates, and those are exactly the chunks that read as empty.
+  for (let tries = n * 6; n > 0 && tries--;) {
+    const x = rf(L + 44, Rr - 44), y = c.y + rf(.07, .93) * c.h;
+    const cir = rp(.58), rad = rf(13, 25), hl = rf(30, 76), a = rf(0, PI);
+    // Every extremity must clear existing geometry by more than the unicorn's
+    // diameter. That keeps the filler from ever closing a route: splitting a
+    // wide gap in two still leaves both halves passable.
+    const need = 48 + (cir ? rad : ST);
+    if (solidNear(c, x, y, need)) continue;
+    if (!cir) {
+      const dx = cos(a) * hl, dy = sin(a) * hl;
+      if (solidNear(c, x + dx, y + dy, need) || solidNear(c, x - dx, y - dy, need)) continue;
+    }
+    n--;
+    c.o.push(cir
+      ? ci(x, y, rad, mat(b, 0) | (rp(.42) ? M_BUMP : 0), moving(b, 74))
+      : sg(x, y, hl, a, mat(b, 1) | (rp(.2) ? M_ANCH : 0), moving(b, 62)));
+  }
+}
+
+// --- archetypes ------------------------------------------------------------
+function pegField(c, L, Rr, wdt, cx, b, dif) {
+  const rows = ri(4, 6), gap = c.h / (rows + 1);
+  for (let r = 0; r < rows; r++) {
+    const yy = c.y + gap * (r + 1), n = ri(4, 7);
+    for (let i = 0; i < n; i++) {
+      const t = (i + (r & 1 ? .5 : 0)) / (n - .35);
+      c.o.push(ci(L + 44 + t * (wdt - 88), yy, rf(14, 27),
+        mat(b, 0) | (rp(.3) ? M_BUMP : 0), moving(b, 60)));
+    }
+  }
+}
+
+// One builder covers both the Funnel and the Sieve: a wall across the column
+// with n openings. `drop` slopes the outer ends up and the gap edges down,
+// which turns a flat sieve into a converging funnel.
+function barrier(c, L, Rr, wdt, b, dif, n, drop, yy, quiet) {
+  const m = mat(b, 1), cuts = [];
+  for (let i = 0; i < n; i++) cuts.push(L + (i + rf(.25, .75)) * wdt / n);
+  let px = L - 20, py = yy - drop;
+  for (let i = 0; i <= n; i++) {
+    const last = i === n;
+    const gw = mx(100, rf(125, 195) - dif * 16);
+    const nx = last ? Rr + 20 : cuts[i] - gw / 2, ny = last ? yy - drop : yy + drop;
+    if (nx - px > 24) c.o.push(sgAB(px, py, nx, ny, m));
+    if (!last && drop > 40 && rp(.6)) c.o.push(ci(nx, ny, 15, M_BUMP));
+    px = last ? nx : cuts[i] + gw / 2;
+    py = yy + drop;
+  }
+  if (quiet) return;
+  // Coins below the easiest gap, the prize above the least convenient one.
+  for (let i = 0; i < 4; i++) c.i.push(item(I_COIN, cuts[0] + rf(-26, 26), yy + drop + 70 + i * 46));
+  c.i.push(item(rp(.35) ? I_PIG : I_CROWN, cuts[n - 1], yy - drop - 70, pick(aff(c.rg))));
+}
+
+function bowl(c, L, Rr, wdt, cx, b, dif) {
+  const r = mn(wdt * .42, 280), bx = cx + rf(-.2, .2) * wdt, by = c.y + c.h * .58;
+  const rim = r * cos(.12 * PI);
+  arcSegs(c, bx, by, r, .12 * PI, .88 * PI, rp(.35) ? M_DAMP : 0);
+  c.o.push(ci(bx - rim, by, 15, M_BUMP), ci(bx + rim, by, 15, M_BUMP));
+  // Something worth the risk of dropping in.
+  c.i.push(item(rp(.3) ? I_CROWN : I_PIG, bx, by + r * .55, pick(aff(c.rg))));
+  if (rp(.6)) c.o.push(sg(bx, c.y + c.h * .18, rf(60, 120), rf(-.4, .4), M_BUMP, moving(b, 90)));
+}
+
+function shaft(c, L, Rr, wdt, cx, b, dif) {
+  const w = mx(135, 250 - dif * 30), sx = cx + rf(-.22, .22) * wdt;
+  const drift = rf(-90, 90);
+  c.o.push(sgAB(sx - w / 2, c.y, sx - w / 2 + drift, c.y + c.h, M_RAIL));
+  c.o.push(sgAB(sx + w / 2, c.y, sx + w / 2 + drift, c.y + c.h, M_RAIL));
+  for (let i = 0; i < 7; i++) c.i.push(item(I_COIN, sx + drift * (i / 7) + rf(-30, 30), c.y + 80 + i * (c.h - 160) / 6));
+  // Outside the shaft: an optional pocket the player has to leave the rail for.
+  if (rp(.6)) {
+    const ox = sx < cx ? Rr - 70 : L + 70;
+    const bp = rp(.45);
+    c.i.push(item(bp ? I_PIG : I_BOOST, ox, c.y + c.h * .5, bp ? pick(aff(c.rg)) : ri(0, 1)));
+  }
+}
+
+function rotor(c, L, Rr, wdt, cx, b, dif) {
+  const n = ri(1, 2);
+  for (let i = 0; i < n; i++) {
+    const rx = cx + rf(-.25, .25) * wdt, ry = c.y + c.h * (n === 1 ? .5 : .3 + i * .42);
+    const arms = ri(2, 3), len = mn(wdt * .34, 210), w = rs() * rf(.9, 1.9 + dif * .3);
+    for (let a = 0; a < arms; a++)
+      c.o.push(sg(rx, ry, len, a * PI / arms, M_BUMP, { w }));
+    c.o.push(ci(rx, ry, 18, 0));
+    c.i.push(item(I_COIN, rx, ry - len - 40), item(I_COIN, rx, ry + len + 40));
+  }
+}
+
+function chamber(c, L, Rr, wdt, cx, b, dif) {
+  const top = c.y + c.h * .16, bot = c.y + c.h * .86;
+  barrier(c, L, Rr, wdt, b, dif, 1, 0, top, 1);
+  barrier(c, L, Rr, wdt, b, dif, 1, 0, bot, 1);
+  const n = ri(4, 7);
+  for (let i = 0; i < n; i++) {
+    const ix = L + rf(.12, .88) * wdt, iy = lerp(top + 60, bot - 60, rr());
+    if (solidNear(c, ix, iy, 66)) continue;
+    if (rp(.45)) c.o.push(ci(ix, iy, rf(16, 30), rp(.5) ? M_BUMP : M_ANCH, moving(b, 80)));
+    else c.o.push(sg(ix, iy, rf(46, 96), rf(0, PI), mat(b, 1) | (rp(.3) ? M_RAIL : 0), moving(b, 70)));
+  }
+  // A ring of orbit fodder around the middle: this is the archetype the Green
+  // tether and the Yellow spring are meant to be used in.
+  const mx2 = (L + Rr) / 2, my = (top + bot) / 2, rr2 = mn(wdt * .3, 190);
+  for (let i = 0; i < 4; i++) {
+    const a = i / 4 * TAU + rf(0, 1), ix = mx2 + cos(a) * rr2, iy = my + sin(a) * rr2 * .7;
+    if (!solidNear(c, ix, iy, 62)) c.o.push(ci(ix, iy, rf(13, 21), M_BUMP, moving(b, 56)));
+  }
+  // Side pocket with the good stuff
+  c.i.push(item(rp(.25) ? I_CROWN : I_PIG, rp(.5) ? L + 55 : Rr - 55, (top + bot) / 2, pick(aff(c.rg))));
+}
+
+// --- special rooms ---------------------------------------------------------
+// Focus Vault — a slow, enclosed prize room. Some of them hold a Prism Well
+// instead of a Crown Coin, which is the game's only full pigment refill.
+function buildVault(c, L, Rr, rg) {
+  const cx = (L + Rr) / 2, cy = c.y + c.h * .5, r = mn((Rr - L) * .38, 250);
+  c.cx = cx; c.cy = cy;
+  arcSegs(c, cx, cy, r, .78 * PI, 2.16 * PI, M_BUMP);   // bowl with a top-left mouth
+  const well = rp(.4);
+  for (let a = 0; a < 3; a++) c.o.push(sg(cx, cy, r * .46, a * PI / 3, M_BUMP, { w: rs() * .55 }));
+  c.i.push(item(well ? I_WELL : I_CROWN, cx, cy - r * .72));
+  c.i.push(item(I_PIG, cx - r * .6, cy + r * .3, pick(aff(rg))));
+  c.i.push(item(I_PIG, cx + r * .6, cy + r * .3, ri(0, 6)));
+  for (let i = 0; i < 6; i++)
+    c.i.push(item(I_COIN, cx + cos(i / 6 * TAU) * r * .78, cy + sin(i / 6 * TAU) * r * .78));
+}
+
+// Region exit machine: a spinning prism above a closing throat, then a full
+// spectrum of pigment as a reward for getting through it.
+function buildGate(c, L, Rr, rg, dif) {
+  const cx = (L + Rr) / 2, w = Rr - L, cy = c.y + c.h * .4, b = bias(rg);
+  rotor(c, L, Rr, w, cx, b, dif);
+  barrier(c, L, Rr, w, b, dif, 1, 0, cy + 300, 1);
+  c.o.push(ci(cx, cy, 26, M_BUMP));
+  for (let i = 0; i < 7; i++) c.i.push(item(I_PIG, cx + (i - 3) * 74, cy + 420, i));
+  c.i.push(item(I_CROWN, cx, c.y + 150));
+}
+
+// --- rewards ---------------------------------------------------------------
+function rewards(c, L, Rr, rg, dif) {
+  const af = aff(rg);
+  // Drop something valuable in the first free spot we find.
+  const place = (t, cc, lo, hi) => {
+    for (let a = 0; a < 10; a++) {
+      const x = rf(L + 45, Rr - 45), y = c.y + rf(lo, hi) * c.h;
+      if (!solidNear(c, x, y, 34)) { c.i.push(item(t, x, y, cc)); return; }
+    }
+  };
+  // A coin arc that teaches a trajectory.
+  if (rp(.75)) {
+    const n = ri(5, 9), x0 = L + rf(.1, .5) * (Rr - L), y0 = c.y + rf(.15, .5) * c.h;
+    const dir = rs(), spread = rf(150, 330), rise = rf(-190, 240);
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      const x = x0 + dir * spread * t, y = y0 + rise * sin(t * PI) + t * 150;
+      if (x > L + 25 && x < Rr - 25 && !solidNear(c, x, y, 26)) c.i.push(item(I_COIN, x, y));
+    }
+  }
+  // Pigment biased to the region affinity, but never exclusive to it.
+  if (rp(.62)) place(I_PIG, rp(.7) ? pick(af) : ri(0, 6), .15, .85);
+  // Upward temptation, above the entry line.
+  if (rp(.3)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 1), .02, .16);
+  if (rp(.16)) place(I_BOOST, ri(0, 1), .3, .8);
+  // Destruction cache: coins sealed behind breakable panels.
+  if (rp(.24)) {
+    const x = rp(.5) ? L + 90 : Rr - 90, y = c.y + rf(.25, .7) * c.h;
+    for (let i = 0; i < 4; i++)
+      c.o.push(sg(x + (i < 2 ? 0 : i > 2 ? 62 : -62), y + (i < 2 ? (i ? 62 : -62) : 0), 62, i < 2 ? PI / 2 : 0, M_BREAK));
+    c.i.push(item(I_COIN, x, y), item(I_COIN, x - 34, y), item(I_COIN, x + 34, y),
+      item(rp(.4) ? I_CROWN : I_PIG, x, y - 34, ri(0, 6)));
+  }
+}
+
+// --- lifecycle -------------------------------------------------------------
+function worldReset(sd) {
+  seed = sd || (rnd() * 1e9) | 0;
+  srnd(seed);
+  chunks = []; nextY = -900; prevL = -COL; prevR = COL; cIdx = 0; vault = null;
+  // Opening room: open, gentle, and it demonstrates bouncing within seconds.
+  const c = { y: -900, h: 1400, l: -COL, r: COL, pl: -COL, pr: COL, o: [], i: [], rg: 0, k: 0, v: 0 };
+  c.o.push(sgAB(-COL, -900, -COL, 500, 0), sgAB(COL, -900, COL, 500, 0),
+    sgAB(-COL, -900, COL, -900, M_BUMP),
+    ci(-140, 60, 26, M_BUMP), ci(150, 250, 26, M_BUMP), ci(-60, 420, 22, M_BUMP));
+  for (let i = 0; i < 7; i++) c.i.push(item(I_COIN, -220 + i * 74, 150 + sin(i * .9) * 90));
+  c.i.push(item(I_PIG, 250, -60, 1), item(I_PIG, -260, 380, 2));
+  chunks.push(c);
+  nextY = 500;
+  while (nextY < 3000) genChunk();
+}
+
+function worldUpdate() {
+  while (nextY < P.y + 3200) genChunk();
+  // Ceiling guard: never let the unicorn leave the retained world upward.
+  const top = chunks[0];
+  if (P.y < top.y + 40) { P.y = top.y + 40; if (P.vy < 0) P.vy = abs(P.vy) * .6; }
+}
+
+// Chunks overlapping a vertical span (used by physics + render).
+function nearChunks(y0, y1) {
+  const out = [];
+  for (const c of chunks) if (c.y + c.h > y0 && c.y < y1) out.push(c);
+  return out;
+}
+
+// ==== 40_physics.js ====
+// ---------------------------------------------------------------------------
+// Simulation: semi-fixed timestep, adaptive substeps, circle-vs-{circle,
+// segment, arc} collision, plus the Blue rail and Green tether constraints.
+// ---------------------------------------------------------------------------
+
+let NC = [];        // chunks near the unicorn this step
+let hitCd = 0;      // global stroke retrigger cooldown
+
+// Velocity clamp plus a NaN guard: no combination of effects may destabilise
+// the simulation.
+function clampV() {
+  const s = hyp(P.vx, P.vy);
+  if (s > VMAX) { P.vx = P.vx / s * VMAX; P.vy = P.vy / s * VMAX; }
+  if (!isFinite(s)) { P.vx = 0; P.vy = 200; }
+  if (!isFinite(P.x + P.y)) { P.x = 0; P.y = depth; }
+}
+
+// --- constraints -----------------------------------------------------------
+function detachRail(boost) {
+  const s = P.ra;
+  if (s) { s.u = 1; s.l = mn(s.l, .12); }
+  P.ra = null;
+  if (boost) { P.vx *= 1.06; P.vy *= 1.06; }
+  sndRail(0);
+}
+
+function railStep(h) {
+  const s = P.ra;
+  const dx = s.x2 - s.x1, dy = s.y2 - s.y1, L = hyp(dx, dy);
+  if (s.l <= 0 || L < 8) { detachRail(1); return 0; }
+  s.l = mx(s.l, .1);
+  const ux = dx / L, uy = dy / L;
+  let sp = P.vx * ux + P.vy * uy;
+  sp = sp * .998 + (Gx * ux + Gy * uy) * h;
+  const floor_ = 370;
+  if (abs(sp) < floor_) {
+    const gd = Gx * ux + Gy * uy;
+    sp = (gd ? (gd > 0 ? 1 : -1) : sp >= 0 ? 1 : -1) * floor_;
+  }
+  P.rt += sp * h / L;
+  P.vx = ux * sp; P.vy = uy * sp;
+  if (P.rt < 0 || P.rt > 1) { P.rt = clamp(P.rt, 0, 1); detachRail(1); return 0; }
+  const nx = -uy * P.rs, ny = ux * P.rs;
+  P.x = s.x1 + dx * P.rt + nx * (R + ST);
+  P.y = s.y1 + dy * P.rt + ny * (R + ST);
+  if (rnd() < .5) burst(P.x, P.y, 3, 0, 60, HUE[4], -P.vx * .1, -P.vy * .1);
+  return 1;
+}
+
+// Releasing a tether converts the orbit into a launch.
+function releaseTether() {
+  if (!P.te) return;
+  P.te = null;
+  const s = hyp(P.vx, P.vy) || 1, k = 1.34 + 150 / s;
+  P.vx *= k; P.vy *= k;
+  clampV();
+  burst(P.x, P.y, 10, 0, 260);
+  sndTether(0);
+}
+
+// Inextensible rope: pull the body back onto the circle and drop the radial
+// velocity. Orbits gain a hair of energy so a swing never quietly dies.
+function tetherConstrain() {
+  const t = P.te;
+  let dx = P.x - t.x, dy = P.y - t.y;
+  const d = hyp(dx, dy);
+  if (d < 1 || d <= t.l) return;
+  dx /= d; dy /= d;
+  P.x = t.x + dx * t.l; P.y = t.y + dy * t.l;
+  const vr = P.vx * dx + P.vy * dy;
+  if (vr > 0) { P.vx -= vr * dx; P.vy -= vr * dy; }
+  const s = hyp(P.vx, P.vy);
+  if (s > 1 && s < 1500) { const k = mx(1.004, 320 / s); P.vx *= k; P.vy *= k; }
+}
+
+// --- item pickup -----------------------------------------------------------
+function items() {
+  for (const c of NC) for (const it of c.i)
+    if (!it.g && hyp(P.x - it.x, P.y - it.y) < R + 26) grab(it);
+}
+
+// --- obstacle collision ----------------------------------------------------
+function collideAll(h) {
+  for (const c of NC) for (const o of c.o) { if (!o.k) hitOb(o); }
+  if (hitCd > 0) hitCd -= h;
+  else for (let i = 0; i < strokes.length; i++) { if (hitStroke(strokes[i])) break; }
+}
+
+function hitOb(o) {
+  obT(o);
+  let nx, ny, d, px, py, pen;
+  if (!o.t) {
+    nx = P.x - _cx; ny = P.y - _cy; d = hyp(nx, ny);
+    const rr2 = o.r + R;
+    if (d > rr2) return;
+    if (d < 1e-4) { nx = 0; ny = -1; d = 1e-4; } else { nx /= d; ny /= d; }
+    pen = rr2 - d; px = _cx + nx * o.r; py = _cy + ny * o.r;
+  } else {
+    const cg = cos(_cg) * o.L, sg2 = sin(_cg) * o.L;
+    const ax = _cx - cg, ay = _cy - sg2, bx = _cx + cg, by = _cy + sg2;
+    const t = segT(ax, ay, bx, by, P.x, P.y);
+    px = ax + (bx - ax) * t; py = ay + (by - ay) * t;
+    nx = P.x - px; ny = P.y - py; d = hyp(nx, ny);
+    const rr2 = R + ST;
+    if (d > rr2) return;
+    if (d < 1e-4) { nx = -sin(_cg); ny = cos(_cg); d = 1e-4; } else { nx /= d; ny /= d; }
+    pen = rr2 - d;
+  }
+  if (o.m & M_PHASE) { if (P.ph > 0) return; }
+  obVel(o, px, py);
+  let rvx = P.vx - _cvx, rvy = P.vy - _cvy;
+  const vn = rvx * nx + rvy * ny;
+
+  if (o.m & M_BREAK) {
+    const imp = -vn;
+    if (imp > (P.rp > 0 ? BRK_R : BRK_E)) { shatter(o, px, py, imp); return; }
+  }
+
+  P.x += nx * pen; P.y += ny * pen;
+  if (P.ra) detachRail(0);
+  if (vn >= 0) return;
+
+  const bump = o.m & M_BUMP, damp = o.m & M_DAMP;
+  // A bumper's restitution falls off with speed: it kicks hard when you are
+  // slow (a genuine rescue) and bleeds energy when you are already flying.
+  // Without this the world is a closed energy pump and every run saturates at
+  // VMAX, which reads as noise rather than pinball.
+  const e = bump ? 1.32 - clamp(P.sp / VMAX, 0, 1) * .72 : damp ? .12 : .44;
+  const j = (1 + e) * -vn;                 // normal impulse magnitude
+  rvx += j * nx; rvy += j * ny;
+
+  // Coulomb friction: the tangential loss is capped by the normal impulse, not
+  // taken as a flat fraction of sliding speed. Resting contact therefore barely
+  // scrubs speed, so surfaces stop behaving like glue and a grazing skim keeps
+  // its momentum. The flat-fraction version stopped a 440-unit launch in three
+  // frames and made every ledge an unescapable trap.
+  const tx = -ny, ty = nx, vt = rvx * tx + rvy * ty;
+  const dv = mn(abs(vt), (damp ? 1.15 : .3) * j) * (vt < 0 ? -1 : 1);
+  rvx -= dv * tx; rvy -= dv * ty;
+  P.vx = rvx + _cvx; P.vy = rvy + _cvy;
+  clampV();
+
+  const imp = -vn;
+  sndHit(imp, damp ? 1 : bump ? 2 : 0);
+  shake = mn(26, shake + imp * (bump ? .006 : .0035));
+  const n = clamp(imp * .012, 1, 14) | 0;
+  burst(px, py, n, 1, mn(imp * .35, 420), geoHue(o));
+}
+
+function shatter(o, px, py, imp) {
+  o.k = 1;
+  shake = mn(30, shake + 10);
+  burst(px, py, 22, 2, 460, geoHue(o));
+  sndBreak();
+  score += 45 * mult | 0;
+  pop(px, py, '+' + (45 * mult | 0), 45);
+  P.vx *= .84; P.vy *= .84;
+}
+
+const geoHue = (o) => o.m & M_DAMP ? 280 : o.m & M_BREAK ? 20 : o.m & M_PHASE ? 285 : pal[6];
+
+// --- main step -------------------------------------------------------------
+function physics(h) {
+  const sp0 = hyp(P.vx, P.vy);
+  NC = nearChunks(P.y - 420 - sp0 * h, P.y + 420 + sp0 * h);
+
+  if (P.te) {
+    P.te.t -= h;
+    P.te.l = mx(48, P.te.l - 62 * h);
+    P.vx += Gx * h; P.vy += Gy * h;
+    if (P.te.t <= 0) releaseTether();
+  } else if (P.ra) {
+    // rail supplies its own motion
+  } else {
+    P.vx += Gx * h; P.vy += Gy * h;
+  }
+  clampV();
+
+  // Drag above the "fast" reference speed. Bumpers, rotors and Red together
+  // form an open energy pump, and without this the run spends half its life
+  // pinned to VMAX -- the hard clamp ends up setting the pace of the game
+  // instead of the player. Below VFAST there is no drag at all, so recovering
+  // from a stall is never taxed.
+  let sp = hyp(P.vx, P.vy);
+  if (sp > VFAST) {
+    const d = mx(0, 1 - (sp / VFAST - 1) * 1.5 * h);
+    P.vx *= d; P.vy *= d;
+    sp *= d;
+  }
+
+  const k = clamp(M.ceil(sp * h / (R * .55)), 1, 8);
+  const hh = h / k;
+  for (let i = 0; i < k; i++) {
+    if (P.ra) { if (!railStep(hh)) { P.x += P.vx * hh; P.y += P.vy * hh; } }
+    else { P.x += P.vx * hh; P.y += P.vy * hh; }
+    if (P.te) tetherConstrain();
+    collideAll(hh);
+    items();
+  }
+
+  // Absolute containment: no effect (warp included) may leave the column.
+  const bx = WMAX + 46;
+  if (P.x < -bx) { P.x = -bx; P.vx = abs(P.vx) * .55 + 110; }
+  if (P.x > bx) { P.x = bx; P.vx = -abs(P.vx) * .55 - 110; }
+
+  // timers
+  if (P.ph > 0) P.ph -= h;
+  if (P.rp > 0) P.rp -= h;
+  if (P.gt > 0) {
+    P.gt -= h;
+    if (P.gt <= 0) { Gx = 0; Gy = GRAV; }
+  }
+  P.sp = hyp(P.vx, P.vy);
+  if (P.sp > 30) P.a = at2(P.vy, P.vx);
+}
+
+// ==== 50_colors.js ====
+// ---------------------------------------------------------------------------
+// The seven colours, pigment economy, stroke drawing and effect composition.
+//
+// Effects are applied in a fixed order so that any combination of live bits is
+// deterministic:  space -> constraint -> gravity -> direction -> bounce -> energy.
+// Mixing is therefore free: two overlapping strokes simply OR their bitmasks.
+// ---------------------------------------------------------------------------
+
+let chainT = 0;     // seconds left before the colour chain lapses
+let dryC = -1, dryT = 0;   // "out of pigment" HUD flash
+
+const costMul = () => boostT[1] > 0 ? BOOST[1][0] : 1;
+
+// --- drawing ---------------------------------------------------------------
+// A stroke may only begin within SREACH of the unicorn; further clicks clamp
+// back onto that circle so the player is never silently ignored.
+function startStroke() {
+  if (st !== 1 || !P.al) return;
+  if (pig[sel] <= .5) { dryC = sel; dryT = .5; sndEmpty(); return; }
+  const dx = mwx - P.x, dy = mwy - P.y, k = mn(1, SREACH / (hyp(dx, dy) || 1));
+  const sx = P.x + dx * k, sy = P.y + dy * k;
+  if (!hint) { hint = 1; hintT = 0; }
+  drawing = { x1: sx, y1: sy, x2: sx, y2: sy, e: CBIT[sel], c: sel, l: SLIFE, u: 0, paid: 0 };
+  strokes.push(drawing);
+  while (strokes.length > SLIM) if (P.ra === strokes.shift()) detachRail(0);
+  if (P.te) releaseTether();
+}
+
+// Growing a stroke spends pigment; shrinking it back is free but refunds
+// nothing, so length is a real decision.
+function moveStroke() {
+  const s = drawing;
+  if (!s) return;
+  const dx = mwx - s.x1, dy = mwy - s.y1, d = hyp(dx, dy);
+  if (d < 1) return;
+  let L = mn(d, SMAX);
+  if (L > s.paid) {
+    const unit = PC[s.c] * costMul(), want = (L - s.paid) * unit;
+    if (pig[s.c] >= want) { pig[s.c] -= want; s.paid = L; }
+    else {
+      L = s.paid += pig[s.c] / unit;
+      pig[s.c] = 0;
+      if (dryT <= 0) { dryC = s.c; dryT = .6; sndEmpty(); }
+    }
+  }
+  s.x2 = s.x1 + dx / d * L; s.y2 = s.y1 + dy / d * L;
+  fuse(s);
+}
+
+// Overlapping live strokes fuse into a Prism Node and share effect bits.
+function fuse(s) {
+  for (const o of strokes) {
+    if (o === s || o.u || o.e === s.e) continue;
+    const p = segX(s.x1, s.y1, s.x2, s.y2, o.x1, o.y1, o.x2, o.y2);
+    if (p) {
+      s.e = o.e = s.e | o.e;
+      nodes.push({ x: p[0], y: p[1], t: .55 });
+      sndFuse();
+    }
+  }
+}
+
+// --- collision with a live stroke ------------------------------------------
+// A stroke fires once, on the first contact after it is long enough to matter.
+function hitStroke(s) {
+  const ax = s.x2 - s.x1, ay = s.y2 - s.y1, L = hyp(ax, ay);
+  if (s.u || s === P.ra || L < 26) return 0;
+  const t = segT(s.x1, s.y1, s.x2, s.y2, P.x, P.y);
+  const px = s.x1 + ax * t, py = s.y1 + ay * t;
+  let nx = P.x - px, ny = P.y - py;
+  const d = hyp(nx, ny);
+  if (d > R + ST) return 0;
+  const ux = ax / L, uy = ay / L;
+  if (d < 1e-3) { nx = -uy; ny = ux; } else { nx /= d; ny /= d; }
+  applyStroke(s, nx, ny, px, py, t, ux, uy);
+  hitCd = .05;
+  return 1;
+}
+
+function applyStroke(s, nx, ny, px, py, t, ux, uy) {
+  const b = s.e;
+  let consume = 1;
+
+  // 1 --- SPACE (Violet) ----------------------------------------------------
+  // With a second live Violet stroke on screen the pair becomes a portal and
+  // the exit angle rotates your velocity; alone it is a phase dash that passes
+  // straight through the next obstacle. Fused with Blue it phases a whole rail.
+  if (b & 64) {
+    if (b & 16) P.ph = .8;
+    else {
+      let o2 = 0;
+      for (const o of strokes) if (o !== s && !o.u && o.e & 64) { o2 = o; break; }
+      warpFX(P.x, P.y);
+      if (o2) {
+        const da = at2(o2.y2 - o2.y1, o2.x2 - o2.x1) - at2(uy, ux), ca = cos(da), sa = sin(da);
+        const vx = P.vx * ca - P.vy * sa, vy = P.vx * sa + P.vy * ca;
+        const k = (R + ST + 8) / (hyp(vx, vy) || 1);
+        P.vx = vx; P.vy = vy;
+        P.x = (o2.x1 + o2.x2) / 2 + vx * k;
+        P.y = (o2.y1 + o2.y2) / 2 + vy * k;
+        o2.u = 1; o2.l = .12;
+      } else {
+        // A lone Violet stroke is a dash along the current heading — or, from a
+        // standstill, straight off the face of the stroke, so Violet is also an
+        // escape tool rather than a no-op when you need it most.
+        const sp = hyp(P.vx, P.vy);
+        if (sp < 60) { P.x += nx * 300; P.y += ny * 300; P.vx = nx * 460; P.vy = ny * 460; }
+        else { const k = 300 / sp; P.x += P.vx * k; P.y += P.vy * k; }
+      }
+      P.x = clamp(P.x, -WMAX + R, WMAX - R);
+      P.ph = .34; P.vx *= 1.07; P.vy *= 1.07;
+      warpFX(P.x, P.y);
+    }
+    sndWarp();
+  }
+
+  // 2 --- CONSTRAINT (Blue rail, Green tether) ------------------------------
+  if (b & 16) {
+    if (P.te) releaseTether();
+    P.ra = s; P.rt = t;
+    P.rs = nx * -uy + ny * ux >= 0 ? 1 : -1;
+    const sp = mx(hyp(P.vx, P.vy), 420);
+    const dir = P.vx * ux + P.vy * uy >= 0 ? 1 : -1;
+    P.vx = ux * sp * dir; P.vy = uy * sp * dir;
+    consume = 0;
+    sndRail(1);
+  } else if (b & 8) {
+    if (P.ra) detachRail(0);
+    const d = hyp(P.x - px, P.y - py);
+    P.te = { x: px, y: py, l: clamp(d, 62, 195), t: 1.2 };
+    sndTether(1);
+  }
+
+  // 3 --- GRAVITY (Indigo) --------------------------------------------------
+  if (b & 32) {
+    Gx = nx * GRAV; Gy = ny * GRAV; P.gt = 2.9;
+    sndGrav(ny);
+    burst(px, py, 10, 3, 150, HUE[5]);
+  }
+
+  // 4/5 --- DIRECTION (Orange) / BOUNCE (Yellow) ----------------------------
+  const dirB = b & 2, sprB = b & 4;
+  if (dirB) {
+    const sp = hyp(P.vx, P.vy);
+    const ns = sprB ? mx(sp * 1.34, 800) : mx(sp * .99, 440);
+    P.vx = ux * ns; P.vy = uy * ns;
+    sndVector(sprB);
+  } else if (sprB) {
+    const vn = P.vx * nx + P.vy * ny, e = 1.85;
+    P.vx -= (1 + e) * vn * nx; P.vy -= (1 + e) * vn * ny;
+    // The floor scales with the impact so a spring stays impact-driven: it pops
+    // you off on a glancing hit, but it can never rescue a dead-stopped unicorn.
+    // That job belongs to Red.
+    const on = P.vx * nx + P.vy * ny, fl = mn(540, abs(vn) * 1.6);
+    if (on < fl) { P.vx += (fl - on) * nx; P.vy += (fl - on) * ny; }
+    sndSpring(abs(vn));
+  } else if (!(b & 89)) {              // 89 = red|tether|rail|violet
+    const vn = P.vx * nx + P.vy * ny;
+    if (vn < 0) { P.vx -= 1.55 * vn * nx; P.vy -= 1.55 * vn * ny; }
+  }
+
+  // 6 --- ENERGY (Red) ------------------------------------------------------
+  // Red never rebounds the way Yellow does: it mirrors the *aim* off the line so
+  // it can't fire the unicorn back into it, then injects a fixed amount of
+  // energy. That is why Red still works from a dead stop and Yellow does not.
+  if (b & 1) {
+    const rk = boostT[0] > 0 ? BOOST[0][1] : 1;
+    let sp = hyp(P.vx, P.vy), dxn, dyn;
+    if (sp < 50) { dxn = nx; dyn = ny; sp = 0; }
+    else {
+      dxn = P.vx / sp; dyn = P.vy / sp;
+      const vn = dxn * nx + dyn * ny;
+      if (vn < 0) { dxn -= 2 * vn * nx; dyn -= 2 * vn * ny; }
+    }
+    const ns = sp * 1.5 + 440 * rk;
+    P.vx = dxn * ns; P.vy = dyn * ns;
+    P.rp = .85;
+    shake = mn(26, shake + 7);
+    burst(px, py, 26, 0, 220, HUE[0], -dxn * 420, -dyn * 420);
+    sndBoost(ns);
+  }
+
+  clampV();
+  if (consume) { s.u = 1; s.l = mn(s.l, .14); }
+  strokeFX(s, px, py);
+  chainAdd(b);
+}
+
+// --- spectrum chain --------------------------------------------------------
+// Successfully landing a new colour extends the spectrum chain. Refunds are
+// deliberately partial: a perfect seven-colour loop never pays for itself.
+function chainAdd(b) {
+  const before = chain;
+  chainT = 7;
+  chain |= b & ALL7;
+  if (chain === before) return;
+  let n = 0;
+  for (let i = 0; i < 7; i++) if (chain & CBIT[i]) n++;
+  if (n <= chainN) return;
+  chainN = n;
+  if (n === 7) return fullSpectrum();
+  if (n === 3 || n === 5) {
+    for (let i = 0; i < 7; i++) pig[i] = mn(PMAX, pig[i] + 6);
+    pop(P.x, P.y - 30, 'SPECTRUM ' + n + '/7', HUE[n]);
+    sndRefund();
+  }
+}
+
+function fullSpectrum() {
+  fullSpec = 3.2;
+  for (let i = 0; i < 7; i++) pig[i] = mn(PMAX, pig[i] + 26);
+  mult = mn(12, mult + 1.5);
+  score += 1200 * mult | 0;
+  flash = 1; flashH = -1;
+  shake = mn(32, shake + 14);
+  pop(P.x, P.y - 46, 'FULL SPECTRUM', -1);
+  sndSpectrum();
+  chain = 0; chainN = 0;
+}
+
+// --- pickups ---------------------------------------------------------------
+function grab(it) {
+  it.g = 1;
+  if (it.t === I_COIN) {
+    combo++; comboT = 1.4; coins++;
+    score += 10 * mult * (1 + combo * .05) | 0;
+    sndCoin(combo);
+  } else if (it.t === I_CROWN) {
+    coins += 15; score += (500 * mult) | 0;
+    pop(it.x, it.y, 'CROWN +15', 48);
+    flash = mx(flash, .45); flashH = 48;
+    sndCrown();
+  } else if (it.t === I_PIG) {
+    pig[it.c] = mn(PMAX, pig[it.c] + 40);
+    sndPig(it.c);
+    burst(it.x, it.y, 12, 3, 190, HUE[it.c]);
+  } else if (it.t === I_WELL) {
+    for (let i = 0; i < 7; i++) pig[i] = PMAX;
+    flash = 1; flashH = -1;
+    pop(it.x, it.y, 'PRISM WELL', -1);
+    sndWell();
+  } else {
+    boostT[it.c] = BOOST[it.c][2];
+    pop(it.x, it.y, BN[it.c], BH[it.c]);
+    sndPower();
+  }
+}
+
+// ==== 60_audio.js ====
+// ---------------------------------------------------------------------------
+// Procedural Web Audio. Everything is synthesised from two primitives:
+//   O() — an oscillator with a pitch sweep and an AD envelope
+//   N() — a slice of the shared noise buffer through a swept filter
+// Two continuous voices (wind, rail grind) are created once and only have
+// their gain/frequency modulated, so long runs never accumulate nodes.
+// ---------------------------------------------------------------------------
+
+let AC = null, mg, sfxG, musG, lpF, nzBuf, windG, windF, railG, railO, railF;
+let voices = 0;                   // per-frame voice budget
+let mNext = 0, mStep = 0;         // music scheduler
+
+const NOTE = (n) => 440 * M.pow(2, (n - 69) / 12);
+const SCALE = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 4, 5, 7, 9, 11], [0, 3, 5, 7, 10, 12], [0, 1, 5, 6, 8, 11]];
+const WAVE = ['triangle', 'sawtooth', 'square'];
+
+function audioInit() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  const AX = window.AudioContext || window.webkitAudioContext;
+  if (!AX) return;
+  AC = new AX();
+
+  lpF = AC.createBiquadFilter(); lpF.type = 'lowpass'; lpF.frequency.value = 20000;
+  mg = AC.createGain(); mg.gain.value = SAVE.m ? 0 : .8;
+  lpF.connect(mg).connect(AC.destination);
+  sfxG = AC.createGain(); sfxG.gain.value = .85; sfxG.connect(lpF);
+  musG = AC.createGain(); musG.gain.value = .38; musG.connect(lpF);
+
+  const n = AC.sampleRate * 2;
+  nzBuf = AC.createBuffer(1, n, AC.sampleRate);
+  const d = nzBuf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = rnd() * 2 - 1;
+
+  // Two always-on voices: wind (speed) and rail grind (Blue). Built once, then
+  // only their gain/frequency is modulated, so long runs never leak nodes.
+  const voice = (src, f, q) => {
+    const b = AC.createBiquadFilter(); b.type = 'bandpass'; b.frequency.value = f; b.Q.value = q;
+    const g = AC.createGain(); g.gain.value = 0;
+    src.connect(b).connect(g).connect(sfxG); src.start();
+    return [b, g];
+  };
+  const ws = AC.createBufferSource(); ws.buffer = nzBuf; ws.loop = true;
+  [windF, windG] = voice(ws, 300, .7);
+  railO = AC.createOscillator(); railO.type = 'sawtooth'; railO.frequency.value = 220;
+  [railF, railG] = voice(railO, 1400, 6);
+
+  mNext = AC.currentTime + .1;
+}
+
+const ok = () => AC && !SAVE.m && voices < 26;
+const now = () => AC.currentTime;
+
+// Oscillator with an optional pitch sweep and an attack/decay envelope.
+// f1 of 0 (or equal to f0) means "hold the pitch".
+function O(w, f0, f1, dur, pk, dest, t0) {
+  const t = t0 || now();
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = w;
+  o.frequency.setValueAtTime(mx(8, f0), t);
+  if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(mx(8, f1), t + dur);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .008);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  o.connect(g).connect(dest || sfxG);
+  o.start(t); o.stop(t + dur + .02);
+  voices++;
+}
+
+function N(dur, pk, ft, f0, f1, q, dest, t0) {
+  const t = t0 || now();
+  const s = AC.createBufferSource();
+  s.buffer = nzBuf; s.loop = true;
+  s.playbackRate.value = .7 + rnd() * .6;
+  const f = AC.createBiquadFilter(); f.type = ft;
+  f.frequency.setValueAtTime(mx(20, f0), t);
+  if (f1 !== f0) f.frequency.exponentialRampToValueAtTime(mx(20, f1), t + dur);
+  f.Q.value = q || 1;
+  const g = AC.createGain();
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .005);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  s.connect(f).connect(g).connect(dest || sfxG);
+  s.start(t); s.stop(t + dur + .02);
+  voices++;
+}
+
+// --- collision / material --------------------------------------------------
+// Impact: one noise transient scaled by impulse, plus a body tone. kind 1 is a
+// dampener (dull thud), kind 2 a bumper (bright ping).
+function sndHit(imp, kind) {
+  if (!ok() || imp < 60) return;
+  const v = clamp(imp / 2200, .04, .55);
+  N(.03 + v * .12, v * .7, 'lowpass', 300 + imp * 1.6, 140, 1);
+  if (imp > 380) O('triangle', 120 + imp * .05, 44, .1 + v * .12, v * .8);
+  if (kind) O('sine', kind > 1 ? 520 + imp * .18 : 90, kind > 1 ? 260 : 42, kind > 1 ? .12 : .25, v * .5);
+}
+
+function sndBreak() {
+  if (!ok()) return;
+  N(.3, .45, 'bandpass', 2600, 300, 1.4);
+  O('triangle', 160, 38, .34, .5);
+  N(.09, .3, 'highpass', 4000, 9000, 1);
+}
+
+// --- the seven colours -----------------------------------------------------
+function sndBoost(ns) {                       // Red — rocket
+  if (!ok()) return;
+  const v = clamp(ns / 2600, .16, .5);
+  O('sawtooth', 150, 780 + ns * .2, .22, v * .5);
+  N(.34, v * .7, 'bandpass', 700, 4200, 1.1);
+  O('sine', 70, 34, .3, v * .8);
+}
+function sndVector(sup) {                     // Orange — directional snap
+  if (!ok()) return;
+  O('square', sup ? 700 : 940, sup ? 2000 : 1680, .07, .16);
+  N(.05, .12, 'highpass', 2600, 5200, 1);
+  if (sup) O('sine', 320, 900, .16, .2);
+}
+function sndSpring(imp) {                     // Yellow — elastic boing
+  if (!ok()) return;
+  const v = clamp(imp / 1400, .12, .4);
+  O('sine', 180 + imp * .1, 700 + imp * .3, .1, v);
+  O('sine', 700 + imp * .3, 210, .22, v * .8);
+}
+function sndTether(on) {                      // Green — tension / thwip
+  if (!ok()) return;
+  if (on) { O('triangle', 240, 720, 1.1, .13); N(.06, .1, 'bandpass', 900, 2400, 3); }
+  else { O('sawtooth', 900, 190, .13, .26); N(.1, .22, 'bandpass', 1800, 500, 2); }
+}
+function sndRail(on) {                        // Blue — continuous grind
+  if (!AC) return;
+  if (railG) railG.gain.setTargetAtTime(on && !SAVE.m ? .12 : 0, now(), .03);
+  if (on && ok()) O('square', 1200, 2400, .05, .1);
+}
+function sndGrav(ny) {                        // Indigo — gravity whoop
+  if (!ok()) return;
+  const up = ny < 0;
+  O('sine', up ? 120 : 460, up ? 460 : 110, .5, .3);
+  O('triangle', up ? 240 : 700, up ? 700 : 200, .38, .12);
+  N(.4, .1, 'lowpass', 900, 200, 1);
+}
+function sndWarp() {                          // Violet — space
+  if (!ok()) return;
+  O('sawtooth', 2600, 260, .1, .2);
+  N(.08, .18, 'highpass', 7000, 1400, 2);
+  O('sine', 90, 240, .22, .26);
+}
+
+// --- rewards / systems -----------------------------------------------------
+function sndCoin(cmb) {
+  if (!ok()) return;
+  const n = 74 + mn(cmb, 14) * 2;
+  O('square', NOTE(n), 0, .06, .1);
+  O('sine', NOTE(n + 12), 0, .1, .12);
+}
+// One arpeggio/chord engine drives every musical reward cue.
+// offs = semitone offsets, gap = seconds between notes (0 = chord), up = glide.
+function ARP(root, offs, dur, pk, w, gap, up) {
+  if (!AC || SAVE.m) return;
+  const t = now();
+  offs.forEach((o, i) => O(w, NOTE(root + o), up ? NOTE(root + o + up) : 0, dur, pk, 0, t + i * gap));
+}
+const MAJ = [0, 4, 7, 12];
+function sndCrown() { ARP(72, MAJ, .5, .12, 'triangle', .045); }
+function sndPig(c) { if (ok()) O('triangle', NOTE(64 + c * 2), NOTE(76 + c * 2), .16, .16); }
+function sndWell() {
+  ARP(60, SCALE[1], .5, .13, 'sine', .06, 12);
+  if (ok()) N(.9, .16, 'bandpass', 800, 6000, .8);
+}
+function sndSpectrum() {
+  ARP(60, SCALE[1], .7, .12, 'sawtooth', .05, 12);
+  ARP(84, MAJ, 1.5, .1, 'sine', 0);
+  if (AC && !SAVE.m) N(1.2, .2, 'bandpass', 400, 8000, .7, 0, now() + .3);
+}
+function sndFuse() { if (ok()) { O('square', 1500, 2600, .05, .09); O('sine', 900, 1800, .1, .09); } }
+function sndRefund() { if (ok()) O('triangle', NOTE(76), NOTE(83), .18, .12); }
+function sndPower() { ARP(62, [0, 5, 10], .12, .1, 'square', .06, 2); }
+function sndEmpty() { if (ok()) { O('sine', 150, 70, .12, .18); N(.06, .07, 'lowpass', 500, 200, 1); } }
+function sndStall(u) { if (ok()) O('sine', 70 + u * 40, 50, .18, .12 + u * .18); }
+function sndDeath() {
+  ARP(72, [0, -3, -6, -9, -12, -15, -18], .8, .1, 'sawtooth', .04, -30);
+  if (AC && !SAVE.m) { N(1, .3, 'lowpass', 3000, 90, 1); O('sine', 120, 30, 1.1, .3); }
+}
+function sndUI(up) { if (ok()) O('square', up ? 900 : 620, up ? 1200 : 500, .04, .07); }
+function sndGate() {
+  ARP(48, [0, 7, 12, 16, 19], 1.6, .1, 'triangle', 0);
+  if (AC && !SAVE.m) N(1.4, .22, 'bandpass', 300, 5000, .6);
+}
+
+// --- per-frame continuous layers ------------------------------------------
+// Continuous layers, updated once a frame:
+//  - wind gets louder and brighter with speed (you can hear acceleration)
+//  - the rail grind tracks rail speed
+//  - one master low-pass ducks everything inside a Focus Vault or a pause
+function audioFrame() {
+  voices = 0;
+  if (!AC) return;
+  const t = now(), n = clamp(P.sp / VMAX, 0, 1), play = st === 1 && P.al;
+  const set = (p, v, k) => p.setTargetAtTime(v, t, k);
+  set(windG.gain, play && !SAVE.m ? mn(.3, n * n * 1.9 + .015) : 0, .08);
+  set(windF.frequency, 240 + n * 3200, .08);
+  set(windF.Q, .6 + n * 2, .1);
+  set(railG.gain, P.ra && !SAVE.m ? .1 + n * .12 : 0, .04);
+  set(railF.frequency, 700 + P.sp * 1.4, .04);
+  set(railO.frequency, 90 + P.sp * .22, .04);
+  set(lpF.frequency, slow > .05 ? 480 : st === 2 ? 700 : 20000, .1);
+  set(musG.gain, SAVE.m ? 0 : st === 1 ? .38 : .26, .2);
+  if (play) musicTick();
+  else mNext = t + .1;
+}
+
+// A 16th-note scheduler. Region identity comes from formulas — a different
+// root, mode and wave per region, with a tempo that escalates as you descend.
+// Arrangement density follows speed, so the music reacts to how you are doing.
+function musicTick() {
+  const root = 44 + reg * 5 % 11, sc = SCALE[reg % 4], w = WAVE[reg % 3];
+  const inten = clamp(P.sp / VFAST, 0, 1.5) + (fullSpec > 0 ? .6 : 0);
+  const spb = 15 / ((92 + reg * 8) * (slow > .5 ? .5 : 1));
+  const t0 = now();
+  for (let guard = 8; mNext < t0 + .16 && guard--;) {
+    const t = mx(mNext, t0), i = mStep, b = i & 15;
+    if (!SAVE.m) {
+      const bass = root - 12 + sc[(i >> 2) % sc.length];
+      if (!(b & 3)) { O('sine', 120, 44, .16, .34, musG, t); O(w, NOTE(bass), 0, .22, .2, musG, t); }
+      else if (inten > .5 && b === 6) O(w, NOTE(bass), 0, .22, .2, musG, t);
+      if (inten > .3 && b & 1) N(.028, .05 + inten * .03, 'highpass', 7000, 6000, 1, musG, t);
+      if (inten > .65 && !(b & 1)) {
+        const n = NOTE(root + 12 + sc[(i * 3 + (i >> 4)) % sc.length]);
+        O(w, n, n, .1, .07 + inten * .03, musG, t);
+      }
+    }
+    mStep++; mNext = t + spb;
+  }
+}
+
+// ==== 70_render.js ====
+// ---------------------------------------------------------------------------
+// Rendering: camera, region backdrops, world geometry, the procedural unicorn,
+// trail and particles. Everything is Canvas2D primitives — no assets.
+//
+// Written for compressed size: one set of drawing shorthands, one particle
+// spawner, one polygon helper, and region identity carried by parameters
+// rather than by separate code paths.
+// ---------------------------------------------------------------------------
+
+const BP = () => X.beginPath();
+const SK = (w, c) => { X.lineWidth = w; X.strokeStyle = c; X.stroke(); };
+const FL = (c) => { X.fillStyle = c; X.fill(); };
+const AR = (x, y, r, a, b) => X.arc(x, y, r, a || 0, b === undefined ? TAU : b);
+const MT = (x, y) => X.moveTo(x, y);
+const LT = (x, y) => X.lineTo(x, y);
+const LIN = (ax, ay, bx, by, w, c) => { BP(); MT(ax, ay); LT(bx, by); SK(w, c); };
+const CIR = (x, y, r, f, s, w) => { BP(); AR(x, y, r); if (f) FL(f); if (s) SK(w, s); };
+// Closed polygon; fn(i) plots vertex i through VTX.
+const POLY = (n, f, s, w, fn) => {
+  BP();
+  for (let i = 0; i < n; i++) fn(i);
+  X.closePath();
+  if (f) FL(f);
+  if (s) SK(w, s);
+};
+const VTX = (i, x, y) => (i ? LT : MT)(x, y);
+
+let pal = [232, 62, 12, 322, 52, 27, 288, 80];   // live (interpolated) palette
+let shX = 0, shY = 0;
+
+// --- particles -------------------------------------------------------------
+// k: 0 spark (streak), 1 debris, 2 ring. hue undefined = current colour.
+function pt(x, y, vx, vy, l, h, k, s) {
+  if (parts.length > 340) parts.shift();
+  parts.push({ x, y, vx, vy, l, L: l, h, k, s });
+}
+function burst(x, y, n, k, spd, hue, vx, vy) {
+  const h = hue === undefined ? HUE[sel] : hue;
+  // k===1 is a generic world impact — the equipped Impact cosmetic restyles it.
+  const kk = k === 1 ? SAVE.e[2] : k;
+  for (let i = 0; i < n; i++) {
+    const a = rf(0, TAU), v = rf(.3, 1) * spd;
+    pt(x, y, (vx || 0) + cos(a) * v, (vy || 0) + sin(a) * v,
+      rf(.18, .55), h + rf(-18, 18), kk, rf(1.4, 3.6));
+  }
+}
+function warpFX(x, y) {
+  pt(x, y, 0, 0, .4, HUE[6], 2, 8);
+  burst(x, y, 12, 0, 320, HUE[6]);
+}
+function strokeFX(s, px, py) {
+  for (let i = 0; i < 7; i++) if (s.e & CBIT[i]) burst(px, py, 5, 0, 240, HUE[i]);
+  pt(px, py, 0, 0, .3, HUE[s.c], 2, 6);
+}
+function pop(x, y, t, h) { pops.push({ x, y, t, h, l: 1.15 }); }
+
+function partStep(h) {
+  for (let i = parts.length; i--;) {
+    const p = parts[i];
+    if ((p.l -= h) <= 0) { parts.splice(i, 1); continue; }
+    p.x += p.vx * h; p.y += p.vy * h;
+    if (p.k !== 2) { p.vy += 400 * h; p.vx *= .985; p.vy *= .985; }
+  }
+  for (let i = pops.length; i--;) {
+    const p = pops[i]; p.y -= 46 * h;
+    if ((p.l -= h) <= 0) pops.splice(i, 1);
+  }
+  for (let i = nodes.length; i--;) if ((nodes[i].t -= h) <= 0) nodes.splice(i, 1);
+}
+
+// --- camera ----------------------------------------------------------------
+function camUpdate(h) {
+  const v = vault;
+  C.x = approach(C.x, v ? v.cx : P.x + clamp(P.vx * .12, -180, 180), v ? 3.5 : 7.5, h);
+  C.y = approach(C.y, v ? v.cy : P.y + clamp(P.vy * .24, -.19 * VH, .25 * VH), v ? 3.5 : 7.5, h);
+  C.z = approach(C.z, v ? .82 : 1 / (1 + P.sp / 5200), 4, h);
+  SC = mn(H / VH, W / (COL * 2 + 46)) * C.z;
+  // Keep the play column framed. Without this the velocity lead walks the
+  // camera off the side of the world and half the screen becomes dead rock.
+  const lim = mx(0, WMAX + 66 - W / 2 / SC);
+  C.x = clamp(C.x, -lim, lim);
+  shake = mx(0, shake - shake * 7 * h - 4 * h);
+  const s = mn(shake, 24);
+  shX = rf(-s, s); shY = rf(-s, s);
+}
+const w2sx = (x) => W / 2 + (x - C.x) * SC + shX;
+const w2sy = (y) => H / 2 + (y - C.y) * SC + shY;
+const s2wx = (x) => C.x + (x - W / 2 - shX) / SC;
+const s2wy = (y) => C.y + (y - H / 2 - shY) / SC;
+
+// Shortest-path hue interpolation so palettes cross-fade instead of spinning.
+const alerp = (a, b, r, h) => (a + (((b - a + 540) % 360) - 180) * (1 - M.exp(-r * h)) + 360) % 360;
+
+// Target palette derived from the region's three numbers:
+// [bgTopH, bgTopS, bgTopL, bgBotH, bgBotS, bgBotL, geoH, geoL]
+// Geometry takes the complement of the background's midpoint hue. Deriving the
+// obstacle colour from the same hue as the sky made every region a monotone
+// wash where nothing you could hit stood out from what you couldn't.
+const regPal = (r) => {
+  const q = REG[r], hu = q[1], sp = q[2], bl = q[4];
+  return [hu, 56, bl, hu + sp, 64, bl + 23, hu + sp / 2 + 165, q[3]];
+};
+function palUpdate(h) {
+  const t = regPal(reg);
+  for (let i = 0; i < 8; i++)
+    pal[i] = i % 3 || i > 6 ? approach(pal[i], t[i], 1.6, h) : alerp(pal[i], t[i], 1.6, h);
+}
+
+// --- background ------------------------------------------------------------
+// Two parallax layers of a region motif, placed on an infinite hashed grid so
+// the scenery is endless and costs no storage.
+function background() {
+  const g = X.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, hsl(pal[0] | 0, pal[1] | 0, pal[2] | 0));
+  g.addColorStop(1, hsl(pal[3] | 0, pal[4] | 0, pal[5] | 0));
+  X.fillStyle = g; X.fillRect(0, 0, W, H);
+  const k = MOT[reg];
+  X.lineWidth = mx(1, 2.4 * SC);
+  for (let L = 0; L < 2; L++) {
+    const par = L ? .4 : .16, size = L ? 300 : 560, al = L ? .13 : .05;
+    const cx = C.x * par, cy = C.y * par, hw = W / 2 / SC, hh = H / 2 / SC;
+    const x1 = flr((cx + hw) / size), y1 = flr((cy + hh) / size);
+    for (let gy = flr((cy - hh) / size); gy <= y1; gy++)
+      for (let gx = flr((cx - hw) / size); gx <= x1; gx++) {
+        const v = hsh(gx * 31 + k[0], gy * 17);
+        if (v < .4) continue;
+        const wx = (gx + .15 + hsh(gx, gy) * .7) * size, wy = (gy + .15 + hsh(gy, gx + 9) * .7) * size;
+        const hue = pal[6] + (v - .5) * 60 | 0;
+        X.fillStyle = hsl(hue, 60, pal[7] | 0, al);
+        X.strokeStyle = hsl(hue, 70, pal[7] | 0, al * 2);
+        motif(k, W / 2 + (wx - cx) * SC, H / 2 + (wy - cy) * SC, size * (.16 + v * .3) * SC, v);
+      }
+  }
+}
+
+// Motif families: [prim, a, b].
+// prim 0 blobs · 1 polygon(a sides, b/10 inner radius, b<0 rough)
+// prim 2 rings(a) + spokes(|b|), b<0 = partial arcs instead of full rings.
+const MOT = [[0, 3, 0], [2, 1, 8], [2, 2, -3], [1, 5, 4], [1, 7, -1], [2, 3, 6], [2, 1, 4]];
+
+function motif(k, x, y, r, v) {
+  const a1 = k[1], a2 = k[2];
+  BP();
+  if (!k[0]) {
+    for (let i = 0; i < 3; i++) AR(x + (i - 1) * r * .5, y + (i & 1 ? r * .16 : 0), r * (.5 - i * .06));
+    X.fill();
+  } else if (k[0] < 2) {
+    for (let i = 0; i < a1; i++) {
+      const a = i / a1 * TAU + v * 4;
+      const q = r * (a2 < 0 ? .6 + hsh(i, v * 99) * .5 : i & 1 ? a2 / 10 : 1);
+      VTX(i, x + cos(a) * q, y + sin(a) * q);
+    }
+    X.closePath(); X.fill();
+  } else {
+    const span = a2 < 0 ? 2.4 : TAU, n = abs(a2);
+    for (let i = 1; i <= a1; i++) { BP(); AR(x, y, r * (1 - i * .22), v * TAU, v * TAU + span); X.stroke(); }
+    BP();
+    for (let i = 0; i < n; i++) {
+      const a = i / n * TAU + T * .06 * (v > .7 ? -1 : 1);
+      MT(x + cos(a) * r * .5, y + sin(a) * r * .5);
+      LT(x + cos(a) * r, y + sin(a) * r);
+    }
+    X.stroke();
+  }
+}
+
+// --- world -----------------------------------------------------------------
+// Material styling: [hue, fillSat, fillLight, edgeSat, edgeLight].
+const MSTY = [
+  [276, 40, 7, 60, 26],      // damp / void
+  [18, 74, 42, 100, 66],     // breakable
+  [292, 60, 30, 100, 74],    // phase wall
+  [200, 80, 40, 100, 76],    // guide rail
+  [140, 70, 34, 100, 70],    // tether anchor
+];
+function obStyle(o) {
+  const m = o.m;
+  const i = m & M_DAMP ? 0 : m & M_BREAK ? 1 : m & M_PHASE ? 2 : m & M_RAIL ? 3 : m & M_ANCH ? 4 : -1;
+  if (i < 0) {
+    const b = m & M_BUMP;
+    return [hsl(pal[6] + (b ? 30 : 0) | 0, b ? 90 : 46, b ? 46 : mx(26, pal[7] * .46) | 0),
+      hsl(pal[6] + (b ? 40 : 0) | 0, b ? 100 : 68, b ? 78 : pal[7] | 0)];
+  }
+  const s = MSTY[i];
+  return [hsl(s[0], s[1], s[2]), hsl(s[0], s[3], s[4])];
+}
+
+function drawWorld() {
+  const y0 = s2wy(0) - 200, y1 = s2wy(H) + 200;
+  const wide = mx(2, (ST * 2 + 3) * SC), thin = mx(1, ST * SC);
+  const mass = hsl(pal[6] | 0, 34, mx(4, pal[2] * .42) | 0);
+  X.lineCap = 'round';
+  for (const c of chunks) {
+    if (c.y + c.h < y0 || c.y > y1) continue;
+    // Rock beyond each wall, so the play column reads as a shaft.
+    const ty = w2sy(c.y), by = w2sy(c.y + c.h);
+    X.fillStyle = mass;
+    for (const sd of [-9e3, 9e3]) {
+      BP(); MT(sd, ty);
+      LT(w2sx(sd < 0 ? c.pl : c.pr), ty);
+      LT(w2sx(sd < 0 ? c.l : c.r), by);
+      LT(sd, by); X.fill();
+    }
+    for (const o of c.o) {
+      if (o.k) continue;
+      obT(o);
+      const s2 = obStyle(o);
+      if (!o.t) {
+        CIR(w2sx(_cx), w2sy(_cy), o.r * SC, s2[0], s2[1], mx(1, 2.5 * SC));
+        if (o.m & M_BUMP) CIR(w2sx(_cx), w2sy(_cy), o.r * SC * .55, 0, s2[1], mx(1, 1.6 * SC));
+      } else {
+        const cg = cos(_cg) * o.L, sg2 = sin(_cg) * o.L;
+        LIN(w2sx(_cx - cg), w2sy(_cy - sg2), w2sx(_cx + cg), w2sy(_cy + sg2), wide, s2[0]);
+        SK(thin, s2[1]);
+        if (o.m & M_BREAK) {
+          X.setLineDash([6 * SC, 7 * SC]);
+          SK(mx(1, 2 * SC), 'hsl(48 100% 80% / .85)');
+          X.setLineDash([]);
+        }
+      }
+    }
+    for (const it of c.i) if (!it.g) drawItem(it);
+  }
+}
+
+// Coins are circles; everything else is a spinning polygon with its own
+// vertex count, radius and spin rate.
+function drawItem(it) {
+  const x = w2sx(it.x), y = w2sy(it.y), s = SC, b = 1 + sin(T * 3 + it.x * .02) * .12, t = it.t;
+  if (!t) { CIR(x, y, 9 * s * b, UG, 'hsl(38 100% 84%)', mx(1, 2.2 * s)); return; }
+  if (t === I_WELL) {
+    for (let i = 0; i < 7; i++) {
+      const a = i / 7 * TAU + T * .6;
+      BP(); AR(x, y, 24 * s * b, a, a + .8);
+      SK(7 * s, chsl(i, 62));
+    }
+    CIR(x, y, 13 * s * b, '#fff');
+    return;
+  }
+  const cr = t === I_CROWN, pg = t === I_PIG;
+  const n = cr ? 10 : pg ? 6 : 3, rad = (cr ? 16 : pg ? 12 : 15) * s * b;
+  X.save(); X.translate(x, y);
+  X.rotate(T * (cr ? .8 : pg ? 1.4 : -1) + it.c);
+  POLY(n, cr ? UG : pg ? chsl(it.c, 58) : it.c ? '#fff' : hsl(0, 100, 60),
+    pg ? chsl(it.c, 86) : '#fff', mx(1, 2 * s), (i) => {
+      const a = i / n * TAU, q = rad * (cr && i & 1 ? .44 : 1);
+      VTX(i, cos(a) * q, sin(a) * q);
+    });
+  X.restore();
+}
+
+// --- player strokes --------------------------------------------------------
+// A fused stroke paints a gradient through every colour it carries — that
+// gradient is the whole visual language of mixing.
+function strokeColor(s, a) {
+  const bits = [];
+  for (let i = 0; i < 7; i++) if (s.e & CBIT[i]) bits.push(i);
+  if (bits.length < 2) return chsl(bits[0] | 0, 62, a);
+  const g = X.createLinearGradient(w2sx(s.x1), w2sy(s.y1), w2sx(s.x2), w2sy(s.y2));
+  bits.forEach((b, i) => g.addColorStop(i / (bits.length - 1), chsl(b, 64, a)));
+  return g;
+}
+
+function drawStrokes() {
+  X.lineCap = 'round';
+  for (const s of strokes) {
+    const a = clamp(s.l / SLIFE * 1.6, .12, 1);
+    LIN(w2sx(s.x1), w2sy(s.y1), w2sx(s.x2), w2sy(s.y2), mx(3, 16 * SC), strokeColor(s, a * .22));
+    SK(mx(2, ST * 2 * SC), strokeColor(s, a));
+    if (s === P.ra) {
+      X.setLineDash([4 * SC, 9 * SC]); X.lineDashOffset = -T * 90 * SC;
+      SK(mx(1, 3 * SC), 'hsl(190 100% 88% / .9)');
+      X.setLineDash([]);
+    }
+  }
+  for (const n of nodes) {
+    const a = n.t / .55;
+    CIR(w2sx(n.x), w2sy(n.y), (6 + (1 - a) * 26) * SC, 0, 'hsl(0 0% 100% / ' + a + ')', mx(1, 3 * SC));
+  }
+  if (P.te) {
+    const ax = w2sx(P.te.x), ay = w2sy(P.te.y);
+    LIN(ax, ay, w2sx(P.x), w2sy(P.y), mx(1, 3.4 * SC), chsl(3, 70));
+    CIR(ax, ay, 8 * SC, chsl(3, 62));
+  }
+}
+
+function drawParts() {
+  X.lineCap = 'round';
+  for (const p of parts) {
+    const a = clamp(p.l / p.L, 0, 1), x = w2sx(p.x), y = w2sy(p.y);
+    if (p.k === 2) CIR(x, y, (1 - a) * p.s * 9 * SC, 0, hsl(p.h | 0, 100, 75, a), mx(1, 3 * a * SC));
+    else LIN(x, y, x - p.vx * (p.k ? .02 : .012) * SC, y - p.vy * (p.k ? .02 : .012) * SC,
+      mx(1, p.s * (p.k ? 1 : a) * SC), hsl(p.h | 0, p.k ? 70 : 100, p.k ? 55 : 68, a));
+  }
+  for (const p of pops) {
+    const a = clamp(p.l, 0, 1);
+    txt(p.t, w2sx(p.x), w2sy(p.y), 17 * SC / U,
+      p.h < 0 ? 'hsl(0 0% 100% / ' + a + ')' : hsl(p.h | 0, 100, 70, a), 'center', 1);
+  }
+}
+
+// --- the unicorn -----------------------------------------------------------
+function pushTrail() {
+  const n = trail.length ? trail[trail.length - 1] : 0;
+  if (!n || hyp(P.x - n.x, P.y - n.y) > 7) {
+    trail.push({ x: P.x, y: P.y, h: fullSpec > 0 ? -1 : HUE[sel] });
+    while (trail.length > 26 + clamp(P.sp / 34, 0, 34)) trail.shift();
+  }
+}
+
+function drawTrail() {
+  const n = trail.length, style = SAVE.e[1];
+  X.lineCap = 'round';
+  for (let i = 1; i < n; i++) {
+    if (style === 1 && i % 2) continue;
+    const a = i / n, p = trail[i - 1], q = trail[i];
+    LIN(w2sx(p.x), w2sy(p.y), w2sx(q.x), w2sy(q.y),
+      mx(1, 15 * a * SC * (style === 2 ? .6 + rnd() * .8 : 1)),
+      hsl((q.h < 0 ? (T * 400 + i * 26) % 360 : q.h) | 0, 100, 60 + a * 18, a * .8));
+  }
+}
+
+// The unicorn, drawn in local units under the current transform. Shared by
+// gameplay and the store preview so there is exactly one unicorn in the game.
+function unicornBody(body, tint, white) {
+  const main = white ? '#fff' : body === 1 ? 'hsl(268 40% 12%)' : body === 2 ? 'hsl(190 100% 72%)' : 'hsl(300 40% 96%)';
+  const line = white ? chsl(flr(T * 6) % 7, 70) : body === 2 ? 'hsl(300 100% 70%)' : 'hsl(280 45% 62%)';
+  const gal = sin(T * 13), rb = flr(T * 5);
+  X.lineCap = 'round';
+
+  BP(); MT(-13, 0);
+  for (let i = 1; i < 5; i++) LT(-13 - i * 6, sin(T * 9 - i * .8) * (2 + i * 1.6));
+  SK(5, chsl((rb + 2) % 7, 65));
+  SK(2.4, chsl((rb + 5) % 7, 80));
+
+  for (let i = 0; i < 4; i++) {
+    const lx = -8 + (i >> 1) * 15, ph = gal * (i & 1 ? 1 : -1) * (i > 1 ? -1 : 1);
+    BP(); MT(lx, 6); LT(lx + ph * 5, 15); LT(lx + ph * 8 + 2, 20);
+    SK(3, main);
+  }
+
+  BP(); X.ellipse(0, 0, 17, 11, 0, 0, TAU);
+  FL(main); SK(2, line);
+  BP(); MT(8, -6);
+  X.quadraticCurveTo(20, -14, 25, -12);
+  X.quadraticCurveTo(31, -11, 30, -5);
+  LT(20, -1); X.closePath();
+  FL(main); SK(2, line);
+
+  for (let i = 0; i < 4; i++) {
+    BP(); MT(6 + i * 4, -7 - i);
+    X.quadraticCurveTo(2 + i * 4, -16 - i * 1.5, 9 + i * 4, -18 - i);
+    SK(3.4, chsl((rb + i) % 7, 66));
+  }
+
+  X.save(); X.translate(26, -12); X.rotate(-.62);
+  const hl = 15;
+  const hg = X.createLinearGradient(0, 0, 0, -hl);
+  hg.addColorStop(0, chsl(0, 65)); hg.addColorStop(1, chsl(tint, 82));
+  POLY(3, hg, '#fff', 1.2, (i) => VTX(i, [-3, 3, 0][i], [0, 0, -hl][i]));
+  X.restore();
+
+  CIR(26, -8, 1.7, st === 1 && P.st > STALLW ? '#f44' : '#2a1836');
+}
+
+function drawUnicorn() {
+  const s = SC, x = w2sx(P.x), y = w2sy(P.y);
+  X.save();
+  X.translate(x, y); X.rotate(P.a); X.scale(s, s);
+  unicornBody(SAVE.e[0], sel, fullSpec > 0 || P.ph > 0);
+  X.restore();
+
+  // Selected-colour halo, tinted red while Red-charged: world-space feedback
+  // so the player never has to glance at the HUD.
+  CIR(x, y, (R + 7) * s, 0, P.rp > 0 ? 'hsl(6 100% 62%)' : chsl(sel, 70, .55), mx(1, (P.rp > 0 ? 3 : 2) * s));
+  if (P.st > STALLW) {
+    const u = (P.st - STALLW) / (STALLT - STALLW);
+    BP(); AR(x, y, (R + 16 + sin(T * 22) * 4) * s, -PI / 2, -PI / 2 + TAU * (1 - u));
+    SK(mx(2, 4 * s), 'hsl(' + (30 - u * 30) + ' 100% 60%)');
+  }
+}
+
+// ==== 80_hud.js ====
+// ---------------------------------------------------------------------------
+// HUD, prism selector, radial wheel, menus, results and the cosmetic store.
+// All immediate-mode on the same canvas — no DOM.
+//
+// The UI deliberately reuses a tiny fixed palette and a single modal helper:
+// every distinct colour string and layout number costs compressed bytes.
+// ---------------------------------------------------------------------------
+
+// Three cosmetic categories of three variants; variant 0 is always owned.
+// Cosmetics are render-only: they never touch collision, pigment or scoring.
+const COSN = 'CLOUD SHADOW NEON RAINBOW DASHED COMET SPARKS SHARDS RINGS'.split(' ');
+const COSP = [0, 180, 420];
+const BN = ['RED OVERDRIVE', 'EFFICIENCY'];
+const BH = [0, -1];
+const owned = (c, i) => !i || (SAVE.o >> (c * 3 + i)) & 1;
+
+// fixed UI palette
+const W9 = '#fff';
+const W6 = 'hsl(0 0% 100% / .62)';
+const W3 = 'hsl(0 0% 100% / .34)';
+const UB = 'hsl(282 40% 15% / .88)';   // button
+const UE = 'hsl(290 55% 50%)';         // edge / accent
+const UG = 'hsl(48 100% 66%)';         // gold
+
+let U = 1;              // UI scale
+let btns = [];          // immediate-mode buttons for this frame
+
+function txt(s, x, y, sz, col, al, bold) {
+  X.font = (bold ? 'bold ' : '') + (sz * U | 0) + 'px monospace';
+  X.textAlign = al || 'center';
+  X.textBaseline = 'middle';
+  X.fillStyle = col;
+  X.fillText(s, x, y);
+}
+const RR = (x, y, w, h, r) => { BP(); X.roundRect(x, y, w, h, r); };
+const hot = (x, y, w, h) => pmx > x - w / 2 && pmx < x + w / 2 && pmy > y - h / 2 && pmy < y + h / 2;
+
+function btn(x, y, w, h, label, fn, accent) {
+  const o = hot(x, y, w, h);
+  btns.push({ hot: o, fn });
+  RR(x - w / 2, y - h / 2, w, h, 8 * U);
+  FL(o ? accent || UE : UB);
+  SK(2 * U, o ? W9 : UE);
+  txt(label, x, y + U, 15, o ? W9 : W6, 'center', 1);
+}
+
+function uiClick() {
+  for (const b of btns) if (b.hot) { sndUI(1); b.fn(); return 1; }
+  return 0;
+}
+
+// --- in-run HUD ------------------------------------------------------------
+function hud() {
+  const p = 30 * U, bw = 240 * U, dep = mx(P.y, 0);
+  CIR(p, p, 9 * U, UG);
+  txt(coins + (SAVE.c ? ' (' + (SAVE.c + coins) + ')' : ''), p + 16 * U, p, 16, UG, 'left', 1);
+  txt(score | 0, W - p, p, 19, W9, 'right', 1);
+  if (mult > 1.05) txt('x' + mult.toFixed(1), W - p, p + 22 * U, 15, chsl(2, 70), 'right', 1);
+
+  // region name, progress bar and depth
+  X.fillStyle = W3;
+  X.fillRect(W / 2 - bw / 2, p + 12 * U, bw, 4 * U);
+  X.fillStyle = hsl(pal[6] | 0, 90, 70);
+  X.fillRect(W / 2 - bw / 2, p + 12 * U, bw * clamp((dep % REGD) / REGD, 0, 1), 4 * U);
+  txt(REG[reg][0] + (loopAt(P.y) ? ' +' + loopAt(P.y) : ''), W / 2, 18 * U, 14, W6, 'center', 1);
+  txt((dep / 10 | 0) + 'm', W / 2 + bw / 2 + 24 * U, p + 14 * U, 13, W3, 'left');
+
+  prismBar();
+
+  for (let i = 0; i < 2; i++) if (boostT[i] > 0)
+    txt(BN[i] + ' ' + boostT[i].toFixed(1), W - p, p + (30 + i * 16) * U, 12,
+      BH[i] < 0 ? W9 : hsl(BH[i], 100, 70), 'right', 1);
+
+  if (regShow > 0)
+    txt(REG[reg][0], W / 2, H * .3, 42,
+      'hsl(0 0% 100% / ' + clamp(regShow, 0, 1) * clamp(3.2 - regShow, 0, 1) + ')', 'center', 1);
+  if (!SAVE.t) {
+    const t = ['DRAG TO DRAW A RAINBOW RAIL', 'PRESS 1-7 OR SCROLL TO CHANGE COLOUR',
+      'PIGMENT IS FINITE - GRAB SHARDS TO REFILL'][hint];
+    if (t) txt(t, W / 2, H - 118 * U, 15, W6, 'center', 1);
+  }
+  if (slow > .05) {
+    X.fillStyle = 'hsl(275 60% 60% / ' + slow * .1 + ')';
+    X.fillRect(0, 0, W, H);
+    txt('FOCUS VAULT', W / 2, 70 * U, 16, W6, 'center', 1);
+  }
+}
+
+// Seven reservoirs: fill = pigment left, ring = selection, dot = chain state.
+// The segments are clickable, so the game is playable with the mouse alone.
+function prismBar() {
+  const w = 44 * U, x0 = W / 2 - 25 * w / 7, y = H - 40 * U, h = 26 * U;
+  for (let i = 0; i < 7; i++) {
+    const x = x0 + i * w * 50 / 44, on = i === sel, f = pig[i] / PMAX, cx = x + w / 2;
+    RR(x, y - h / 2, w, h, 5 * U);
+    FL('hsl(270 30% 8% / .8)');
+    X.save(); X.clip();
+    X.fillStyle = chsl(i, on ? 60 : 42, dryC === i && dryT > 0 ? .4 + sin(T * 40) * .3 : 1);
+    X.fillRect(x, y + h / 2 - h * f, w, h * f);
+    X.restore();
+    RR(x, y - h / 2, w, h, 5 * U);
+    SK((on ? 2.6 : 1.2) * U, on ? W9 : chsl(i, 55, .8));
+    txt('ROYGBIV'[i], cx, y, on ? 15 : 12, on ? W9 : W6, 'center', 1);
+    txt(i + 1, cx, y - h / 2 - 9 * U, 10, on ? W9 : W3);
+    if (chain & CBIT[i]) CIR(cx, y + h / 2 + 8 * U, 2.6 * U, chsl(i, 75));
+    btns.push({ hot: hot(cx, y, w, h), fn: () => setSel(i) });
+  }
+  if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 'center', 1);
+}
+
+// --- cursor ----------------------------------------------------------------
+function cursor() {
+  if (st !== 1) { CIR(pmx, pmy, 7 * U, 0, W9, 2 * U); return; }
+  CIR(pmx, pmy, 9 * U, 0, chsl(sel, 70), 2.4 * U);
+  CIR(pmx, pmy, 2 * U, chsl(sel, 85));
+  if (!drawing && P.al) {
+    const dx = mwx - P.x, dy = mwy - P.y, d = hyp(dx, dy);
+    if (d > SREACH) CIR(w2sx(P.x + dx / d * SREACH), w2sy(P.y + dy / d * SREACH), 4 * U, chsl(sel, 60, .8));
+  }
+}
+
+// --- modal framework -------------------------------------------------------
+// bs = [dx, dy, w, label, fn, accent] offsets from the screen centre.
+function modal(w, h, title, lines, bs, sz) {
+  X.fillStyle = 'hsl(275 45% 5% / .8)';
+  X.fillRect(0, 0, W, H);
+  if (w) {
+    RR(W / 2 - w * U / 2, H / 2 - h * U / 2, w * U, h * U, 14 * U);
+    FL('hsl(272 40% 9% / .96)');
+    SK(2 * U, UE);
+    txt(title, W / 2, H / 2 - (h / 2 - 34) * U, 27, W9, 'center', 1);
+  }
+  for (let i = 0; i < lines.length; i++)
+    txt(lines[i], W / 2, H / 2 - (h / 2 - 78) * U + i * 22 * U, sz || 13.5, W6, 'center', sz ? 1 : 0);
+  for (const b of bs) btn(W / 2 + b[0] * U, H / 2 + b[1] * U, b[2] * U, 40 * U, b[3], b[4], b[5]);
+}
+
+const back = () => { st = SAVE.b || score ? 3 : 0; };
+function mute() { SAVE.m ^= 1; if (mg) mg.gain.value = SAVE.m ? 0 : .8; save(); }
+
+function screenTitle() {
+  modal(0, 0, 0, [], [
+    [0, -30, 190, 'PLAY', startRun, 'hsl(300 80% 55%)'],
+    [-105, 26, 130, 'STORE', () => { st = 4; }],
+    [105, 26, 130, SAVE.m ? 'UNMUTE' : 'MUTE', mute],
+  ]);
+  const cy = H * .3;
+  for (let i = 0; i < 7; i++) {
+    X.font = 'bold ' + (66 * U | 0) + 'px monospace';
+    X.textAlign = 'center';
+    X.fillStyle = chsl(i, 60, .5);
+    X.fillText('PRISMFALL', W / 2 + sin(T * 1.2 + i * .5) * 5 * U, cy + (i - 3) * 2.4 * U);
+  }
+  txt('PRISMFALL', W / 2, cy, 66, W9, 'center', 1);
+  txt('you never steer the unicorn — you draw the physics', W / 2, cy + 46 * U, 15, W6);
+  [
+    'DRAG a short rail near the unicorn · 1-7 or SCROLL picks a colour',
+    'R push · O aim · Y spring · G tether · B rail · I gravity · V warp',
+  ].forEach((l, i) => txt(l, W / 2, H - 100 * U + i * 20 * U, 13, i ? W6 : W9, 'center', !i));
+  if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm   COINS ' + SAVE.c,
+    W / 2, cy + 128 * U, 14, W3);
+}
+
+function screenResults() {
+  modal(470, 330, 'RUN OVER', [
+    'SCORE   ' + (score | 0),
+    'DEPTH   ' + (depth / 10 | 0) + 'm',
+    'REGION  ' + REG[reg][0],
+    'COINS   +' + coins,
+    'BEST    ' + SAVE.b,
+    score >= SAVE.b && score ? 'NEW BEST!' : '',
+  ], [
+    [0, 62, 210, 'RETRY  (R)', startRun, 'hsl(300 80% 55%)'],
+    [-105, 114, 130, 'STORE', () => { st = 4; }],
+    [105, 114, 130, 'MENU', () => { st = 0; }],
+  ], 16);
+}
+
+function screenPause() {
+  modal(340, 250, 'PAUSED', [], [
+    [0, -16, 200, 'RESUME', () => { st = 1; }],
+    [0, 32, 200, SAVE.m ? 'UNMUTE' : 'MUTE', mute],
+    [0, 80, 200, 'QUIT RUN', () => { endRun(); st = 3; }],
+  ]);
+}
+
+// --- store -----------------------------------------------------------------
+let prevCat = -1, prevIt = -1;
+function screenStore() {
+  modal(560, 430, 'PRISM STORE', [SAVE.c + ' COINS  ·  cosmetics only, never power'],
+    [[0, 178, 150, 'BACK', back]], 14);
+  prevCat = -1;
+  const x0 = W / 2 - 240 * U;
+  for (let n = 0; n < 9; n++) {
+    const c = n / 3 | 0, i = n % 3;
+    const x = x0 + i * 150 * U, y = H / 2 - 108 * U + c * 52 * U;
+    const own = owned(c, i), eq = SAVE.e[c] === i, o = hot(x + 66 * U, y, 140 * U, 42 * U);
+    if (o) { prevCat = c; prevIt = i; }
+    RR(x, y - 21 * U, 140 * U, 42 * U, 7 * U);
+    FL(eq ? UE : own ? UB : 'hsl(275 25% 10%)');
+    SK((eq ? 2.4 : 1) * U, eq || o ? W9 : W3);
+    txt(COSN[n], x + 66 * U, y - 6 * U, 11, own ? W9 : W6, 'center', 1);
+    txt(own ? (eq ? 'EQUIPPED' : 'EQUIP') : COSP[i] + 'c', x + 66 * U, y + 9 * U, 10,
+      own ? W3 : SAVE.c < COSP[i] ? 'hsl(0 60% 60%)' : UG);
+    btns.push({ hot: o, fn: () => buyEquip(c, i) });
+  }
+  // Live preview through the real unicorn renderer.
+  X.save();
+  X.translate(W / 2, H / 2 + 112 * U);
+  X.scale(2.2 * U, 2.2 * U);
+  unicornBody(prevCat ? SAVE.e[0] : prevIt, flr(T * 3) % 7);
+  X.restore();
+}
+
+function buyEquip(c, i) {
+  if (owned(c, i)) { SAVE.e[c] = i; save(); return; }
+  if (SAVE.c >= COSP[i]) {
+    SAVE.c -= COSP[i];
+    SAVE.o |= 1 << (c * 3 + i);
+    SAVE.e[c] = i;
+    save(); sndPower();
+  } else sndEmpty();
+}
+
+// ==== 85_input.js ====
+// ---------------------------------------------------------------------------
+// Input: pointer drawing, colour selection (keys 1-7, wheel, HUD, radial),
+// pause/restart/mute.
+// ---------------------------------------------------------------------------
+
+// Colour selection is instant and free; only drawing costs pigment.
+function setSel(i) {
+  i = (i + 7) % 7;
+  if (i === sel) return;
+  sel = i;
+  sndUI(1);
+  burst(P.x, P.y, 6, 0, 130, HUE[i]);
+  if (hint === 1) { hint = 2; hintT = 0; }
+}
+
+document.body.style.cssText = 'margin:0;overflow:hidden;background:#05030c';
+CV.style.cssText = 'position:fixed;width:100%;height:100%;cursor:none';
+
+function resize() {
+  const d = mn(devicePixelRatio || 1, 2);
+  W = CV.width = innerWidth * d | 0;
+  H = CV.height = innerHeight * d | 0;
+  U = mn(W / 1280, H / 720);
+}
+
+function ptr(e) {
+  const d = W / innerWidth;
+  pmx = e.clientX * d; pmy = e.clientY * d;
+  mwx = s2wx(pmx); mwy = s2wy(pmy);
+}
+
+addEventListener('resize', resize);
+addEventListener('contextmenu', (e) => e.preventDefault());
+
+addEventListener('pointermove', (e) => { ptr(e); if (drawing) moveStroke(); });
+
+addEventListener('pointerdown', (e) => {
+  audioInit();
+  ptr(e);
+  // Right button steps backwards through the prism; left draws / clicks UI.
+  if (e.button === 2) { if (st === 1) setSel(sel - 1); return; }
+  if (e.button) return;
+  if (!uiClick() && st === 1) startStroke();
+});
+
+addEventListener('pointerup', () => { drawing = null; });
+addEventListener('blur', () => { drawing = null; if (st === 1) st = 2; });
+
+addEventListener('wheel', (e) => {
+  if (st !== 1) return;
+  e.preventDefault();
+  setSel(sel + (e.deltaY > 0 ? 1 : -1));
+}, { passive: false });
+
+addEventListener('keydown', (e) => {
+  audioInit();
+  const k = e.key, l = k.toLowerCase();
+  if (k > '0' && k < '8') { setSel(+k - 1); return; }
+  if (k === 'Escape' || l === 'p') st = st === 1 ? 2 : st === 2 ? 1 : st === 4 ? (back(), st) : st;
+  if (l === 'r' && st > 1) startRun();
+  if (l === 'm') mute();
+  if (k === ' ' || k === 'Enter') { if (st === 2) st = 1; else if (st < 4) startRun(); }
+  if (DEBUG) {
+    if (k === 'g') { P.y += REGD; P.vy = 400; }
+    if (k === 'f') for (let i = 0; i < 7; i++) pig[i] = PMAX;
+  }
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden && st === 1) st = 2; });
+
+// ==== 90_game.js ====
+// ---------------------------------------------------------------------------
+// Game flow: persistence, run lifecycle, per-frame update and the main loop.
+// ---------------------------------------------------------------------------
+
+let acc = 0, last = 0, deadT = 0, stallSnd = 0;
+const HSTEP = 1 / 120;
+
+// --- persistence -----------------------------------------------------------
+// One namespaced key, comma separated, clamped on read. Never clears storage.
+function load() {
+  try {
+    const a = (localStorage[LS] || '').split(',').map(Number);
+    if (a.length < 9 || a.some(isNaN)) return;
+    SAVE.c = clamp(a[0] | 0, 0, 1e9);
+    SAVE.b = clamp(a[1] | 0, 0, 1e12);
+    SAVE.d = clamp(a[2] | 0, 0, 1e12);
+    SAVE.o = a[3] | 0;
+    SAVE.m = a[4] ? 1 : 0;
+    SAVE.t = a[5] ? 1 : 0;
+    for (let i = 0; i < 3; i++) {
+      const v = a[6 + i] | 0;
+      SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
+    }
+  } catch (err) { /* storage unavailable — play anyway */ }
+}
+function save() {
+  try {
+    localStorage[LS] = [SAVE.c, SAVE.b, SAVE.d, SAVE.o, SAVE.m, SAVE.t].concat(SAVE.e).join();
+  } catch (err) { /* ignore */ }
+}
+
+// --- run lifecycle ---------------------------------------------------------
+function startRun(sd) {
+  audioInit();
+  st = 1; score = 0; coins = 0; mult = 1; depth = 0; reg = 0; regShow = 3.2;
+  chain = 0; chainN = 0; chainT = 0; fullSpec = 0; combo = 0; comboT = 0;
+  deadT = 0; slow = 0; vault = null; shake = 0; flash = 0;
+  pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
+  boostT = [0, 0];
+  strokes = []; parts = []; trail = []; pops = []; nodes = [];
+  drawing = null;
+  P.x = 0; P.y = -320; P.vx = rf(-70, 70); P.vy = 300; P.a = PI / 2;
+  P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300;
+  Gx = 0; Gy = GRAV;
+  C.x = P.x; C.y = P.y; C.z = 1;
+  pal = regPal(0);
+  worldReset(sd);
+  hint = SAVE.t ? 3 : 0; hintT = 0;
+  mStep = 0; if (AC) mNext = AC.currentTime + .05;
+  sndRail(0);
+}
+
+function endRun() {
+  SAVE.c += coins;
+  SAVE.b = mx(SAVE.b, score | 0);
+  SAVE.d = mx(SAVE.d, depth | 0);
+  if (!SAVE.t) { SAVE.t = 1; }
+  save();
+  sndRail(0);
+}
+
+function die() {
+  P.al = 0; deadT = 1.3;
+  for (let i = 0; i < 7; i++) burst(P.x, P.y, 16, 0, 520, HUE[i]);
+  pt(P.x, P.y, 0, 0, .7, -1, 2, 22);
+  shake = 30; flash = .7; flashH = -1;
+  sndDeath();
+  if (P.ra) detachRail(0);
+  if (P.te) releaseTether();
+  if (st !== 0) endRun();
+}
+
+// --- per-frame -------------------------------------------------------------
+function update(dt) {
+  worldUpdate();
+
+  // Focus Vaults dilate presentation time only; the stall check below uses
+  // simulation speed, so slow motion can never fake a death.
+  vault = null;
+  for (const c of chunks) if (c.v && P.y > c.y + 120 && P.y < c.y + c.h - 120) vault = c;
+  const was = slow;
+  slow = approach(slow, vault ? 1 : 0, 3.5, dt);
+  if (was > .5 && slow <= .5) { burst(P.x, P.y, 14, 0, 420, HUE[6]); sndVector(1); }
+
+  if (P.al) physicsFrame(dt);
+
+  // region progression
+  const r = regAt(P.y);
+  if (r !== reg) {
+    reg = r; regShow = 3.2;
+    flash = mx(flash, .35); flashH = regHue(reg);
+    sndGate();
+    score += 500 * mult | 0;
+  }
+
+  // score + multiplier
+  if (P.y > depth) { score += (P.y - depth) * .05 * mult; depth = P.y; }
+  mult = clamp(1 + P.sp / 950 + chainN * .2 + (fullSpec > 0 ? 2 : 0), 1, 12);
+
+  // Stall is the only failure state: too slow for too long and the run ends.
+  if (P.al) {
+    if (P.sp < STALLV) {
+      P.st += dt;
+      const u = clamp((P.st - STALLW) / (STALLT - STALLW), 0, 1);
+      if ((stallSnd -= dt) <= 0 && u > 0) { stallSnd = mx(.16, .55 - u * .4); sndStall(u); }
+      if (P.st > STALLT) die();
+    } else if (P.st > 0) {
+      if (P.st > STALLW) burst(P.x, P.y, 8, 0, 260, HUE[0]);
+      P.st = mx(0, P.st - dt * 2.6);
+    }
+  } else {
+    deadT -= dt;
+    if (deadT <= 0) { if (st === 0) { startRun(); st = 0; } else st = 3; }
+  }
+
+  // timers
+  regShow -= dt; dryT -= dt; fullSpec -= dt;
+  boostT[0] -= dt; boostT[1] -= dt;
+  if (comboT > 0 && (comboT -= dt) <= 0) combo = 0;
+  if (chainT > 0 && (chainT -= dt) <= 0) { chain = 0; chainN = 0; }
+  flash = mx(0, flash - dt * 2.4);
+
+  // Strokes age out unless they are being drawn or are the active rail.
+  for (let i = strokes.length; i--;) {
+    const s = strokes[i];
+    if (s !== drawing && s !== P.ra) s.l -= dt;
+    if (s.l <= 0) {
+      if (P.ra === s) detachRail(1);
+      if (s === drawing) drawing = null;
+      strokes.splice(i, 1);
+    }
+  }
+
+  partStep(dt);
+  if (P.al) pushTrail();
+
+  // onboarding
+  if (!SAVE.t) {
+    hintT += dt;
+    if (hint === 2 && hintT > 9) { hint = 3; SAVE.t = 1; save(); }
+  }
+}
+
+function physicsFrame(dt) {
+  acc += dt;
+  let n = 0;
+  while (acc >= HSTEP && n < 8) { physics(HSTEP); acc -= HSTEP; n++; }
+  if (n >= 8) acc = 0;
+}
+
+// --- draw ------------------------------------------------------------------
+function draw() {
+  btns = [];
+  U = mn(W / 1280, H / 720);
+  background();
+  drawWorld();
+  drawStrokes();
+  drawTrail();
+  drawParts();
+  if (P.al) drawUnicorn();
+  if (st === 1 || st === 2) hud();
+  if (flash > .01) {
+    X.fillStyle = flashH < 0
+      ? 'hsl(' + ((T * 500) % 360 | 0) + ' 100% 75% / ' + flash * .5 + ')'
+      : hsl(flashH | 0, 100, 72, flash * .45);
+    X.fillRect(0, 0, W, H);
+  }
+  if (st > 1) [0, 0, screenPause, screenResults, screenStore][st]();
+  else if (!st) screenTitle();
+  cursor();
+  if (DEBUG) {
+    txt('seed ' + seed + '  v ' + (P.sp | 0) + '  chunks ' + chunks.length + '  parts ' + parts.length +
+      '  reg ' + reg + '  st ' + P.st.toFixed(1), 8, H - 10, 12, '#0f0', 'left');
+  }
+}
+
+// --- main loop -------------------------------------------------------------
+function frame(ts) {
+  requestAnimationFrame(frame);
+  const raw = clamp((ts - last) / 1000, 0, .05);
+  last = ts;
+  const dt = raw * lerp(1, .4, slow);
+  T += dt;
+  if (st === 1 || st === 0) update(dt);
+  else if (st === 3) partStep(dt);
+  camUpdate(raw);
+  palUpdate(raw);
+  audioFrame();
+  draw();
+}
+
+// --- boot ------------------------------------------------------------------
+load();
+resize();
+// The title screen shows a live world behind it.
+startRun();
+st = 0;
+P.al = 1;
+requestAnimationFrame(frame);
+
+
+})()</script>

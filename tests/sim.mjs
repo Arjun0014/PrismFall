@@ -383,9 +383,8 @@ console.log('\n=== reachability: up, down, sideways ===');
 }
 {
   // Indigo must be able to carry the unicorn back up over time.
-  A.__eval('startRun(21);st=1');
-  const P = A.P;
-  P.x = 0; P.y = 900; P.vx = 0; P.vy = 200;
+  const P = clean(0, 200);
+  P.y = 900;
   A.__eval('Gx=0;Gy=-GRAV;P.gt=3');
   const y0 = P.y;
   for (let i = 0; i < 120; i++) A.__eval('physics(1/120)');
