@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { minify } from 'terser';
 import { Packer } from 'roadroller';
 import { makeZip } from './zip.mjs';
-import { bundle } from './build.mjs';
+import { bundle } from './src.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const html = (s) => '<!doctype html><meta charset=utf-8><title>PRISMFALL</title><canvas id=a></canvas><script>' + s + '</script>';

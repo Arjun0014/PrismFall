@@ -51,9 +51,12 @@ const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]]
 let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
 let vault = null;   // chunk currently focusing the camera
 
-// --- obstacle constructors (t: 0 circle, 1 segment, 2 arc) ------------------
-const ci = (x, y, r, m, e) => Object.assign({ t: 0, x, y, r, m: m | 0 }, e);
-const sg = (x, y, L, g, m, e) => Object.assign({ t: 1, x, y, L, g, m: m | 0 }, e);
+// --- obstacle constructors -------------------------------------------------
+// One shape record covers both primitives: t 0 is a circle of radius r, t 1 is
+// a segment of half-length r at angle g. Sharing the field means the collision
+// probe, the renderer and the placement test all read the same two numbers.
+const ci = (x, y, r, m, e) => Object.assign({ t: 0, x, y, r, g: 0, m: m | 0 }, e);
+const sg = (x, y, r, g, m, e) => Object.assign({ t: 1, x, y, r, g, m: m | 0 }, e);
 // segment from A to B
 const sgAB = (ax, ay, bx, by, m, e) =>
   sg((ax + bx) / 2, (ay + by) / 2, hyp(bx - ax, by - ay) / 2, at2(by - ay, bx - ax), m, e);
@@ -73,6 +76,8 @@ function arcSegs(c, x, y, r, a0, a1, m) {
 // --- current transform of an obstacle --------------------------------------
 // Results land in scratch globals to avoid per-frame allocation.
 let _cx = 0, _cy = 0, _cvx = 0, _cvy = 0, _cg = 0;
+// Closest-point scratch, filled by near().
+let _px = 0, _py = 0, _nx = 0, _ny = 0, _pd = 0;
 function obT(o) {
   _cx = o.x; _cy = o.y; _cvx = 0; _cvy = 0; _cg = o.g;
   if (o.os) {
@@ -106,17 +111,35 @@ const regAt = (y) => { const i = flr(mx(y, 0) / REGD); return i < 7 ? i : i % 7;
 const loopAt = (y) => flr(flr(mx(y, 0) / REGD) / 7);
 const difAt = (y) => clamp(flr(mx(y, 0) / REGD) * .085 + loopAt(y) * .3, 0, 2.4);
 
+// Closest point on obstacle o (in whatever pose the scratch globals hold) to
+// (x,y). Leaves the point in _px/_py, the unit normal pointing back at the
+// query in _nx/_ny and the distance in _pd, and returns the obstacle's surface
+// radius so callers can compare. Shared by collision and by the generator's
+// placement probe, which used to carry its own copy of this arithmetic.
+function near(o, x, y) {
+  if (!o.t) {
+    _nx = x - _cx; _ny = y - _cy; _pd = hyp(_nx, _ny);
+    if (_pd < 1e-4) { _nx = 0; _ny = -1; _pd = 1e-4; } else { _nx /= _pd; _ny /= _pd; }
+    _px = _cx + _nx * o.r; _py = _cy + _ny * o.r;
+    return o.r;
+  }
+  const cg = cos(_cg) * o.r, sg2 = sin(_cg) * o.r;
+  const ax = _cx - cg, ay = _cy - sg2, bx = _cx + cg, by = _cy + sg2;
+  const t = segT(ax, ay, bx, by, x, y);
+  _px = ax + (bx - ax) * t; _py = ay + (by - ay) * t;
+  _nx = x - _px; _ny = y - _py; _pd = hyp(_nx, _ny);
+  if (_pd < 1e-4) { _nx = -sin(_cg); _ny = cos(_cg); _pd = 1e-4; } else { _nx /= _pd; _ny /= _pd; }
+  return ST;
+}
+
 // --- solidity probe --------------------------------------------------------
 // Deliberately measured against each obstacle's *base* pose, not its animated
 // one: placement has to be deterministic for a seed, and a moving arm sweeping
 // over a coin is the intended risk rather than a bad spawn.
 function solidNear(c, x, y, rad) {
   for (const o of c.o) {
-    if (!o.t) { if (hyp(x - o.x, y - o.y) < o.r + rad) return 1; continue; }
-    const cg = cos(o.g) * o.L, sg2 = sin(o.g) * o.L;
-    const ax = o.x - cg, ay = o.y - sg2;
-    const t = segT(ax, ay, o.x + cg, o.y + sg2, x, y);
-    if (hyp(x - (ax + cg * 2 * t), y - (ay + sg2 * 2 * t)) < ST + rad) return 1;
+    _cx = o.x; _cy = o.y; _cg = o.g;
+    if (near(o, x, y) + rad > _pd) return 1;
   }
   return 0;
 }
@@ -368,6 +391,23 @@ function worldUpdate() {
   // Ceiling guard: never let the unicorn leave the retained world upward.
   const top = chunks[0];
   if (P.y < top.y + 40) { P.y = top.y + 40; if (P.vy < 0) P.vy = abs(P.vy) * .6; }
+}
+
+// --- column bounds ---------------------------------------------------------
+// The shaft walls are chunk-to-chunk segments, so the playable span at a given
+// height is an interpolation between the chunk's entry and exit walls. Warps,
+// portals and Indigo can all put the unicorn somewhere arbitrary, and relying
+// on segment collision alone let it end up behind a wall with nothing to push
+// it back. Results land in scratch globals to keep the physics step allocation
+// free.
+let _wl = -WMAX, _wr = WMAX;
+function wallsAt(y) {
+  _wl = -WMAX; _wr = WMAX;
+  for (const c of chunks) if (y >= c.y && y < c.y + c.h) {
+    const t = (y - c.y) / c.h;
+    _wl = lerp(c.pl, c.l, t); _wr = lerp(c.pr, c.r, t);
+    return;
+  }
 }
 
 // Chunks overlapping a vertical span (used by physics + render).

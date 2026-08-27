@@ -99,24 +99,9 @@ function collideAll(h) {
 
 function hitOb(o) {
   obT(o);
-  let nx, ny, d, px, py, pen;
-  if (!o.t) {
-    nx = P.x - _cx; ny = P.y - _cy; d = hyp(nx, ny);
-    const rr2 = o.r + R;
-    if (d > rr2) return;
-    if (d < 1e-4) { nx = 0; ny = -1; d = 1e-4; } else { nx /= d; ny /= d; }
-    pen = rr2 - d; px = _cx + nx * o.r; py = _cy + ny * o.r;
-  } else {
-    const cg = cos(_cg) * o.L, sg2 = sin(_cg) * o.L;
-    const ax = _cx - cg, ay = _cy - sg2, bx = _cx + cg, by = _cy + sg2;
-    const t = segT(ax, ay, bx, by, P.x, P.y);
-    px = ax + (bx - ax) * t; py = ay + (by - ay) * t;
-    nx = P.x - px; ny = P.y - py; d = hyp(nx, ny);
-    const rr2 = R + ST;
-    if (d > rr2) return;
-    if (d < 1e-4) { nx = -sin(_cg); ny = cos(_cg); d = 1e-4; } else { nx /= d; ny /= d; }
-    pen = rr2 - d;
-  }
+  const rr2 = near(o, P.x, P.y) + R;
+  if (_pd > rr2) return;
+  const nx = _nx, ny = _ny, px = _px, py = _py, pen = rr2 - _pd;
   if (o.m & M_PHASE) { if (P.ph > 0) return; }
   obVel(o, px, py);
   let rvx = P.vx - _cvx, rvy = P.vy - _cvy;
@@ -209,10 +194,13 @@ function physics(h) {
     items(hh);
   }
 
-  // Absolute containment: no effect (warp included) may leave the column.
-  const bx = WMAX + 46;
-  if (P.x < -bx) { P.x = -bx; P.vx = abs(P.vx) * .55 + 110; }
-  if (P.x > bx) { P.x = bx; P.vx = -abs(P.vx) * .55 - 110; }
+  // Absolute containment: no effect (warp included) may leave the shaft. This
+  // is measured against the real wall line at the unicorn's height, not a fixed
+  // bound, because the walls taper and a warp could otherwise strand it in the
+  // rock outside them.
+  wallsAt(P.y);
+  if (P.x < _wl + R) { P.x = _wl + R; if (P.vx < 0) P.vx = -P.vx * .55 + 60; }
+  if (P.x > _wr - R) { P.x = _wr - R; if (P.vx > 0) P.vx = -P.vx * .55 - 60; }
 
   // timers
   if (P.ph > 0) P.ph -= h;

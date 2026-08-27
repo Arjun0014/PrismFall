@@ -9,12 +9,13 @@
   13,
   21,
   42,
-  50,
   57,
-  362
+  339,
+  392
  ],
- "precision": 14,
- "modelMaxCount": 5,
+ "precision": 16,
+ "modelMaxCount": 4,
  "recipLearningRate": 1500,
- "modelRecipBaseCount": 20
+ "modelRecipBaseCount": 20,
+ "numAbbreviations": 8
 }

@@ -36,7 +36,7 @@ const TERSER_OPTS = {
   compress: {
     passes: 4,
     unsafe: true,
-    unsafe_arrows: true,
+    unsafe_arrows: false,
     unsafe_math: true,
     unsafe_methods: true,
     unsafe_comps: true,
@@ -90,23 +90,40 @@ function ectShrink(buf, tag) {
 const RR_CACHE = p('build', 'roadroller.json');
 const RR_KEYS = ['sparseSelectors', 'precision', 'modelMaxCount', 'recipLearningRate', 'contextBits', 'modelRecipBaseCount', 'learningRateNum', 'learningRateDenom'];
 
+// Roadroller's own optimizer does not search the abbreviation count, and it
+// matters: the gap between the library default and the best value has measured
+// ~70 archive bytes here, so the deep build sweeps it explicitly and caches it.
+const RR_ABBREV = [4, 5, 6, 7, 8, 9, 10, 12, 16, 24, 32];
+
 async function roadroll(js, deep) {
   const { Packer } = await import('roadroller');
   let cached = null;
   if (existsSync(RR_CACHE)) { try { cached = JSON.parse(readFileSync(RR_CACHE, 'utf8')); } catch { /* ignore */ } }
   const inputs = [{ data: js, type: 'js', action: 'eval' }];
-  const opts = { maxMemoryMB: 400 };
-  if (cached && !deep) Object.assign(opts, cached);
-  opts.maxMemoryMB = 700;
-  opts.numAbbreviations = 32;
+  const opts = Object.assign({ maxMemoryMB: 700, numAbbreviations: 8 }, cached);
   const packer = new Packer(inputs, opts);
   if (deep) {
-    // Full search at milestones; cache the winning parameters for fast builds.
-    const res = await packer.optimize(1);
+    // Full model search at milestones, then sweep the abbreviation count on top
+    // of whatever model it settled on. Cache both for the fast path.
+    const res = await packer.optimize(2);
     const keep = {};
     for (const k of RR_KEYS) if (packer.options[k] !== undefined) keep[k] = packer.options[k];
+    if (res && res.best) log('   roadroller model search -> est ' + (res.best.size | 0) + ' B');
+    let best = null;
+    for (const n of RR_ABBREV) {
+      const pk = new Packer(inputs, Object.assign({ maxMemoryMB: 700 }, keep, { numAbbreviations: n }));
+      const d = pk.makeDecoder();
+      const out = d.firstLine + '\n' + d.secondLine;
+      if (/<\/script/i.test(out)) continue;
+      const z = await zipOf(html(out), [15]);
+      if (!best || z.length < best.zip) best = { n, zip: z.length, out };
+    }
+    if (best) {
+      keep.numAbbreviations = best.n;
+      log('   roadroller abbrev sweep -> ' + best.n + ' (zip ' + best.zip + ' B)');
+    }
     writeFileSync(RR_CACHE, JSON.stringify(keep, null, 1));
-    if (res && res.best) log('   roadroller search -> est ' + (res.best.size | 0) + ' B');
+    if (best) return best.out;
   }
   const { firstLine, secondLine } = packer.makeDecoder();
   return firstLine + '\n' + secondLine;
@@ -150,7 +167,7 @@ async function main() {
     }
   }
 
-  const iterations = DEEP ? [15, 200, 1000] : QUICK ? [15] : [15, 200];
+  const iterations = DEEP ? [15, 200, 1000, 4000] : QUICK ? [15] : [15, 200];
   let best = null;
   for (const c of candidates) {
     let z = await zipOf(c.html, iterations);

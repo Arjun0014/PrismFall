@@ -130,7 +130,7 @@ export function boot(opts = {}) {
     'srnd rr rf ri rp pick clamp lerp approach hyp hsl chsl segT segX regPal aff bias mat rewards ' +
     'sndHit sndBreak sndBoost sndVector sndSpring sndTether sndRail sndGrav sndWarp sndCoin sndCrown '+
     'sndPig sndWell sndSpectrum sndFuse sndRefund sndPower sndEmpty sndStall sndDeath sndUI sndGate '+
-    'musicTick audioFrame O N ARP NOTE unicornBody drawWorld drawItem drawStrokes drawParts drawTrail ' +
+    'musicTick audioFrame O N ARP NOTE KICK BASSR wallsAt unicornBody drawWorld drawItem drawStrokes drawParts drawTrail ' +
     'drawUnicorn background motif obStyle obT obVel strokeColor railStep').split(' ');
   const consts = ('R GRAV VMAX VFAST VH COL WMAX SMAX SREACH SLIFE SLIM ST PMAX PC STALLV STALLT STALLW ' +
     'HUE CBIT ALL7 M_BUMP M_DAMP M_BREAK M_PHASE M_ANCH M_RAIL CHUNKS REGD BRK_E BRK_R ' +

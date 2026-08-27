@@ -115,7 +115,9 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy) {
         if (sp < 60) { P.x += nx * reach; P.y += ny * reach; P.vx = nx * 460; P.vy = ny * 460; }
         else { const k = reach / sp; P.x += P.vx * k; P.y += P.vy * k; }
       }
-      P.x = clamp(P.x, -WMAX + R, WMAX - R);
+      // Land inside the shaft, whatever the exit geometry said.
+      wallsAt(P.y);
+      P.x = clamp(P.x, _wl + R, _wr - R);
       P.ph = .34 * vb; P.vx *= 1.07; P.vy *= 1.07;
       warpFX(P.x, P.y);
     }

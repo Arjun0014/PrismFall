@@ -1,3 +1,4 @@
+
 // Audio coverage and hygiene.
 //
 // The soundscape is a graded requirement, not a nice-to-have, so this plays a
@@ -66,7 +67,7 @@ E('grab({t:I_WELL,x:P.x,y:P.y,c:0,g:0})');
 E('chain=0;chainN=0;for(let i=0;i<7;i++)chainAdd(CBIT[i])');
 E('grab({t:I_CROWN,x:P.x,y:P.y,c:0,g:0})');
 E('grab({t:I_BOOST,x:P.x,y:P.y,c:3,g:0})');
-E('sndUI(1);sndGate();sndBreak()');
+E('sndUI(1);sndGate();sndBreak();sndStall(.5)');
 E('for(let i=0;i<7;i++)pig[i]=0');
 E('sel=0;mwx=P.x+40;mwy=P.y-16;startStroke()');
 E('die()');
@@ -106,7 +107,13 @@ console.log('\n=== continuous layers ===');
   const loud = A.__eval('windG.gain.value');
   ok(loud > quiet * 3, 'wind tracks speed', quiet.toFixed(3) + ' -> ' + loud.toFixed(3));
   const bright = A.__eval('windF.frequency.value');
-  ok(bright > 2000, 'wind brightens at speed', bright | 0);
+  P.vx = 0; P.vy = 60; E('P.sp=60;audioFrame()');
+  const dark = A.__eval('windF.frequency.value');
+  ok(bright > dark * 1.8, 'wind brightens at speed', (dark | 0) + ' -> ' + (bright | 0));
+  // Deliberately capped. A high-Q bandpass sweeping past 2kHz and sitting near
+  // full gain for most of a run reads as a shriek, not as speed.
+  ok(bright < 1600, 'wind never becomes a whistle', bright | 0);
+  ok(loud < .2, 'wind stays under the effects', loud.toFixed(3));
 
   E('P.ra=null;sndRail(0);audioFrame()');
   const railOff = A.__eval('railG.gain.value');
@@ -156,6 +163,22 @@ console.log('\n=== music ===');
   for (let i = 0; i < 120; i++) { E('voices=0;P.sp=2400;audioFrame();AC.currentTime+=1/60'); }
   const busy = globalThis.__n.length;
   ok(busy > calm * 1.4, 'the arrangement thickens with intensity', calm + ' -> ' + busy);
+}
+
+console.log('\n=== arrangement ===');
+{
+  // The bed -- kick, bass and the bar-top pad -- must play even when the run is
+  // slow, or a region has no music until you are already going fast.
+  for (let r = 0; r < 7; r++) {
+    E('reg=' + r + ';startRun(3);st=1;reg=' + r + ';mStep=0;mNext=AC.currentTime');
+    globalThis.__n = [];
+    E('window.__n=globalThis.__n');
+    for (let i = 0; i < 240; i++) { E('voices=0;P.sp=40;audioFrame();AC.currentTime+=1/60'); }
+    ok(globalThis.__n.length > 12, 'region ' + r + ' has a bed at low speed', globalThis.__n.length);
+  }
+  const K = A.KICK, B = A.BASSR;
+  ok(new Set(K.map((k, i) => k + ':' + B[i])).size >= 6, 'regions have distinct rhythms',
+    new Set(K.map((k, i) => k + ':' + B[i])).size + '/7');
 }
 
 console.log('\n=== hygiene ===');

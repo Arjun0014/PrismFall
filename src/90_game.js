@@ -175,7 +175,7 @@ function draw() {
   cursor();
   if (DEBUG) {
     txt('seed ' + seed + '  v ' + (P.sp | 0) + '  chunks ' + chunks.length + '  parts ' + parts.length +
-      '  reg ' + reg + '  st ' + P.st.toFixed(1), 8, H - 10, 12, '#0f0', 'left');
+      '  reg ' + reg + '  st ' + P.st.toFixed(1), 8, H - 10, 12, '#0f0', 0, 'left');
   }
 }
 

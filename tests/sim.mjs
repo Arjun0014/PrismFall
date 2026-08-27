@@ -333,7 +333,7 @@ console.log('\n=== physics robustness ===');
 {
   // Breakables shatter above the energy threshold and survive below it.
   A.__eval('startRun(5);st=1');
-  const mk = (m) => ({ t: 1, x: 0, y: 500, L: 80, g: 0, m, k: 0 });
+  const mk = (m) => ({ t: 1, x: 0, y: 500, r: 80, g: 0, m, k: 0 });
   const slow_ = mk(A.M_BREAK), fast_ = mk(A.M_BREAK);
   A.__eval('NC=[{o:[],i:[]}]');
   A.P.x = 0; A.P.y = 500 - A.R - A.ST + 1; A.P.vx = 0; A.P.vy = 300;
@@ -352,7 +352,7 @@ console.log('\n=== physics robustness ===');
 {
   // Phase walls: solid normally, passable while phased.
   A.__eval('startRun(5);st=1');
-  const w = { t: 1, x: 0, y: 500, L: 200, g: 0, m: A.M_PHASE, k: 0 };
+  const w = { t: 1, x: 0, y: 500, r: 200, g: 0, m: A.M_PHASE, k: 0 };
   A.__eval('NC=[{o:[],i:[]}]');
   A.NC[0].o.push(w);
   const P = A.P;

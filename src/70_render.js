@@ -209,7 +209,7 @@ function drawWorld() {
         CIR(w2sx(_cx), w2sy(_cy), o.r * SC, s2[0], s2[1], mx(1, 2.5 * SC));
         if (o.m & M_BUMP) CIR(w2sx(_cx), w2sy(_cy), o.r * SC * .55, 0, s2[1], mx(1, 1.6 * SC));
       } else {
-        const cg = cos(_cg) * o.L, sg2 = sin(_cg) * o.L;
+        const cg = cos(_cg) * o.r, sg2 = sin(_cg) * o.r;
         LIN(w2sx(_cx - cg), w2sy(_cy - sg2), w2sx(_cx + cg), w2sy(_cy + sg2), wide, s2[0]);
         SK(thin, s2[1]);
         if (o.m & M_BREAK) {
@@ -297,7 +297,7 @@ function drawParts() {
   for (const p of pops) {
     const a = clamp(p.l, 0, 1);
     txt(p.t, w2sx(p.x), w2sy(p.y), 17 * SC / U,
-      p.h < 0 ? 'hsl(0 0% 100% / ' + a + ')' : hsl(p.h | 0, 100, 70, a), 'center', 1);
+      p.h < 0 ? 'hsl(0 0% 100% / ' + a + ')' : hsl(p.h | 0, 100, 70, a), 1);
   }
 }
 

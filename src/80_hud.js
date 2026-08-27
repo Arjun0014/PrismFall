@@ -25,7 +25,9 @@ const UG = 'hsl(48 100% 66%)';         // gold
 let U = 1;              // UI scale
 let btns = [];          // immediate-mode buttons for this frame
 
-function txt(s, x, y, sz, col, al, bold) {
+// Centred and bold is by far the commonest case, so it is the default and the
+// alignment argument comes last.
+function txt(s, x, y, sz, col, bold, al) {
   X.font = (bold ? 'bold ' : '') + (sz * U | 0) + 'px monospace';
   X.textAlign = al || 'center';
   X.textBaseline = 'middle';
@@ -41,7 +43,7 @@ function btn(x, y, w, h, label, fn, accent) {
   RR(x - w / 2, y - h / 2, w, h, 8 * U);
   FL(o ? accent || UE : UB);
   SK(2 * U, o ? W9 : UE);
-  txt(label, x, y + U, 15, o ? W9 : W6, 'center', 1);
+  txt(label, x, y + U, 15, o ? W9 : W6, 1);
 }
 
 function uiClick() {
@@ -53,37 +55,37 @@ function uiClick() {
 function hud() {
   const p = 30 * U, bw = 240 * U, dep = mx(P.y, 0);
   CIR(p, p, 9 * U, UG);
-  txt(coins + (SAVE.c ? ' (' + (SAVE.c + coins) + ')' : ''), p + 16 * U, p, 16, UG, 'left', 1);
-  txt(score | 0, W - p, p, 19, W9, 'right', 1);
-  if (mult > 1.05) txt('x' + mult.toFixed(1), W - p, p + 22 * U, 15, chsl(2, 70), 'right', 1);
+  txt(coins + (SAVE.c ? ' (' + (SAVE.c + coins) + ')' : ''), p + 16 * U, p, 16, UG, 1, 'left');
+  txt(score | 0, W - p, p, 19, W9, 1, 'right');
+  if (mult > 1.05) txt('x' + mult.toFixed(1), W - p, p + 22 * U, 15, chsl(2, 70), 1, 'right');
 
   // region name, progress bar and depth
   X.fillStyle = W3;
   X.fillRect(W / 2 - bw / 2, p + 12 * U, bw, 4 * U);
   X.fillStyle = hsl(pal[6] | 0, 90, 70);
   X.fillRect(W / 2 - bw / 2, p + 12 * U, bw * clamp((dep % REGD) / REGD, 0, 1), 4 * U);
-  txt(REG[reg][0] + (loopAt(P.y) ? ' +' + loopAt(P.y) : ''), W / 2, 18 * U, 14, W6, 'center', 1);
-  txt((dep / 10 | 0) + 'm', W / 2 + bw / 2 + 24 * U, p + 14 * U, 13, W3, 'left');
+  txt(REG[reg][0] + (loopAt(P.y) ? ' +' + loopAt(P.y) : ''), W / 2, 18 * U, 14, W6, 1);
+  txt((dep / 10 | 0) + 'm', W / 2 + bw / 2 + 24 * U, p + 14 * U, 13, W3, 0, 'left');
 
   prismBar();
 
   let brow = 0;
   for (let i = 0; i < 7; i++) if (boostT[i] > 0)
     txt(BNAME[i] + ' ' + boostT[i].toFixed(1), W - p, p + (30 + brow++ * 16) * U, 12,
-      BOOST[i][0] > 6 ? W9 : chsl(BOOST[i][0], 70), 'right', 1);
+      BOOST[i][0] > 6 ? W9 : chsl(BOOST[i][0], 70), 1, 'right');
 
   if (regShow > 0)
     txt(REG[reg][0], W / 2, H * .3, 42,
-      'hsl(0 0% 100% / ' + clamp(regShow, 0, 1) * clamp(3.2 - regShow, 0, 1) + ')', 'center', 1);
+      'hsl(0 0% 100% / ' + clamp(regShow, 0, 1) * clamp(3.2 - regShow, 0, 1) + ')', 1);
   if (!SAVE.t) {
     const t = ['DRAG TO DRAW A RAINBOW RAIL', 'PRESS 1-7 OR SCROLL TO CHANGE COLOUR',
       'PIGMENT IS FINITE - GRAB SHARDS TO REFILL'][hint];
-    if (t) txt(t, W / 2, H - 118 * U, 15, W6, 'center', 1);
+    if (t) txt(t, W / 2, H - 118 * U, 15, W6, 1);
   }
   if (slow > .05) {
     X.fillStyle = 'hsl(275 60% 60% / ' + slow * .1 + ')';
     X.fillRect(0, 0, W, H);
-    txt('FOCUS VAULT', W / 2, 70 * U, 16, W6, 'center', 1);
+    txt('FOCUS VAULT', W / 2, 70 * U, 16, W6, 1);
   }
 }
 
@@ -101,12 +103,12 @@ function prismBar() {
     X.restore();
     RR(x, y - h / 2, w, h, 5 * U);
     SK((on ? 2.6 : 1.2) * U, on ? W9 : chsl(i, 55, .8));
-    txt('ROYGBIV'[i], cx, y, on ? 15 : 12, on ? W9 : W6, 'center', 1);
+    txt('ROYGBIV'[i], cx, y, on ? 15 : 12, on ? W9 : W6, 1);
     txt(i + 1, cx, y - h / 2 - 9 * U, 10, on ? W9 : W3);
     if (chain & CBIT[i]) CIR(cx, y + h / 2 + 8 * U, 2.6 * U, chsl(i, 75));
     btns.push({ hot: hot(cx, y, w, h), fn: () => setSel(i) });
   }
-  if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 'center', 1);
+  if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 1);
 }
 
 // --- radial Prism Wheel ----------------------------------------------------
@@ -128,14 +130,14 @@ function prismWheel() {
     FL(chsl(i, on ? 58 : 30, on ? 1 : .8));
     SK(on ? 2.6 * U : 1 * U, on ? W9 : chsl(i, 46, .7));
     const am = (a0 + a1) / 2, tr = r * (on ? .8 : .72);
-    txt('ROYGBIV'[i], cx + cos(am) * tr, cy + sin(am) * tr, on ? 17 : 13, on ? W9 : W6, 'center', 1);
+    txt('ROYGBIV'[i], cx + cos(am) * tr, cy + sin(am) * tr, on ? 17 : 13, on ? W9 : W6, 1);
     // Pigment left in this reservoir, as a ring arc — the wheel doubles as a gauge.
     BP();
     AR(cx, cy, r * .34, a0 + .04, lerp(a0 + .04, a1 - .04, pig[i] / PMAX));
     SK(5 * U, chsl(i, 62));
   }
   CIR(cx, cy, 20 * U, 'hsl(272 45% 8% / .9)', W3, 1.5 * U);
-  txt(pig[wsel] | 0, cx, cy, 12, W6, 'center', 1);
+  txt(pig[wsel] | 0, cx, cy, 12, W6, 1);
 }
 
 // --- cursor ----------------------------------------------------------------
@@ -158,10 +160,10 @@ function modal(w, h, title, lines, bs, sz) {
     RR(W / 2 - w * U / 2, H / 2 - h * U / 2, w * U, h * U, 14 * U);
     FL('hsl(272 40% 9% / .96)');
     SK(2 * U, UE);
-    txt(title, W / 2, H / 2 - (h / 2 - 34) * U, 27, W9, 'center', 1);
+    txt(title, W / 2, H / 2 - (h / 2 - 34) * U, 27, W9, 1);
   }
   for (let i = 0; i < lines.length; i++)
-    txt(lines[i], W / 2, H / 2 - (h / 2 - 78) * U + i * 22 * U, sz || 13.5, W6, 'center', sz ? 1 : 0);
+    txt(lines[i], W / 2, H / 2 - (h / 2 - 78) * U + i * 22 * U, sz || 13.5, W6, sz ? 1 : 0);
   for (const b of bs) btn(W / 2 + b[0] * U, H / 2 + b[1] * U, b[2] * U, 40 * U, b[3], b[4], b[5]);
 }
 
@@ -181,12 +183,12 @@ function screenTitle() {
     X.fillStyle = chsl(i, 60, .5);
     X.fillText('PRISMFALL', W / 2 + sin(T * 1.2 + i * .5) * 5 * U, cy + (i - 3) * 2.4 * U);
   }
-  txt('PRISMFALL', W / 2, cy, 66, W9, 'center', 1);
+  txt('PRISMFALL', W / 2, cy, 66, W9, 1);
   txt('you never steer the unicorn — you draw the physics', W / 2, cy + 46 * U, 15, W6);
   [
     'DRAG a short rail near the unicorn · 1-7 or SCROLL picks a colour',
     'R push · O aim · Y spring · G tether · B rail · I gravity · V warp',
-  ].forEach((l, i) => txt(l, W / 2, H - 100 * U + i * 20 * U, 13, i ? W6 : W9, 'center', !i));
+  ].forEach((l, i) => txt(l, W / 2, H - 100 * U + i * 20 * U, 13, i ? W6 : W9, !i));
   // Below the buttons, not at a fixed offset from the title: at 16:9 heights
   // the old position landed straight on top of PLAY.
   if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm   COINS ' + SAVE.c,
@@ -232,7 +234,7 @@ function screenStore() {
     RR(x, y - 19 * U, 140 * U, 38 * U, 7 * U);
     FL(eq ? UE : own ? UB : 'hsl(275 25% 10%)');
     SK((eq ? 2.4 : 1) * U, eq || o ? W9 : W3);
-    txt(COSN[n], x + 66 * U, y - 5 * U, 11, own ? W9 : W6, 'center', 1);
+    txt(COSN[n], x + 66 * U, y - 5 * U, 11, own ? W9 : W6, 1);
     txt(own ? (eq ? 'EQUIPPED' : 'EQUIP') : COSP[i] + 'c', x + 66 * U, y + 9 * U, 10,
       own ? W3 : SAVE.c < COSP[i] ? 'hsl(0 60% 60%)' : UG);
     btns.push({ hot: o, fn: () => buyEquip(c, i) });
