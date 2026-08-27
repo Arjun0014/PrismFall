@@ -2,11 +2,11 @@
 // Procedural Web Audio. Everything is synthesised from two primitives:
 //   O() — an oscillator with a pitch sweep and an AD envelope
 //   N() — a slice of the shared noise buffer through a swept filter
-// Two continuous voices (wind, rail grind) are created once and only have
-// their gain/frequency modulated, so long runs never accumulate nodes.
+// The rail grind is a single continuous voice created once and only modulated,
+// so long runs never accumulate nodes.
 // ---------------------------------------------------------------------------
 
-let AC = null, mg, sfxG, musG, lpF, nzBuf, windG, windF, railG, railO, railF;
+let AC = null, mg, sfxG, musG, lpF, nzBuf, railG, railO, railF;
 let voices = 0;                   // per-frame voice budget
 let mNext = 0, mStep = 0;         // music scheduler
 
@@ -31,18 +31,20 @@ function audioInit() {
   const d = nzBuf.getChannelData(0);
   for (let i = 0; i < n; i++) d[i] = rnd() * 2 - 1;
 
-  // Two always-on voices: wind (speed) and rail grind (Blue). Built once, then
-  // only their gain/frequency is modulated, so long runs never leak nodes.
-  const voice = (src, f, q) => {
-    const b = AC.createBiquadFilter(); b.type = 'bandpass'; b.frequency.value = f; b.Q.value = q;
-    const g = AC.createGain(); g.gain.value = 0;
-    src.connect(b).connect(g).connect(sfxG); src.start();
-    return [b, g];
-  };
-  const ws = AC.createBufferSource(); ws.buffer = nzBuf; ws.loop = true;
-  [windF, windG] = voice(ws, 220, .5);
+  // One always-on voice: the Blue rail grind. Built once, then only its gain
+  // and frequency are modulated, so long runs never leak nodes.
+  //
+  // There was a second continuous voice here -- a speed-driven wind bed. Even
+  // heavily damped it was fatiguing over a run, because it is on whenever you
+  // are moving and you are almost always moving. Speed already reads through
+  // the camera, the trail, the impacts and the music intensity, so the noise
+  // bed was carrying no information anyone needed.
   railO = AC.createOscillator(); railO.type = 'sawtooth'; railO.frequency.value = 220;
-  [railF, railG] = voice(railO, 1400, 6);
+  railF = AC.createBiquadFilter(); railF.type = 'bandpass';
+  railF.frequency.value = 1400; railF.Q.value = 6;
+  railG = AC.createGain(); railG.gain.value = 0;
+  railO.connect(railF).connect(railG).connect(sfxG);
+  railO.start();
 
   mNext = AC.currentTime + .1;
 }
@@ -192,7 +194,6 @@ function sndGate() {
 
 // --- per-frame continuous layers ------------------------------------------
 // Continuous layers, updated once a frame:
-//  - wind gets louder and brighter with speed (you can hear acceleration)
 //  - the rail grind tracks rail speed
 //  - one master low-pass ducks everything inside a Focus Vault or a pause
 function audioFrame() {
@@ -200,10 +201,7 @@ function audioFrame() {
   if (!AC) return;
   const t = now(), n = clamp(P.sp / VMAX, 0, 1), play = st === 1 && P.al;
   const set = (p, v, k) => p.setTargetAtTime(v, t, k);
-  set(windG.gain, play && !SAVE.m ? mn(.14, n * n * .8) : 0, .12);
-  set(windF.frequency, 170 + n * 900, .12);
-  set(windF.Q, .4 + n * .5, .15);
-  set(railG.gain, P.ra && !SAVE.m ? .1 + n * .12 : 0, .04);
+  set(railG.gain, P.ra && !SAVE.m && play ? .1 + n * .12 : 0, .04);
   set(railF.frequency, 700 + P.sp * 1.4, .04);
   set(railO.frequency, 90 + P.sp * .22, .04);
   set(lpF.frequency, slow > .05 ? 480 : st === 2 ? 700 : 20000, .1);

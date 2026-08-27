@@ -99,21 +99,11 @@ ok(new Set(sig.sndBoost || []).size > 5, 'Red boost scales with the launch', new
 
 console.log('\n=== continuous layers ===');
 {
-  // Wind must track speed and the rail grind must follow attachment.
+  // There is deliberately no continuous wind bed: it is audible whenever the
+  // unicorn is moving, which is almost always, and it was fatiguing over a run.
+  ok(A.__eval('typeof windG') === 'undefined', 'no always-on wind voice exists');
   E('startRun(5);st=1');
-  P.vx = 0; P.vy = 60; E('P.sp=60;audioFrame()');
-  const quiet = A.__eval('windG.gain.value');
   P.vx = 0; P.vy = 2600; E('P.sp=2600;audioFrame()');
-  const loud = A.__eval('windG.gain.value');
-  ok(loud > quiet * 3, 'wind tracks speed', quiet.toFixed(3) + ' -> ' + loud.toFixed(3));
-  const bright = A.__eval('windF.frequency.value');
-  P.vx = 0; P.vy = 60; E('P.sp=60;audioFrame()');
-  const dark = A.__eval('windF.frequency.value');
-  ok(bright > dark * 1.8, 'wind brightens at speed', (dark | 0) + ' -> ' + (bright | 0));
-  // Deliberately capped. A high-Q bandpass sweeping past 2kHz and sitting near
-  // full gain for most of a run reads as a shriek, not as speed.
-  ok(bright < 1600, 'wind never becomes a whistle', bright | 0);
-  ok(loud < .2, 'wind stays under the effects', loud.toFixed(3));
 
   E('P.ra=null;sndRail(0);audioFrame()');
   const railOff = A.__eval('railG.gain.value');
@@ -184,21 +174,20 @@ console.log('\n=== arrangement ===');
 console.log('\n=== hygiene ===');
 {
   ok(H.audioStats.contexts === 1, 'exactly one AudioContext for the session', H.audioStats.contexts);
-  // Two sources are meant to run forever: the wind noise loop and the rail
-  // oscillator. Everything else must be scheduled with a stop time.
-  ok(H.audioStats.live === 2, 'only the two permanent voices stay running', H.audioStats.live);
+  // Exactly one source is meant to run forever: the rail oscillator.
+  // Everything else must be scheduled with a stop time.
+  ok(H.audioStats.live === 1, 'only the rail voice stays running', H.audioStats.live);
   ok(H.audioStats.created > before + 500, 'the run actually made sound', H.audioStats.created - before);
 
   // Restart soak: a fresh run must not accumulate nodes.
   const mark = H.audioStats.created;
   for (let i = 0; i < 40; i++) { E('startRun(' + i + ');st=1'); E('voices=0;audioFrame()'); }
-  ok(H.audioStats.live === 2, 'restarts add no permanent voices', H.audioStats.live);
+  ok(H.audioStats.live === 1, 'restarts add no permanent voices', H.audioStats.live);
   ok(H.audioStats.created - mark < 4000, 'restarts do not spray voices', H.audioStats.created - mark);
 
   // Muting must silence every path, including the continuous ones.
   E('SAVE.m=1;startRun(9);st=1;P.sp=2600;P.ra={x1:0,y1:0,x2:9,y2:0};audioFrame()');
-  ok(A.__eval('windG.gain.value') === 0 && A.__eval('railG.gain.value') === 0,
-    'mute silences the continuous voices');
+  ok(A.__eval('railG.gain.value') === 0, 'mute silences the continuous voice');
   const m0 = H.audioStats.created;
   for (let i = 0; i < 200; i++) E('voices=0;sndHit(1800,2,7);sndCoin(3);musicTick()');
   ok(H.audioStats.created === m0, 'mute stops all synthesis', H.audioStats.created - m0);

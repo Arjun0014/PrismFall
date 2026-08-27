@@ -57,14 +57,22 @@ const base = await zipOf(raw);
 console.log('baseline zip ' + base + '\n');
 
 const GROUPS = {
-  'audio cues (snd*)': (n) => /^snd/.test(n),
-  'menus (screen*/modal/btn)': (n) => /^screen|^modal$|^btn$|^uiClick$/.test(n),
-  'world archetypes': (n) => /^(pegField|barrier|bowl|shaft|rotor|chamber|decorate|buildVault|buildGate|rewards|arcSegs)$/.test(n),
-  'hud + wheel + bar': (n) => /^(hud|prismBar|prismWheel|cursor|txt)$/.test(n),
-  'render world+items': (n) => /^(drawWorld|drawItem|obStyle|background|motif|strokeColor|drawStrokes)$/.test(n),
-  'unicorn + trail + parts': (n) => /^(unicornBody|drawUnicorn|drawTrail|pushTrail|drawParts|partStep|pt|burst|warpFX|strokeFX|pop)$/.test(n),
-  'music (musicTick/ARP)': (n) => /^(musicTick|ARP)$/.test(n),
-  'store': (n) => /^(screenStore|buyEquip|owned)$/.test(n),
+  'radial Prism Wheel': (n) => /^prismWheel$/.test(n),
+  'store + cosmetics': (n) => /^(screenStore|buyEquip|owned)$/.test(n),
+  'unicorn drawing': (n) => /^(unicornBody)$/.test(n),
+  'background motifs': (n) => /^(background|motif)$/.test(n),
+  'music arrangement': (n) => /^(musicTick|ARP)$/.test(n),
+  'audio cues': (n) => /^snd/.test(n),
+  'focus vaults': (n) => /^buildVault$/.test(n),
+  'region gates': (n) => /^buildGate$/.test(n),
+  'world filler pass': (n) => /^decorate$/.test(n),
+  'archetype: bowl': (n) => /^(bowl|arcSegs)$/.test(n),
+  'archetype: shaft': (n) => /^shaft$/.test(n),
+  'archetype: rotor': (n) => /^rotor$/.test(n),
+  'archetype: chamber': (n) => /^chamber$/.test(n),
+  'archetype: pegField': (n) => /^pegField$/.test(n),
+  'reward placement': (n) => /^rewards$/.test(n),
+  'particles + trail': (n) => /^(pt|burst|warpFX|strokeFX|partStep|pushTrail|drawTrail|drawParts)$/.test(n),
 };
 
 for (const [label, pick] of Object.entries(GROUPS)) {

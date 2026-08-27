@@ -38,5 +38,6 @@ async function tryOpts(label, extra) {
   } catch (e) { console.log(label.padEnd(26) + 'failed: ' + e.message); }
 }
 
-for (const n of [2, 4, 5, 6, 7, 8, 9, 10, 12, 14]) await tryOpts('abbrev ' + n, { numAbbreviations: n });
-for (const n of [6, 7, 8, 9]) await tryOpts('abbrev ' + n + ' + prec16', { numAbbreviations: n, precision: 16 });
+await tryOpts('cached baseline', {});
+for (const mb of [200, 400, 700, 1200, 2000]) await tryOpts('maxMemoryMB ' + mb, { maxMemoryMB: mb });
+for (const cb of [16, 17, 18, 19, 20, 21, 22]) await tryOpts('contextBits ' + cb, { maxMemoryMB: 2400, contextBits: cb });
