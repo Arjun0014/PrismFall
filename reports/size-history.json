@@ -1,0 +1,89 @@
+[
+ {
+  "date": "2026-08-27 13:07",
+  "zip": 15042,
+  "min": 46342,
+  "raw": 92377,
+  "rr": 19678,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "M0-M5 first full pass",
+  "delta": 0,
+  "left": -1730
+ },
+ {
+  "date": "2026-08-27 13:11",
+  "zip": 15187,
+  "min": 46975,
+  "raw": 93361,
+  "rr": 19873,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 145,
+  "left": -1875
+ },
+ {
+  "date": "2026-08-27 13:13",
+  "zip": 15073,
+  "min": 46975,
+  "raw": 93361,
+  "rr": 19722,
+  "tag": "roadroller",
+  "deep": true,
+  "note": "",
+  "delta": -114,
+  "left": -1761
+ },
+ {
+  "date": "2026-08-27 13:19",
+  "zip": 15001,
+  "min": 42208,
+  "raw": 87383,
+  "rr": 19623,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -72,
+  "left": -1689
+ },
+ {
+  "date": "2026-08-27 13:31",
+  "quick": false,
+  "zip": 14708,
+  "min": 40810,
+  "raw": 85512,
+  "rr": 19239,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -293,
+  "left": -1396
+ },
+ {
+  "date": "2026-08-27 13:45",
+  "quick": false,
+  "zip": 14009,
+  "min": 37255,
+  "raw": 81218,
+  "rr": 18431,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "post cut rounds 1-2",
+  "delta": -699,
+  "left": -697
+ },
+ {
+  "date": "2026-08-27 16:01",
+  "quick": false,
+  "zip": 13559,
+  "min": 35092,
+  "raw": 80881,
+  "rr": 17839,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -450,
+  "left": -247
+ }
+]

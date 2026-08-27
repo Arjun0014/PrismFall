@@ -1,0 +1,24 @@
+{
+  "name": "prismfall",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PRISMFALL - js13kGames 2026 entry (Unicorns and Rainbows)",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "pack": "node tools/build.mjs --deep",
+    "size": "node tools/build.mjs --quiet",
+    "test": "node tools/build.mjs && node tests/run.mjs",
+    "test:sim": "node tests/sim.mjs",
+    "test:gen": "node tests/gen.mjs",
+    "test:browser": "node tests/browser.mjs",
+    "serve": "node tools/serve.mjs"
+  },
+  "devDependencies": {
+    "@gfx/zopfli": "^1.0.15",
+    "ect-bin": "^1.4.1",
+    "playwright": "^1.62.1",
+    "roadroller": "^2.1.0",
+    "terser": "^5.51.2"
+  }
+}

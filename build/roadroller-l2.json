@@ -1,0 +1,20 @@
+{
+ "sparseSelectors": [
+  0,
+  1,
+  2,
+  3,
+  7,
+  13,
+  21,
+  42,
+  57,
+  370,
+  404,
+  449
+ ],
+ "precision": 14,
+ "modelMaxCount": 5,
+ "recipLearningRate": 1333,
+ "modelRecipBaseCount": 12
+}
