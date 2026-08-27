@@ -50,6 +50,10 @@ const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]]
 
 let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
 let vault = null;   // chunk currently focusing the camera
+// Shared build context for the archetype builders: the playable span, its
+// centre and width, the region's material bias and the current difficulty.
+// Set once per chunk by genChunk so no builder has to take seven parameters.
+let bL = 0, bR = 0, bW = 0, bX = 0, bB = 0, bD = 0;
 
 // --- obstacle constructors -------------------------------------------------
 // One shape record covers both primitives: t 0 is a circle of radius r, t 1 is
@@ -163,19 +167,19 @@ function genChunk() {
   // Walls, drawn as chunk-to-chunk segments so the column is continuous.
   c.o.push(sgAB(prevL, y, l, y + h, 0), sgAB(prevR, y, r, y + h, 0));
 
-  const L = mx(prevL, l) + 30, Rr = mn(prevR, r) - 30, wdt = Rr - L, cx = (L + Rr) / 2;
+  bL = mx(prevL, l) + 30; bR = mn(prevR, r) - 30;
+  bW = bR - bL; bX = (bL + bR) / 2; bB = b; bD = dif;
 
-  if (boundary) buildGate(c, L, Rr, rg, dif);
-  else if (cIdx > 2 && rp(.1)) { c.v = 1; buildVault(c, L, Rr, rg); }
+  if (boundary) buildGate(c);
+  else if (cIdx > 2 && rp(.1)) { c.v = 1; buildVault(c, rg); }
   else {
     const k = +REG[rg][5][ri(0, 9)];
     c.k = k;
     if (k === 1 || k === 5)
-      barrier(c, L, Rr, wdt, b, dif, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 210),
-        c.y + c.h * rf(.34, .6), 0);
-    else [pegField, 0, bowl, shaft, rotor, 0, chamber][k](c, L, Rr, wdt, cx, b, dif);
-    decorate(c, L, Rr, b, REG[rg][6] + (dif * 1.6 | 0));
-    rewards(c, L, Rr, rg, dif);
+      barrier(c, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 210), c.y + c.h * rf(.34, .6), 0);
+    else [pegField, 0, bowl, shaft, rotor, 0, chamber][k](c);
+    decorate(c, REG[rg][6] + (dif * 1.6 | 0));
+    rewards(c, rg);
   }
 
   // Nothing is allowed to spawn inside solid geometry, whichever builder placed it.
@@ -192,11 +196,11 @@ function genChunk() {
 // which is what makes the game read as pinball rather than as empty shafts.
 // It refuses any spot that would crowd existing geometry, so it can never seal
 // a route it did not create.
-function decorate(c, L, Rr, b, n) {
+function decorate(c, n) {
   // Keep trying until the quota is met: shaft and rotor chunks reject most
   // candidates, and those are exactly the chunks that read as empty.
   for (let tries = n * 6; n > 0 && tries--;) {
-    const x = rf(L + 44, Rr - 44), y = c.y + rf(.07, .93) * c.h;
+    const x = rf(bL + 44, bR - 44), y = c.y + rf(.07, .93) * c.h;
     const cir = rp(.58), rad = rf(13, 25), hl = rf(30, 76), a = rf(0, PI);
     // Every extremity must clear existing geometry by more than the unicorn's
     // diameter. That keeps the filler from ever closing a route: splitting a
@@ -209,20 +213,20 @@ function decorate(c, L, Rr, b, n) {
     }
     n--;
     c.o.push(cir
-      ? ci(x, y, rad, mat(b, 0) | (rp(.42) ? M_BUMP : 0), moving(b, 74))
-      : sg(x, y, hl, a, mat(b, 1) | (rp(.2) ? M_ANCH : 0), moving(b, 62)));
+      ? ci(x, y, rad, mat(bB, 0) | (rp(.42) ? M_BUMP : 0), moving(bB, 74))
+      : sg(x, y, hl, a, mat(bB, 1) | (rp(.2) ? M_ANCH : 0), moving(bB, 62)));
   }
 }
 
 // --- archetypes ------------------------------------------------------------
-function pegField(c, L, Rr, wdt, cx, b, dif) {
+function pegField(c) {
   const rows = ri(4, 6), gap = c.h / (rows + 1);
   for (let r = 0; r < rows; r++) {
     const yy = c.y + gap * (r + 1), n = ri(4, 7);
     for (let i = 0; i < n; i++) {
       const t = (i + (r & 1 ? .5 : 0)) / (n - .35);
-      c.o.push(ci(L + 44 + t * (wdt - 88), yy, rf(14, 27),
-        mat(b, 0) | (rp(.3) ? M_BUMP : 0), moving(b, 60)));
+      c.o.push(ci(bL + 44 + t * (bW - 88), yy, rf(14, 27),
+        mat(bB, 0) | (rp(.3) ? M_BUMP : 0), moving(bB, 60)));
     }
   }
 }
@@ -230,14 +234,14 @@ function pegField(c, L, Rr, wdt, cx, b, dif) {
 // One builder covers both the Funnel and the Sieve: a wall across the column
 // with n openings. `drop` slopes the outer ends up and the gap edges down,
 // which turns a flat sieve into a converging funnel.
-function barrier(c, L, Rr, wdt, b, dif, n, drop, yy, quiet) {
-  const m = mat(b, 1), cuts = [];
-  for (let i = 0; i < n; i++) cuts.push(L + (i + rf(.25, .75)) * wdt / n);
-  let px = L - 20, py = yy - drop;
+function barrier(c, n, drop, yy, quiet) {
+  const m = mat(bB, 1), cuts = [];
+  for (let i = 0; i < n; i++) cuts.push(bL + (i + rf(.25, .75)) * bW / n);
+  let px = bL - 20, py = yy - drop;
   for (let i = 0; i <= n; i++) {
     const last = i === n;
-    const gw = mx(100, rf(125, 195) - dif * 16);
-    const nx = last ? Rr + 20 : cuts[i] - gw / 2, ny = last ? yy - drop : yy + drop;
+    const gw = mx(100, rf(125, 195) - bD * 16);
+    const nx = last ? bR + 20 : cuts[i] - gw / 2, ny = last ? yy - drop : yy + drop;
     if (nx - px > 24) c.o.push(sgAB(px, py, nx, ny, m));
     if (!last && drop > 40 && rp(.6)) c.o.push(ci(nx, ny, 15, M_BUMP));
     px = last ? nx : cuts[i] + gw / 2;
@@ -249,35 +253,35 @@ function barrier(c, L, Rr, wdt, b, dif, n, drop, yy, quiet) {
   c.i.push(item(rp(.35) ? I_PIG : I_CROWN, cuts[n - 1], yy - drop - 70, pick(aff(c.rg))));
 }
 
-function bowl(c, L, Rr, wdt, cx, b, dif) {
-  const r = mn(wdt * .42, 280), bx = cx + rf(-.2, .2) * wdt, by = c.y + c.h * .58;
+function bowl(c) {
+  const r = mn(bW * .42, 280), bx = bX + rf(-.2, .2) * bW, by = c.y + c.h * .58;
   const rim = r * cos(.12 * PI);
   arcSegs(c, bx, by, r, .12 * PI, .88 * PI, rp(.35) ? M_DAMP : 0);
   c.o.push(ci(bx - rim, by, 15, M_BUMP), ci(bx + rim, by, 15, M_BUMP));
   // Something worth the risk of dropping in.
   c.i.push(item(rp(.3) ? I_CROWN : I_PIG, bx, by + r * .55, pick(aff(c.rg))));
-  if (rp(.6)) c.o.push(sg(bx, c.y + c.h * .18, rf(60, 120), rf(-.4, .4), M_BUMP, moving(b, 90)));
+  if (rp(.6)) c.o.push(sg(bx, c.y + c.h * .18, rf(60, 120), rf(-.4, .4), M_BUMP, moving(bB, 90)));
 }
 
-function shaft(c, L, Rr, wdt, cx, b, dif) {
-  const w = mx(135, 250 - dif * 30), sx = cx + rf(-.22, .22) * wdt;
+function shaft(c) {
+  const w = mx(135, 250 - bD * 30), sx = bX + rf(-.22, .22) * bW;
   const drift = rf(-90, 90);
   c.o.push(sgAB(sx - w / 2, c.y, sx - w / 2 + drift, c.y + c.h, M_RAIL));
   c.o.push(sgAB(sx + w / 2, c.y, sx + w / 2 + drift, c.y + c.h, M_RAIL));
   for (let i = 0; i < 7; i++) c.i.push(item(I_COIN, sx + drift * (i / 7) + rf(-30, 30), c.y + 80 + i * (c.h - 160) / 6));
   // Outside the shaft: an optional pocket the player has to leave the rail for.
   if (rp(.6)) {
-    const ox = sx < cx ? Rr - 70 : L + 70;
+    const ox = sx < bX ? bR - 70 : bL + 70;
     const bp = rp(.45);
     c.i.push(item(bp ? I_PIG : I_BOOST, ox, c.y + c.h * .5, bp ? pick(aff(c.rg)) : ri(0, 6)));
   }
 }
 
-function rotor(c, L, Rr, wdt, cx, b, dif) {
+function rotor(c) {
   const n = ri(1, 2);
   for (let i = 0; i < n; i++) {
-    const rx = cx + rf(-.25, .25) * wdt, ry = c.y + c.h * (n === 1 ? .5 : .3 + i * .42);
-    const arms = ri(2, 3), len = mn(wdt * .34, 210), w = rs() * rf(.9, 1.9 + dif * .3);
+    const rx = bX + rf(-.25, .25) * bW, ry = c.y + c.h * (n === 1 ? .5 : .3 + i * .42);
+    const arms = ri(2, 3), len = mn(bW * .34, 210), w = rs() * rf(.9, 1.9 + bD * .3);
     for (let a = 0; a < arms; a++)
       c.o.push(sg(rx, ry, len, a * PI / arms, M_BUMP, { w }));
     c.o.push(ci(rx, ry, 18, 0));
@@ -285,33 +289,33 @@ function rotor(c, L, Rr, wdt, cx, b, dif) {
   }
 }
 
-function chamber(c, L, Rr, wdt, cx, b, dif) {
+function chamber(c) {
   const top = c.y + c.h * .16, bot = c.y + c.h * .86;
-  barrier(c, L, Rr, wdt, b, dif, 1, 0, top, 1);
-  barrier(c, L, Rr, wdt, b, dif, 1, 0, bot, 1);
+  barrier(c, 1, 0, top, 1);
+  barrier(c, 1, 0, bot, 1);
   const n = ri(4, 7);
   for (let i = 0; i < n; i++) {
-    const ix = L + rf(.12, .88) * wdt, iy = lerp(top + 60, bot - 60, rr());
+    const ix = bL + rf(.12, .88) * bW, iy = lerp(top + 60, bot - 60, rr());
     if (solidNear(c, ix, iy, 66)) continue;
-    if (rp(.45)) c.o.push(ci(ix, iy, rf(16, 30), rp(.5) ? M_BUMP : M_ANCH, moving(b, 80)));
-    else c.o.push(sg(ix, iy, rf(46, 96), rf(0, PI), mat(b, 1) | (rp(.3) ? M_RAIL : 0), moving(b, 70)));
+    if (rp(.45)) c.o.push(ci(ix, iy, rf(16, 30), rp(.5) ? M_BUMP : M_ANCH, moving(bB, 80)));
+    else c.o.push(sg(ix, iy, rf(46, 96), rf(0, PI), mat(bB, 1) | (rp(.3) ? M_RAIL : 0), moving(bB, 70)));
   }
   // A ring of orbit fodder around the middle: this is the archetype the Green
   // tether and the Yellow spring are meant to be used in.
-  const mx2 = (L + Rr) / 2, my = (top + bot) / 2, rr2 = mn(wdt * .3, 190);
+  const mx2 = bX, my = (top + bot) / 2, rr2 = mn(bW * .3, 190);
   for (let i = 0; i < 4; i++) {
     const a = i / 4 * TAU + rf(0, 1), ix = mx2 + cos(a) * rr2, iy = my + sin(a) * rr2 * .7;
-    if (!solidNear(c, ix, iy, 62)) c.o.push(ci(ix, iy, rf(13, 21), M_BUMP, moving(b, 56)));
+    if (!solidNear(c, ix, iy, 62)) c.o.push(ci(ix, iy, rf(13, 21), M_BUMP, moving(bB, 56)));
   }
   // Side pocket with the good stuff
-  c.i.push(item(rp(.25) ? I_CROWN : I_PIG, rp(.5) ? L + 55 : Rr - 55, (top + bot) / 2, pick(aff(c.rg))));
+  c.i.push(item(rp(.25) ? I_CROWN : I_PIG, rp(.5) ? bL + 55 : bR - 55, (top + bot) / 2, pick(aff(c.rg))));
 }
 
 // --- special rooms ---------------------------------------------------------
 // Focus Vault — a slow, enclosed prize room. Some of them hold a Prism Well
 // instead of a Crown Coin, which is the game's only full pigment refill.
-function buildVault(c, L, Rr, rg) {
-  const cx = (L + Rr) / 2, cy = c.y + c.h * .5, r = mn((Rr - L) * .38, 250);
+function buildVault(c, rg) {
+  const cx = bX, cy = c.y + c.h * .5, r = mn(bW * .38, 250);
   c.cx = cx; c.cy = cy;
   arcSegs(c, cx, cy, r, .78 * PI, 2.16 * PI, M_BUMP);   // bowl with a top-left mouth
   const well = rp(.4);
@@ -325,33 +329,33 @@ function buildVault(c, L, Rr, rg) {
 
 // Region exit machine: a spinning prism above a closing throat, then a full
 // spectrum of pigment as a reward for getting through it.
-function buildGate(c, L, Rr, rg, dif) {
-  const cx = (L + Rr) / 2, w = Rr - L, cy = c.y + c.h * .4, b = bias(rg);
-  rotor(c, L, Rr, w, cx, b, dif);
-  barrier(c, L, Rr, w, b, dif, 1, 0, cy + 300, 1);
+function buildGate(c) {
+  const cx = bX, cy = c.y + c.h * .4;
+  rotor(c);
+  barrier(c, 1, 0, cy + 300, 1);
   c.o.push(ci(cx, cy, 26, M_BUMP));
   for (let i = 0; i < 7; i++) c.i.push(item(I_PIG, cx + (i - 3) * 74, cy + 420, i));
   c.i.push(item(I_CROWN, cx, c.y + 150));
 }
 
 // --- rewards ---------------------------------------------------------------
-function rewards(c, L, Rr, rg, dif) {
+function rewards(c, rg) {
   const af = aff(rg);
   // Drop something valuable in the first free spot we find.
   const place = (t, cc, lo, hi) => {
     for (let a = 0; a < 10; a++) {
-      const x = rf(L + 45, Rr - 45), y = c.y + rf(lo, hi) * c.h;
+      const x = rf(bL + 45, bR - 45), y = c.y + rf(lo, hi) * c.h;
       if (!solidNear(c, x, y, 34)) { c.i.push(item(t, x, y, cc)); return; }
     }
   };
   // A coin arc that teaches a trajectory.
   if (rp(.75)) {
-    const n = ri(5, 9), x0 = L + rf(.1, .5) * (Rr - L), y0 = c.y + rf(.15, .5) * c.h;
+    const n = ri(5, 9), x0 = bL + rf(.1, .5) * bW, y0 = c.y + rf(.15, .5) * c.h;
     const dir = rs(), spread = rf(150, 330), rise = rf(-190, 240);
     for (let i = 0; i < n; i++) {
       const t = i / (n - 1);
       const x = x0 + dir * spread * t, y = y0 + rise * sin(t * PI) + t * 150;
-      if (x > L + 25 && x < Rr - 25 && !solidNear(c, x, y, 26)) c.i.push(item(I_COIN, x, y));
+      if (x > bL + 25 && x < bR - 25 && !solidNear(c, x, y, 26)) c.i.push(item(I_COIN, x, y));
     }
   }
   // Pigment biased to the region affinity, but never exclusive to it.
@@ -361,7 +365,7 @@ function rewards(c, L, Rr, rg, dif) {
   if (rp(.16)) place(I_BOOST, ri(0, 6), .3, .8);
   // Destruction cache: coins sealed behind breakable panels.
   if (rp(.24)) {
-    const x = rp(.5) ? L + 90 : Rr - 90, y = c.y + rf(.25, .7) * c.h;
+    const x = rp(.5) ? bL + 90 : bR - 90, y = c.y + rf(.25, .7) * c.h;
     for (let i = 0; i < 4; i++)
       c.o.push(sg(x + (i < 2 ? 0 : i > 2 ? 62 : -62), y + (i < 2 ? (i ? 62 : -62) : 0), 62, i < 2 ? PI / 2 : 0, M_BREAK));
     c.i.push(item(I_COIN, x, y), item(I_COIN, x - 34, y), item(I_COIN, x + 34, y),

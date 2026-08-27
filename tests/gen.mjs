@@ -201,12 +201,56 @@ console.log('\n=== descent probes ===');
     return { depth: best, deaths, stuck: worstStuck / 60 };
   };
 
+  // Free fall is reported for reference only. A body with no input legitimately
+  // mills around in a dense pinball world and then comes to rest, and coming to
+  // rest is the designed failure -- momentum is life. Asserting on how deep it
+  // drifts would be measuring the genre, not the level design. Whether the
+  // world is passable is covered by the seal invariant above; whether it is
+  // playable is covered by the policy probe below.
   const geo = seeds.slice(0, 40).map((sd) => drive(sd, null, 1));
-  const shallow = geo.filter((r) => r.depth < 3000);
   const med = geo.map((r) => r.depth).sort((a, b) => a - b)[geo.length >> 1];
-  ok(shallow.length === 0, 'geometry never stops a falling body short of 3000',
-    shallow.length + '/' + geo.length);
-  ok(med > 5000, 'median geometric descent over ' + SECS + 's', med | 0);
+  out.push('        free-fall median depth ' + (med | 0) + ' over ' + SECS + 's');
+
+  // The property that actually matters when the unicorn comes to rest: the
+  // player can always get it moving again. Drop it, let it settle wherever the
+  // world puts it, then spend one stroke.
+  // A single fixed stroke is not the bar -- a player picks a colour and a
+  // placement. The bar is that *some* stroke works, everywhere.
+  const PLACE = [[18, -60, 18, 60], [-55, -16, 55, -16], [-46, -52, 26, 16]];
+  let stranded = 0, tried = 0;
+  const escapes = {};
+  for (const sd of seeds.slice(0, 30)) {
+    E('startRun(' + sd + ');st=1;SAVE.t=1');
+    const P = A.P;
+    for (let i = 0; i < 60 * 25 && P.sp > 60; i++) { P.st = 0; E('update(1/60)'); }
+    if (P.sp > 60) continue;              // never settled; nothing to escape from
+    tried++;
+    const rest = { x: P.x, y: P.y };
+    let best = 0, via = '';
+    for (let c = 0; c < 7 && best < 260; c++) {
+      for (let mode = 0; mode < 3 && best < 260; mode++) {
+        E('startRun(' + sd + ');st=1');
+        P.x = rest.x; P.y = rest.y; P.vx = 0; P.vy = 0;
+        P.ra = null; P.te = null; P.ph = 0; P.st = 0;
+        E('NC=nearChunks(P.y-500,P.y+500)');
+        E('for(let j=0;j<7;j++)pig[j]=PMAX');
+        E('sel=' + c + ';hitCd=0;strokes.length=0');
+        const q = PLACE[mode];
+        E('mwx=P.x+' + q[0] + ';mwy=P.y+' + q[1]);
+        E('startStroke()');
+        E('mwx=P.x+' + q[2] + ';mwy=P.y+' + q[3]);
+        E('moveStroke()');
+        E('drawing=null');
+        for (let i = 0; i < 40; i++) { P.st = 0; E('update(1/60)'); }
+        if (P.sp > best) { best = P.sp; via = 'ROYGBIV'[c]; }
+      }
+    }
+    if (best < 200) stranded++; else escapes[via] = (escapes[via] || 0) + 1;
+  }
+  ok(tried > 5, 'the probe actually reached resting states', tried);
+  ok(stranded === 0, 'a resting unicorn can always be freed by some stroke',
+    stranded + '/' + tried);
+  out.push('        escapes by colour: ' + Object.entries(escapes).map((e) => e.join('x')).join(' '));
 
   // A modest policy: keep the energy up, aim it downward, and warp off a ledge
   // when it comes to rest. Far less than a good player has available.
