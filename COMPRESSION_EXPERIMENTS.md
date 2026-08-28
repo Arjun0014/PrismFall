@@ -32,6 +32,12 @@ measured as losses.
 | 0 | *(baseline at start of this phase)* | — | 16,812 | — | PASS | — |
 | 1 | **Audio patch VM** — 19 runtime-invariant cues as a 260-char packed string + one interpreter | 16,812 | 16,829 | **+17** | PASS | **REVERT** |
 | 2 | **HTML shell trim** — drop `<title>` and `<meta charset>`, make the source ASCII-only | 16,812 | 16,748 | **−64** | PASS | **KEEP** |
+| 3 | **Stronger deflate** — Zopfli 200 → 4,000 → 15,000 → 50,000 iterations, ECT -9 on each | 16,748 | 16,748 | **0** | PASS | n/a — saturated |
+| 4 | **Top-level function reordering** — hill-climb over declaration order, deflate-scored | 16,748 | 16,711* | −37* | **FAIL** | **ABANDON** |
+| 5 | **Constant lattice 0.005** — snap decimals to a shared grid | 16,758 | 16,750 | −8 | PASS | **REJECT** — not worth the churn |
+| 6 | **Constant lattice 0.02 / 0.05** | 16,758 | 16,712 / 16,627 | −46 / −131 | PASS | **REJECT** — destroys the pigment economy |
+
+\* measured by proxy; the resulting bundle hangs, see notes.
 
 ## Previously settled (do not re-run)
 
@@ -99,3 +105,67 @@ is worth recording because both look free and neither reports an error:
 In both cases the page loads, the console stays empty, and the canvas sits at
 its default 300×150 doing nothing. They were caught by the viewport assertions
 in the browser suite, not by any error.
+
+
+### 3 — Stronger deflate (saturated)
+
+Zopfli at 200, 4,000, 15,000 and 50,000 iterations, each followed by ECT -9,
+all produce **exactly 16,748 B**. The 50,000-iteration run takes 153 seconds to
+arrive at the same number as the 0.9-second run. ECT 0.8.3 has no level above
+-9, and `--mt-deflate` only adds threads. No `advzip`, `7z` or system `zopfli`
+is present, and none would beat this. **The deflate layer is at its floor.**
+
+### 4 — Function reordering (abandoned)
+
+Reordering top-level function declarations is one of the very few provably safe
+source mutations — declarations hoist, so moving one cannot change when it
+exists or what it closes over — and file-order was already worth up to 177 B, so
+the finer-grained version looked promising.
+
+A hill-climb over 46,858 candidate moves, scored with raw deflate as a fast
+proxy, found **−37 B** (13 of it from simply grouping all functions ahead of the
+non-function code, 24 from the search).
+
+**It was abandoned because the result does not run.** The splitter that carves
+the minified bundle into declarations never handles regex literals, so it
+mis-tracks brace depth and emits a program that parses but hangs the page on
+load. Doing this safely needs a real JS parser rather than a scanner, and the
+78 minified functions have no clean mapping back to the 139 in source (Terser
+inlines 55 of them), so the win could not be expressed as a source change
+either — it would have to live as a cached permutation keyed to a hash of the
+minified output. Thirty-seven bytes does not justify that machinery.
+
+### 5/6 — Constant lattice (rejected)
+
+Snapping every decimal onto a shared grid reduces the number of *distinct*
+values, which is the one thing that has reliably paid here. It works, and the
+coarser the grid the more it pays — but what it is spending is design.
+
+| Grid | Zip | Delta | Pigment costs left distinct |
+|---|---:|---:|---|
+| 0.005 | 16,750 | −8 | 7 of 7 |
+| 0.01 | 16,742 | −16 | 6 of 7 |
+| 0.02 | 16,712 | −46 | 3 of 7 |
+| 0.05 | 16,627 | −131 | 2 of 7 |
+
+`PC` is the canary: seven deliberately different per-colour pigment costs, with
+Red the most expensive and Blue the cheapest. At 0.05 they collapse to two
+values and the economy stops meaning anything. Only the 0.005 grid preserves all
+seven, and −8 B does not justify rewriting every numeric literal in the source
+past a regex that cannot tell code from strings and comments.
+
+## Ruled out by the same mechanism as experiment 1
+
+These were on the list. All are the same shape as the audio VM — replace cheap
+repetitive JS with an interpreter plus dense packed data — and the measurement
+that sank it applies unchanged, so none were built:
+
+| Idea | Why it cannot win here |
+|---|---|
+| One shared packed-data decoder across systems | The data it would pack is already shared: 3,501 numeric uses draw on only 326 distinct values. Packing converts cheap repetition into expensive novelty; sharing one decoder reduces the interpreter cost but not the data cost, which is the larger half. |
+| World/archetype mini-DSL | Same trade, plus the archetypes are genuinely different logic rather than the same logic with different constants. |
+| Boons as a generic modifier table | Already data: each boon is one bit read by exactly one system. There is no duplicated logic left to collapse. |
+| Cosmetics from parameters | Already parameters — `SAVE.e` is four small indices, and the renderer branches on them. |
+| One VFX emitter | Already one emitter: `pt` / `burst` / `shock` are shared by every effect in the game. |
+| WASM for the physics core | The module, its embedding and its JS glue start around a kilobyte; the physics core is a few hundred characters of JS. |
+| RegPack / JS-crush after the rewrites | Roadroller beats Terser+deflate alone by ~3.3 KB on this payload, and the standard advice is not to LZ-pack before deflate. |
