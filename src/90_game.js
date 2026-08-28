@@ -39,7 +39,7 @@ function startRun(sd) {
   pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
   boostT = [0, 0, 0, 0, 0, 0, 0];
   strokes = []; parts = []; trail = []; pops = []; nodes = []; shocks = [];
-  drawing = null; wheel = null;
+  drawing = null;
   P.x = 0; P.y = -320; P.vy = 300; P.a = PI / 2;
   P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300; P.rw = 0;
   Gx = 0; Gy = GRAV;
@@ -214,7 +214,6 @@ function draw() {
   }
   if (st > 1) [0, 0, screenPause, screenResults, screenStore, screenAscend][st]();
   else if (!st) screenTitle();
-  if (wheel && st === 1) prismWheel(); else wheel = null;
   cursor();
   if (DEBUG) {
     txt('seed ' + seed + '  v ' + (P.sp | 0) + '  chunks ' + chunks.length + '  parts ' + parts.length +

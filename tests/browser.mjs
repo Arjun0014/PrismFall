@@ -3,7 +3,7 @@
 //   node tests/browser.mjs chromium   one browser
 //   node tests/browser.mjs --head     headed
 //   node tests/browser.mjs --shots    write screenshots to reports/shots
-import { chromium, firefox } from 'playwright';
+import { chromium, firefox, webkit } from 'playwright';
 import { createServer } from 'node:http';
 import { readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -148,8 +148,13 @@ async function runBrowser(name, launcher) {
     };
     requestAnimationFrame(tick);
   }));
-  ok(perf.med < 20, 'median frame under 20ms (' + perf.med.toFixed(1) + 'ms)');
-  ok(perf.p95 < 34, '95th percentile frame under 34ms (' + perf.p95.toFixed(1) + 'ms)');
+  // Playwright's WebKit on Windows is a non-native build and runs roughly 60%
+  // slower than the engines anyone actually ships on, so it is held to a looser
+  // bar. It is here to catch Chromium-only ASSUMPTIONS, not to measure speed.
+  const slowEngine = name === 'webkit';
+  const medBar = slowEngine ? 34 : 20, p95Bar = slowEngine ? 50 : 34;
+  ok(perf.med < medBar, 'median frame under ' + medBar + 'ms (' + perf.med.toFixed(1) + 'ms)');
+  ok(perf.p95 < p95Bar, '95th percentile frame under ' + p95Bar + 'ms (' + perf.p95.toFixed(1) + 'ms)');
 
   // Soak: leave it running to catch runaway allocation / audio node leaks.
   await page.waitForTimeout(6000);
@@ -178,6 +183,16 @@ try {
   // A browser that will not start on this machine is an environment problem,
   // not a game failure, so it is reported loudly and skipped rather than
   // turning every run red. A browser that starts and then fails still fails.
+  // WebKit is not Firefox and does not satisfy the rules, which name Chrome and
+  // Firefox explicitly. It is here because it is a genuinely different engine
+  // from Chromium, so it catches Chromium-only assumptions -- which is most of
+  // what a Firefox run would have caught -- on a machine where Firefox refuses
+  // to start.
+  if (!only || only === 'webkit') {
+    try {
+      await runBrowser('webkit', webkit);
+    } catch (e) { skipped.push('webkit -- ' + String(e && e.message).split('\n')[0]); }
+  }
   if (!only || only === 'firefox') {
     try {
       await runBrowser('firefox', firefox);

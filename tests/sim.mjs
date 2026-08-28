@@ -511,21 +511,23 @@ console.log('\n=== cosmetics ===');
 }
 
 // ---------------------------------------------------------------------------
-console.log('\n=== prism wheel ===');
+// The radial Prism Wheel was removed: keys 1-7, the scroll wheel and the
+// clickable prism bar all already select a colour, and the bar is also the
+// touch path, so the wheel was the one item on the size menu that cost nothing
+// to lose. Its assertions live on as a guarantee that the survivors work.
+console.log('\n=== colour selection paths ===');
 {
-  A.__eval('startRun(31);st=1;sel=0;W=1920;H=1080;U=1');
-  A.__eval('wheel=[900,540];pmx=900;pmy=440');
-  const before = H.counter.calls;
-  A.__eval('prismWheel()');
-  ok(H.counter.calls > before, 'the wheel draws');
-  ok(A.wsel === 0, 'straight up selects Red', A.wsel);
-  A.__eval('pmx=900;pmy=640;prismWheel()');
-  ok(A.wsel === 3 || A.wsel === 4, 'straight down selects a middle wedge', A.wsel);
-  A.__eval('pmx=902;pmy=542;prismWheel()');
-  ok(A.wsel === A.sel, 'the dead zone keeps the current colour', A.wsel);
-  A.__eval('wheel=null');
+  A.__eval('startRun(5);st=1;sel=0');
+  A.__eval('setSel(3)');
+  ok(A.sel === 3, 'keys 1-7 select', A.sel);
+  A.__eval('setSel(sel + 1)');
+  ok(A.sel === 4, 'scroll steps forward', A.sel);
+  A.__eval('setSel(-1)');
+  ok(A.sel === 6, 'and wraps around', A.sel);
+  // The prism bar publishes a clickable button per colour every frame.
+  A.__eval('btns=[];W=1920;H=1080;U=1;prismBar()');
+  ok(A.__eval('btns.length') >= 7, 'the prism bar is clickable', A.__eval('btns.length'));
 }
-
 
 // ---------------------------------------------------------------------------
 console.log('\n=== audio hygiene ===');

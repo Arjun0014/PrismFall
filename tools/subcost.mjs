@@ -57,23 +57,40 @@ const base = await zipOf(raw);
 console.log('baseline zip ' + base + '\n');
 
 const GROUPS = {
-  'radial Prism Wheel': (n) => /^prismWheel$/.test(n),
+  // --- whole optional systems -------------------------------------------
   'store + cosmetics': (n) => /^(screenStore|buyEquip|owned)$/.test(n),
-  'unicorn drawing': (n) => /^(unicornBody)$/.test(n),
-  'background motifs': (n) => /^(background|motif)$/.test(n),
-  'music arrangement': (n) => /^(musicTick|ARP)$/.test(n),
-  'audio cues': (n) => /^snd/.test(n),
+  'radial Prism Wheel': (n) => /^prismWheel$/.test(n),
+  'Ascension draft': (n) => /^(screenAscend|ascend|takeBoon)$/.test(n),
   'focus vaults': (n) => /^buildVault$/.test(n),
   'region gates': (n) => /^buildGate$/.test(n),
+  'target banks (pinball)': (n) => /^(targets|tag|light)$/.test(n),
+  'crusher lanes': (n) => /^crushers$/.test(n),
+  'cascading destruction': (n) => /^(fuseStep|shards)$/.test(n),
+  'force fields (zones)': (n) => /^(zoneF|drawZone)$/.test(n),
+  'background motifs': (n) => /^(background|motif)$/.test(n),
+  'music arrangement': (n) => /^(musicTick|ARP)$/.test(n),
+  'audio: all cues': (n) => /^snd/.test(n),
+  'audio: reward cues only': (n) => /^snd(Crown|Pig|Well|Spectrum|Fuse|Refund|Power|Coin|Bank|Target)$/.test(n),
+  'particles + trail': (n) => /^(pt|burst|warpFX|strokeFX|partStep|pushTrail|drawTrail|drawParts|shock)$/.test(n),
+  'the trail only': (n) => /^(pushTrail|drawTrail)$/.test(n),
+  'unicorn drawing': (n) => /^unicornBody$/.test(n),
+  'reward placement': (n) => /^rewards$/.test(n),
   'world filler pass': (n) => /^decorate$/.test(n),
+  // --- individual archetypes ---------------------------------------------
   'archetype: bowl': (n) => /^(bowl|arcSegs)$/.test(n),
   'archetype: shaft': (n) => /^shaft$/.test(n),
   'archetype: rotor': (n) => /^rotor$/.test(n),
   'archetype: chamber': (n) => /^chamber$/.test(n),
   'archetype: pegField': (n) => /^pegField$/.test(n),
-  'reward placement': (n) => /^rewards$/.test(n),
-  'particles + trail': (n) => /^(pt|burst|warpFX|strokeFX|partStep|pushTrail|drawTrail|drawParts)$/.test(n),
+  'archetype: barrier': (n) => /^barrier$/.test(n),
+  // --- screens ------------------------------------------------------------
+  'results screen': (n) => /^screenResults$/.test(n),
+  'pause screen': (n) => /^screenPause$/.test(n),
+  'title screen': (n) => /^screenTitle$/.test(n),
+  'in-run HUD': (n) => /^(hud|prismBar)$/.test(n),
+  'cursor': (n) => /^cursor$/.test(n),
 };
+
 
 for (const [label, pick] of Object.entries(GROUPS)) {
   const hit = fns.filter((f) => pick(f.name));

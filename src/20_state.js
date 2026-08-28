@@ -73,7 +73,5 @@ const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
 let pmx = 0, pmy = 0;           // pointer in screen px
 let mwx = 0, mwy = 0;         // pointer in world units
 let drawing = null;           // stroke being drawn
-let wheel = null;             // radial Prism Wheel anchor [x, y] in screen px
-let wsel = 0;                 // wedge the pointer is currently over
 let hint = 0;                 // onboarding step
 let hintT = 0;

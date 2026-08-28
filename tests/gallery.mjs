@@ -61,22 +61,6 @@ console.log('  ascension');
 await page.keyboard.press('1');
 await page.waitForTimeout(300);
 
-// Radial Prism Wheel: hold the right button, flick to a wedge, release.
-await page.keyboard.press('r');
-await page.waitForTimeout(500);
-await page.mouse.move(800, 500);
-await page.mouse.down({ button: 'right' });
-await page.mouse.move(880, 420, { steps: 5 });
-await page.waitForTimeout(220);
-await page.screenshot({ path: join(DIR, 'prism-wheel.png') });
-await page.mouse.up({ button: 'right' });
-await page.waitForTimeout(180);
-console.log('  prism wheel');
-await page.keyboard.press('Escape');
-await page.waitForTimeout(300);
-await page.screenshot({ path: join(DIR, 'pause.png') });
-await page.keyboard.press('Escape');
-await page.waitForTimeout(200);
 // Store, reached from the title screen with plenty of coins banked.
 await page.evaluate(() => { try { localStorage.pf26_save = '5000,900,9000,0,0,1,0,0,0,0'; } catch (e) {} });
 await page.reload();

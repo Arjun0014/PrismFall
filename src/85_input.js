@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Input: pointer drawing, colour selection (keys 1-7, wheel, HUD, radial),
+// Input: pointer drawing, colour selection (keys 1-7, scroll, prism bar),
 // pause/restart/mute.
 // ---------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ function setSel(i) {
 }
 
 document.body.style.cssText = 'margin:0;overflow:hidden;background:#05030c';
-CV.style.cssText = 'position:fixed;width:100%;height:100%;cursor:none';
+CV.style.cssText = 'position:fixed;width:100%;height:100%';
 
 function resize() {
   const d = mn(devicePixelRatio || 1, 2);
@@ -37,17 +37,12 @@ addEventListener('pointermove', (e) => { ptr(e); if (drawing) moveStroke(); });
 addEventListener('pointerdown', (e) => {
   audioInit();
   ptr(e);
-  // Right button opens the radial Prism Wheel; left draws / clicks UI.
-  if (e.button === 2) { if (st === 1) { wheel = [pmx, pmy]; wsel = sel; } return; }
   if (e.button) return;
   if (!uiClick() && st === 1) startStroke();
 });
 
-addEventListener('pointerup', (e) => {
-  if (e.button === 2) { if (wheel) { setSel(wsel); wheel = null; } return; }
-  drawing = null;
-});
-addEventListener('blur', () => { drawing = null; wheel = null; if (st === 1) st = 2; });
+addEventListener('pointerup', () => { drawing = null; });
+addEventListener('blur', () => { drawing = null; if (st === 1) st = 2; });
 
 addEventListener('wheel', (e) => {
   if (st !== 1) return;

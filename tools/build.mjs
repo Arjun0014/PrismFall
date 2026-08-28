@@ -128,8 +128,13 @@ async function roadroll(js, deep) {
   // sweep of 12/16/20/24/32 put the minimum at 20. allowFreeVars is safe here
   // because the packed script is the only code on the page -- the Wavedash
   // build, which does coexist with an injected SDK, is not packed at all.
+  // 150 MB, not 700. The decoder allocates this table before the game exists,
+  // so an over-ambitious figure is not a size trade -- it is a "does the game
+  // start at all" trade. No phone can hand out 700 MB, and the rules require
+  // the game to run in Firefox as well as Chrome. Measured cost of dropping
+  // back to Roadroller's own default: 52 bytes.
   const opts = Object.assign({
-    maxMemoryMB: 700, numAbbreviations: 8, allowFreeVars: true,
+    maxMemoryMB: 150, numAbbreviations: 8, allowFreeVars: true,
     sparseSelectors: defaultSparseSelectors(20),
   }, cached);
   // The cache is written by a previous --deep run and may hold a 12-selector
@@ -137,6 +142,7 @@ async function roadroll(js, deep) {
   if (!opts.sparseSelectors || opts.sparseSelectors.length !== 20)
     opts.sparseSelectors = defaultSparseSelectors(20);
   opts.allowFreeVars = true;
+  opts.maxMemoryMB = 150;
   const packer = new Packer(inputs, opts);
   if (deep) {
     // Full model search at milestones, then sweep the abbreviation count on top

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// HUD, prism selector, radial wheel, menus, results and the cosmetic store.
+// HUD, prism selector, menus, results and the cosmetic store.
 // All immediate-mode on the same canvas — no DOM.
 //
 // The UI deliberately reuses a tiny fixed palette and a single modal helper:
@@ -124,44 +124,14 @@ function prismBar() {
   if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 1);
 }
 
-// --- radial Prism Wheel ----------------------------------------------------
-// Held on the right mouse button, anchored where the pointer already is, so the
-// player never looks away from the unicorn. Flick toward a wedge, release to
-// commit. The game keeps running underneath it.
-function prismWheel() {
-  const r = 84 * U, cx = wheel[0], cy = wheel[1];
-  const dx = pmx - cx, dy = pmy - cy, d = hyp(dx, dy);
-  // Inside the dead zone the current colour stays selected.
-  wsel = d < 22 * U ? sel : flr(((at2(dy, dx) + PI * 2.5 + PI / 7) % TAU) / TAU * 7) % 7;
-  CIR(cx, cy, r * 1.06, 'hsl(272 45% 6% / .72)');
-  for (let i = 0; i < 7; i++) {
-    const a0 = i / 7 * TAU - PI / 2 - PI / 7, a1 = a0 + TAU / 7, on = i === wsel;
-    BP();
-    MT(cx, cy);
-    AR(cx, cy, on ? r * 1.1 : r, a0 + .02, a1 - .02);
-    X.closePath();
-    FL(chsl(i, on ? 58 : 30, on ? 1 : .8));
-    SK(on ? 2.6 * U : 1 * U, on ? W9 : chsl(i, 46, .7));
-    const am = (a0 + a1) / 2, tr = r * (on ? .8 : .72);
-    txt('ROYGBIV'[i], cx + cos(am) * tr, cy + sin(am) * tr, on ? 17 : 13, on ? W9 : W6, 1);
-    // Pigment left in this reservoir, as a ring arc — the wheel doubles as a gauge.
-    BP();
-    AR(cx, cy, r * .34, a0 + .04, lerp(a0 + .04, a1 - .04, pig[i] / PMAX));
-    SK(5 * U, chsl(i, 62));
-  }
-  CIR(cx, cy, 20 * U, 'hsl(272 45% 8% / .9)', W3, 1.5 * U);
-  txt(pig[wsel] | 0, cx, cy, 12, W6, 1);
-}
-
-// --- cursor ----------------------------------------------------------------
+// The reach ring: strokes may only start within SREACH of the unicorn, and
+// further clicks clamp back onto that circle. Showing the clamp point is the
+// one piece of pointer feedback that is about the rules rather than decoration,
+// so it survives while the drawn cursor does not.
 function cursor() {
-  if (st !== 1) { CIR(pmx, pmy, 7 * U, 0, W9, 2 * U); return; }
-  CIR(pmx, pmy, 9 * U, 0, chsl(sel, 70), 2.4 * U);
-  CIR(pmx, pmy, 2 * U, chsl(sel, 85));
-  if (!drawing && P.al) {
-    const dx = mwx - P.x, dy = mwy - P.y, d = hyp(dx, dy);
-    if (d > SREACH) CIR(w2sx(P.x + dx / d * SREACH), w2sy(P.y + dy / d * SREACH), 4 * U, chsl(sel, 60, .8));
-  }
+  if (st !== 1 || drawing || !P.al) return;
+  const dx = mwx - P.x, dy = mwy - P.y, d = hyp(dx, dy);
+  if (d > SREACH) CIR(w2sx(P.x + dx / d * SREACH), w2sy(P.y + dy / d * SREACH), 4 * U, chsl(sel, 60, .8));
 }
 
 // --- modal framework -------------------------------------------------------
