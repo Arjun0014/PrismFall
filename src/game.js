@@ -35,7 +35,6 @@ function startRun(sd) {
   st = 1; score = 0; coins = 0; mult = 1; depth = 0; reg = 0; regShow = 3.2;
   chain = 0; chainN = 0; chainT = 0; fullSpec = 0; combo = 0; comboT = 0;
   deadT = 0; slow = 0; vault = null; shake = 0; flash = 0; hstop = 0;
-  boon = 0; draft = []; dsel = -1; descent = 0;
   pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
   boostT = [0, 0, 0, 0, 0, 0, 0];
   strokes = []; parts = []; trail = []; pops = []; nodes = []; shocks = [];
@@ -65,37 +64,6 @@ function endRun() {
   if (WD) wdSubmit(score | 0, depth | 0);
 }
 
-// --- the Ascension draft ---------------------------------------------------
-// Reaching the bottom of the Rainbow Engine is not the end of the game: the
-// shaft loops, harder, and before it does you take one permanent upgrade from
-// two on offer. Boons are what make the second descent a different run rather
-// than the same run with bigger numbers.
-function ascend() {
-  const pool = [];
-  for (let i = 0; i < NBOON; i++) if (!bn(i)) pool.push(i);
-  if (!pool.length) { descent++; return; }
-  draft = [pool.splice(flr(rr() * pool.length), 1)[0]];
-  if (pool.length) draft.push(pool[flr(rr() * pool.length)]);
-  dsel = -1;
-  st = 5;
-  flash = 1; flashH = -1;
-  sndSpectrum();
-}
-
-function takeBoon(i) {
-  if (st !== 5 || i >= draft.length) return;
-  boon |= 1 << draft[i];
-  descent++;
-  st = 1;
-  // The upgrade lands with a full tank, so the new descent starts on the front
-  // foot rather than immediately begging for pigment.
-  for (let j = 0; j < 7; j++) pig[j] = pmax();
-  score += 5000 * mult | 0;
-  pop(P.x, P.y - 40, BOONN[draft[i] * 2], -1);
-  draft = [];
-  sndWell();
-}
-
 function die() {
   P.al = 0; deadT = 1.3;
   for (let i = 0; i < 7; i++) burst(P.x, P.y, 16, 0, 520, HUE[i]);
@@ -123,9 +91,10 @@ function update(dt) {
 
   fuseStep(dt);
 
-  // A descent is over once the Rainbow Engine is behind you. Everything below
-  // is the same seven regions again, harder, with whatever boon you drafted.
-  if (st === 1 && loopAt(P.y) > descent && P.al) { ascend(); return; }
+  // Past the Rainbow Engine the shaft simply begins again, harder: regAt wraps
+  // and difAt keeps climbing with the loop count, so the cycle boundary needs no
+  // code of its own. It still announces itself, because a loop boundary is also
+  // a region change and those already flash, name themselves and sound a gate.
 
   // region progression
   const r = regAt(P.y);
@@ -142,7 +111,7 @@ function update(dt) {
 
   // Stall is the only failure state: too slow for too long and the run ends.
   if (P.al) {
-    const stallT = STALLT * (bn(5) ? 1.8 : 1);
+    const stallT = STALLT;
     if (P.sp < STALLV) {
       P.st += dt;
       const u = clamp((P.st - STALLW) / (stallT - STALLW), 0, 1);
@@ -212,7 +181,7 @@ function draw() {
       : hsl(flashH | 0, 100, 72, flash * .45);
     X.fillRect(0, 0, W, H);
   }
-  if (st > 1) [0, 0, screenPause, screenResults, screenStore, screenAscend][st]();
+  if (st > 1) [0, 0, screenPause, screenResults, screenStore][st]();
   else if (!st) screenTitle();
   cursor();
   if (DEBUG) {

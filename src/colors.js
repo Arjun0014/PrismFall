@@ -15,9 +15,8 @@ function bst(c) {
   for (let i = 0; i < 7; i++) if (boostT[i] > 0 && BOOST[i][0] === c) return BOOST[i][1];
   return 1;
 }
-const costMul = () => bst(7) * (bn(1) ? .7 : 1);
-// Pigment capacity, which the Prism Heart boon raises.
-const pmax = () => bn(0) ? PMAX * 1.3 : PMAX;
+const costMul = () => bst(7);
+const pmax = () => PMAX;
 // How strong a stroke of length L is. Every colour reads this one curve, so
 // "draw longer for more of it" is a single rule the player learns once, and
 // pigment already bills per unit length so the cost side needs no new economy.
@@ -35,9 +34,9 @@ function startStroke() {
   // n is the number of times the stroke may fire before it is spent; l is only
   // a fade timer, and only ticks once it has been. A drawing you never use
   // stays on the field for the whole run.
-  drawing = { x1: sx, y1: sy, x2: sx, y2: sy, e: CBIT[sel], c: sel, l: 0, u: 0, paid: 0, n: bn(8) ? 2 : 1 };
+  drawing = { x1: sx, y1: sy, x2: sx, y2: sy, e: CBIT[sel], c: sel, l: 0, u: 0, paid: 0 };
   strokes.push(drawing);
-  while (strokes.length > SLIM + (bn(7) ? 2 : 0)) if (P.ra === strokes.shift()) detachRail(0);
+  while (strokes.length > SLIM) if (P.ra === strokes.shift()) detachRail(0);
   if (P.te) releaseTether();
 }
 
@@ -214,7 +213,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy, L) {
   }
 
   clampV();
-  if (consume && !--s.n) { s.u = 1; s.l = SPENT; }
+  if (consume) { s.u = 1; s.l = SPENT; }
   strokeFX(s, px, py);
   chainAdd(b);
 }
@@ -255,8 +254,8 @@ function fullSpectrum() {
 function grab(it) {
   it.g = 1;
   if (it.t === I_COIN) {
-    combo++; comboT = 1.4; coins += bn(9) ? 3 : 1;
-    score += 10 * mult * (1 + combo * .05) * (bn(9) ? 3 : 1) | 0;
+    combo++; comboT = 1.4; coins += 1;
+    score += 10 * mult * (1 + combo * .05) | 0;
     sndCoin(combo);
   } else if (it.t === I_CROWN) {
     coins += 15; score += (500 * mult) | 0;

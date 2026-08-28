@@ -734,7 +734,7 @@ console.log('\n=== pinball: bumpers, targets, cascades ===');
 {
   // Breaking one panel must light the fuse on its neighbours.
   const P = clean(0, 2000);
-  A.__eval('boon=0;hstop=0');
+  A.__eval('hstop=0');
   A.__eval(`
     const c={o:[],i:[],bk:[]};
     for(let i=0;i<5;i++)c.o.push(ci(i*60,400,20,M_BREAK));
@@ -795,55 +795,23 @@ console.log('\n=== region force fields ===');
 }
 
 // ---------------------------------------------------------------------------
-console.log('\n=== ascension draft ===');
+console.log('\n=== the cycle loops ===');
 {
+  // Ascension is gone. Past the seventh region the shaft has to simply keep
+  // going, harder -- not stop, not open a screen, not reset the region index.
   A.__eval('startRun(88);st=1');
-  ok(A.boon === 0 && A.descent === 0, 'a run starts with no boons');
   A.P.y = A.NREG * A.REGD + 400;
   A.__eval('update(1/60)');
-  ok(A.st === 5, 'finishing the seventh region opens the draft', A.st);
-  ok(A.draft.length === 2, 'two boons are offered', A.draft.length);
-  ok(A.draft[0] !== A.draft[1], 'and they are different');
-  A.__eval('screenAscend()');
-  ok(1, 'the draft screen draws');
-  const pick = A.draft[0];
-  A.__eval('takeBoon(0)');
-  ok(A.st === 1, 'taking one resumes the run', A.st);
-  ok(A.__eval('bn(' + pick + ')') === 1, 'the boon is applied');
-  ok(A.descent === 1, 'the descent counter advances', A.descent);
-  ok(A.pig.every((p) => p >= A.PMAX), 'and the tank is refilled');
-
-  // Boons are permanent within a run and gone at the start of the next.
-  for (let i = 0; i < 120; i++) A.__eval('update(1/60)');
-  ok(A.__eval('bn(' + pick + ')') === 1, 'a boon does not expire');
-  A.__eval('startRun(89)');
-  ok(A.boon === 0, 'a new run starts clean');
-}
-{
-  // Every boon has to measurably change the thing it names.
-  const setB = (i) => A.__eval('startRun(90);st=1;boon=' + (1 << i));
-  A.__eval('startRun(90);st=1;boon=0');
-  const basePmax = A.__eval('pmax()'), baseCost = A.__eval('costMul()');
-  const baseSlots = A.__eval('SLIM + (bn(7)?2:0)');
-  setB(0); ok(A.__eval('pmax()') > basePmax, 'PRISM HEART raises pigment capacity');
-  setB(1); ok(A.__eval('costMul()') < baseCost, 'AFTERGLOW lowers stroke cost');
-  setB(2); ok(A.__eval('(()=>{P.vx=VFAST*1.4;P.vy=0;const b=P.vx;physics(1/120);return P.vx>=b*.999})()'),
-    'MOMENTUM keeps speed that would otherwise bleed off');
-  setB(3); ok(A.__eval('BRK_E*(bn(3)?.5:1)') < A.BRK_E, 'DEMOLITION halves the break threshold');
-  setB(4); ok(A.__eval('bn(4)') === 1, 'LODESTONE is set');
-  setB(5); ok(A.__eval('STALLT*(bn(5)?1.8:1)') > A.STALLT, 'SECOND WIND lengthens the stall clock');
-  setB(6); ok(A.__eval('bn(6)') === 1, 'RESONANCE is set');
-  setB(7); ok(A.__eval('SLIM + (bn(7)?2:0)') > baseSlots, 'WIDE PALETTE adds stroke slots');
-  setB(8);
-  A.__eval('for(const c of chunks){c.o.length=0;c.i.length=0}');
-  A.__eval('sel=0;mwx=P.x+40;mwy=P.y+40;startStroke();mwx=P.x+140;mwy=P.y+140;moveStroke();drawing=null');
-  ok(A.strokes[A.strokes.length - 1].n === 2, 'HARD LIGHT gives a stroke two charges');
-  setB(9);
-  A.__eval('coins=0;grab({t:I_COIN,x:P.x,y:P.y,c:0,g:0})');
-  const gold = A.coins;
-  A.__eval('startRun(90);st=1;boon=0;coins=0;grab({t:I_COIN,x:P.x,y:P.y,c:0,g:0})');
-  ok(gold > A.coins, 'GOLDEN HOUR multiplies coin value', A.coins + ' -> ' + gold);
-  ok(A.NBOON === 10, 'ten boons exist', A.NBOON);
+  ok(A.st === 1, 'passing the last region does not interrupt the run', A.st);
+  ok(A.P.al === 1, 'and does not kill the player');
+  ok(A.__eval('loopAt(P.y)') === 1, 'the loop counter advances', A.__eval('loopAt(P.y)'));
+  ok(A.__eval('regAt(P.y)') === 0, 'the region index wraps to the first region');
+  const d1 = A.__eval('difAt(P.y)');
+  A.P.y = A.NREG * A.REGD * 2 + 400;
+  ok(A.__eval('difAt(P.y)') > d1, 'and the second lap is harder than the first',
+    d1.toFixed(2) + ' -> ' + A.__eval('difAt(P.y)').toFixed(2));
+  for (let i = 0; i < 240; i++) A.__eval('update(1/60)');
+  ok(A.st === 1, 'four seconds later the run is still going', A.st);
 }
 
 // ---------------------------------------------------------------------------

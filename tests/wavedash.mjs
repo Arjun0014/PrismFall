@@ -49,9 +49,13 @@ for (const withSdk of [0, 1]) {
   await page.waitForTimeout(1200);
   const label = withSdk ? 'with stubbed SDK' : 'with NO SDK';
   console.log('\n=== wavedash build ' + label + ' ===');
-  ok(await page.evaluate(() => !!document.getElementById('a')), 'canvas exists');
+  // querySelector, not getElementById: the game binds its canvas with
+  // document.querySelector('canvas') and neither shell carries an id any more.
+  // This assertion was still asking for #a and only passed because it ran
+  // against a dist-wavedash/ built before the id was dropped.
+  ok(await page.evaluate(() => !!document.querySelector('canvas')), 'canvas exists');
   const drew = await page.evaluate(() => {
-    const c = document.getElementById('a');
+    const c = document.querySelector('canvas');
     return c.width > 0 && c.height > 0;
   });
   ok(drew, 'canvas sized');

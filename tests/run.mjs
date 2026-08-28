@@ -17,6 +17,10 @@ if (!args.includes('--no-browser')) {
   // The Wavedash build is a separate product from the same source, so it needs
   // its own gate: it must run with the SDK and, just as importantly, without it.
   SUITES.push(['wavedash build', 'tests/wavedash.mjs', []]);
+  // ...and it is built first. tests/wavedash.mjs reads dist-wavedash/index.html
+  // off disk, so without this the suite happily certifies whatever was there
+  // from a previous session -- which it did, once.
+  spawnSync(process.execPath, [join(ROOT, 'tools/build.mjs'), '--wavedash'], { cwd: ROOT, stdio: 'ignore' });
 }
 
 let failed = 0;

@@ -8,7 +8,7 @@ const X = CV.getContext('2d');
 let W = 0, H = 0, SC = 1;      // canvas pixel size, world->screen scale
 
 // -- game / scene state -----------------------------------------------------
-// 0 title  1 playing  2 paused  3 results  4 store  5 ascension draft
+// 0 title  1 playing  2 paused  3 results  4 store
 let st = 0;
 let T = 0;        // wall-clock seconds since load (drives animation)
 let slow = 0;     // 0..1 focus-vault time dilation blend

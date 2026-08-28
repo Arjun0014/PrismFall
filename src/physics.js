@@ -85,7 +85,7 @@ function tetherConstrain() {
 // reward for keeping a chain alive, never a substitute for aim: the radius
 // only opens up once the multiplier is already high, and it pulls coins only.
 function items(h) {
-  const mag = bn(4) ? 180 + mult * 24 : mult > 4 ? 60 + mult * 24 : 0;
+  const mag = mult > 4 ? 60 + mult * 24 : 0;
   for (const c of NC) for (const it of c.i) {
     if (it.g) continue;
     const dx = P.x - it.x, dy = P.y - it.y, d = hyp(dx, dy);
@@ -116,7 +116,7 @@ function hitOb(o) {
 
   if (o.m & M_BREAK) {
     const imp = -vn;
-    if (imp > (P.rp > 0 ? BRK_R : BRK_E) * (bn(3) ? .5 : 1)) { shatter(o, px, py, imp, 0); return; }
+    if (imp > (P.rp > 0 ? BRK_R : BRK_E)) { shatter(o, px, py, imp, 0); return; }
   }
 
   P.x += nx * pen; P.y += ny * pen;
@@ -157,9 +157,8 @@ function hitOb(o) {
   // and playing a pinball table.
   if (bump && imp > 150) {
     combo++; comboT = 1.6;
-    const v = (18 + imp * .05) * mult * (bn(6) ? 2 : 1) | 0;
+    const v = (18 + imp * .05) * mult | 0;
     score += v;
-    if (bn(6)) { const c2 = flr(rr() * 7); pig[c2] = mn(pmax(), pig[c2] + 2.4); }
     if (imp > 620) {
       pop(px, py, '+' + v, HUE[2]);
       shock(px, py, 60 + mn(imp * .2, 190), pal[6] + 30);
@@ -215,7 +214,7 @@ function shatter(o, px, py, imp, d) {
   // Light the fuse on every breakable neighbour. Staggering by distance turns
   // a cluster into a chain rather than a single silent frame.
   if (d > 3) return;
-  const rad = BRK_CH * (bn(3) ? 2 : 1);
+  const rad = BRK_CH;
   for (const c of NC) for (const q of c.o) {
     if (q === o || q.k || q.kt || !(q.m & M_BREAK)) continue;
     const dd = hyp(q.x - px, q.y - py);
@@ -278,9 +277,9 @@ function physics(h) {
   // instead of the player. Below VFAST there is no drag at all, so recovering
   // from a stall is never taxed.
   let sp = hyp(P.vx, P.vy);
-  const vf = VFAST * (bn(2) ? 1.5 : 1);
+  const vf = VFAST;
   if (sp > vf) {
-    const d = mx(0, 1 - (sp / vf - 1) * (bn(2) ? .6 : 1.5) * h);
+    const d = mx(0, 1 - (sp / vf - 1) * 1.5 * h);
     P.vx *= d; P.vy *= d;
     sp *= d;
   }

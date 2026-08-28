@@ -28,10 +28,9 @@ for (let r = 0; r < 7; r++) {
   // Fresh run per region so a death mid-capture can never poison the next shot.
   await page.keyboard.press('r');
   await page.waitForTimeout(300);
-  // Play a beat FIRST, then jump. Playing after the jump let a fast run carry
-  // past the seventh region into the Ascension draft, and the draft's own cards
-  // then swallowed these drag gestures -- which is how half of these shots
-  // ended up being of the wrong region entirely.
+  // Play a beat FIRST, then jump: playing after the jump let a fast run drift
+  // into the next region, which is how half of these shots ended up being of
+  // the wrong region entirely.
   for (let i = 0; i < 12; i++) {
     await page.keyboard.press('f');
     await page.keyboard.press(String((i % 7) + 1));
@@ -49,15 +48,6 @@ for (let r = 0; r < 7; r++) {
   await page.screenshot({ path: join(DIR, 'region-' + r + '-' + NAMES[r] + '.png') });
   console.log('  region ' + r + ' ' + NAMES[r]);
 }
-// The Ascension draft, reached by jumping past the seventh region.
-await page.keyboard.press('r');
-await page.waitForTimeout(300);
-for (let j = 0; j < 7; j++) { await page.keyboard.press('g'); await page.waitForTimeout(200); }
-await page.waitForTimeout(800);
-await page.mouse.move(600, 455);
-await page.waitForTimeout(200);
-await page.screenshot({ path: join(DIR, 'ascension.png') });
-console.log('  ascension');
 await page.keyboard.press('1');
 await page.waitForTimeout(300);
 

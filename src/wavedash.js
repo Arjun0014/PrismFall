@@ -118,15 +118,14 @@ async function wdFetch() {
 
 // Called from endRun. Score and depth go to their own boards, and the run's
 // shape rides along as metadata so a board entry can be read back as a story:
-// which region ended it, how deep, how many descents, which boons.
+// which region ended it, how deep, how many laps of the shaft it took.
 function wdSubmit(sc, dp) {
   const S = WDS();
   if (!S || !wdLB || !sc) return;
   const meta = {
     region: REG[reg][0],
     depth: (dp / 10) | 0,
-    descents: descent,
-    boons: BOONN.filter((n, i) => !(i & 1) && bn(i >> 1)).join(',') || 'none',
+    laps: loopAt(dp),
   };
   wdOk(S.uploadLeaderboardScore(wdLB, sc, true, undefined, meta), 'upload').then((d) => {
     if (d) { wdMe = d.globalRank | 0; wdMsg = 'rank #' + wdMe; }

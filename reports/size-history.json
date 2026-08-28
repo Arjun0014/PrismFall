@@ -826,5 +826,18 @@
   "note": "",
   "delta": -5,
   "left": -2885
+ },
+ {
+  "date": "2026-08-28 15:45",
+  "quick": false,
+  "zip": 15430,
+  "min": 73417,
+  "raw": 115042,
+  "rr": 20386,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP1 remove Ascension",
+  "delta": -767,
+  "left": -2118
  }
 ]

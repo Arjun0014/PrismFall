@@ -373,9 +373,6 @@ function drawStrokes() {
           VTX(i, x2 + cb * ux - sb * uy, y2 + sb * ux + cb * uy);
         });
       }
-      // Charges left, for the Hard Light boon.
-      for (let i = 1; i < s.n; i++)
-        CIR((x1 + x2) / 2 + i * 8 * SC, (y1 + y2) / 2, 2.6 * SC, '#fff');
     }
     if (s === P.ra) {
       X.setLineDash([4 * SC, 9 * SC]); X.lineDashOffset = -T * 90 * SC;

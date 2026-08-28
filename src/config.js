@@ -98,17 +98,5 @@ const BOOST = [
 ];
 const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split(' ');
 
-// -- boons ------------------------------------------------------------------
-// Drafted between descents, permanent for the rest of the run. Like BOOST these
-// are pure table rows: each boon is a bit, and exactly one system reads it, so
-// adding one costs a name and an `if`.
-const BOONN = ('PRISM HEART|+30% pigment, refilled|AFTERGLOW|strokes cost 30% less|' +
-  'MOMENTUM|far less drag at speed|DEMOLITION|panels break at half the hit|' +
-  'LODESTONE|coins always pull to you|SECOND WIND|stall clock +80%|' +
-  'RESONANCE|bumpers pay double|WIDE PALETTE|+2 stroke slots|' +
-  'HARD LIGHT|strokes fire twice|GOLDEN HOUR|coins worth triple').split('|');
-const NBOON = BOONN.length >> 1;
-const bn = (i) => (boon >> i) & 1;
-
 // -- localStorage namespace -------------------------------------------------
 const LS = 'pf26_save';

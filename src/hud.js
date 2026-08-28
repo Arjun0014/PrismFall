@@ -82,11 +82,6 @@ function hud() {
   for (let i = 0; i < 7; i++) if (boostT[i] > 0)
     txt(BNAME[i] + ' ' + boostT[i].toFixed(1), W - p, p + (30 + brow++ * 16) * U, 12,
       BOOST[i][0] > 6 ? W9 : chsl(BOOST[i][0], 70), 1, 'right');
-  // Drafted boons are permanent, so they live down the left edge rather than
-  // competing with the timed boosters on the right.
-  for (let i = 0, row = 0; i < NBOON; i++) if (bn(i))
-    txt(BOONN[i * 2], p - 12 * U, (58 + row++ * 15) * U, 11, chsl(i % 7, 72), 1, 'left');
-
   if (regShow > 0)
     txt(REG[reg][0], W / 2, H * .3, 42,
       'hsl(0 0% 100% / ' + clamp(regShow, 0, 1) * clamp(3.2 - regShow, 0, 1) + ')', 1);
@@ -202,54 +197,6 @@ function screenResults() {
     [-105, 114, 130, 'STORE', () => { st = 4; }],
     [105, 114, 130, 'MENU', () => { st = 0; }],
   ], 16);
-}
-
-// --- Ascension draft -------------------------------------------------------
-// Shown once a full seven-region descent is behind you. Two cards, one choice,
-// permanent for the rest of the run - the thing that makes the loop a new run
-// rather than a lap.
-function screenAscend() {
-  X.fillStyle = 'hsl(275 45% 5% / .86)';
-  X.fillRect(0, 0, W, H);
-  const cy = H / 2;
-  for (let i = 0; i < 7; i++) {
-    X.font = 'bold ' + (44 * U | 0) + 'px monospace';
-    X.textAlign = 'center';
-    X.fillStyle = chsl(i, 60, .45);
-    X.fillText('PRISM ASCENSION', W / 2 + sin(T * 1.6 + i * .5) * 4 * U, cy - 168 * U + (i - 3) * 1.8 * U);
-  }
-  txt('PRISM ASCENSION', W / 2, cy - 168 * U, 44, W9, 1);
-  txt('DESCENT ' + (descent + 1) + ' DONE - the shaft begins again, harder', W / 2, cy - 128 * U, 15, W6);
-  txt('TAKE ONE. IT IS YOURS FOR THE REST OF THE RUN.', W / 2, cy - 104 * U, 13, W3);
-
-  dsel = -1;
-  const cw = 300 * U, ch = 190 * U;
-  for (let i = 0; i < draft.length; i++) {
-    const b = draft[i];
-    const x = W / 2 + (i - (draft.length - 1) / 2) * (cw + 26 * U), y = cy + 4 * U;
-    const o = hot(x, y, cw, ch);
-    if (o) dsel = i;
-    RR(x - cw / 2, y - ch / 2, cw, ch, 14 * U);
-    FL(o ? 'hsl(285 45% 17% / .98)' : 'hsl(272 40% 10% / .96)');
-    SK((o ? 3 : 1.6) * U, o ? W9 : chsl(b % 7, 60));
-    // A colour bar keys each boon to a hue so the cards are told apart at a
-    // glance across many runs.
-    RR(x - cw / 2 + 16 * U, y - ch / 2 + 16 * U, cw - 32 * U, 5 * U, 3 * U);
-    FL(chsl(b % 7, 62));
-    txt(BOONN[b * 2], x, y - 34 * U, 21, W9, 1);
-    // Wrap the description by words so a long boon never runs off its card.
-    const words = BOONN[b * 2 + 1].split(' ');
-    let line = '', row = 0;
-    X.font = (13 * U | 0) + 'px monospace';
-    for (let w = 0; w <= words.length; w++) {
-      const nx = line ? line + ' ' + words[w] : words[w];
-      if (w < words.length && X.measureText(nx).width < cw - 44 * U) { line = nx; continue; }
-      txt(line, x, y + (4 + row++ * 19) * U, 13, W6);
-      line = words[w] || '';
-    }
-    txt('PRESS ' + (i + 1), x, y + ch / 2 - 22 * U, 12, o ? W9 : W3, 1);
-    btns.push({ x, y, w: cw, h: ch, fn: () => takeBoon(i) });
-  }
 }
 
 function screenPause() {

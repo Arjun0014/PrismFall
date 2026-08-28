@@ -53,11 +53,9 @@ addEventListener('wheel', (e) => {
 addEventListener('keydown', (e) => {
   audioInit();
   const k = e.key, l = k.toLowerCase();
-  // The Ascension draft is modal and owns the number keys while it is up.
-  if (st === 5) { if (k === '1' || k === '2') takeBoon(+k - 1); return; }
   if (k > '0' && k < '8') { setSel(+k - 1); return; }
   if (k === 'Escape' || l === 'p') st = st === 1 ? 2 : st === 2 ? 1 : st === 4 ? (back(), st) : st;
-  if (l === 'r' && st > 1 && st !== 5) startRun();
+  if (l === 'r' && st > 1) startRun();
   if (l === 'm') mute();
   // Let go of whatever is holding you. With permanent strokes a rail lasts as
   // long as its line does, so there has to be a way off it that is not a crash.
