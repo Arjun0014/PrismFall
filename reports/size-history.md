@@ -49,3 +49,5 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 11:25 |  | 120456 | 45877 | 21926 | **16596** | -39 | -3284 | roadroller |
 | 2026-08-28 11:31 | anti-inlining Terser block | 120456 | 45877 | 21880 | **16551** | -45 | -3239 | roadroller (deep) |
 | 2026-08-28 11:38 |  | 120456 | 45877 | 21883 | **16558** | +7 | -3246 | roadroller |
+| 2026-08-28 12:41 | baseline for compression tournament | 120456 | 45877 | 21883 | **16558** | 0 | -3246 | roadroller |
+| 2026-08-28 12:59 | terflags: lhs_constants+beautify+braces+loops+unsafe_arrows+passes3 | 120456 | 77189 | 21784 | **16481** | -77 | -3169 | roadroller |

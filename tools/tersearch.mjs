@@ -101,7 +101,7 @@ for (const [name, v] of Object.entries(variants)) {
   } catch (e) { console.log(name.padEnd(20) + ' ERROR ' + e.message); continue; }
   if (r.error) { console.log(name.padEnd(20) + ' ERROR'); continue; }
   const pk = new Packer([{ data: r.code, type: 'js', action: 'eval' }],
-    Object.assign({ maxMemoryMB: 700 }, rr));
+    Object.assign({ maxMemoryMB: 150 }, rr));
   const d = pk.makeDecoder();
   const out = d.firstLine + '\n' + d.secondLine;
   if (/<\/script/i.test(out)) { console.log(name.padEnd(20) + ' skipped (</script)'); continue; }

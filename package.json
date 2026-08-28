@@ -23,9 +23,13 @@
   },
   "devDependencies": {
     "@gfx/zopfli": "^1.0.15",
+    "@swc/core": "^1.16.1",
     "ect-bin": "^1.4.1",
+    "esbuild": "^0.28.2",
+    "google-closure-compiler": "^20260825.0.0",
     "playwright": "^1.62.1",
     "roadroller": "^2.1.0",
-    "terser": "^5.51.2"
+    "terser": "^5.51.2",
+    "uglify-js": "^3.19.3"
   }
 }

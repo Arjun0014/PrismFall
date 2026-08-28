@@ -1,0 +1,98 @@
+[
+ {
+  "name": "terser-cur",
+  "pk": "rr",
+  "min": 45877,
+  "packed": 21923,
+  "zip": 16586,
+  "ok": 1
+ },
+ {
+  "name": "terser>swc",
+  "pk": "rr",
+  "min": 44322,
+  "packed": 21975,
+  "zip": 16624,
+  "ok": 1
+ },
+ {
+  "name": "swc>terser",
+  "pk": "rr",
+  "min": 44307,
+  "packed": 22030,
+  "zip": 16669,
+  "ok": 1
+ },
+ {
+  "name": "esbuild>terser",
+  "pk": "rr",
+  "min": 45646,
+  "packed": 22066,
+  "zip": 16691,
+  "ok": 1
+ },
+ {
+  "name": "terser-stock",
+  "pk": "rr",
+  "min": 45286,
+  "packed": 22130,
+  "zip": 16738,
+  "ok": 1
+ },
+ {
+  "name": "swc",
+  "pk": "rr",
+  "min": 43355,
+  "packed": 22160,
+  "zip": 16765,
+  "ok": 1
+ },
+ {
+  "name": "swc>terser",
+  "pk": "plain",
+  "min": 44307,
+  "packed": 44307,
+  "zip": 19829,
+  "ok": 1
+ },
+ {
+  "name": "terser>swc",
+  "pk": "plain",
+  "min": 44322,
+  "packed": 44322,
+  "zip": 19832,
+  "ok": 1
+ },
+ {
+  "name": "swc",
+  "pk": "plain",
+  "min": 43355,
+  "packed": 43355,
+  "zip": 19888,
+  "ok": 1
+ },
+ {
+  "name": "terser-stock",
+  "pk": "plain",
+  "min": 45286,
+  "packed": 45286,
+  "zip": 20064,
+  "ok": 1
+ },
+ {
+  "name": "esbuild>terser",
+  "pk": "plain",
+  "min": 45646,
+  "packed": 45646,
+  "zip": 20070,
+  "ok": 1
+ },
+ {
+  "name": "terser-cur",
+  "pk": "plain",
+  "min": 45877,
+  "packed": 45877,
+  "zip": 20113,
+  "ok": 1
+ }
+]

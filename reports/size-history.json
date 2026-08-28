@@ -579,5 +579,31 @@
   "note": "",
   "delta": 7,
   "left": -3246
+ },
+ {
+  "date": "2026-08-28 12:41",
+  "quick": false,
+  "zip": 16558,
+  "min": 45877,
+  "raw": 120456,
+  "rr": 21883,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "baseline for compression tournament",
+  "delta": 0,
+  "left": -3246
+ },
+ {
+  "date": "2026-08-28 12:59",
+  "quick": false,
+  "zip": 16481,
+  "min": 77189,
+  "raw": 120456,
+  "rr": 21784,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "terflags: lhs_constants+beautify+braces+loops+unsafe_arrows+passes3",
+  "delta": -77,
+  "left": -3169
  }
 ]

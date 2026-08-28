@@ -18,6 +18,7 @@ These govern which experiments are worth running at all.
 | Numeric literals | 3,501 uses of only **326 distinct values** | histogram of the minified bundle |
 | Roadroller output | 22,012 chars → 16,692 B | that 24% is its printable-charset overhead, which deflate recovers in full |
 | ZIP methods allowed | Deflate and Store only | js13k servers cannot extract anything else |
+| Decoder memory ceiling | **150 MB setting = 120 MB allocated** | `Packer.memoryUsageMB`; 700 allocates 486 MB and is not shippable |
 
 **The consequence, and the reason most "make it smaller" ideas fail here:** a
 context-mixing coder already predicts repetition almost for free, so removing
@@ -39,8 +40,14 @@ measured as losses.
 | 7 | **Anti-inlining Terser block** — `reduce_funcs`, `sequences`, `inline`, and the whole `unsafe` family switched OFF; IIFE dropped for the packed build | 16,748 | 16,596 | **−152** | PASS | **KEEP** |
 | 8 | **Deep packer re-search** on the new payload | 16,596 | 16,551 | **−45** | PASS | **KEEP** |
 | 9 | **Model count re-check** — 14/16/18/24, each given its own `optimize(2)` | 16,551 | 16,634 best | +83 | PASS | **REJECT** — 20 stays optimal |
+| 10 | **Decoder-memory audit** — the `--deep` path was building its winner at `maxMemoryMB: 700` | 16,551* | 16,558 | +7 | PASS | **KEEP the +7** — the 16,551 was never shippable, see below |
+| 11 | **Compiler tournament** — Terser / esbuild / swc / uglify / Closure (3 levels) / 8 chains / raw, each × Roadroller and × plain deflate, all smoke-validated | 16,558 | 16,558 | **0** | PASS | **KEEP Terser** — nothing else is close |
+| 12 | **Terser flag descent** — 78 moves scored as real archives, coordinate descent to a fixed point | 16,558 | **16,481** | **−77** | PASS | **KEEP** |
 
 \* measured by proxy; the resulting bundle hangs, see notes.
+
+\* 16,551 was measured with a decoder that allocates 486 MB. The honest
+baseline for everything below is **16,558 B**.
 
 ## Previously settled (do not re-run)
 
@@ -213,3 +220,107 @@ Re-running `optimize(2)` against the new payload found a better one: −45 B.
 Model count was then re-checked properly, giving each of 14/16/18/24 its own
 full `optimize(2)` rather than reusing selectors searched at 20. All were worse
 (16,634 at best against 16,551), so 20 stands.
+
+
+### 10 — The decoder was allocating 486 MB (bug, +7 B to fix)
+
+`build.mjs` forces `maxMemoryMB: 150` on the packer it constructs, and the
+comment above it explains why at length: the decoder allocates its context
+table *before the game exists*, so an over-ambitious figure is not a size trade,
+it is a "does the game start at all" trade.
+
+The abbreviation sweep inside the `--deep` path then built each candidate with
+`maxMemoryMB: 700` and **returned that candidate directly**. So the flag was
+correct everywhere except in the one code path whose output actually ships.
+
+Measured with `Packer.memoryUsageMB` on this payload:
+
+| Setting | Actually allocates | Packed chars |
+|---:|---:|---:|
+| 50 | 31 MB | 22,098 |
+| 100 | 60 MB | 21,985 |
+| **150** | **120 MB** | **21,922** |
+| 300 | 240 MB | 21,891 |
+| 700 | 486 MB | 21,879 |
+
+The 700 setting is worth about 7 archive bytes and asks a phone for half a
+gigabyte before the first frame. `RR_MEM = 150` is now a single constant used by
+every packer the build constructs, and the tournament and flag-search tools were
+corrected to match so their numbers mean something. **The true baseline for this
+phase is 16,558 B, not 16,551.**
+
+### 11 — Compiler tournament (Terser keeps the crown)
+
+Every minifier that will compile this source, each scored as a complete archive.
+`--deep` gave the six finalists their own `optimize(2)` rather than reusing a
+model searched against Terser's output, which is the only way this comparison is
+fair. Every entry was validated by `tools/smoke.mjs` first — it boots the
+compiled bundle in a stubbed DOM, starts a run, draws strokes in all seven
+colours for 240 frames and asserts the canvas and the audio graph both did work.
+
+| Compiler | Roadroller + zip | Plain deflate |
+|---|---:|---:|
+| **Terser (this config)** | **16,558** | 20,113 |
+| Terser → swc | 16,586 | 19,832 |
+| swc → Terser | 16,622 | 19,829 |
+| esbuild → Terser | 16,658 | 20,070 |
+| Terser (stock settings) | 16,698 | 20,064 |
+| Closure SIMPLE → Terser | 16,718 | 20,113 |
+| swc alone | 16,723 | 19,888 |
+| Terser → esbuild | 16,999 | 20,269 |
+| esbuild alone | 17,264 | 20,558 |
+| Terser → uglify | 17,302 | 20,291 |
+| uglify alone | 17,614 | 20,588 |
+| Closure SIMPLE | 18,655 | 22,267 |
+| Closure WHITESPACE\_ONLY | 19,517 | 23,235 |
+| *no minifier at all* | 19,688 | 42,503 |
+
+Closure ADVANCED does not compile this source at all (it renames properties the
+DOM and Web Audio own). Closure WHITESPACE\_ONLY → Terser is byte-identical to
+Terser alone, which is a useful sanity check on the harness.
+
+Three things worth keeping from this:
+
+- **swc minifies hardest and packs worst.** It produces the shortest
+  intermediate file of anything here (43,355 chars vs Terser's 45,877) and a
+  *larger* archive. Same law as experiment 7, third confirmation.
+- **Roadroller is worth 3.3–3.5 KB on every single compiler.** There is no
+  compiler for which plain deflate is competitive, so no packer-free branch is
+  worth maintaining.
+- **The raw, unminified source packs to 19,688 B.** Minification is worth only
+  3.1 KB here, which is the clearest possible statement that this archive is
+  distinct information rather than sloppy text.
+
+### 12 — Terser flag descent (−77 B)
+
+`tools/terflags.mjs` scores one flag change at a time as a complete
+Terser → Roadroller → Zopfli + ECT archive, in a worker pool, then does
+coordinate descent from the shipping config until no single move improves.
+78 candidate moves, five taken:
+
+| Move | Delta | Minified chars |
+|---|---:|---:|
+| `lhs_constants: false` | **−46** | +1 |
+| `format.beautify + braces` | **−14** | +28,515 |
+| `loops: false` | −9 | +4 |
+| `unsafe_arrows: true` | −7 | −5 |
+| `passes: 3` | −1 | −10 |
+| | **−77** | **16,558 → 16,481** |
+
+`lhs_constants` is the find of the round and it is worth understanding. Terser
+rewrites `a = a + b` to `a += b`: one character shorter, and it deletes a
+repeated pattern the model was predicting nearly for free, replacing it with a
+rarer token. Turning it off costs **one character** across the whole bundle and
+buys 46 archive bytes.
+
+`beautify: true` with `braces: true` is the same law at its most extreme. It
+takes the bundle from 45,878 to 74,393 characters — 62% larger — and the archive
+14 bytes *smaller*. Indentation is the most predictable text that exists, and
+mandatory braces turn every single-statement `if` into the same shape as every
+other one.
+
+Nothing else moved. In particular `passes` 6/8/12, every `ecma` level from 2015
+to 2024, `hoist_props`, `hoist_vars`, `keep_fargs`, `evaluate`, `dead_code`,
+`unused`, `arguments`, `typeofs`, `properties`, `computed_props`, `arrows`,
+`switches`, `directives` and every quote style are all worth exactly **0 bytes**
+on this payload.

@@ -37,44 +37,48 @@ const log = (...a) => { if (!QUIET) console.log(...a); };
 
 
 // ---------------------------------------------------------------- terser ----
-const TERSER_OPTS = {
+export const TERSER_OPTS = {
   ecma: 2020,
   module: false,
   toplevel: false,
   compress: {
-    passes: 4,
-    unsafe: true,
-    unsafe_arrows: false,
-    unsafe_math: true,
-    unsafe_methods: true,
-    unsafe_comps: true,
-    unsafe_undefined: true,
-    booleans_as_integers: true,
-    pure_getters: true,
-    hoist_funs: true,
-    drop_console: true,
-    // ---- the anti-inlining block ----
+    // ---- the anti-repetition block ----
     // Every option below is switched to the setting that makes Terser's output
     // LONGER, and each one makes the archive SMALLER. That is not a paradox:
     // this packer predicts repeated text almost for free and pays full price
     // for novel text, so trading an inlined body (unique) for a call to a
     // shared function (repeated) is a win even though the character count
-    // rises. Measured together they are worth 159 B, and they take the
-    // minified bundle from 44,932 to 45,877 characters while doing it.
+    // rises. Minified length is not the fitness function. The archive is.
     //
-    // Minified length is not the fitness function. The archive is.
+    // Every value here was found by tools/terflags.mjs, which scores one flag
+    // at a time as a complete Terser -> Roadroller -> Zopfli+ECT archive. Do
+    // not "tidy" any of them back to a Terser default without re-running it.
+    passes: 3,
     reduce_funcs: false,    // keep single-use functions as functions
     sequences: false,       // do not comma-fold statements together
     inline: false,          // do not inline function bodies at all
+    loops: false,           // leave for/while shapes as written          -9 B
+    // `a = a + b` -> `a += b` shortens the text and destroys a repeated
+    // pattern the model was predicting nearly free. The single largest flag
+    // win found so far, and it costs exactly one character of output.
+    lhs_constants: false,   //                                           -46 B
     unsafe: false,          // the unsafe rewrites all shorten and specialise
-    unsafe_arrows: false,
+    unsafe_arrows: true,    // except this one, which is repetition-neutral -7 B
     unsafe_math: false,
     unsafe_methods: false,
     unsafe_comps: false,
     unsafe_undefined: false,
+    booleans_as_integers: true,
+    pure_getters: true,
+    hoist_funs: true,
+    drop_console: true,
   },
   mangle: { toplevel: true },
-  format: { comments: false, wrap_func_args: false },
+  // Yes, pretty-printed. beautify + braces takes the bundle from 45,878 to
+  // 74,393 characters -- 62% larger -- and the archive 14 B SMALLER, because
+  // indentation and always-present braces are the most predictable text there
+  // is and they break up token sequences the model would otherwise mispredict.
+  format: { comments: false, wrap_func_args: false, beautify: true, braces: true },
 };
 
 // `wrap` keeps the IIFE. The competition build drops it -- Roadroller evals the
@@ -168,6 +172,15 @@ const RR_KEYS = ['sparseSelectors', 'precision', 'modelMaxCount', 'recipLearning
 // ~70 archive bytes here, so the deep build sweeps it explicitly and caches it.
 const RR_ABBREV = [4, 5, 6, 7, 8, 9, 10, 12, 16, 24, 32];
 
+// The decoder's context-table budget, and the one Roadroller option that is a
+// safety limit rather than a size knob. Measured allocations at this payload:
+//   150 MB setting -> 120 MB actual   700 MB setting -> 486 MB actual
+// The larger table packs 43 characters better and is worth ~7 archive bytes.
+// It is not available: the decoder allocates before the game exists, so a
+// phone that cannot hand over half a gigabyte does not get a smaller game, it
+// gets a blank canvas. One figure, used by every packer this file constructs.
+const RR_MEM = 150;
+
 async function roadroll(js, deep) {
   const { Packer, defaultSparseSelectors } = await import('roadroller');
   let cached = null;
@@ -185,7 +198,7 @@ async function roadroll(js, deep) {
   // the game to run in Firefox as well as Chrome. Measured cost of dropping
   // back to Roadroller's own default: 52 bytes.
   const opts = Object.assign({
-    maxMemoryMB: 150, numAbbreviations: 8, allowFreeVars: true,
+    maxMemoryMB: RR_MEM, numAbbreviations: 8, allowFreeVars: true,
     sparseSelectors: defaultSparseSelectors(20),
   }, cached);
   // The cache is written by a previous --deep run and may hold a 12-selector
@@ -193,7 +206,7 @@ async function roadroll(js, deep) {
   if (!opts.sparseSelectors || opts.sparseSelectors.length !== 20)
     opts.sparseSelectors = defaultSparseSelectors(20);
   opts.allowFreeVars = true;
-  opts.maxMemoryMB = 150;
+  opts.maxMemoryMB = RR_MEM;
   const packer = new Packer(inputs, opts);
   if (deep) {
     // Full model search at milestones, then sweep the abbreviation count on top
@@ -204,7 +217,12 @@ async function roadroll(js, deep) {
     if (res && res.best) log('   roadroller model search -> est ' + (res.best.size | 0) + ' B');
     let best = null;
     for (const n of RR_ABBREV) {
-      const pk = new Packer(inputs, Object.assign({ maxMemoryMB: 700 }, keep, { numAbbreviations: n }));
+      // 150 MB, like the main packer. Roadroller's own default is 150, and at
+      // that setting the decoder allocates 120 MB before the game exists; the
+      // 700 this sweep used allocates 486 MB, which no phone will hand over.
+      // The sweep returns its winner directly, so a different figure here does
+      // not merely mis-measure -- it SHIPS. Worth 7 B and not available.
+      const pk = new Packer(inputs, Object.assign({ maxMemoryMB: RR_MEM }, keep, { numAbbreviations: n }));
       const d = pk.makeDecoder();
       const out = d.firstLine + '\n' + d.secondLine;
       if (/<\/script/i.test(out)) continue;
