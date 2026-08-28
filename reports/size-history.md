@@ -108,3 +108,4 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 21:23 | EXP1 one-loop motif | 114538 | 67326 | 18664 | **14132** | -46 | -820 | roadroller |
 | 2026-08-28 21:24 |  | 115189 | 67664 | 18725 | **14178** | +46 | -866 | roadroller |
 | 2026-08-28 21:29 | EXP6 crushers from barrier | 115168 | 67425 | 18668 | **14136** | -42 | -824 | roadroller |
+| 2026-08-28 21:42 | EXP3 remove destruction cache | 114710 | 67044 | 18590 | **14079** | -57 | -767 | roadroller |

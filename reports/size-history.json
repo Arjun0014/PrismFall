@@ -1346,5 +1346,18 @@
   "note": "EXP6 crushers from barrier",
   "delta": -42,
   "left": -824
+ },
+ {
+  "date": "2026-08-28 21:42",
+  "quick": false,
+  "zip": 14079,
+  "min": 67044,
+  "raw": 114710,
+  "rr": 18590,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP3 remove destruction cache",
+  "delta": -57,
+  "left": -767
  }
 ]

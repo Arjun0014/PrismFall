@@ -433,14 +433,7 @@ function rewards(c, rg) {
   // a Focus Vault; with those gone it becomes a rare find in its own right,
   // still rare enough that hitting one feels like luck rather than supply.
   if (rp(.07 * rich)) place(I_WELL, 0, .2, .8);
-  // Destruction cache: coins sealed behind breakable panels.
-  if (rp(.22 * rich)) {
-    const x = rp(.5) ? bL + 90 : bR - 90, y = c.y + rf(.22, .7) * c.h;
-    for (let i = 0; i < 4; i++)
-      c.o.push(sg(x + (i < 2 ? 0 : i > 2 ? 60 : -60), y + (i < 2 ? (i ? 60 : -60) : 0), 60, i < 2 ? PI / 2 : 0, M_BREAK));
-    c.i.push(item(I_COIN, x, y), item(I_COIN, x - 30, y), item(I_COIN, x + 30, y),
-      item(rp(.4) ? I_CROWN : I_PIG, x, y - 30, ri(0, 6)));
-  }
+
 }
 
 // --- lifecycle -------------------------------------------------------------
