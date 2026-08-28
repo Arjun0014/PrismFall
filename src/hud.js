@@ -154,12 +154,11 @@ function screenTitle() {
   if (WD) bs.push([-105, 26, 130, 'STORE', () => { st = 4; }]);
   modal(0, 0, 0, [], bs);
   const cy = H * .3;
-  for (let i = 0; i < 7; i++) {
-    X.font = 'bold ' + (66 * U | 0) + 'px monospace';
-    X.textAlign = 'center';
-    X.fillStyle = chsl(i, 60, .5);
-    X.fillText('PRISMFALL', W / 2 + sin(T * 1.2 + i * .5) * 5 * U, cy + (i - 3) * 2.4 * U);
-  }
+  // Seven drifting colour ghosts behind one white title. This used to set the
+  // font, the alignment and the fill by hand every pass, which is precisely
+  // what txt() already does.
+  for (let i = 0; i < 7; i++)
+    txt('PRISMFALL', W / 2 + sin(T * 1.2 + i * .5) * 5 * U, cy + (i - 3) * 2.4 * U, 66, chsl(i, 60, .5), 1);
   txt('PRISMFALL', W / 2, cy, 66, W9, 1);
   txt('you never steer the unicorn - you draw the physics', W / 2, cy + 46 * U, 15, W6);
   [

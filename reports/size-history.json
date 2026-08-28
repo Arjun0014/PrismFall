@@ -1359,5 +1359,31 @@
   "note": "EXP3 remove destruction cache",
   "delta": -57,
   "left": -767
+ },
+ {
+  "date": "2026-08-28 21:49",
+  "quick": false,
+  "zip": 14064,
+  "min": 66926,
+  "raw": 114790,
+  "rr": 18573,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP11 title reuses txt()",
+  "delta": -15,
+  "left": -752
+ },
+ {
+  "date": "2026-08-28 21:51",
+  "quick": false,
+  "zip": 14037,
+  "min": 66711,
+  "raw": 114762,
+  "rr": 18537,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP5 simpler filler clearance",
+  "delta": -27,
+  "left": -725
  }
 ]

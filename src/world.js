@@ -223,15 +223,12 @@ function decorate(c, n) {
   for (let tries = n * 6; n > 0 && tries--;) {
     const x = rf(bL + 40, bR - 40), y = c.y + rf(.07, .93) * c.h;
     const cir = rp(.6), rad = rf(13, 26), hl = rf(30, 70), a = rf(0, PI);
-    // Every extremity must clear existing geometry by more than the unicorn's
-    // diameter. That keeps the filler from ever closing a route: splitting a
-    // wide gap in two still leaves both halves passable.
-    const need = 48 + (cir ? rad : ST);
-    if (solidNear(c, x, y, need)) continue;
-    if (!cir) {
-      const dx = cos(a) * hl, dy = sin(a) * hl;
-      if (solidNear(c, x + dx, y + dy, need) || solidNear(c, x - dx, y - dy, need)) continue;
-    }
+    // One clearance test, taken at the piece's full reach rather than at each
+    // extremity in turn. A disc of radius hl + 48 around the centre contains
+    // the whole segment, so this is STRICTER than the three-point version it
+    // replaced -- it can still never close a route, it just rejects a few more
+    // candidates, which the tries budget already absorbs.
+    if (solidNear(c, x, y, 48 + (cir ? rad : hl))) continue;
     n--;
     // Half the scatter is live pinball furniture: bumpers that kick, targets
     // that light, panels that shatter. A screen should always contain

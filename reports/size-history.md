@@ -109,3 +109,5 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 21:24 |  | 115189 | 67664 | 18725 | **14178** | +46 | -866 | roadroller |
 | 2026-08-28 21:29 | EXP6 crushers from barrier | 115168 | 67425 | 18668 | **14136** | -42 | -824 | roadroller |
 | 2026-08-28 21:42 | EXP3 remove destruction cache | 114710 | 67044 | 18590 | **14079** | -57 | -767 | roadroller |
+| 2026-08-28 21:49 | EXP11 title reuses txt() | 114790 | 66926 | 18573 | **14064** | -15 | -752 | roadroller |
+| 2026-08-28 21:51 | EXP5 simpler filler clearance | 114762 | 66711 | 18537 | **14037** | -27 | -725 | roadroller |
