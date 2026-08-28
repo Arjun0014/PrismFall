@@ -1,0 +1,9 @@
+# The tools in this repo edit source by matching exact text spans, so a
+# checkout that rewrites line endings silently breaks them: three rows of the
+# reduction menu started failing with "not found in hud.js" after one
+# git checkout turned four files CRLF.
+*.js   text eol=lf
+*.mjs  text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.html text eol=lf

@@ -874,3 +874,77 @@ game, in two specific ways the suites caught:
 
 Twelve percent is the ceiling for this codebase, and it is a measured ceiling
 rather than a guessed one.
+
+## EXP 4 — Cross-system fusion (closed by measurement)
+
+`tools/dupes.mjs` hashes every subtree of the minified bundle by **shape** —
+node types and operators, with identifiers and literals erased — and groups the
+matches. Erasing names is the point: two systems that do the same thing to
+different variables have the same shape and different text, so this finds
+duplication a diff never would.
+
+| Subtree size | Repeated shapes |
+|---|---|
+| ≥ 16 nodes | **0** |
+| ≥ 12 nodes | 5, the largest 44 chars appearing 3× |
+| ≥ 8 nodes | 19 |
+| ≥ 4 nodes | 243, and these are idioms like `x.y()`, not logic |
+
+**The largest duplicated structure in the whole program is 44 characters,
+appearing three times.** There is no second implementation of anything to fuse.
+
+The specific fusions on the list were checked individually and are already done
+or are not duplication at all:
+
+| Idea | Finding |
+|---|---|
+| force-field physics also drives its visuals | already: `drawZone` samples `zoneF` |
+| shared transient system | already: `pt`/`burst`/`shock` are one emitter with a kind flag |
+| music from region/game state | already: root, mode, timbre, tempo and both rhythm masks key off `reg` |
+| room generation also places rewards | already: every archetype places its own items; `rewards` is the region-level pass on top |
+| world generator also makes background motifs | not duplication — one makes collidable geometry from circles, segments and arcs, the other infinite parallax scenery from blobs, polygons and rings. Merging them would make the background look like the foreground. |
+
+## EXP 5 — Simplification (nothing left to simplify)
+
+Follows directly from EXP 4. The one concrete candidate — repeated
+`AC.createGain(); g.gain.value = v; g.connect(d)` in `audioInit`, four
+occurrences — collapses to about 50 characters net, roughly 6 B. Not taken.
+
+## Standing at 15,246 B — the complete costed menu
+
+Baseline 15,246 B, limit 13,312, **gap 1,934 B**. Every row is a real archive
+measurement against this build.
+
+### The list this phase was authorised to draw from, if still necessary
+
+| Reduction | Bytes |
+|---|---:|
+| store + all cosmetics | 283 |
+| title-screen copy block | 177 |
+| world archetypes 9 → 7 | 163 |
+| focus vaults | 75 |
+| region gates | 31 |
+| **total** | **729** |
+
+### The list this phase was told to preserve
+
+| Reduction | Bytes |
+|---|---:|
+| all 24 audio cues | 647 |
+| particles + shockwaves | 416 |
+| background motifs | 373 |
+| region force fields | 305 |
+| music arrangement | 276 |
+| reward placement | 212 |
+| the trail | 108 |
+| world filler pass | 110 |
+| onboarding hints | 49 |
+
+### Quantity reductions are still worthless
+
+Cosmetics 12 → 6 is 13 B. Boosters 7 → 5 is 8 B. Regions 7 → 5 is **−3 B** —
+it makes the archive *bigger*, because the five-region table costs less than the
+extra code needed to handle five instead of seven.
+
+**The arithmetic: the authorised list is 729 B against a gap of 1,934 B.** Taking
+all of it leaves 1,205 B, which can only come from the preserve list.

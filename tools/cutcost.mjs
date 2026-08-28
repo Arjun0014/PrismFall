@@ -78,10 +78,6 @@ const CUTS = [
     o['hud.js'] = o['hud.js'].split('CATS * 3').join('CATS * 2').split('n % 3').join('n % 2')
       .split('n / 3 | 0').join('n / 2 | 0').split('c * 3 + i').join('c * 2 + i');
   }],
-  ['QTY  boons 10 -> 6 (Ascension intact)', (o) => {
-    sub(o, 'config.js', "'RESONANCE|bumpers pay double|WIDE PALETTE|+2 stroke slots|' +\n  'HARD LIGHT|strokes fire twice|GOLDEN HOUR|coins worth triple'",
-      "'RESONANCE|bumpers pay double'");
-  }],
   ['QTY  boosters 7 -> 5', (o) => {
     sub(o, 'config.js', "  [5, 1.9, 11],     // Indigo Flux    - gravity stays bent\n  [6, 1.9, 11],     // Violet Echo    - longer phase, longer warp\n", '');
     sub(o, 'config.js', "const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split(' ');",
@@ -100,9 +96,6 @@ const CUTS = [
   // --- meta systems: no effect on moment-to-moment play ---------------------
   ['META store + cosmetics entirely', (o) => {
     stub(o, 'hud.js', 'screenStore'); stub(o, 'hud.js', 'buyEquip');
-  }],
-  ['META Ascension + all boons', (o) => {
-    stub(o, 'hud.js', 'screenAscend'); stub(o, 'game.js', 'ascend'); stub(o, 'game.js', 'takeBoon');
   }],
   ['META onboarding hints', (o) => {
     sub(o, 'hud.js', "    const t = ['DRAG TO DRAW A RAINBOW RAIL', 'PRESS 1-7 OR SCROLL TO CHANGE COLOUR',\n      'PIGMENT IS FINITE - GRAB SHARDS'][hint];", '    const t = 0;');
