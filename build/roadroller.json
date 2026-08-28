@@ -4,18 +4,26 @@
   1,
   2,
   3,
+  4,
   6,
   7,
   13,
+  19,
   21,
+  25,
+  37,
   42,
-  57,
-  339,
-  392
+  90,
+  141,
+  177,
+  329,
+  385,
+  404,
+  418
  ],
  "precision": 16,
  "modelMaxCount": 4,
- "recipLearningRate": 1500,
+ "recipLearningRate": 2501,
  "modelRecipBaseCount": 20,
- "numAbbreviations": 8
+ "numAbbreviations": 10
 }

@@ -118,11 +118,25 @@ const RR_KEYS = ['sparseSelectors', 'precision', 'modelMaxCount', 'recipLearning
 const RR_ABBREV = [4, 5, 6, 7, 8, 9, 10, 12, 16, 24, 32];
 
 async function roadroll(js, deep) {
-  const { Packer } = await import('roadroller');
+  const { Packer, defaultSparseSelectors } = await import('roadroller');
   let cached = null;
   if (existsSync(RR_CACHE)) { try { cached = JSON.parse(readFileSync(RR_CACHE, 'utf8')); } catch { /* ignore */ } }
   const inputs = [{ data: js, type: 'js', action: 'eval' }];
-  const opts = Object.assign({ maxMemoryMB: 700, numAbbreviations: 8 }, cached);
+  // 20 context models rather than the library default of 12, and allowFreeVars.
+  // numModels is literally sparseSelectors.length, and Roadroller optimises
+  // WHICH selectors to use but never HOW MANY, so this axis is ours to set; a
+  // sweep of 12/16/20/24/32 put the minimum at 20. allowFreeVars is safe here
+  // because the packed script is the only code on the page -- the Wavedash
+  // build, which does coexist with an injected SDK, is not packed at all.
+  const opts = Object.assign({
+    maxMemoryMB: 700, numAbbreviations: 8, allowFreeVars: true,
+    sparseSelectors: defaultSparseSelectors(20),
+  }, cached);
+  // The cache is written by a previous --deep run and may hold a 12-selector
+  // model; the count is our decision, not the optimizer's, so re-assert it.
+  if (!opts.sparseSelectors || opts.sparseSelectors.length !== 20)
+    opts.sparseSelectors = defaultSparseSelectors(20);
+  opts.allowFreeVars = true;
   const packer = new Packer(inputs, opts);
   if (deep) {
     // Full model search at milestones, then sweep the abbreviation count on top
