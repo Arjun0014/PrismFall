@@ -514,5 +514,57 @@
   "note": "",
   "delta": 6,
   "left": -3436
+ },
+ {
+  "date": "2026-08-28 11:13",
+  "quick": false,
+  "zip": 16720,
+  "min": 45444,
+  "raw": 120456,
+  "rr": 22098,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -28,
+  "left": -3408
+ },
+ {
+  "date": "2026-08-28 11:20",
+  "quick": false,
+  "zip": 16635,
+  "min": 45724,
+  "raw": 120456,
+  "rr": 21986,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -85,
+  "left": -3323
+ },
+ {
+  "date": "2026-08-28 11:25",
+  "quick": false,
+  "zip": 16596,
+  "min": 45877,
+  "raw": 120456,
+  "rr": 21926,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -39,
+  "left": -3284
+ },
+ {
+  "date": "2026-08-28 11:31",
+  "quick": false,
+  "zip": 16551,
+  "min": 45877,
+  "raw": 120456,
+  "rr": 21880,
+  "tag": "roadroller",
+  "deep": true,
+  "note": "anti-inlining Terser block",
+  "delta": -45,
+  "left": -3239
  }
 ]

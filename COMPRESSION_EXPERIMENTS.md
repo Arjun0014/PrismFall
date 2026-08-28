@@ -36,6 +36,9 @@ measured as losses.
 | 4 | **Top-level function reordering** — hill-climb over declaration order, deflate-scored | 16,748 | 16,711* | −37* | **FAIL** | **ABANDON** |
 | 5 | **Constant lattice 0.005** — snap decimals to a shared grid | 16,758 | 16,750 | −8 | PASS | **REJECT** — not worth the churn |
 | 6 | **Constant lattice 0.02 / 0.05** | 16,758 | 16,712 / 16,627 | −46 / −131 | PASS | **REJECT** — destroys the pigment economy |
+| 7 | **Anti-inlining Terser block** — `reduce_funcs`, `sequences`, `inline`, and the whole `unsafe` family switched OFF; IIFE dropped for the packed build | 16,748 | 16,596 | **−152** | PASS | **KEEP** |
+| 8 | **Deep packer re-search** on the new payload | 16,596 | 16,551 | **−45** | PASS | **KEEP** |
+| 9 | **Model count re-check** — 14/16/18/24, each given its own `optimize(2)` | 16,551 | 16,634 best | +83 | PASS | **REJECT** — 20 stays optimal |
 
 \* measured by proxy; the resulting bundle hangs, see notes.
 
@@ -169,3 +172,44 @@ that sank it applies unchanged, so none were built:
 | One VFX emitter | Already one emitter: `pt` / `burst` / `shock` are shared by every effect in the game. |
 | WASM for the physics core | The module, its embedding and its JS glue start around a kilobyte; the physics core is a few hundred characters of JS. |
 | RegPack / JS-crush after the rewrites | Roadroller beats Terser+deflate alone by ~3.3 KB on this payload, and the standard advice is not to LZ-pack before deflate. |
+
+
+### 7 — The anti-inlining block (kept, and the most useful finding so far)
+
+Every option in this block is set to the value that makes Terser's output
+**longer**, and every one of them makes the archive **smaller**:
+
+```
+reduce_funcs: false     keep single-use functions as functions
+sequences: false        do not comma-fold statements together
+inline: false           do not inline function bodies at all
+unsafe*: false          the unsafe rewrites all shorten and specialise
++ no IIFE               so Terser can compress and mangle at top level
+```
+
+Together they take the minified bundle from **44,932 to 45,877 characters** —
+945 characters *larger* — and the archive from **16,748 to 16,596 B**.
+
+That is not a paradox, it is the standing measurement stated as a build setting.
+Inlining a function body replaces a call — repeated syntax the model predicts
+almost for free — with unique text it must pay full price for. Comma-folding
+statements does the same to punctuation. **Minified length is not the fitness
+function and optimising for it actively hurts.**
+
+This is the same effect that sank the audio VM and property aliasing, finally
+pointing the right way: instead of hand-writing more repetition, stop the
+minifier destroying the repetition that is already there.
+
+The IIFE is dropped for the competition build only. Roadroller evals the
+payload, so declarations land in that eval's scope and nothing else on the page
+can reach them. The Wavedash build keeps the wrapper, because there the script
+is plain minified JS sharing a page with the injected platform SDK.
+
+### 8/9 — Packer re-search
+
+The cached Roadroller model had been searched against the *old* Terser output.
+Re-running `optimize(2)` against the new payload found a better one: −45 B.
+
+Model count was then re-checked properly, giving each of 14/16/18/24 its own
+full `optimize(2)` rather than reusing selectors searched at 20. All were worse
+(16,634 at best against 16,551), so 20 stands.

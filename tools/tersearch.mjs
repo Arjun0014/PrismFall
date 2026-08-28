@@ -39,6 +39,41 @@ const variants = {
   'arrows-off': { c: { unsafe_arrows: false } },
   'keep_fargs-off': { c: { keep_fargs: false } },
   'reduce_funcs-off': { c: { reduce_funcs: false } },
+  // reduce_funcs:false won by making the output LONGER but more repetitive.
+  // These are the rest of the options in that family -- every one of them
+  // trades inlining (unique text) for indirection (repeated text), which is
+  // the trade this packer rewards.
+  'reduce_vars-off': { c: { reduce_vars: false } },
+  'collapse_vars-off': { c: { collapse_vars: false } },
+  'inline-off': { c: { inline: false } },
+  'join_vars-off': { c: { join_vars: false } },
+  'sequences-off': { c: { sequences: false } },
+  'conditionals-off': { c: { conditionals: false } },
+  'evaluate-off': { c: { evaluate: false } },
+  'unsafe-off': { c: { unsafe: false, unsafe_arrows: false, unsafe_math: false, unsafe_methods: false, unsafe_comps: false, unsafe_undefined: false } },
+  'no-inline-family': { c: { reduce_funcs: false, reduce_vars: false, inline: false, collapse_vars: false } },
+  'rf+seq-off': { c: { reduce_funcs: false, sequences: false } },
+  'rf+rv-off': { c: { reduce_funcs: false, reduce_vars: false } },
+  'rf+inline-off': { c: { reduce_funcs: false, inline: false } },
+  // Round two: build on the rf+seq winner (B). Anything that trades unique
+  // text for repeated text is a candidate.
+  'B': { c: { reduce_funcs: false, sequences: false } },
+  'B+arrows-off': { c: { reduce_funcs: false, sequences: false, unsafe_arrows: false } },
+  'B+unsafe-off': { c: { reduce_funcs: false, sequences: false, unsafe: false, unsafe_arrows: false, unsafe_math: false, unsafe_methods: false, unsafe_comps: false, unsafe_undefined: false } },
+  'B+collapse-off': { c: { reduce_funcs: false, sequences: false, collapse_vars: false } },
+  'B+inline-off': { c: { reduce_funcs: false, sequences: false, inline: false } },
+  'B+no-bool-int': { c: { reduce_funcs: false, sequences: false, booleans_as_integers: false } },
+  'B+keep_fargs': { c: { reduce_funcs: false, sequences: false, keep_fargs: true } },
+  'B+hoist_props': { c: { reduce_funcs: false, sequences: false, hoist_props: true } },
+  'B+if_return-off': { c: { reduce_funcs: false, sequences: false, if_return: false } },
+  'B+passes8': { c: { reduce_funcs: false, sequences: false, passes: 8 } },
+  'B+unwrapped': { wrap: 0, c: { reduce_funcs: false, sequences: false, toplevel: true } },
+  // Round three: stack the round-two winners. U = B with the unsafe family off.
+  'U': { c: { reduce_funcs: false, sequences: false, unsafe: false, unsafe_arrows: false, unsafe_math: false, unsafe_methods: false, unsafe_comps: false, unsafe_undefined: false } },
+  'U+unwrapped': { wrap: 0, c: { toplevel: true, reduce_funcs: false, sequences: false, unsafe: false, unsafe_arrows: false, unsafe_math: false, unsafe_methods: false, unsafe_comps: false, unsafe_undefined: false } },
+  'U+inline-off': { c: { reduce_funcs: false, sequences: false, inline: false, unsafe: false, unsafe_arrows: false, unsafe_math: false, unsafe_methods: false, unsafe_comps: false, unsafe_undefined: false } },
+  'U+unwrapped+inline-off': { wrap: 0, c: { toplevel: true, reduce_funcs: false, sequences: false, inline: false, unsafe: false, unsafe_arrows: false, unsafe_math: false, unsafe_methods: false, unsafe_comps: false, unsafe_undefined: false } },
+  'U+no-mangle-toplevel': { m: { toplevel: false }, c: { reduce_funcs: false, sequences: false, unsafe: false, unsafe_arrows: false, unsafe_math: false, unsafe_methods: false, unsafe_comps: false, unsafe_undefined: false } },
   'no-bool-int': { c: { booleans_as_integers: false } },
   'compress-toplevel': { c: { toplevel: true } },
   ecma2022: { ecma: 2022 },

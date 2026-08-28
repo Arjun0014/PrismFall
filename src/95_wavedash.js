@@ -25,17 +25,30 @@ let wdBusy = 0;
 // The SDK's async calls all return { success, data, message }; this unwraps
 // that shape and turns any failure - rejected, offline, absent - into null,
 // which is the only thing the drawing code ever has to handle.
-async function wdOk(pr) {
+async function wdOk(pr, what) {
   try {
     const r = await pr;
-    return r && r.success ? r.data : null;
-  } catch (e) { return null; }
+    if (r && r.success) return r.data;
+    wdMsg = (what || 'call') + ' failed: ' + ((r && r.message) || 'no reason given');
+    return null;
+  } catch (e) {
+    wdMsg = (what || 'call') + ' threw: ' + String(e && e.message).slice(0, 60);
+    return null;
+  }
 }
 
 // --- boot ------------------------------------------------------------------
+// The docs say the SDK is injected before our code runs, and on the platform it
+// is. Locally, and if that ever changes, it is not -- so this retries for a few
+// seconds rather than giving up on the first frame and staying silent forever.
+let wdTries = 0;
 function wdInit() {
   const S = WDS();
-  if (!S) { wdMsg = 'offline - scores stay local'; return; }
+  if (!S) {
+    if (++wdTries < 40) { wdMsg = 'waiting for the Wavedash SDK...'; setTimeout(wdInit, 250); return; }
+    wdMsg = 'no SDK on this page - scores stay local';
+    return;
+  }
   try {
     S.init({ deferEvents: true });
     S.readyForEvents();
@@ -43,13 +56,14 @@ function wdInit() {
     // interactive on the first frame.
     if (S.updateLoadProgressZeroToOne) S.updateLoadProgressZeroToOne(1);
     if (S.loadComplete) S.loadComplete();
-  } catch (e) { wdMsg = 'sdk init failed'; return; }
+  } catch (e) { wdMsg = 'init failed: ' + String(e && e.message).slice(0, 60); return; }
 
   try {
     wdUser = S.getUser && S.getUser();
     if (wdUser && wdUser.avatarUrl) wdAvatar(wdUser.userId);
   } catch (e) { /* identity is optional */ }
 
+  wdMsg = 'connected' + (wdUser ? ' as ' + (wdUser.username || '?') : ', no user');
   wdBoards();
   wdPresence('In the shaft');
 }
@@ -61,10 +75,15 @@ async function wdBoards() {
   if (!S || !S.getOrCreateLeaderboard) return;
   const D = S.LeaderboardSortOrder ? S.LeaderboardSortOrder.DESC : 1;
   const N = S.LeaderboardDisplayType ? S.LeaderboardDisplayType.NUMERIC : 0;
-  const a = await wdOk(S.getOrCreateLeaderboard('prismfall-score', D, N));
-  const b = await wdOk(S.getOrCreateLeaderboard('prismfall-depth', D, N));
+  const a = await wdOk(S.getOrCreateLeaderboard('prismfall-score', D, N), 'score board');
+  const b = await wdOk(S.getOrCreateLeaderboard('prismfall-depth', D, N), 'depth board');
   if (a) wdLB = a.id;
   if (b) wdDL = b.id;
+  // A leaderboard created by a PLAYER defaults to Hidden and never reaches the
+  // game's public Leaderboards tab; one created while a member of the game's
+  // team is playing defaults to Visible. So whether this call makes the board
+  // appear depends on who ran it first, which is worth saying out loud.
+  if (!wdLB) wdMsg = wdMsg || 'no leaderboard id';
   wdFetch();
 }
 
@@ -87,12 +106,12 @@ async function wdFetch() {
   const S = WDS();
   if (!S || !wdLB || wdBusy) return;
   wdBusy = 1;
-  const rows = await wdOk(S.listLeaderboardEntries(wdLB, 0, 8, false));
+  const rows = await wdOk(S.listLeaderboardEntries(wdLB, 0, 8, false), 'list');
   if (rows) {
     wdTop = rows.map((e) => [e.globalRank, e.username || 'player', e.score]);
     wdMsg = wdTop.length ? '' : 'be the first to post a score';
   }
-  const mine = await wdOk(S.getMyLeaderboardEntries(wdLB));
+  const mine = await wdOk(S.getMyLeaderboardEntries(wdLB), 'my entries');
   if (mine && mine.length) wdMe = mine[0].globalRank | 0;
   wdBusy = 0;
 }
@@ -109,7 +128,7 @@ function wdSubmit(sc, dp) {
     descents: descent,
     boons: BOONN.filter((n, i) => !(i & 1) && bn(i >> 1)).join(',') || 'none',
   };
-  wdOk(S.uploadLeaderboardScore(wdLB, sc, true, undefined, meta)).then((d) => {
+  wdOk(S.uploadLeaderboardScore(wdLB, sc, true, undefined, meta), 'upload').then((d) => {
     if (d) { wdMe = d.globalRank | 0; wdMsg = 'rank #' + wdMe; }
     wdFetch();
   });
@@ -146,13 +165,25 @@ function wdIdentity(x, y) {
 // The live top-8, drawn as a side panel. Deliberately unobtrusive: it is
 // context for your own score, not the point of the screen.
 function wdBoard(x, y) {
-  if (!WDS()) return;
   const w = 250 * U;
   RR(x - w / 2, y - 130 * U, w, 260 * U, 12 * U);
   FL('hsl(272 40% 9% / .8)');
   SK(1.4 * U, W3);
   txt('GLOBAL TOP 8', x, y - 108 * U, 13, W9, 1);
-  if (!wdTop.length) { txt(wdMsg || 'loading...', x, y, 12, W3); return; }
+  if (wdTop.length && wdMsg) txt(wdMsg, x, y + 110 * U, 10, W3);
+  if (!wdTop.length) {
+    // Wrap, because a real SDK error message is longer than the panel is wide.
+    const words = (wdMsg || 'loading...').split(' ');
+    let line = '', row = 0;
+    X.font = (11 * U | 0) + 'px monospace';
+    for (let i = 0; i <= words.length; i++) {
+      const nx = line ? line + ' ' + words[i] : words[i];
+      if (i < words.length && X.measureText(nx).width < w - 28 * U) { line = nx; continue; }
+      txt(line, x, y - 30 * U + row++ * 15 * U, 11, W6);
+      line = words[i] || '';
+    }
+    return;
+  }
   wdTop.forEach((e, i) => {
     const ry = y - 78 * U + i * 24 * U;
     const me = wdUser && e[1] === wdUser.username;

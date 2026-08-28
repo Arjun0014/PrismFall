@@ -53,14 +53,46 @@ const TERSER_OPTS = {
     pure_getters: true,
     hoist_funs: true,
     drop_console: true,
+    // ---- the anti-inlining block ----
+    // Every option below is switched to the setting that makes Terser's output
+    // LONGER, and each one makes the archive SMALLER. That is not a paradox:
+    // this packer predicts repeated text almost for free and pays full price
+    // for novel text, so trading an inlined body (unique) for a call to a
+    // shared function (repeated) is a win even though the character count
+    // rises. Measured together they are worth 159 B, and they take the
+    // minified bundle from 44,932 to 45,877 characters while doing it.
+    //
+    // Minified length is not the fitness function. The archive is.
+    reduce_funcs: false,    // keep single-use functions as functions
+    sequences: false,       // do not comma-fold statements together
+    inline: false,          // do not inline function bodies at all
+    unsafe: false,          // the unsafe rewrites all shorten and specialise
+    unsafe_arrows: false,
+    unsafe_math: false,
+    unsafe_methods: false,
+    unsafe_comps: false,
+    unsafe_undefined: false,
   },
   mangle: { toplevel: true },
   format: { comments: false, wrap_func_args: false },
 };
 
-async function terse(js) {
-  const wrapped = '(()=>{\n' + js + '\n})()';
-  const r = await minify(wrapped, TERSER_OPTS);
+// `wrap` keeps the IIFE. The competition build drops it -- Roadroller evals the
+// payload, so the declarations land in that eval's scope and nothing else on
+// the page can see them, and losing the wrapper lets Terser mangle and compress
+// at top level for another 14 B.
+//
+// The Wavedash build keeps the wrapper, because there the script is NOT packed:
+// it is plain minified JS inline on a page that also carries the injected
+// Wavedash SDK, and unwrapping it would put every name in the game into the
+// same scope as the platform's.
+async function terse(js, wrap) {
+  const src = wrap ? '(()=>{\n' + js + '\n})()' : js;
+  const opts = wrap ? TERSER_OPTS
+    : Object.assign({}, TERSER_OPTS, {
+      compress: Object.assign({}, TERSER_OPTS.compress, { toplevel: true }),
+    });
+  const r = await minify(src, opts);
   if (r.error) throw r.error;
   return r.code;
 }
@@ -206,7 +238,7 @@ async function main() {
   if (WAVE) {
     mkdirSync(p('dist-wavedash'), { recursive: true });
     const src = bundle(false, true);
-    const js = await terse(src);
+    const js = await terse(src, 1);
     const page = wavedashHtml(js);
     writeFileSync(p('dist-wavedash', 'index.html'), page);
     if (!existsSync(p('wavedash.toml'))) writeFileSync(p('wavedash.toml'), WD_TOML);
@@ -216,7 +248,7 @@ async function main() {
   }
 
   const raw = bundle(false);
-  const min = await terse(raw);
+  const min = await terse(raw, 0);
   writeFileSync(p('build', 'bundle.min.js'), min);
 
   const candidates = [];
