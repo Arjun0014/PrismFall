@@ -550,3 +550,35 @@ and its own abbreviation sweep.
 **Twenty still wins.** The best alternative is +38 B and the worst is +130 B.
 The abbreviation sweep did find the cached value had drifted — 9 rather than 12,
 worth **−2 B**, which is applied.
+
+### 22 — Source file order, searched properly (−26 B, kept)
+
+File order was previously checked by trying five permutations by hand, which
+found the existing order best. There are 39,916,800 of them.
+
+`tools/reorder.mjs --files` hill-climbs the order instead. Unlike function
+reordering this is **not** provably safe — `const CV = document.getElementById('a')`
+lives in `20_state.js` and `85_input.js` touches `CV` at top level, so file order
+carries real temporal-dead-zone dependencies. Every candidate is therefore gated
+on `tools/smoke.mjs`, which compiles it, boots it in a stubbed DOM, starts a run
+and drives 150 frames of real input before the archive is weighed. **67 candidate
+orders in the first search did not run and were rejected**, which is the gate
+doing exactly the job it exists for.
+
+The winner moves `colors` ahead of `physics` and `world` after `audio`:
+
+```
+util  config  state  colors  physics  audio  world  render  hud  input  game
+```
+
+Worth −26 B measured alone, −11 B on top of the improved alphabet (the two
+changes overlap). Applied by renumbering `src/`. All suites re-run green
+afterwards, including both browser engines.
+
+### 23 — Mangling alphabet, second climb (−8 B)
+
+Re-running the alphabet climb after the abbreviation change found
+`YCBDEFHIJKLMNOPVSQTURWXAZ`, a further −8 B and **−244 B against Terser's
+default**. Two characters swapped. This axis clearly still has a little left in
+it each time the payload moves, which is the argument for `npm run mangle` being
+part of the routine rather than a one-off.

@@ -14,26 +14,17 @@
 import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { minify } from 'terser';
-import { Packer } from 'roadroller';
-import { makeZip } from './zip.mjs';
+import { score, competitionTerser, rrOptions } from './measure.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(ROOT, 'src');
-const rr = JSON.parse(readFileSync(join(ROOT, 'build', 'roadroller.json'), 'utf8'));
+// The build's own configuration, not a copy of it. This file used to carry a
+// private duplicate of the Terser options, which went stale the moment the flag
+// search and the mangling alphabet moved -- and then every figure it printed
+// was measured against a compiler setup the product does not use.
+const rr = rrOptions();
 const filter = process.argv[2] || '';
 
-const TERSER = {
-  ecma: 2020,
-  compress: {
-    passes: 4, booleans_as_integers: true, pure_getters: true, hoist_funs: true,
-    drop_console: true, toplevel: true,
-    reduce_funcs: false, sequences: false, inline: false,
-    unsafe: false, unsafe_arrows: false, unsafe_math: false,
-    unsafe_methods: false, unsafe_comps: false, unsafe_undefined: false,
-  },
-  mangle: { toplevel: true }, format: { comments: false, wrap_func_args: false },
-};
 
 const files = readdirSync(SRC).filter((f) => f.endsWith('.js') && !/^9[5-9]_/.test(f)).sort();
 const base = Object.fromEntries(files.map((f) => [f, readFileSync(join(SRC, f), 'utf8')]));
@@ -43,15 +34,7 @@ async function measure(mutate) {
   if (mutate) mutate(now);
   const src = 'const DEBUG=0,WD=0;\n' +
     files.map((f) => '// ==== ' + f + ' ====\n' + now[f]).join('\n') + '\n';
-  const r = await minify(src, TERSER);
-  if (r.error) throw r.error;
-  const pk = new Packer([{ data: r.code, type: 'js', action: 'eval' }],
-    Object.assign({ maxMemoryMB: 150 }, rr, { allowFreeVars: true }));
-  const d = pk.makeDecoder();
-  const out = d.firstLine + '\n' + d.secondLine;
-  const html = '<!doctype html><canvas id=a></canvas><script>' + out + '</script>';
-  const z = await makeZip([{ name: 'index.html', data: Buffer.from(html, 'utf8') }], { iterations: [15, 200, 1000] });
-  return z.length;
+  return (await score(src, competitionTerser(), rr, 'cut', [15, 200, 1000])).zip;
 }
 
 // Helper: replace in one file, asserting the target existed.

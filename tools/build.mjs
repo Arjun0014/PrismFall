@@ -47,7 +47,7 @@ const log = (...a) => { if (!QUIET) console.log(...a); };
 //
 // The alphabet below was then searched directly against the archive by
 // tools/mangle.mjs (family survey, then a hill-climb over swap / substitute /
-// drop / insert). Total against Terser's default: -229 B. It is 25 characters
+// drop / insert). Total against Terser's default: -244 B. It is 25 characters
 // long and mostly uppercase, which no amount of reasoning would have predicted;
 // the landscape is rugged and non-monotonic in length, so it was found by
 // measurement and it has to be RE-searched after any significant source change:
@@ -57,7 +57,7 @@ const log = (...a) => { if (!QUIET) console.log(...a); };
 // This is a build parameter, exactly like the Roadroller model. Nothing about
 // the game depends on it: Terser guarantees the names it emits are unique,
 // non-reserved and non-shadowing whatever alphabet it is handed.
-const NAME_LEAD = 'YBCDEFHIJKLMNOPQSVTURWXAZ';
+const NAME_LEAD = 'YCBDEFHIJKLMNOPVSQTURWXAZ';
 const NAME_TAIL = NAME_LEAD + '0123456789';
 
 /** A Terser `nth_identifier`. Omitting reset/sort is what disables the sort. */

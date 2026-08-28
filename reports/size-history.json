@@ -683,5 +683,31 @@
   "note": "",
   "delta": -2,
   "left": -2938
+ },
+ {
+  "date": "2026-08-28 14:34",
+  "quick": false,
+  "zip": 16242,
+  "min": 77275,
+  "raw": 120456,
+  "rr": 21467,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "alphabet climb restart",
+  "delta": -8,
+  "left": -2930
+ },
+ {
+  "date": "2026-08-28 14:41",
+  "quick": false,
+  "zip": 16231,
+  "min": 77281,
+  "raw": 120456,
+  "rr": 21445,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "searched file order",
+  "delta": -11,
+  "left": -2919
  }
 ]

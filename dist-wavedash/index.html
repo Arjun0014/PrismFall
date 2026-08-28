@@ -1,1 +1,2693 @@
-<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no"><title>PRISMFALL</title><style>html,body{margin:0;height:100%;background:#05030c;overflow:hidden}canvas{display:block}</style><canvas id=a></canvas><script>(()=>{function t(t){ye=t>>>0}function n(){ye=ye+1831565813|0;let t=Dn.imul(ye^ye>>>15,1|ye);t=t+Dn.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}function e(t,n){let e=Dn.imul(0|t,374761393)+Dn.imul(0|n,668265263);e=Dn.imul(e^e>>>13,1274126177);return((e^e>>>16)>>>0)/4294967296}function o(t,n,e,o,s,i){const r=e-t,c=o-n,l=r*r+c*c;return l?fe(((s-t)*r+(i-n)*c)/l,0,1):0}function s(t,n,e,o,s,i,r,c){const l=e-t,f=o-n,a=r-s,u=c-i,y=l*u-f*a;if(!y)return null;const h=((s-t)*u-(i-n)*a)/y,p=((s-t)*f-(i-n)*l)/y;return h>=0&&h<=1&&p>=0&&p<=1?[t+l*h,n+f*h]:null}function i(t,n,e,o,s,i,r){const c=qn(3,(i-s)*o/80|0);for(let l=0;l<c;l++){const f=ae(s,i,l/c),a=ae(s,i,(l+1)/c);t.o.push(Do(n+Fn(f)*o,e+Gn(f)*o,n+Fn(a)*o,e+Gn(a)*o,r))}}function r(t){Mo=t.x;qo=t.y;Go=0;Fo=0;Bo=t.g;if(t.os){const n=t.os*Oe+t.op,e=Gn(n),o=Fn(n)*t.os;Mo+=t.ox*e;qo+=t.oy*e;Go=t.ox*o;Fo=t.oy*o}t.w&&(Bo+=t.w*Oe)}function c(t,n,e){if(t.w){Go+=-t.w*(e-qo);Fo+=t.w*(n-Mo)}}function l(t,n){return xe(vo(t,2))?2:n&&xe(vo(t,0))?4:xe(vo(t,1))?8:xe(vo(t,3))?1:0}function f(t,n){if(!xe(vo(t,4)))return null;const e=he(0,Un);return{ox:Fn(e)*n,oy:Gn(e)*n*.6,os:he(.7,2.1),op:he(0,Un)}}function a(t,n,e){if(!t.t){Vo=n-Mo;zo=e-qo;Yo=Wn(Vo,zo);if(Yo<1e-4){Vo=0;zo=-1;Yo=1e-4}else{Vo/=Yo;zo/=Yo}Wo=Mo+Vo*t.r;Ho=qo+zo*t.r;return t.r}const s=Fn(Bo)*t.r,i=Gn(Bo)*t.r,r=Mo-s,c=qo-i,l=Mo+s,f=qo+i,a=o(r,c,l,f,n,e);Wo=r+(l-r)*a;Ho=c+(f-c)*a;Vo=n-Wo;zo=e-Ho;Yo=Wn(Vo,zo);if(Yo<1e-4){Vo=-Gn(Bo);zo=Fn(Bo);Yo=1e-4}else{Vo/=Yo;zo/=Yo}return 5}function u(t,n,e,o){for(const s of t.o){Mo=s.x;qo=s.y;Bo=s.g;if(a(s,n,e)+o>Yo)return 1}return 0}function y(){const t=Eo,n=Ko(t),e=jo(t),o=xo(n),s=Hn((t+1400)/ee)>Hn(t/ee)&&t>200,i=xe(.26)?120:0,r=fe(-400+he(-90,70)-i,-545,-300),c=fe(Qn+he(-70,90)+i,300,jn),l=s?1240:pe(760,1080),f={y:t,h:l,l:r,r:c,pl:Ro,pr:So,o:[],i:[],rg:n,k:0,v:0,z:0,bk:[]};f.o.push(Do(Ro,t,r,t+l,0),Do(So,t,c,t+l,0));Oo=qn(Ro,r)+30;Lo=Mn(So,c)-30;wo=Lo-Oo;ko=(Oo+Lo)/2;Co=o;Io=e;if(s)b(f);else if(To>2&&xe(.1)){f.v=1;T(f,n)}else{const t=+uo[n][5][pe(0,9)];f.k=t;To>1&&pe(0,9)<uo[n][8]&&(f.z=mo(n)||pe(1,5));1===t||5===t?d(f,t>1?pe(2,3):1,t>1?he(0,26):he(120,210),f.y+f.h*he(.34,.6),0):[x,0,v,g,m,0,E,R,S][t](f);h(f,uo[n][6]+(1.6*e|0));A(f,n)}f.i=f.i.filter(t=>!u(f,t.x,t.y,10.2));Ro=r;So=c;Eo=t+l;To++;Ze.push(f);Ze.length>26&&Ze.shift();return f}function h(t,n){for(let e=6*n;n>0&&e--;){const e=he(Oo+44,Lo-44),o=t.y+he(.07,.93)*t.h,s=xe(.58),i=he(13,25),r=he(30,76),c=he(0,Nn),a=48+(s?i:5);if(!u(t,e,o,a)){if(!s){const n=Fn(c)*r,s=Gn(c)*r;if(u(t,e+n,o+s,a)||u(t,e-n,o-s,a))continue}n--;t.o.push(s?No(e,o,i,l(Co,0)|(xe(.5)?1:xe(.3)?ne:0),f(Co,74)):Uo(e,o,r,c,l(Co,1)|(xe(.22)?16:0),f(Co,62)));t.o[t.o.length-1].m&ne&&p(t,t.o[t.o.length-1],3)}}}function p(t,n,e){let o=t.bk[t.bk.length-1];if(!o||o.n>=o.cap){o={n:0,l:0,cap:e,x:n.x,y:n.y,m:[]};t.bk.push(o)}o.n++;o.m.push(n);n.bk=o;n.m|=ne}function x(t){const n=pe(4,6),e=t.h/(n+1);for(let o=0;o<n;o++){const n=t.y+e*(o+1),s=pe(4,7);for(let e=0;e<s;e++){t.o.push(No(Oo+44+(e+(1&o?.5:0))/(s-.35)*(wo-88),n,he(14,27),l(Co,0)|(xe(.45)?1:xe(.25)?ne:0),f(Co,60)));t.o[t.o.length-1].m&ne&&p(t,t.o[t.o.length-1],3)}}}function d(t,n,e,o,s){const i=l(Co,1),r=[];for(let t=0;t<n;t++)r.push(Oo+(t+he(.25,.75))*wo/n);let c=Oo-20,f=o-e;for(let s=0;s<=n;s++){const l=s===n,a=qn(100,he(125,195)-16*Io),u=l?Lo+20:r[s]-a/2,y=l?o-e:o+e;u-c>24&&t.o.push(Do(c,f,u,y,i));!l&&e>40&&xe(.6)&&t.o.push(No(u,y,15,1));c=l?u:r[s]+a/2;f=o+e}if(!s){for(let n=0;n<4;n++)t.i.push(Po(0,r[0]+he(-26,26),o+e+70+46*n));t.i.push(Po(xe(.35)?2:1,r[n-1],o-e-70,de(go(t.rg))))}}function v(t){const n=Mn(.42*wo,280),e=ko+he(-.2,.2)*wo,o=t.y+.58*t.h,s=n*Fn(.12*Nn);i(t,e,o,n,.12*Nn,.88*Nn,xe(.35)?2:0);t.o.push(No(e-s,o,15,1),No(e+s,o,15,1));t.i.push(Po(xe(.3)?1:2,e,o+.55*n,de(go(t.rg))));xe(.6)&&t.o.push(Uo(e,t.y+.18*t.h,he(60,120),he(-.4,.4),1,f(Co,90)))}function g(t){const n=qn(135,250-30*Io),e=ko+he(-.22,.22)*wo,o=he(-90,90);t.o.push(Do(e-n/2,t.y,e-n/2+o,t.y+t.h,32));t.o.push(Do(e+n/2,t.y,e+n/2+o,t.y+t.h,32));for(let n=0;n<7;n++)t.i.push(Po(0,e+o*(n/7)+he(-30,30),t.y+80+n*(t.h-160)/6));if(xe(.6)){const n=e<ko?Lo-70:Oo+70,o=xe(.45);t.i.push(Po(o?2:4,n,t.y+.5*t.h,o?de(go(t.rg)):pe(0,6)))}}function m(t){const n=pe(1,2);for(let e=0;e<n;e++){const o=ko+he(-.25,.25)*wo,s=t.y+t.h*(1===n?.5:.3+.42*e),i=pe(2,3),r=Mn(.34*wo,210),c=ve()*he(.9,1.9+.3*Io);for(let n=0;n<i;n++)t.o.push(Uo(o,s,r,n*Nn/i,1,{w:c}));t.o.push(No(o,s,18,0));t.i.push(Po(0,o,s-r-40),Po(0,o,s+r+40))}}function E(t){const e=t.y+.16*t.h,o=t.y+.86*t.h;d(t,1,0,e,1);d(t,1,0,o,1);const s=pe(4,7);for(let i=0;i<s;i++){const s=Oo+he(.12,.88)*wo,i=ae(e+60,o-60,n());u(t,s,i,66)||(xe(.45)?t.o.push(No(s,i,he(16,30),xe(.5)?1:16,f(Co,80))):t.o.push(Uo(s,i,he(46,96),he(0,Nn),l(Co,1)|(xe(.3)?32:0),f(Co,70))))}const i=ko,r=(e+o)/2,c=Mn(.3*wo,190);for(let n=0;n<4;n++){const e=n/4*Un+he(0,1),o=i+Fn(e)*c,s=r+Gn(e)*c*.7;u(t,o,s,62)||t.o.push(No(o,s,he(13,21),1,f(Co,56)))}t.i.push(Po(xe(.25)?1:2,xe(.5)?Oo+55:Lo-55,(e+o)/2,de(go(t.rg))))}function R(t){const n=pe(2,3);for(let e=0;e<n;e++){const o=t.y+t.h*(.2+.62*e/n+he(-.04,.04)),s=pe(3,5),i=Mn(.74*wo,330),r=ko-i/2+he(-40,40),c={n:s,l:0,cap:s,x:ko,y:o,m:[]};t.bk.push(c);for(let n=0;n<s;n++){const e=Uo(r+(n+.5)*i/s,o,30,Nn/2+he(-.2,.2),ne);e.bk=c;c.m.push(e);t.o.push(e)}t.o.push(No(r-42,o,20,1),No(r+i+42,o,20,1));for(let n=0;n<s;n++)t.i.push(Po(0,r+(n+.5)*i/s,o-54))}t.i.push(Po(xe(.4)?4:2,ko+he(-.3,.3)*wo,t.y+.92*t.h,pe(0,6)))}function S(t){const n=Mn(.8*wo,380),e=ko+he(-.1,.1)*wo,o=pe(3,4);for(let s=0;s<o;s++){const i=t.y+t.h*(.14+.74*s/o),r=e+he(-.34,.34)*n,c=qn(86,150-20*Io);for(const o of[-1,1]){const s=o<0?e-n/2:e+n/2,l=r+o*c/2;Pn(s-l)>30&&t.o.push(Do(l,i,s,i+he(-14,14),4))}t.o.push(Uo(r,i+.37*t.h/o,Mn(.34*n,150),he(0,Nn),1,{w:ve()*he(.8,1.7+.4*Io)}));t.i.push(Po(0,r,i+40),Po(0,r+he(-30,30),i+86))}t.i.push(Po(xe(.5)?1:4,e,t.y+.96*t.h,pe(0,6)))}function T(t,n){const e=ko,o=t.y+.5*t.h,s=Mn(.38*wo,250);t.cx=e;t.cy=o;i(t,e,o,s,.78*Nn,2.16*Nn,1);const r=xe(.4);for(let n=0;n<3;n++)t.o.push(Uo(e,o,.46*s,n*Nn/3,1,{w:.55*ve()}));t.i.push(Po(r?3:1,e,o-.72*s));t.i.push(Po(2,e-.6*s,o+.3*s,de(go(n))));t.i.push(Po(2,e+.6*s,o+.3*s,pe(0,6)));for(let n=0;n<6;n++)t.i.push(Po(0,e+Fn(n/6*Un)*s*.78,o+Gn(n/6*Un)*s*.78))}function b(t){const n=ko,e=t.y+.4*t.h;m(t);d(t,1,0,e+300,1);t.o.push(No(n,e,26,1));for(let o=0;o<7;o++)t.i.push(Po(2,n+74*(o-3),e+420,o));t.i.push(Po(1,n,t.y+150))}function A(t,n){const e=go(n),o=uo[n][6]/6,s=(n,e,o,s)=>{for(let i=0;i<10;i++){const i=he(Oo+45,Lo-45),r=t.y+he(o,s)*t.h;if(!u(t,i,r,34)){t.i.push(Po(n,i,r,e));return}}};if(xe(.75)){const n=pe(5,9),e=Oo+he(.1,.5)*wo,o=t.y+he(.15,.5)*t.h,s=ve(),i=he(150,330),r=he(-190,240);for(let c=0;c<n;c++){const l=c/(n-1),f=e+s*i*l,a=o+r*Gn(l*Nn)+150*l;f>Oo+25&&f<Lo-25&&!u(t,f,a,26)&&t.i.push(Po(0,f,a))}}xe(.62*o)&&s(2,xe(.7)?de(e):pe(0,6),.15,.85);xe(.3*o)&&s(xe(.3)?4:1,pe(0,6),.02,.16);xe(.16*o)&&s(4,pe(0,6),.3,.8);if(xe(.24*o)){const n=xe(.5)?Oo+90:Lo-90,e=t.y+he(.25,.7)*t.h;for(let o=0;o<4;o++)t.o.push(Uo(n+(o<2?0:o>2?62:-62),e+(o<2?o?62:-62:0),62,o<2?Nn/2:0,4));t.i.push(Po(0,n,e),Po(0,n-34,e),Po(0,n+34,e),Po(xe(.4)?1:2,n,e-34,pe(0,6)))}}function O(n){bo=n||1e9*Vn()|0;t(bo);Ze=[];Eo=-900;Ro=-400;So=Qn;To=0;Ao=null;const e={y:-900,h:1400,l:-400,r:Qn,pl:-400,pr:Qn,o:[],i:[],rg:0,k:0,v:0,z:0,bk:[]};e.o.push(Do(-400,-900,-400,500,0),Do(Qn,-900,Qn,500,0),Do(-400,-900,Qn,-900,1),No(-140,60,26,1),No(150,250,26,1),No(-60,420,22,1));for(let t=0;t<7;t++)e.i.push(Po(0,74*t-220,150+90*Gn(.9*t)));e.i.push(Po(2,250,-60,1),Po(2,-260,380,2));Ze.push(e);Eo=500;for(;Eo<3e3;)y()}function L(){for(;Eo<Ne.y+3200;)y();const t=Ze[0];if(Ne.y<t.y+40){Ne.y=t.y+40;Ne.vy<0&&(Ne.vy=.6*Pn(Ne.vy))}}function w(t){Xo=-545;Zo=jn;for(const n of Ze)if(t>=n.y&&t<n.y+n.h){const e=(t-n.y)/n.h;Xo=ae(n.pl,n.l,e);Zo=ae(n.pr,n.r,e);return}}function k(t,n,e){_o=Jo=0;const o=t.z;if(!o)return;const s=(e-t.y)/t.h,i=Gn(7*s+1.4*Oe);if(1===o){const e=Fn((n-t.l)/(t.r-t.l)*Un*1.5);e>.1&&(Jo=-1437.5*e)}else if(2===o){const o=(t.l+t.r)/2-n,s=t.y+.5*t.h-e,i=Wn(o,s)+60,r=Mn(1,300/i)*Yn*.8;_o=o/i*r;Jo=s/i*r}else if(3===o)_o=i*Yn*.62;else if(4===o)Jo=-2500*fe(6*Mn(s,1-s),0,1);else if(5===o){const o=n-(t.l+t.r)/2,s=e-(t.y+.5*t.h),i=Wn(o,s)+80,r=875*Mn(1,340/i);_o=-s/i*r;Jo=o/i*r}else{const o=(t.l+t.r)/2+Gn(.0016*e+.01*t.y)*(t.r-t.l)*.3;_o=fe(5*(o-n),-1250,Yn);Jo=687.5}}function C(t,n){const e=[];for(const o of Ze)o.y+o.h>t&&o.y<n&&e.push(o);return e}function I(){const t=Wn(Ne.vx,Ne.vy);if(t>Kn){Ne.vx=Ne.vx/t*Kn;Ne.vy=Ne.vy/t*Kn}if(!isFinite(t)){Ne.vx=0;Ne.vy=200}if(!isFinite(Ne.x+Ne.y)){Ne.x=0;Ne.y=ze}}function N(t){const n=Ne.ra;if(n){n.u=1;n.l=Mn(n.l,.12)}Ne.ra=null;if(t){Ne.vx*=1.06;Ne.vy*=1.06}at(0)}function U(t){const n=Ne.ra,e=n.x2-n.x1,o=n.y2-n.y1,s=Wn(e,o);if(n.u||s<8){N(1);return 0}const i=e/s,r=o/s;let c=Ne.vx*i+Ne.vy*r;c=.998*c+(Ue*i+De*r)*t;if(Pn(c)<370){const t=Ue*i+De*r;c=370*(t?t>0?1:-1:c>=0?1:-1)}Ne.rt+=c*t/s;Ne.vx=i*c;Ne.vy=r*c;if(Ne.rt<0||Ne.rt>1){Ne.rt=fe(Ne.rt,0,1);if(!(Ne.rw>0)){N(1);return 0}Ne.rw-=t;Ne.vx=-Ne.vx;Ne.vy=-Ne.vy;Ne.rt=fe(Ne.rt,.02,.98);lt(400)}const l=i*Ne.rs;Ne.x=n.x1+e*Ne.rt+-r*Ne.rs*22;Ne.y=n.y1+o*Ne.rt+22*l;Vn()<.5&&It(Ne.x,Ne.y,3,0,60,$n[4],.1*-Ne.vx,.1*-Ne.vy);return 1}function D(){if(!Ne.te)return;Ne.te=null;const t=1.34+150/(Wn(Ne.vx,Ne.vy)||1);Ne.vx*=t;Ne.vy*=t;I();It(Ne.x,Ne.y,10,0,260);ft(0)}function P(){const t=Ne.te;let n=Ne.x-t.x,e=Ne.y-t.y;const o=Wn(n,e);if(o<1||o<=t.l)return;n/=o;e/=o;Ne.x=t.x+n*t.l;Ne.y=t.y+e*t.l;const s=Ne.vx*n+Ne.vy*e;if(s>0){Ne.vx-=s*n;Ne.vy-=s*e}const i=Wn(Ne.vx,Ne.vy);if(i>1&&i<1500){const t=qn(1.004,320/i);Ne.vx*=t;Ne.vy*=t}}function M(t){const n=ce(4)?180+24*Ve:Ve>4?60+24*Ve:0;for(const e of $o)for(const o of e.i){if(o.g)continue;const e=Ne.x-o.x,s=Ne.y-o.y,i=Wn(e,s);if(i<43)J(o);else if(n&&!o.t&&i<n){const n=Mn(1,700*t/i);o.x+=e*n;o.y+=s*n}}}function q(t){for(const t of $o)for(const n of t.o)n.k||G(n);if(ts>0)ts-=t;else for(let t=0;t<_e.length&&!j(_e[t]);t++);}function G(t){r(t);const e=a(t,Ne.x,Ne.y)+zn;if(Yo>e)return;const o=Vo,s=zo,i=Wo,l=Ho,f=e-Yo;if(8&t.m&&Ne.ph>0)return;c(t,i,l);let u=Ne.vx-Go,y=Ne.vy-Fo;const h=u*o+y*s;if(4&t.m&&-h>(Ne.rp>0?300:900)*(ce(3)?.5:1)){B(t,i,l,0,0);return}Ne.x+=o*f;Ne.y+=s*f;Ne.ra&&N(0);if(h>=0)return;const p=1&t.m,x=2&t.m;t.f=1;t.m&ne&&F(t,i,l);const d=(1+(p?1.32-.72*fe(Ne.sp/Kn,0,1):x?.12:.44))*-h;u+=d*o;y+=d*s;const v=-s,g=o,m=u*v+y*g,E=Mn(Pn(m),(x?1.15:.3)*d)*(m<0?-1:1);u-=E*v;y-=E*g;Ne.vx=u+Go;Ne.vy=y+Fo;I();const R=-h;et(R,x?1:p?2:0,t.x+t.y);we=Mn(26,we+R*(p?.008:.0035));It(i,l,0|fe(.012*R,1,14),1,Mn(.35*R,420),ns(t));if(p&&R>150){je++;Xe=1.6;const t=(18+.05*R)*Ve*(ce(6)?2:1)|0;He+=t;if(ce(6)){const t=Hn(7*n());Me[t]=Mn(rs(),Me[t]+2.4)}if(R>620){Dt(i,l,"+"+t,$n[2]);kt(i,l,60+Mn(.2*R,190),Gs[6]+30);Ie=qn(Ie,.045)}}}function F(t,n,e){if(t.lt)return;const o=t.bk;t.lt=1;if(!o)return;o.l++;He+=60*Ve|0;st(o.l/o.n);It(n,e,10,0,260,48);if(o.l<o.n)return;o.l=0;for(const t of o.m)t.lt=0;const s=420*o.n*Ve|0;He+=s;We+=2*o.n;for(let t=0;t<7;t++)Me[t]=Mn(rs(),Me[t]+5);Dt(o.x,o.y,"BANK +"+s,48);kt(o.x,o.y,320,48);ke=qn(ke,.4);Ce=48;we=Mn(30,we+12);Ie=qn(Ie,.07);it()}function B(t,n,e,o,s){t.k=1;const i=ns(t);we=Mn(32,we+10-s);It(n,e,18,2,460,i);H(n,e,t,i);kt(n,e,150,i);ot(s);const r=60*Ve*(1+.5*s)|0;He+=r;je++;Xe=1.6;if(!s){Dt(n,e,"+"+r,45);Ie=qn(Ie,.05)}if(s>3)return;const c=150*(ce(3)?2:1);for(const o of $o)for(const i of o.o){if(i===t||i.k||i.kt||!(4&i.m))continue;const o=Wn(i.x-n,i.y-e);if(o<c+i.r){i.kt=.04+o/c*.1;i.kd=s+1}}Ne.vx*=.9;Ne.vy*=.9}function W(t){for(const n of Ze)for(const e of n.o)if(e.kt&&!e.k&&!((e.kt-=t)>0)){r(e);B(e,Mo,qo,0,e.kd)}}function H(t,n,e,o){for(let s=0;s<7;s++){const s=he(0,Un),i=he(90,420);Ct(t,n,Fn(s)*i,Gn(s)*i,he(.5,1.1),o,4,he(3,8)*(e.t?1:1.4))}}function V(t){const n=Wn(Ne.vx,Ne.vy);$o=C(Ne.y-420-n*t,Ne.y+420+n*t);let e=Ue,o=De;for(const t of $o)if(t.z&&Ne.y>=t.y&&Ne.y<t.y+t.h){k(t,Ne.x,Ne.y);e+=_o;o+=Jo;break}if(Ne.te){Ne.te.t-=t;Ne.vx+=e*t;Ne.vy+=o*t;Ne.te.t<=0&&D()}else if(Ne.ra);else{Ne.vx+=e*t;Ne.vy+=o*t}I();let s=Wn(Ne.vx,Ne.vy);const i=1400*(ce(2)?1.5:1);if(s>i){const n=qn(0,1-(s/i-1)*(ce(2)?.6:1.5)*t);Ne.vx*=n;Ne.vy*=n;s*=n}const r=fe(Dn.ceil(s*t/(.55*zn)),1,8),c=t/r;for(let t=0;t<r;t++){if(Ne.ra){if(!U(c)){Ne.x+=Ne.vx*c;Ne.y+=Ne.vy*c}}else{Ne.x+=Ne.vx*c;Ne.y+=Ne.vy*c}Ne.te&&P();q(c);M(c)}w(Ne.y);if(Ne.x<Xo+zn){Ne.x=Xo+zn;Ne.vx<0&&(Ne.vx=.55*-Ne.vx+60)}if(Ne.x>Zo-zn){Ne.x=Zo-zn;Ne.vx>0&&(Ne.vx=.55*-Ne.vx-60)}Ne.ph>0&&(Ne.ph-=t);Ne.rp>0&&(Ne.rp-=t);if(Ne.gt>0){Ne.gt-=t;if(Ne.gt<=0){Ue=0;De=Yn}}Ne.sp=Wn(Ne.vx,Ne.vy);Ne.sp>30&&(Ne.a=Bn(Ne.vy,Ne.vx))}function z(t){for(let n=0;n<7;n++)if(Qe[n]>0&&oe[n][0]===t)return oe[n][1];return 1}function Y(){if(1!==Ae||!Ne.al)return;if(Me[qe]<=.5){os=qe;ss=.5;St();return}const t=ro-Ne.x,n=co-Ne.y,e=Mn(1,Xn/(Wn(t,n)||1)),o=Ne.x+t*e,s=Ne.y+n*e;if(!fo){fo=1;ao=0}lo={x1:o,y1:s,x2:o,y2:s,e:te[qe],c:qe,l:0,u:0,paid:0,n:ce(8)?2:1};_e.push(lo);for(;_e.length>5+(ce(7)?2:0);)Ne.ra===_e.shift()&&N(0);Ne.te&&D()}function K(){const t=lo;if(!t)return;const n=ro-t.x1,e=co-t.y1,o=Wn(n,e);if(o<1)return;let s=Mn(o,210);if(s>t.paid){const n=_n[t.c]*is(),e=(s-t.paid)*n;if(Me[t.c]>=e){Me[t.c]-=e;t.paid=s}else{s=t.paid+=Me[t.c]/n;Me[t.c]=0;if(ss<=0){os=t.c;ss=.6;St()}}}t.x2=t.x1+n/o*s;t.y2=t.y1+e/o*s;Q(t)}function Q(t){for(const n of _e){if(n===t||n.u||n.e===t.e)continue;const e=s(t.x1,t.y1,t.x2,t.y2,n.x1,n.y1,n.x2,n.y2);if(e){t.e=n.e=t.e|n.e;no.push({x:e[0],y:e[1],t:.55});mt()}}}function j(t){const n=t.x2-t.x1,e=t.y2-t.y1,s=Wn(n,e);if(t.u||t===lo||t===Ne.ra||s<22)return 0;const i=o(t.x1,t.y1,t.x2,t.y2,Ne.x,Ne.y),r=t.x1+n*i,c=t.y1+e*i;let l=Ne.x-r,f=Ne.y-c;const a=Wn(l,f);if(a>22)return 0;const u=n/s,y=e/s;if(a<.001){l=-y;f=u}else{l/=a;f/=a}X(t,l,f,r,c,i,u,y,s);ts=.05;return 1}function X(t,n,e,o,s,i,r,c,l){const f=t.e,a=cs(l);let u=1;if(64&f){const o=z(6);if(16&f)Ne.ph=.8*o;else{let s=0;for(const n of _e)if(n!==t&&!n.u&&64&n.e){s=n;break}Nt(Ne.x,Ne.y);if(s){const t=Bn(s.y2-s.y1,s.x2-s.x1)-Bn(c,r),n=Fn(t),e=Gn(t),o=Ne.vx*n-Ne.vy*e,i=Ne.vx*e+Ne.vy*n,l=30/(Wn(o,i)||1);Ne.vx=o;Ne.vy=i;Ne.x=(s.x1+s.x2)/2+o*l;Ne.y=(s.y1+s.y2)/2+i*l;s.u=1;s.l=.12}else{const t=Wn(Ne.vx,Ne.vy),s=300*o*a;if(t<60){Ne.x+=n*s;Ne.y+=e*s;Ne.vx=460*n;Ne.vy=460*e}else{const n=s/t;Ne.x+=Ne.vx*n;Ne.y+=Ne.vy*n}}w(Ne.y);Ne.x=fe(Ne.x,Xo+zn,Zo-zn);Ne.ph=.34*o*a;Ne.vx*=1.07;Ne.vy*=1.07;Nt(Ne.x,Ne.y)}yt()}if(16&f){Ne.te&&D();Ne.ra=t;Ne.rt=i;Ne.rw=z(4)>1?4:0;Ne.rs=n*-c+e*r>=0?1:-1;const o=qn(Wn(Ne.vx,Ne.vy),340+180*a),s=Ne.vx*r+Ne.vy*c>=0?1:-1;Ne.vx=r*o*s;Ne.vy=c*o*s;u=0;at(1)}else if(8&f){Ne.ra&&N(0);const n=z(3);Ne.te={x:t.x1,y:t.y1,l:qn(l*n,30),t:(1.4+a)*n};ft(1)}if(32&f){Ue=n*Yn;De=e*Yn;Ne.gt=2.9*z(5)*a;ut(e);It(o,s,10,3,150,$n[5])}const y=4&f;if(2&f){const t=Wn(Ne.vx,Ne.vy),n=y?qn(1.34*t,560+320*a):qn(.99*t,250+250*a);Ne.vx=r*n;Ne.vy=c*n;ct(y)}else if(y){const t=Ne.vx*n+Ne.vy*e,o=(1.25+.6*a)*z(2);Ne.vx-=(1+o)*t*n;Ne.vy-=(1+o)*t*e;const s=Ne.vx*n+Ne.vy*e,i=Mn(300+300*a,1.6*Pn(t));if(s<i){Ne.vx+=(i-s)*n;Ne.vy+=(i-s)*e}lt(Pn(t))}else if(!(89&f)){const t=Ne.vx*n+Ne.vy*e;if(t<0){Ne.vx-=1.55*t*n;Ne.vy-=1.55*t*e}}if(1&f){const t=z(0);let i,r,c=Wn(Ne.vx,Ne.vy);if(c<50){i=n;r=e;c=0}else{i=Ne.vx/c;r=Ne.vy/c;const t=i*n+r*e;if(t<0){i-=2*t*n;r-=2*t*e}}const l=1.5*c+440*t*a;Ne.vx=i*l;Ne.vy=r*l;Ne.rp=.85;we=Mn(26,we+7);kt(o,s,120+160*a,$n[0]);It(o,s,26,0,220,$n[0],420*-i,420*-r);const f=(90+110*a)*t;for(const t of $o)for(const n of t.o)if(!n.k&&!n.kt&&4&n.m&&Wn(n.x-o,n.y-s)<f+n.r){n.kt=.02;n.kd=0}rt(l)}I();if(u&&! --t.n){t.u=1;t.l=.22}Ut(t,o,s);Z(f)}function Z(t){const n=Ge;es=7;Ge|=127&t;if(Ge===n)return;let e=0;for(let t=0;t<7;t++)Ge&te[t]&&e++;if(!(e<=Fe)){Fe=e;if(7===e)return _();if(3===e||5===e){for(let t=0;t<7;t++)Me[t]=Mn(rs(),Me[t]+6);Dt(Ne.x,Ne.y-30,"SPECTRUM "+e+"/7",$n[e]);Et()}}}function _(){Be=3.2;for(let t=0;t<7;t++)Me[t]=Mn(rs(),Me[t]+26);Ve=Mn(12,Ve+1.5);He+=1200*Ve|0;ke=1;Ce=-1;we=Mn(32,we+14);Dt(Ne.x,Ne.y-46,"FULL SPECTRUM",-1);gt();Ge=0;Fe=0}function J(t){t.g=1;if(0===t.t){je++;Xe=1.4;We+=ce(9)?3:1;He+=10*Ve*(1+.05*je)*(ce(9)?3:1)|0;ht(je)}else if(1===t.t){We+=15;He+=500*Ve|0;Dt(t.x,t.y,"CROWN +15",48);ke=qn(ke,.45);Ce=48;xt()}else if(2===t.t){Me[t.c]=Mn(rs(),Me[t.c]+40);dt(t.c);It(t.x,t.y,12,3,190,$n[t.c])}else if(3===t.t){for(let t=0;t<7;t++)Me[t]=rs();ke=1;Ce=-1;Dt(t.x,t.y,"PRISM WELL",-1);vt()}else{Qe[t.c]=oe[t.c][2];Dt(t.x,t.y,se[t.c],oe[t.c][0]>6?-1:$n[oe[t.c][0]]);Rt()}}function $(){if(ds){"suspended"===ds.state&&ds.resume();return}const t=window.AudioContext||window.webkitAudioContext;if(!t)return;ds=new t;us=ds.createBiquadFilter();us.type="lowpass";us.frequency.value=2e4;ls=ds.createGain();ls.gain.value=oo.m?0:.8;us.connect(ls).connect(ds.destination);fs=ds.createGain();fs.gain.value=.85;fs.connect(us);as=ds.createGain();as.gain.value=.5;as.connect(us);const n=2*ds.sampleRate;ys=ds.createBuffer(1,n,ds.sampleRate);const e=ys.getChannelData(0);for(let t=0;t<n;t++)e[t]=2*Vn()-1;ps=ds.createOscillator();ps.type="sawtooth";ps.frequency.value=220;xs=ds.createBiquadFilter();xs.type="bandpass";xs.frequency.value=1400;xs.Q.value=6;hs=ds.createGain();hs.gain.value=0;ps.connect(xs).connect(hs).connect(fs);ps.start();gs=ds.currentTime+.1}function tt(t,n,e,o,s,i,r){if(!Ts())return;const c=r||bs(),l=ds.createOscillator(),f=ds.createGain();l.type=t;l.frequency.setValueAtTime(qn(8,n),c);e&&e!==n&&l.frequency.exponentialRampToValueAtTime(qn(8,e),c+o);f.gain.setValueAtTime(1e-4,c);f.gain.exponentialRampToValueAtTime(qn(1e-4,s),c+.008);f.gain.exponentialRampToValueAtTime(1e-4,c+o);l.connect(f).connect(i||fs);l.start(c);l.stop(c+o+.02);vs++}function nt(t,n,e,o,s,i,r,c){if(!Ts())return;const l=c||bs(),f=ds.createBufferSource();f.buffer=ys;f.loop=1;f.playbackRate.value=.7+.6*Vn();const a=ds.createBiquadFilter();a.type=e;a.frequency.setValueAtTime(qn(20,o),l);s!==o&&a.frequency.exponentialRampToValueAtTime(qn(20,s),l+t);a.Q.value=i||1;const u=ds.createGain();u.gain.setValueAtTime(1e-4,l);u.gain.exponentialRampToValueAtTime(qn(1e-4,n),l+.005);u.gain.exponentialRampToValueAtTime(1e-4,l+t);f.connect(a).connect(u).connect(r||fs);f.start(l);f.stop(l+t+.02);vs++}function et(t,n,e){if(t<60)return;const o=fe(t/2200,.04,.55);nt(.03+.12*o,.7*o,"lowpass",300+1.6*t,140,1);t>380&&tt("triangle",120+.05*t,44,.1+.12*o,.8*o);if(n>1){const t=Rs[Ye%4],n=Pn(0|e),s=64+t[(n>>5)%t.length]+12*(n>>9&1);tt("sine",Es(s),1.5*Es(s),.17,.55*o);tt("triangle",Es(s+12),0,.1,.3*o)}else n&&tt("sine",90,42,.25,.5*o)}function ot(t){const n=1/(1+.5*t);nt(.3*n,.45*n,"bandpass",2600*(1+.3*t),300,1.4);tt("triangle",160*(1+.22*t),38,.34*n,.5*n);nt(.09,.3*n,"highpass",4e3,9e3,1)}function st(t){const n=76+12*t|0;tt("square",Es(n),Es(n+7),.07,.13);tt("triangle",Es(n+12),0,.13,.1)}function it(){pt(72,[0,4,7,12,16,19],.45,.13,"square",.04,12);nt(.7,.24,"bandpass",700,6e3,.8);tt("sine",90,300,.4,.3)}function rt(t){const n=fe(t/2600,.16,.5);tt("sawtooth",150,780+.2*t,.22,.5*n);nt(.34,.7*n,"bandpass",700,4200,1.1);tt("sine",70,34,.3,.8*n)}function ct(t){tt("square",t?700:940,t?2e3:1680,.07,.16);nt(.05,.12,"highpass",2600,5200,1);t&&tt("sine",320,900,.16,.2)}function lt(t){const n=fe(t/1400,.12,.4);tt("sine",180+.1*t,700+.3*t,.1,n);tt("sine",700+.3*t,210,.22,.8*n)}function ft(t){if(t){tt("triangle",240,720,1.1,.13);nt(.06,.1,"bandpass",900,2400,3)}else{tt("sawtooth",900,190,.13,.26);nt(.1,.22,"bandpass",1800,500,2)}}function at(t){if(ds){hs&&hs.gain.setTargetAtTime(t&&!oo.m?.12:0,bs(),.03);t&&tt("square",1200,2400,.05,.1)}}function ut(t){const n=t<0;tt("sine",n?120:460,n?460:110,.5,.3);tt("triangle",n?240:700,n?700:200,.38,.12);nt(.4,.1,"lowpass",900,200,1)}function yt(){tt("sawtooth",2600,260,.1,.2);nt(.08,.18,"highpass",7e3,1400,2);tt("sine",90,240,.22,.26)}function ht(t){const n=74+2*Mn(t,14);tt("square",Es(n),0,.06,.1);tt("sine",Es(n+12),0,.1,.12)}function pt(t,n,e,o,s,i,r){if(!ds)return;const c=bs();n.forEach((n,l)=>tt(s,Es(t+n),r?Es(t+n+r):0,e,o,0,c+l*i))}function xt(){pt(72,As,.5,.12,"triangle",.045)}function dt(t){tt("triangle",Es(64+2*t),Es(76+2*t),.16,.16)}function vt(){pt(60,Rs[1],.5,.13,"sine",.06,12);nt(.9,.16,"bandpass",800,6e3,.8)}function gt(){pt(60,Rs[1],.7,.12,"sawtooth",.05,12);pt(84,As,1.5,.1,"sine",0);ds&&nt(1.2,.2,"bandpass",400,8e3,.7,0,bs()+.3)}function mt(){tt("square",1500,2600,.05,.09);tt("sine",900,1800,.1,.09)}function Et(){tt("triangle",Es(76),Es(83),.18,.12)}function Rt(){pt(62,[0,5,10],.12,.1,"square",.06,2)}function St(){tt("sine",150,70,.12,.18);nt(.06,.07,"lowpass",500,200,1)}function Tt(t){tt("sine",70+40*t,50,.18,.12+.18*t)}function bt(){pt(72,[0,-3,-6,-9,-12,-15,-18],.8,.1,"sawtooth",.04,-30);nt(1,.3,"lowpass",3e3,90,1);tt("sine",120,30,1.1,.3)}function At(t){tt("square",t?900:620,t?1200:500,.04,.07)}function Ot(){pt(48,[0,7,12,16,19],1.6,.1,"triangle",0);nt(1.4,.22,"bandpass",300,5e3,.6)}function Lt(){vs=0;if(!ds)return;const t=bs(),n=fe(Ne.sp/Kn,0,1),e=1===Ae&&Ne.al,o=(n,e,o)=>n.setTargetAtTime(e,t,o);o(hs.gain,Ne.ra&&!oo.m&&e?.1+.12*n:0,.04);o(xs.frequency,700+1.4*Ne.sp,.04);o(ps.frequency,90+.22*Ne.sp,.04);o(us.frequency,Le>.05?480:2===Ae?700:2e4,.1);o(as.gain,oo.m?0:1===Ae?.5:.34,.2);e?wt():gs=t+.1}function wt(){const t=40+5*Ye%11,n=Rs[Ye%4],e=Ss[Ye%3],o=fe(Ne.sp/1400,0,1.5)+(Be>0?.6:0),s=15/((88+7*Ye)*(Le>.5?.5:1)),i=Os[Ye],r=Ls[Ye],c=bs();for(let l=8;gs<c+.16&&l--;){const l=qn(gs,c),f=ms,a=15&f,u=f>>4,y=(2*u+(a>7?1:0))%n.length,h=t-12+n[y];if(i>>a&1){tt("sine",130,42,.17,.5,as,l);nt(.03,.12,"lowpass",900,200,1,as,l)}r>>a&1&&tt(e,Es(h),0,.2,.3,as,l);if(!a)for(const e of[0,3+(n[2]>3?1:0),7])tt("triangle",Es(t+n[y]+e),0,15*s,.1,as,l);o>.25&&1&a&&nt(.03,.04+.03*o,"highpass",7e3,6500,1,as,l);o>.5&&a%4==2&&nt(.09,.13,"bandpass",1900,900,1.2,as,l);if(o>.8&&!(1&a)){const o=Es(t+12+n[(3*f+u)%n.length]);tt(e,o,o,.1,.09,as,l)}ms++;gs=l+s}}function kt(t,n,e,o){eo.length>26&&eo.shift();eo.push({x:t,y:n,r:0,R:e,h:o,t:1})}function Ct(t,n,e,o,s,i,r,c){Je.length>420&&Je.shift();Je.push({x:t,y:n,vx:e,vy:o,l:s,L:s,h:i,k:r,s:c,a:he(0,Un),w:he(-9,9)})}function It(t,n,e,o,s,i,r,c){const l=void 0===i?$n[qe]:i,f=1===o?oo.e[3]:o;for(let o=0;o<e;o++){const e=he(0,Un),o=he(.3,1)*s;Ct(t,n,(r||0)+Fn(e)*o,(c||0)+Gn(e)*o,he(.18,.55),l+he(-18,18),f,he(1.4,3.6))}}function Nt(t,n){Ct(t,n,0,0,.4,$n[6],2,8);It(t,n,12,0,320,$n[6])}function Ut(t,n,e){for(let o=0;o<7;o++)t.e&te[o]&&It(n,e,5,0,240,$n[o]);Ct(n,e,0,0,.3,$n[t.c],2,6)}function Dt(t,n,e,o){to.push({x:t,y:n,t:e,h:o,l:1.15})}function Pt(t){for(let n=Je.length;n--;){const e=Je[n];if((e.l-=t)<=0)Je.splice(n,1);else{e.x+=e.vx*t;e.y+=e.vy*t;if(2!==e.k){e.vy+=400*t;e.vx*=.985;e.vy*=.985}4===e.k&&(e.a+=e.w*t)}}for(let n=eo.length;n--;){const e=eo[n];e.r+=(e.R-e.r)*Mn(1,9*t);(e.t-=2.2*t)<=0&&eo.splice(n,1)}for(let n=to.length;n--;){const e=to[n];e.y-=46*t;(e.l-=t)<=0&&to.splice(n,1)}for(let n=no.length;n--;)(no[n].t-=t)<=0&&no.splice(n,1)}function Mt(t){const n=Ao;Pe.x=ue(Pe.x,n?n.cx:Ne.x+fe(.12*Ne.vx,-180,180),n?3.5:7.5,t);Pe.y=ue(Pe.y,n?n.cy:Ne.y+fe(.24*Ne.vy,-117.8,155),n?3.5:7.5,t);Pe.z=ue(Pe.z,n?.82:1/(1+Ne.sp/5200),4,t);be=Mn(Te/620,Se/846)*Pe.z;const e=qn(0,611-Se/2/be);Pe.x=fe(Pe.x,-e,e);we=qn(0,we-7*we*t-4*t);const o=Mn(we,24);Fs=he(-o,o);Bs=he(-o,o)}function qt(t){const n=Ks(Ye);for(let e=0;e<8;e++)Gs[e]=e%3||e>6?ue(Gs[e],n[e],1.6,t):Ys(Gs[e],n[e],1.6,t)}function Gt(){const t=Re.createLinearGradient(0,0,0,Te);t.addColorStop(0,ge(0|Gs[0],0|Gs[1],0|Gs[2]));t.addColorStop(1,ge(0|Gs[3],0|Gs[4],0|Gs[5]));Re.fillStyle=t;Re.fillRect(0,0,Se,Te);const n=Qs[Ye];Re.lineWidth=qn(1,2.4*be);for(let t=0;t<2;t++){const o=t?.4:.16,s=t?330:560,i=t?.085:.045,r=Pe.x*o,c=Pe.y*o,l=Se/2/be,f=Te/2/be,a=Hn((r+l)/s),u=Hn((c+f)/s);for(let t=Hn((c-f)/s);t<=u;t++)for(let o=Hn((r-l)/s);o<=a;o++){const l=e(31*o+n[0],17*t);if(l<.5)continue;const f=(o+.15+.7*e(o,t))*s,a=(t+.15+.7*e(t,o+9))*s,u=Gs[6]+60*(l-.5)|0;Re.fillStyle=ge(u,60,0|Gs[7],i);Re.strokeStyle=ge(u,70,0|Gs[7],2*i);Ft(n,Se/2+(f-r)*be,Te/2+(a-c)*be,s*(.16+.3*l)*be,l)}}}function Ft(t,n,o,s,i){const r=t[1],c=t[2];ws();if(t[0])if(t[0]<2){for(let t=0;t<r;t++){const l=t/r*Un+4*i,f=s*(c<0?.6+.5*e(t,99*i):1&t?c/10:1);qs(t,n+Fn(l)*f,o+Gn(l)*f)}Re.closePath();Re.fill()}else{const t=c<0?2.4:Un,e=Pn(c);for(let e=1;e<=r;e++){ws();Is(n,o,s*(1-.22*e),i*Un,i*Un+t);Re.stroke()}ws();for(let t=0;t<e;t++){const r=t/e*Un+.06*Oe*(i>.7?-1:1);Ns(n+Fn(r)*s*.5,o+Gn(r)*s*.5);Us(n+Fn(r)*s,o+Gn(r)*s)}Re.stroke()}else{const t=4+(4*i|0),r=o+.34*(s*=.58);for(let o=0;o<t;o++){const c=o/(t-1)-.5,l=s*(.3+.34*Fn(2.6*c)+.16*e(7*o,400*i)),f=n+c*s*1.7,a=r-l*(.72+.5*e(o,90*i));Ns(f+l,a);Is(f,a,l)}Ns(n-.95*s,r);Re.roundRect(n-.95*s,r-.34*s,1.9*s,.34*s,.17*s);Re.fill()}}function Bt(t){const n=t.m,e=n&ne?t.lt?6:5:2&n?0:4&n?1:8&n?2:32&n?3:16&n?4:-1;if(e<0)return 1&n?[ge(Gs[6]+30|0,92,48),ge(Gs[6]+40|0,100,80)]:[ge(0|Gs[6],52,19),ge(0|Gs[6],84,0|qn(58,Gs[7]))];const o=js[e];return[ge(o[0],o[1],o[2]),ge(o[0],o[3],o[4])]}function Wt(){const t=zs(0)-200,n=zs(Te)+200,e=qn(2,13*be),o=qn(1,5*be),s=ge(0|Gs[6],34,0|qn(4,.42*Gs[2]));Re.lineCap="round";for(const i of Ze){if(i.y+i.h<t||i.y>n)continue;const c=Hs(i.y),l=Hs(i.y+i.h);Re.fillStyle=s;for(const t of[-9e3,9e3]){ws();Ns(t,c);Us(Ws(t<0?i.pl:i.pr),c);Us(Ws(t<0?i.l:i.r),l);Us(t,l);Re.fill()}i.z&&Ht(i);for(const t of i.o){if(t.k)continue;r(t);const n=Bt(t),s=Ws(Mo),i=Hs(qo),c=t.f>0?t.f=qn(0,t.f-.05):0,l=t.kt>0?1:0;if(c||l){Re.save();Re.translate(s,i);Re.scale(1+.3*c,1+.3*c);Re.translate(-s,-i);l&&(Re.globalAlpha=.5+.5*Vn())}if(t.t){const s=Fn(Bo)*t.r,i=Gn(Bo)*t.r;Ds(Ws(Mo-s),Hs(qo-i),Ws(Mo+s),Hs(qo+i),e,n[0]);ks(o,n[1]);if(4&t.m){Re.setLineDash([6*be,7*be]);ks(qn(1,2*be),"hsl(48 100% 80% / .85)");Re.setLineDash([])}c&&ks(qn(1,(2+5*c)*be),ge(Gs[6]+30|0,100,85,c))}else{Ps(s,i,t.r*be,n[0],n[1],qn(1,(2.5+4*c)*be));1&t.m&&Ps(s,i,t.r*be*.55,0,n[1],qn(1,1.6*be));c&&Ps(s,i,(t.r+6+22*c)*be,0,ge(Gs[6]+30|0,100,80,c),qn(1,2*be))}if(c||l){Re.globalAlpha=1;Re.restore()}}for(const t of i.bk)if(t.l){const n=Ws(t.x),e=Hs(t.y)-46*be;for(let o=0;o<t.n;o++)Ps(n+13*(o-(t.n-1)/2)*be,e,4*be,o<t.l?"hsl(48 100% 68%)":"hsl(48 30% 32%)")}for(const t of i.i)t.g||Vt(t)}}function Ht(t){const n=qn(t.y,zs(0)-100),o=Mn(t.y+t.h,zs(Te)+100)-n;if(o<=0)return;const s=t.z,i=1===s?190:2===s?288:3===s?24:4===s?262:5===s?150:186,r=Oe*(3===s?60:6===s?320:200)*(1===s||4===s?-1:1);Re.lineCap="round";for(let s=0;s<24;s++){const c=e(13*s,0|t.y),l=ae(t.l+30,t.r-30,e(s,7)),f=n+((c*o+r)%o+o)%o;k(t,l,f);const a=Wn(_o,Jo);if(a<1)continue;const u=Mn(64,.05*a);Ds(Ws(l),Hs(f),Ws(l+_o/a*u),Hs(f+Jo/a*u),qn(1,2.2*be),ge(i,90,72,.16+.18*c))}}function Vt(t){const n=Ws(t.x),e=Hs(t.y),o=be,s=1+.12*Gn(3*Oe+.02*t.x),i=t.t;if(!i){Ps(n,e,9*o*s,oi,"hsl(38 100% 84%)",qn(1,2.2*o));return}if(3===i){for(let t=0;t<7;t++){const i=t/7*Un+.6*Oe;ws();Is(n,e,24*o*s,i,i+.8);ks(7*o,me(t,62))}Ps(n,e,13*o*s,"#fff");return}const r=1===i,c=2===i,l=c?t.c:oe[t.c][0],f=r?10:c?6:3,a=(r?16:c?12:15)*o*s;Re.save();Re.translate(n,e);Re.rotate(Oe*(r?.8:c?1.4:-1)+t.c);Ms(f,r?oi:c?me(l,58):l>6?"#fff":me(l,60),c?me(l,86):"#fff",qn(1,2*o),t=>{const n=t/f*Un,e=a*(r&&1&t?.44:1);qs(t,Fn(n)*e,Gn(n)*e)});Re.restore()}function zt(t,n){const e=[];for(let n=0;n<7;n++)t.e&te[n]&&e.push(n);if(e.length<2)return me(0|e[0],62,n);const o=Re.createLinearGradient(Ws(t.x1),Hs(t.y1),Ws(t.x2),Hs(t.y2));e.forEach((t,s)=>o.addColorStop(s/(e.length-1),me(t,64,n)));return o}function Yt(){Re.lineCap="round";for(const t of _e){const n=t.u?fe(t.l/.22,0,1):1,e=Ws(t.x1),o=Hs(t.y1),s=Ws(t.x2),i=Hs(t.y2);Ds(e,o,s,i,qn(4,22*be),zt(t,.18*n));ks(qn(3,15*be),"hsl(266 55% 5% / "+.8*n+")");ks(qn(2,10*be),zt(t,n));ks(qn(1,4*be),"hsl(0 0% 100% / "+.55*n+")");if(!t.u){Ps(e,o,(4.5+.8*Gn(4*Oe+t.x1))*be,0,me(t.c,80,.9),qn(1,2*be));const n=s-e,r=i-o,c=Wn(n,r);if(c>16){const e=n/c,o=r/c,l=9*be;Ms(3,me(t.c,78,.95),0,0,t=>{const n=[0,2.6,-2.6][t],r=Fn(n)*l,c=Gn(n)*l;qs(t,s+r*e-c*o,i+c*e+r*o)})}for(let n=1;n<t.n;n++)Ps((e+s)/2+8*n*be,(o+i)/2,2.6*be,"#fff")}if(t===Ne.ra){Re.setLineDash([4*be,9*be]);Re.lineDashOffset=90*-Oe*be;ks(qn(1,3*be),"hsl(190 100% 88% / .9)");Re.setLineDash([])}}for(const t of no){const n=t.t/.55;Ps(Ws(t.x),Hs(t.y),(6+26*(1-n))*be,0,"hsl(0 0% 100% / "+n+")",qn(1,3*be))}if(Ne.te){const t=Ws(Ne.te.x),n=Hs(Ne.te.y);Ps(t,n,Ne.te.l*be,0,me(3,60,.17),qn(1,1.4*be));Ds(t,n,Ws(Ne.x),Hs(Ne.y),qn(1,3.4*be),me(3,70));Ps(t,n,8*be,me(3,62));Ps(t,n,(12+3*Gn(9*Oe))*be,0,me(3,80,.8),qn(1,2*be))}}function Kt(){Re.lineCap="round";for(const t of eo){const n=fe(t.t,0,1);Ps(Ws(t.x),Hs(t.y),t.r*be,0,ge(0|t.h,100,78,.7*n),qn(1,5*n*be))}for(const t of Je){const n=fe(t.l/t.L,0,1),e=Ws(t.x),o=Hs(t.y);if(4===t.k){Re.save();Re.translate(e,o);Re.rotate(t.a);const s=t.s*be*(.4+.6*n);Ms(4,ge(0|t.h,70,38+26*n,n),ge(0|t.h,90,78,n),qn(1,1.2*be),t=>qs(t,[-1,.8,1.2,-.6][t]*s,[-.7,-1.1,.9,1][t]*s));Re.restore();continue}2===t.k?Ps(e,o,(1-n)*t.s*9*be,0,ge(0|t.h,100,75,n),qn(1,3*n*be)):Ds(e,o,e-t.vx*(t.k?.02:.012)*be,o-t.vy*(t.k?.02:.012)*be,qn(1,t.s*(t.k?1:n)*be),ge(0|t.h,t.k?70:100,t.k?55:68,n))}for(const t of to){const n=fe(t.l,0,1);_t(t.t,Ws(t.x),Hs(t.y),17*be/si,t.h<0?"hsl(0 0% 100% / "+n+")":ge(0|t.h,100,70,n),1)}}function Qt(){const t=$e.length?$e[$e.length-1]:0;if(!t||Wn(Ne.x-t.x,Ne.y-t.y)>7){$e.push({x:Ne.x,y:Ne.y,h:Be>0?-1:$n[qe]});for(;$e.length>26+fe(Ne.sp/34,0,34);)$e.shift()}}function jt(){const t=$e.length,n=oo.e[2];Re.lineCap="round";for(let e=1;e<t;e++){if(1===n&&e%2)continue;const o=e/t,s=$e[e-1],i=$e[e];Ds(Ws(s.x),Hs(s.y),Ws(i.x),Hs(i.y),qn(1,15*o*be*(2===n?.6+.8*Vn():1)),ge(0|(i.h<0?(400*Oe+26*e)%360:i.h),100,60+18*o,.8*o))}}function Xt(t,n,e,o){const s=e?"#fff":1===t?"hsl(268 40% 12%)":2===t?"hsl(190 100% 72%)":"hsl(300 40% 96%)",i=e?me(Hn(6*Oe)%7,70):2===t?"hsl(300 100% 70%)":"hsl(280 45% 62%)",r=Gn(13*Oe),c=Hn(5*Oe);Re.lineCap="round";ws();Ns(-13,0);for(let t=1;t<5;t++)Us(-13-6*t,Gn(9*Oe-.8*t)*(2+1.6*t));ks(5,me((c+2)%7,65));ks(2.4,me((c+5)%7,80));for(let t=0;t<4;t++){const n=15*(t>>1)-8,e=r*(1&t?1:-1)*(t>1?-1:1);ws();Ns(n,6);Us(n+5*e,15);Us(n+8*e+2,20);ks(3,s)}ws();Re.ellipse(0,0,17,11,0,0,Un);Cs(s);ks(2,i);ws();Ns(8,-6);Re.quadraticCurveTo(20,-14,25,-12);Re.quadraticCurveTo(31,-11,30,-5);Us(20,-1);Re.closePath();Cs(s);ks(2,i);for(let t=0;t<4;t++){ws();Ns(6+4*t,-7-t);Re.quadraticCurveTo(2+4*t,-16-1.5*t,9+4*t,-18-t);ks(3.4,me((c+t)%7,66))}Re.save();Re.translate(26,-12);Re.rotate(-.62);const l=1===o?24:15,f=Re.createLinearGradient(0,0,0,-l);f.addColorStop(0,me(0,65));f.addColorStop(1,me(n,82));Ms(3,f,"#fff",1.2,t=>qs(t,[-3,3,0][t],[0,0,-l][t]));if(!o)for(let t=0;t<4;t++){const n=t/4;Ds(6*n*.5-3,-l*n,3-6*n*.5,-l*n-2,1.1,me((c+t)%7,84))}2===o&&Ms(10,"#fff",me(n,88),1,t=>{const n=t/10*Un+2*Oe,e=1&t?2.4:6;qs(t,Fn(n)*e,-l+Gn(n)*e)});Re.restore();Ps(26,-8,1.7,1===Ae&&Ne.st>Jn?"#f44":"#2a1836")}function Zt(){const t=be,n=Ws(Ne.x),e=Hs(Ne.y);Re.save();Re.translate(n,e);Re.rotate(Ne.a);Re.scale(t,t);Xt(oo.e[0],qe,Be>0||Ne.ph>0,oo.e[1]);Re.restore();Ps(n,e,24*t,0,Ne.rp>0?"hsl(6 100% 62%)":me(qe,70,.55),qn(1,(Ne.rp>0?3:2)*t));if(Ne.st>Jn){const o=(Ne.st-Jn)/1.5;ws();Is(n,e,(33+4*Gn(22*Oe))*t,-Nn/2,-Nn/2+Un*(1-o));ks(qn(2,4*t),"hsl("+(30-30*o)+" 100% 60%)")}}function _t(t,n,e,o,s,i,r){Re.font=(i?"bold ":"")+(o*si|0)+"px monospace";Re.textAlign=r||"center";Re.textBaseline="middle";Re.fillStyle=s;Re.fillText(t,n,e)}function Jt(t,n,e,o,s,i,r){const c=ci(t,n,e,o);ii.push({x:t,y:n,w:e,h:o,fn:i});ri(t-e/2,n-o/2,e,o,8*si);Cs(c?r||ei:ni);ks(2*si,c?Js:ei);_t(s,t,n+si,15,c?Js:$s,1)}function $t(){for(const t of ii)if(ci(t.x,t.y,t.w,t.h)){At(1);t.fn();return 1}return 0}function tn(){const t=30*si,n=240*si,e=qn(Ne.y,0);Ps(t,t,9*si,oi);_t(We+(oo.c?" ("+(oo.c+We)+")":""),t+16*si,t,16,oi,1,"left");_t(0|He,Se-t,t,19,Js,1,"right");Ve>1.05&&_t("x"+Ve.toFixed(1),Se-t,t+22*si,15,me(2,70),1,"right");if(je>3){const n=1+.02*Mn(je,30),e=fe(Xe/1.6,0,1);_t(je+" CHAIN",Se-t,t+46*si,15*n,ge(48,100,60+je,e),1,"right")}Re.fillStyle=ti;Re.fillRect(Se/2-n/2,t+12*si,n,4*si);Re.fillStyle=ge(0|Gs[6],90,70);Re.fillRect(Se/2-n/2,t+12*si,n*fe(e%ee/ee,0,1),4*si);_t(uo[Ye][0]+(Qo(Ne.y)?" +"+Qo(Ne.y):""),Se/2,18*si,14,$s,1);_t((e/10|0)+"m",Se/2+n/2+24*si,t+14*si,13,ti,0,"left");nn();let o=0;for(let n=0;n<7;n++)Qe[n]>0&&_t(se[n]+" "+Qe[n].toFixed(1),Se-t,t+(30+16*o++)*si,12,oe[n][0]>6?Js:me(oe[n][0],70),1,"right");for(let n=0,e=0;n<re;n++)ce(n)&&_t(ie[2*n],t-12*si,(58+15*e++)*si,11,me(n%7,72),1,"left");Ke>0&&_t(uo[Ye][0],Se/2,.3*Te,42,"hsl(0 0% 100% / "+fe(Ke,0,1)*fe(3.2-Ke,0,1)+")",1);if(!oo.t){const t=["DRAG TO DRAW A RAINBOW RAIL","PRESS 1-7 OR SCROLL TO CHANGE COLOUR","PIGMENT IS FINITE - GRAB SHARDS"][fo];t&&_t(t,Se/2,Te-118*si,15,$s,1)}if(Le>.05){Re.fillStyle="hsl(275 60% 60% / "+.1*Le+")";Re.fillRect(0,0,Se,Te);_t("FOCUS VAULT",Se/2,Te-96*si,16,$s,1)}}function nn(){const t=44*si,n=Se/2-25*t/7,e=Te-40*si,o=26*si;for(let s=0;s<7;s++){const i=n+s*t*50/44,r=s===qe,c=Me[s]/Zn,l=i+t/2;ri(i,e-o/2,t,o,5*si);Cs("hsl(270 30% 8% / .8)");Re.save();Re.clip();Re.fillStyle=me(s,r?60:42,os===s&&ss>0?.4+.3*Gn(40*Oe):1);Re.fillRect(i,e+o/2-o*c,t,o*c);Re.restore();ri(i,e-o/2,t,o,5*si);ks((r?2.6:1.2)*si,r?Js:me(s,55,.8));_t("ROYGBIV"[s],l,e,r?15:12,r?Js:$s,1);_t(s+1,l,e-o/2-9*si,10,r?Js:ti);Ge&te[s]&&Ps(l,e+o/2+8*si,2.6*si,me(s,75));ii.push({x:l,y:e,w:t,h:o,fn:()=>yn(s)})}Fe>2&&_t(Fe+"/7",n-18*si,e,13,Js,1)}function en(){if(1!==Ae||lo||!Ne.al)return;const t=ro-Ne.x,n=co-Ne.y,e=Wn(t,n);e>Xn&&Ps(Ws(Ne.x+t/e*Xn),Hs(Ne.y+n/e*Xn),4*si,me(qe,60,.8))}function on(t,n,e,o,s,i){Re.fillStyle="hsl(275 45% 5% / .8)";Re.fillRect(0,0,Se,Te);if(t){ri(Se/2-t*si/2,Te/2-n*si/2,t*si,n*si,14*si);Cs("hsl(272 40% 9% / .96)");ks(2*si,ei);_t(e,Se/2,Te/2-(n/2-34)*si,27,Js,1)}for(let t=0;t<o.length;t++)_t(o[t],Se/2,Te/2-(n/2-78)*si+22*t*si,i||13.5,$s,i?1:0);for(const t of s)Jt(Se/2+t[0]*si,Te/2+t[1]*si,t[2]*si,40*si,t[3],t[4],t[5])}function sn(){oo.m^=1;ls&&(ls.gain.value=oo.m?0:.8);xn()}function rn(){on(0,0,0,[],[[0,-30,190,"PLAY",dn,"hsl(300 80% 55%)"],[-105,26,130,"STORE",()=>{Ae=4}],[105,26,130,oo.m?"UNMUTE":"MUTE",sn]]);const t=.3*Te;for(let n=0;n<7;n++){Re.font="bold "+(66*si|0)+"px monospace";Re.textAlign="center";Re.fillStyle=me(n,60,.5);Re.fillText("PRISMFALL",Se/2+5*Gn(1.2*Oe+.5*n)*si,t+2.4*(n-3)*si)}_t("PRISMFALL",Se/2,t,66,Js,1);_t("you never steer the unicorn - you draw the physics",Se/2,t+46*si,15,$s);["DRAG near the unicorn - drawings STAY until used - longer = stronger","R push - O aim - Y spring - G tether - B rail - I gravity - V warp",0,"X lets go - 1-7 or SCROLL picks a colour"].forEach((t,n)=>t&&_t(t,Se/2,Te-122*si+19*n*si,13,1===n?$s:n>2?ti:Js,!n));const n=Re.createLinearGradient(Se/2-300*si,0,Se/2+300*si,0);for(let t=0;t<7;t++)n.addColorStop(t/6,me(t,68));_t("CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs",Se/2,Te-84*si,13,n,1);Cn(Se/2,.3*Te-74*si),In(Se-190*si,Te/2-40*si);oo.b&&_t("BEST "+oo.b+"   DEPTH "+(oo.d/10|0)+"m   COINS "+oo.c,Se/2,Te/2+82*si,14,ti)}function cn(){on(470,330,"RUN OVER",["SCORE   "+(0|He),"DEPTH   "+(ze/10|0)+"m","REGION  "+uo[Ye][0],"COINS   +"+We,"BEST    "+oo.b,He>=oo.b&&He?"NEW BEST!":""],[[0,62,210,"RETRY  (R)",dn,"hsl(300 80% 55%)"],[-105,114,130,"STORE",()=>{Ae=4}],[105,114,130,"MENU",()=>{Ae=0}]],16)}function ln(){Re.fillStyle="hsl(275 45% 5% / .86)";Re.fillRect(0,0,Se,Te);const t=Te/2;for(let n=0;n<7;n++){Re.font="bold "+(44*si|0)+"px monospace";Re.textAlign="center";Re.fillStyle=me(n,60,.45);Re.fillText("PRISM ASCENSION",Se/2+4*Gn(1.6*Oe+.5*n)*si,t-168*si+1.8*(n-3)*si)}_t("PRISM ASCENSION",Se/2,t-168*si,44,Js,1);_t("DESCENT "+(descent+1)+" DONE - the shaft begins again, harder",Se/2,t-128*si,15,$s);_t("TAKE ONE. IT IS YOURS FOR THE REST OF THE RUN.",Se/2,t-104*si,13,ti);dsel=-1;const n=300*si,e=190*si;for(let o=0;o<draft.length;o++){const s=draft[o],i=Se/2+(o-(draft.length-1)/2)*(n+26*si),r=t+4*si,c=ci(i,r,n,e);c&&(dsel=o);ri(i-n/2,r-e/2,n,e,14*si);Cs(c?"hsl(285 45% 17% / .98)":"hsl(272 40% 10% / .96)");ks((c?3:1.6)*si,c?Js:me(s%7,60));ri(i-n/2+16*si,r-e/2+16*si,n-32*si,5*si,3*si);Cs(me(s%7,62));_t(ie[2*s],i,r-34*si,21,Js,1);const l=ie[2*s+1].split(" ");let f="",a=0;Re.font=(13*si|0)+"px monospace";for(let t=0;t<=l.length;t++){const e=f?f+" "+l[t]:l[t];if(t<l.length&&Re.measureText(e).width<n-44*si)f=e;else{_t(f,i,r+(4+19*a++)*si,13,$s);f=l[t]||""}}_t("PRESS "+(o+1),i,r+e/2-22*si,12,c?Js:ti,1);ii.push({x:i,y:r,w:n,h:e,fn:()=>mn(o)})}}function fn(){on(340,296,"PAUSED",[],[[0,-40,200,"RESUME",()=>{Ae=1}],[0,8,200,"RESTART  (R)",dn],[0,56,200,oo.m?"UNMUTE":"MUTE",sn],[0,104,200,"QUIT RUN",()=>{vn();Ae=3}]])}function an(){on(560,470,"PRISM STORE",[oo.c+" COINS - cosmetics only, never power"],[[0,200,150,"BACK",li]],14);fi=-1;const t=Se/2-240*si;for(let n=0;n<12;n++){const e=n/3|0,o=n%3,s=t+150*o*si,i=Te/2-118*si+48*e*si,r=_s(e,o),c=oo.e[e]===o,l=ci(s+66*si,i,140*si,38*si);if(l){fi=e;ai=o}ri(s,i-19*si,140*si,38*si,7*si);Cs(c?ei:r?ni:"hsl(275 25% 10%)");ks((c?2.4:1)*si,c||l?Js:ti);_t(Xs[n],s+66*si,i-5*si,11,r?Js:$s,1);_t(r?c?"EQUIPPED":"EQUIP":Zs[o]+"c",s+66*si,i+9*si,10,r?ti:oo.c<Zs[o]?"hsl(0 60% 60%)":oi);ii.push({x:s+66*si,y:i,w:140*si,h:38*si,fn:()=>un(e,o)})}Re.save();Re.translate(Se/2,Te/2+122*si);Re.scale(1.9*si,1.9*si);Xt(0===fi?ai:oo.e[0],Hn(3*Oe)%7,0,1===fi?ai:oo.e[1]);Re.restore()}function un(t,n){if(_s(t,n)){oo.e[t]=n;xn()}else if(oo.c>=Zs[n]){oo.c-=Zs[n];oo.o|=1<<3*t+n;oo.e[t]=n;xn();Rt()}else St()}function yn(t){if((t=(t+7)%7)!==qe){qe=t;At(1);It(Ne.x,Ne.y,6,0,130,$n[t]);if(1===fo){fo=2;ao=0}}}function hn(){const t=Mn(devicePixelRatio||1,2);Se=Ee.width=innerWidth*t|0;Te=Ee.height=innerHeight*t|0;si=Mn(Se/1280,Te/720)}function pn(t){const n=Se/innerWidth;so=t.clientX*n;io=t.clientY*n;ro=Vs(so);co=zs(io)}function xn(){try{localStorage[le]=[oo.c,oo.b,oo.d,oo.o,oo.m,oo.t].concat(oo.e).join()}catch(t){}}function dn(t){$();Ae=1;He=0;We=0;Ve=1;ze=0;Ye=0;Ke=3.2;Ge=0;Fe=0;es=0;Be=0;je=0;Xe=0;hi=0;Le=0;Ao=null;we=0;ke=0;Ie=0;boon=0;draft=[];dsel=-1;descent=0;Me=[Zn,Zn,Zn,Zn,Zn,Zn,Zn];Qe=[0,0,0,0,0,0,0];_e=[];Je=[];$e=[];to=[];no=[];eo=[];lo=null;Ne.x=0;Ne.y=-320;Ne.vy=300;Ne.a=Nn/2;Ne.ra=null;Ne.te=null;Ne.ph=0;Ne.rp=0;Ne.st=0;Ne.gt=0;Ne.al=1;Ne.sp=300;Ne.rw=0;Ue=0;De=Yn;Pe.x=Ne.x;Pe.y=Ne.y;Pe.z=1;Gs=Ks(0);O(t);Ne.vx=he(-70,70);fo=oo.t?3:0;ao=0;ms=0;ds&&(gs=ds.currentTime+.05);at(0)}function vn(){oo.c+=We;oo.b=qn(oo.b,0|He);oo.d=qn(oo.d,0|ze);oo.t||(oo.t=1);xn();at(0);wn(0|He,0|ze)}function gn(){const t=[];for(let n=0;n<re;n++)ce(n)||t.push(n);if(t.length){draft=[t.splice(Hn(n()*t.length),1)[0]];t.length&&draft.push(t[Hn(n()*t.length)]);dsel=-1;Ae=5;ke=1;Ce=-1;gt()}else descent++}function mn(t){if(!(5!==Ae||t>=draft.length)){boon|=1<<draft[t];descent++;Ae=1;for(let t=0;t<7;t++)Me[t]=rs();He+=5e3*Ve|0;Dt(Ne.x,Ne.y-40,ie[2*draft[t]],-1);draft=[];vt()}}function En(){Ne.al=0;hi=1.3;for(let t=0;t<7;t++)It(Ne.x,Ne.y,16,0,520,$n[t]);Ct(Ne.x,Ne.y,0,0,.7,-1,2,22);we=30;ke=.7;Ce=-1;bt();Ne.ra&&N(0);Ne.te&&D();0!==Ae&&vn()}function Rn(t){L();Ao=null;for(const t of Ze)t.v&&Ne.y>t.y+120&&Ne.y<t.y+t.h-120&&(Ao=t);const n=Le;Le=ue(Le,Ao?1:0,3.5,t);if(n>.5&&Le<=.5){It(Ne.x,Ne.y,14,0,420,$n[6]);ct(1)}Ne.al&&Sn(t);W(t);if(1===Ae&&Qo(Ne.y)>descent&&Ne.al){gn();return}const e=Ko(Ne.y);if(e!==Ye){Ye=e;Ke=3.2;ke=qn(ke,.35);Ce=po(Ye);Ot();He+=500*Ve|0}if(Ne.y>ze){He+=.05*(Ne.y-ze)*Ve;ze=Ne.y}Ve=fe(1+Ne.sp/950+.2*Fe+(Be>0?2:0),1,12);if(Ne.al){const n=2.4*(ce(5)?1.8:1);if(Ne.sp<118){Ne.st+=t;const e=fe((Ne.st-Jn)/(n-Jn),0,1);if((pi-=t)<=0&&e>0){pi=qn(.16,.55-.4*e);Tt(e)}Ne.st>n&&En()}else if(Ne.st>0){Ne.st>Jn&&It(Ne.x,Ne.y,8,0,260,$n[0]);Ne.st=qn(0,Ne.st-2.6*t)}}else{hi-=t;if(hi<=0)if(0===Ae){dn();Ae=0}else Ae=3}Ke-=t;ss-=t;Be-=t;for(let n=0;n<7;n++)Qe[n]-=t;Xe>0&&(Xe-=t)<=0&&(je=0);if(es>0&&(es-=t)<=0){Ge=0;Fe=0}ke=qn(0,ke-2.4*t);for(let n=_e.length;n--;){const e=_e[n];e.u&&(e.l-=t);if(e.u&&e.l<=0||e.y2<Ne.y-2600){Ne.ra===e&&N(1);e===lo&&(lo=null);_e.splice(n,1)}}Pt(t);Ne.al&&Qt();if(!oo.t){ao+=t;if(2===fo&&ao>9){fo=3;oo.t=1;xn()}}}function Sn(t){ui+=t;let n=0;for(;ui>=xi&&n<8;){V(xi);ui-=xi;n++}n>=8&&(ui=0)}function Tn(){ii=[];si=Mn(Se/1280,Te/720);Gt();Wt();Yt();jt();Kt();Ne.al&&Zt();1!==Ae&&2!==Ae||tn();if(ke>.01){Re.fillStyle=Ce<0?"hsl("+(500*Oe%360|0)+" 100% 75% / "+.5*ke+")":ge(0|Ce,100,72,.45*ke);Re.fillRect(0,0,Se,Te)}Ae>1?[0,0,fn,cn,an,ln][Ae]():Ae||rn();en()}async function bn(t,n){try{const e=await t;if(e&&e.success)return e.data;Ti=(n||"call")+" failed: "+(e&&e.message||"no reason given");return null}catch(t){Ti=(n||"call")+" threw: "+String(t&&t.message).slice(0,60);return null}}async function An(){const t=di();if(!t||!t.getOrCreateLeaderboard)return;const n=t.LeaderboardSortOrder?t.LeaderboardSortOrder.DESC:1,e=t.LeaderboardDisplayType?t.LeaderboardDisplayType.NUMERIC:0,o=await bn(t.getOrCreateLeaderboard("prismfall-score",n,e),"score board"),s=await bn(t.getOrCreateLeaderboard("prismfall-depth",n,e),"depth board");o&&(mi=o.id);s&&(Ei=s.id);mi||(Ti=Ti||"no leaderboard id");Ln()}function On(t){const n=di();try{const e=n.getUserAvatarUrl?n.getUserAvatarUrl(t,n.AvatarSize?n.AvatarSize.MEDIUM:1):vi.avatarUrl;if(!e)return;const o=new Image;o.crossOrigin="anonymous";o.onload=()=>{gi=o};o.src=e}catch(t){}}async function Ln(){const t=di();if(!t||!mi||bi)return;bi=1;const n=await bn(t.listLeaderboardEntries(mi,0,8,0),"list");if(n){Ri=n.map(t=>[t.globalRank,t.username||"player",t.score]);Ti=Ri.length?"":"be the first to post a score"}const e=await bn(t.getMyLeaderboardEntries(mi),"my entries");e&&e.length&&(Si=0|e[0].globalRank);bi=0}function wn(t,n){const e=di();if(!e||!mi||!t)return;const o={region:uo[Ye][0],depth:n/10|0,descents:descent,boons:ie.filter((t,n)=>!(1&n)&&ce(n>>1)).join(",")||"none"};bn(e.uploadLeaderboardScore(mi,t,1,void 0,o),"upload").then(t=>{if(t){Si=0|t.globalRank;Ti="rank #"+Si}Ln()});Ei&&bn(e.uploadLeaderboardScore(Ei,0|n,1));kn("Run over","Scored "+t)}function kn(t,n){const e=di();try{e&&e.updateUserPresence&&e.updateUserPresence({status:t,details:n||""})}catch(t){}}function Cn(t,n){if(!vi)return;const e=17*si,o=vi.username||"player";if(gi){Re.save();ws();Is(t-62*si,n,e);Re.clip();Re.drawImage(gi,t-62*si-e,n-e,2*e,2*e);Re.restore()}else{Ps(t-62*si,n,e,me(o.charCodeAt(0)%7,46));_t(o[0].toUpperCase(),t-62*si,n,17,Js,1)}Ps(t-62*si,n,e,0,ei,2*si);_t(o,t-34*si,n-7*si,15,Js,1,"left");_t(Si?"GLOBAL RANK #"+Si:"UNRANKED",t-34*si,n+10*si,11,ti,0,"left")}function In(t,n){const e=250*si;ri(t-e/2,n-130*si,e,260*si,12*si);Cs("hsl(272 40% 9% / .8)");ks(1.4*si,ti);_t("GLOBAL TOP 8",t,n-108*si,13,Js,1);Ri.length&&Ti&&_t(Ti,t,n+110*si,10,ti);if(!Ri.length){const o=(Ti||"loading...").split(" ");let s="",i=0;Re.font=(11*si|0)+"px monospace";for(let r=0;r<=o.length;r++){const c=s?s+" "+o[r]:o[r];if(r<o.length&&Re.measureText(c).width<e-28*si)s=c;else{_t(s,t,n-30*si+15*i++*si,11,$s);s=o[r]||""}}return}Ri.forEach((o,s)=>{const i=n-78*si+24*s*si,r=vi&&o[1]===vi.username;_t("#"+o[0],t-e/2+16*si,i,12,r?oi:ti,r,"left");_t(o[1].slice(0,12),t-e/2+54*si,i,12,r?Js:$s,r,"left");_t(o[2],t+e/2-16*si,i,12,r?oi:$s,r,"right")})}const Nn=Math.PI,Un=2*Nn,Dn=Math,Pn=Dn.abs,Mn=Dn.min,qn=Dn.max,Gn=Dn.sin,Fn=Dn.cos,Bn=Dn.atan2,Wn=Dn.hypot,Hn=Dn.floor,Vn=Dn.random,zn=17,Yn=1250,Kn=2900,Qn=400,jn=545,Xn=305,Zn=100,_n=[.088,.055,.062,.07,.05,.076,.095],Jn=.9,$n=[0,32,54,140,200,248,312],te=[1,2,4,8,16,32,64],ne=64,ee=15e3,oe=[[0,1.5,10],[2,1.5,11],[3,1.7,12],[4,2,12],[5,1.9,11],[6,1.9,11],[7,.4,12]],se="OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY".split(" "),ie="PRISM HEART|+30% pigment, refilled|AFTERGLOW|strokes cost 30% less|MOMENTUM|far less drag at speed|DEMOLITION|panels break at half the hit|LODESTONE|coins always pull to you|SECOND WIND|stall clock +80%|RESONANCE|bumpers pay double|WIDE PALETTE|+2 stroke slots|HARD LIGHT|strokes fire twice|GOLDEN HOUR|coins worth triple".split("|"),re=ie.length>>1,ce=t=>boon>>t&1,le="pf26_save",fe=(t,n,e)=>t<n?n:t>e?e:t,ae=(t,n,e)=>t+(n-t)*e,ue=(t,n,e,o)=>ae(t,n,1-Dn.exp(-e*o));let ye=1;const he=(t,e)=>t+n()*(e-t),pe=(t,e)=>Hn(t+n()*(e-t+1)),xe=t=>n()<t,de=t=>t[Hn(n()*t.length)],ve=()=>n()<.5?-1:1,ge=(t,n,e,o)=>"hsl("+t+" "+n+"% "+e+"%"+(void 0===o?"":" / "+o)+")",me=(t,n,e)=>ge($n[t],100,n,e),Ee=document.getElementById("a"),Re=Ee.getContext("2d");let Se=0,Te=0,be=1,Ae=0,Oe=0,Le=0,we=0,ke=0,Ce=0,Ie=0;const Ne={x:0,y:0,vx:0,vy:0,a:0,sp:0,ra:null,rt:0,rs:1,rw:0,te:null,ph:0,rp:0,st:0,gt:0,al:1};let Ue=0,De=Yn;const Pe={x:0,y:0,z:1,tz:1};let Me=[],qe=1,Ge=0,Fe=0,Be=0,We=0,He=0,Ve=1,ze=0,Ye=0,Ke=0,Qe=[],je=0,Xe=0,Ze=[],_e=[],Je=[],$e=[],to=[],no=[],eo=[];const oo={c:0,b:0,d:0,o:0,e:[0,0,0,0],m:0,t:0};let so=0,io=0,ro=0,co=0,lo=null,fo=0,ao=0;const uo=[["CLOUDBREAK",206,74,88,26,"0002100210",5,1,5,40],["SUNFORGE",12,34,72,19,"8574185741",7,3,4,196],["VERDANT COIL",152,-74,74,17,"2622762262",8,5,6,320],["CRYSTAL CURRENT",190,44,84,15,"3303531333",5,6,7,25],["PRISM MINE",276,-28,62,10,"6760671666",9,2,6,120],["INVERSION TEMPLE",264,52,80,13,"6465264636",7,4,7,75],["RAINBOW ENGINE",300,-136,90,9,"0123456788",9,0,9,-1]],yo=[180,786794,131494,69971,693042,303957,414347],ho="120132410656",po=t=>uo[t][1],xo=t=>yo[t],vo=(t,n)=>(t>>16-4*n&15)/16,go=t=>t>5?[pe(0,6),pe(0,6)]:[+ho[2*t],+ho[2*t+1]],mo=t=>uo[t][7];let Eo=0,Ro=-400,So=Qn,To=0,bo=1,Ao=null,Oo=0,Lo=0,wo=0,ko=0,Co=0,Io=0;const No=(t,n,e,o,s)=>Object.assign({t:0,x:t,y:n,r:e,g:0,m:0|o},s),Uo=(t,n,e,o,s,i)=>Object.assign({t:1,x:t,y:n,r:e,g:o,m:0|s},i),Do=(t,n,e,o,s,i)=>Uo((t+e)/2,(n+o)/2,Wn(e-t,o-n)/2,Bn(o-n,e-t),s,i),Po=(t,n,e,o)=>({t,x:n,y:e,c:0|o,g:0});let Mo=0,qo=0,Go=0,Fo=0,Bo=0,Wo=0,Ho=0,Vo=0,zo=0,Yo=0;const Ko=t=>{const n=Hn(qn(t,0)/ee);return n<7?n:n%7},Qo=t=>Hn(Hn(qn(t,0)/ee)/7),jo=t=>fe(.085*Hn(qn(t,0)/ee)+.3*Qo(t),0,2.4);let Xo=-545,Zo=jn,_o=0,Jo=0,$o=[],ts=0;const ns=t=>2&t.m?280:4&t.m?20:8&t.m?285:Gs[6];let es=0,os=-1,ss=0;const is=()=>z(7)*(ce(1)?.7:1),rs=()=>ce(0)?130:Zn,cs=t=>.45+Mn(t,210)/105*.55;let ls,fs,as,us,ys,hs,ps,xs,ds=null,vs=0,gs=0,ms=0;const Es=t=>440*Dn.pow(2,(t-69)/12),Rs=[[0,2,3,5,7,8,10],[0,2,4,5,7,9,11],[0,3,5,7,10,12],[0,1,5,6,8,11]],Ss=["triangle","sawtooth","square"],Ts=()=>ds&&!oo.m&&vs<26,bs=()=>ds.currentTime,As=[0,4,7,12],Os=[4369,4437,4115,4369,4097,1298,21845],Ls=[34953,42149,37266,52429,33924,43177,43691],ws=()=>Re.beginPath(),ks=(t,n)=>{Re.lineWidth=t;Re.strokeStyle=n;Re.stroke()},Cs=t=>{Re.fillStyle=t;Re.fill()},Is=(t,n,e,o,s)=>Re.arc(t,n,e,o||0,void 0===s?Un:s),Ns=(t,n)=>Re.moveTo(t,n),Us=(t,n)=>Re.lineTo(t,n),Ds=(t,n,e,o,s,i)=>{ws();Ns(t,n);Us(e,o);ks(s,i)},Ps=(t,n,e,o,s,i)=>{ws();Is(t,n,e);o&&Cs(o);s&&ks(i,s)},Ms=(t,n,e,o,s)=>{ws();for(let n=0;n<t;n++)s(n);Re.closePath();n&&Cs(n);e&&ks(o,e)},qs=(t,n,e)=>(t?Us:Ns)(n,e);let Gs=[232,62,12,322,52,27,288,80],Fs=0,Bs=0;const Ws=t=>Se/2+(t-Pe.x)*be+Fs,Hs=t=>Te/2+(t-Pe.y)*be+Bs,Vs=t=>Pe.x+(t-Se/2-Fs)/be,zs=t=>Pe.y+(t-Te/2-Bs)/be,Ys=(t,n,e,o)=>(t+((n-t+540)%360-180)*(1-Dn.exp(-e*o))+360)%360,Ks=t=>{const n=uo[t],e=n[1],o=n[4],s=n[9];return[e,56,o,e+n[2],64,o+23,s<0?16*Oe%360:s,n[3]]},Qs=[[0,3,0],[2,1,8],[2,2,-3],[1,5,4],[1,7,-1],[2,3,6],[2,1,4]],js=[[276,40,7,60,26],[18,74,42,100,66],[292,60,30,100,74],[200,80,40,100,76],[140,70,34,100,70],[46,38,22,90,60],[46,100,60,100,92]],Xs="CLOUD SHADOW NEON SPIRAL LANCE STARTIP RAINBOW DASHED COMET SPARKS SHARDS RINGS".split(" "),Zs=[0,180,420],_s=(t,n)=>!n||oo.o>>3*t+n&1,Js="#fff",$s="hsl(0 0% 100% / .62)",ti="hsl(0 0% 100% / .34)",ni="hsl(282 40% 15% / .88)",ei="hsl(290 55% 50%)",oi="hsl(48 100% 66%)";let si=1,ii=[];const ri=(t,n,e,o,s)=>{ws();Re.roundRect(t,n,e,o,s)},ci=(t,n,e,o)=>so>t-e/2&&so<t+e/2&&io>n-o/2&&io<n+o/2,li=()=>{Ae=oo.b||He?3:0};let fi=-1,ai=-1;document.body.style.cssText="margin:0;overflow:hidden;background:#05030c";Ee.style.cssText="position:fixed;width:100%;height:100%";addEventListener("resize",hn);addEventListener("contextmenu",t=>t.preventDefault());addEventListener("pointermove",t=>{pn(t);lo&&K()});addEventListener("pointerdown",t=>{$();pn(t);t.button||$t()||1!==Ae||Y()});addEventListener("pointerup",()=>{lo=null});addEventListener("blur",()=>{lo=null;1===Ae&&(Ae=2)});addEventListener("wheel",t=>{if(1===Ae){t.preventDefault();yn(qe+(t.deltaY>0?1:-1))}},{passive:0});addEventListener("keydown",t=>{$();const n=t.key,e=n.toLowerCase();if(5!==Ae)if(n>"0"&&n<"8")yn(+n-1);else{"Escape"!==n&&"p"!==e||(Ae=1===Ae?2:2===Ae?1:4===Ae?(li(),Ae):Ae);"r"===e&&Ae>1&&5!==Ae&&dn();"m"===e&&sn();"x"===e&&(Ne.ra?N(1):Ne.te&&D());" "!==n&&"Enter"!==n||(2===Ae?Ae=1:Ae<4&&dn())}else"1"!==n&&"2"!==n||mn(+n-1)});document.addEventListener("visibilitychange",()=>{document.hidden&&1===Ae&&(Ae=2)});let ui=0,yi=0,hi=0,pi=0;const xi=1/120;!function(){try{const t=(localStorage[le]||"").split(",").map(Number);if(t.length<9||t.some(isNaN))return;oo.c=fe(0|t[0],0,1e9);oo.b=fe(0|t[1],0,1e12);oo.d=fe(0|t[2],0,1e12);oo.o=0|t[3];oo.m=t[4]?1:0;oo.t=t[5]?1:0;for(let n=0;n<4;n++){const e=0|t[6+n];oo.e[n]=e>0&&e<3&&_s(n,e)?e:0}}catch(t){}}();hn();dn();Ae=0;Ne.al=1;requestAnimationFrame(function t(n){requestAnimationFrame(t);const e=fe((n-yi)/1e3,0,.05);yi=n;let o=e*ae(1,.4,Le);if(Ie>0){Ie-=e;o*=.12}Oe+=o;1===Ae||0===Ae?Rn(o):3===Ae&&Pt(o);Mt(e);qt(e);Lt();Tn()});const di=()=>"undefined"!=typeof Wavedash?Wavedash:0;let vi=null,gi=null,mi=0,Ei=0,Ri=[],Si=0,Ti="",bi=0,Ai=0;!function t(){const n=di();if(n){try{n.init({deferEvents:1});n.readyForEvents();n.updateLoadProgressZeroToOne&&n.updateLoadProgressZeroToOne(1);n.loadComplete&&n.loadComplete()}catch(t){Ti="init failed: "+String(t&&t.message).slice(0,60);return}try{vi=n.getUser&&n.getUser();vi&&vi.avatarUrl&&On(vi.userId)}catch(t){}Ti="connected"+(vi?" as "+(vi.username||"?"):", no user");An();kn("In the shaft")}else{if(++Ai<40){Ti="waiting for the Wavedash SDK...";setTimeout(t,250);return}Ti="no SDK on this page - scores stay local"}}()})();</script></html>
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no"><title>PRISMFALL</title><style>html,body{margin:0;height:100%;background:#05030c;overflow:hidden}canvas{display:block}</style><canvas id=a></canvas><script>(() => {
+    function Y(Y) {
+        AF = Y >>> 0;
+    }
+    function B() {
+        AF = AF + 1831565813 | 0;
+        let Y = SE.imul(AF ^ AF >>> 15, 1 | AF);
+        Y = Y + SE.imul(Y ^ Y >>> 7, 61 | Y) ^ Y;
+        return ((Y ^ Y >>> 14) >>> 0) / 4294967296;
+    }
+    function C(Y, B) {
+        let C = SE.imul(Y | 0, 374761393) + SE.imul(B | 0, 668265263);
+        C = SE.imul(C ^ C >>> 13, 1274126177);
+        return ((C ^ C >>> 16) >>> 0) / 4294967296;
+    }
+    function D(Y, B, C, D, E, F) {
+        const H = C - Y, I = D - B, J = H * H + I * I;
+        return J ? RF(((E - Y) * H + (F - B) * I) / J, 0, 1) : 0;
+    }
+    function E(Y, B, C, D, E, F, H, I) {
+        const J = C - Y, K = D - B, L = H - E, M = I - F, N = J * M - K * L;
+        if (!N) {
+            return null;
+        }
+        const O = ((E - Y) * M - (F - B) * L) / N, P = ((E - Y) * K - (F - B) * J) / N;
+        return O >= 0 && O <= 1 && P >= 0 && P <= 1 ? [ Y + J * O, B + K * O ] : null;
+    }
+    function F(Y, B, C, D, E, F, H) {
+        const I = UE(3, (F - E) * D / 80 | 0);
+        for (let J = 0; J < I; J++) {
+            const K = WF(E, F, J / I), L = WF(E, F, (J + 1) / I);
+            Y.o.push(AJ(B + WE(K) * D, C + RE(K) * D, B + WE(L) * D, C + RE(L) * D, H));
+        }
+    }
+    function H(Y) {
+        YK = Y.x;
+        BK = Y.y;
+        CK = 0;
+        DK = 0;
+        EK = Y.g;
+        if (Y.os) {
+            const B = Y.os * NH + Y.op, C = RE(B), D = WE(B) * Y.os;
+            YK += Y.ox * C;
+            BK += Y.oy * C;
+            CK = Y.ox * D;
+            DK = Y.oy * D;
+        }
+        Y.w && (EK += Y.w * NH);
+    }
+    function I(Y, B, C) {
+        if (Y.w) {
+            CK += -Y.w * (C - BK);
+            DK += Y.w * (B - YK);
+        }
+    }
+    function J(Y, B) {
+        return BH(HJ(Y, 2)) ? 2 : B && BH(HJ(Y, 0)) ? 4 : BH(HJ(Y, 1)) ? 8 : BH(HJ(Y, 3)) ? 1 : 0;
+    }
+    function K(Y, B) {
+        if (!BH(HJ(Y, 4))) {
+            return null;
+        }
+        const C = ZF(0, QE);
+        return {
+            ox: WE(C) * B,
+            oy: RE(C) * B * .6,
+            os: ZF(.7, 2.1),
+            op: ZF(0, QE)
+        };
+    }
+    function L(Y, B, C) {
+        if (!Y.t) {
+            IK = B - YK;
+            JK = C - BK;
+            KK = AE(IK, JK);
+            if (KK < 1e-4) {
+                IK = 0;
+                JK = -1;
+                KK = 1e-4;
+            } else {
+                IK /= KK;
+                JK /= KK;
+            }
+            FK = YK + IK * Y.r;
+            HK = BK + JK * Y.r;
+            return Y.r;
+        }
+        const E = WE(EK) * Y.r, F = RE(EK) * Y.r, H = YK - E, I = BK - F, J = YK + E, K = BK + F, L = D(H, I, J, K, B, C);
+        FK = H + (J - H) * L;
+        HK = I + (K - I) * L;
+        IK = B - FK;
+        JK = C - HK;
+        KK = AE(IK, JK);
+        if (KK < 1e-4) {
+            IK = -RE(EK);
+            JK = WE(EK);
+            KK = 1e-4;
+        } else {
+            IK /= KK;
+            JK /= KK;
+        }
+        return 5;
+    }
+    function M(Y, B, C, D) {
+        for (const E of Y.o) {
+            YK = E.x;
+            BK = E.y;
+            EK = E.g;
+            if (L(E, B, C) + D > KK) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+    function N() {
+        const Y = KJ, B = LK(Y), C = NK(Y), D = FJ(B), E = ZE((Y + 1400) / OF) > ZE(Y / OF) && Y > 200, F = BH(.26) ? 120 : 0, H = RF(-400 + ZF(-90, 70) - F, -545, -300), I = RF(EF + ZF(-70, 90) + F, 300, FF), J = E ? 1240 : YH(760, 1080), K = {
+            y: Y,
+            h: J,
+            l: H,
+            r: I,
+            pl: LJ,
+            pr: MJ,
+            o: [],
+            i: [],
+            rg: B,
+            k: 0,
+            v: 0,
+            z: 0,
+            bk: []
+        };
+        K.o.push(AJ(LJ, Y, H, Y + J, 0), AJ(MJ, Y, I, Y + J, 0));
+        QJ = UE(LJ, H) + 30;
+        SJ = TE(MJ, I) - 30;
+        VJ = SJ - QJ;
+        TJ = (QJ + SJ) / 2;
+        UJ = D;
+        RJ = C;
+        if (E) {
+            Z(K);
+        } else if (NJ > 2 && BH(.1)) {
+            K.v = 1;
+            A(K, B);
+        } else {
+            const Y = +BJ[B][5][YH(0, 9)];
+            K.k = Y;
+            NJ > 1 && YH(0, 9) < BJ[B][8] && (K.z = JJ(B) || YH(1, 5));
+            Y === 1 || Y === 5 ? S(K, Y > 1 ? YH(2, 3) : 1, Y > 1 ? ZF(0, 26) : ZF(120, 210), K.y + K.h * ZF(.34, .6), 0) : [ Q, 0, V, T, U, 0, R, W, X ][Y](K);
+            O(K, BJ[B][6] + (C * 1.6 | 0));
+            YY(K, B);
+        }
+        K.i = K.i.filter(Y => !M(K, Y.x, Y.y, 10.2));
+        LJ = H;
+        MJ = I;
+        KJ = Y + J;
+        NJ++;
+        MI.push(K);
+        MI.length > 26 && MI.shift();
+        return K;
+    }
+    function O(Y, B) {
+        for (let C = B * 6; B > 0 && C--; ) {
+            const C = ZF(QJ + 44, SJ - 44), D = Y.y + ZF(.07, .93) * Y.h, E = BH(.58), F = ZF(13, 25), H = ZF(30, 76), I = ZF(0, PE), L = 48 + (E ? F : 5);
+            if (!M(Y, C, D, L)) {
+                if (!E) {
+                    const B = WE(I) * H, E = RE(I) * H;
+                    if (M(Y, C + B, D + E, L) || M(Y, C - B, D - E, L)) {
+                        continue;
+                    }
+                }
+                B--;
+                Y.o.push(E ? WJ(C, D, F, J(UJ, 0) | (BH(.5) ? 1 : BH(.3) ? NF : 0), K(UJ, 74)) : XJ(C, D, H, I, J(UJ, 1) | (BH(.22) ? 16 : 0), K(UJ, 62)));
+                Y.o[Y.o.length - 1].m & NF && P(Y, Y.o[Y.o.length - 1], 3);
+            }
+        }
+    }
+    function P(Y, B, C) {
+        let D = Y.bk[Y.bk.length - 1];
+        if (!D || D.n >= D.cap) {
+            D = {
+                n: 0,
+                l: 0,
+                cap: C,
+                x: B.x,
+                y: B.y,
+                m: []
+            };
+            Y.bk.push(D);
+        }
+        D.n++;
+        D.m.push(B);
+        B.bk = D;
+        B.m |= NF;
+    }
+    function Q(Y) {
+        const B = YH(4, 6), C = Y.h / (B + 1);
+        for (let D = 0; D < B; D++) {
+            const B = Y.y + C * (D + 1), E = YH(4, 7);
+            for (let C = 0; C < E; C++) {
+                Y.o.push(WJ(QJ + 44 + (C + (D & 1 ? .5 : 0)) / (E - .35) * (VJ - 88), B, ZF(14, 27), J(UJ, 0) | (BH(.45) ? 1 : BH(.25) ? NF : 0), K(UJ, 60)));
+                Y.o[Y.o.length - 1].m & NF && P(Y, Y.o[Y.o.length - 1], 3);
+            }
+        }
+    }
+    function S(Y, B, C, D, E) {
+        const F = J(UJ, 1), H = [];
+        for (let Y = 0; Y < B; Y++) {
+            H.push(QJ + (Y + ZF(.25, .75)) * VJ / B);
+        }
+        let I = QJ - 20, K = D - C;
+        for (let E = 0; E <= B; E++) {
+            const J = E === B, L = UE(100, ZF(125, 195) - RJ * 16), M = J ? SJ + 20 : H[E] - L / 2, N = J ? D - C : D + C;
+            M - I > 24 && Y.o.push(AJ(I, K, M, N, F));
+            !J && C > 40 && BH(.6) && Y.o.push(WJ(M, N, 15, 1));
+            I = J ? M : H[E] + L / 2;
+            K = D + C;
+        }
+        if (!E) {
+            for (let B = 0; B < 4; B++) {
+                Y.i.push(ZJ(0, H[0] + ZF(-26, 26), D + C + 70 + B * 46));
+            }
+            Y.i.push(ZJ(BH(.35) ? 2 : 1, H[B - 1], D - C - 70, CH(IJ(Y.rg))));
+        }
+    }
+    function V(Y) {
+        const B = TE(VJ * .42, 280), C = TJ + ZF(-.2, .2) * VJ, D = Y.y + Y.h * .58, E = B * WE(.12 * PE);
+        F(Y, C, D, B, .12 * PE, .88 * PE, BH(.35) ? 2 : 0);
+        Y.o.push(WJ(C - E, D, 15, 1), WJ(C + E, D, 15, 1));
+        Y.i.push(ZJ(BH(.3) ? 1 : 2, C, D + B * .55, CH(IJ(Y.rg))));
+        BH(.6) && Y.o.push(XJ(C, Y.y + Y.h * .18, ZF(60, 120), ZF(-.4, .4), 1, K(UJ, 90)));
+    }
+    function T(Y) {
+        const B = UE(135, 250 - RJ * 30), C = TJ + ZF(-.22, .22) * VJ, D = ZF(-90, 90);
+        Y.o.push(AJ(C - B / 2, Y.y, C - B / 2 + D, Y.y + Y.h, 32));
+        Y.o.push(AJ(C + B / 2, Y.y, C + B / 2 + D, Y.y + Y.h, 32));
+        for (let B = 0; B < 7; B++) {
+            Y.i.push(ZJ(0, C + D * (B / 7) + ZF(-30, 30), Y.y + 80 + B * (Y.h - 160) / 6));
+        }
+        if (BH(.6)) {
+            const B = C < TJ ? SJ - 70 : QJ + 70, D = BH(.45);
+            Y.i.push(ZJ(D ? 2 : 4, B, Y.y + Y.h * .5, D ? CH(IJ(Y.rg)) : YH(0, 6)));
+        }
+    }
+    function U(Y) {
+        const B = YH(1, 2);
+        for (let C = 0; C < B; C++) {
+            const D = TJ + ZF(-.25, .25) * VJ, E = Y.y + Y.h * (B === 1 ? .5 : .3 + C * .42), F = YH(2, 3), H = TE(VJ * .34, 210), I = DH() * ZF(.9, 1.9 + RJ * .3);
+            for (let B = 0; B < F; B++) {
+                Y.o.push(XJ(D, E, H, B * PE / F, 1, {
+                    w: I
+                }));
+            }
+            Y.o.push(WJ(D, E, 18, 0));
+            Y.i.push(ZJ(0, D, E - H - 40), ZJ(0, D, E + H + 40));
+        }
+    }
+    function R(Y) {
+        const C = Y.y + Y.h * .16, D = Y.y + Y.h * .86;
+        S(Y, 1, 0, C, 1);
+        S(Y, 1, 0, D, 1);
+        const E = YH(4, 7);
+        for (let F = 0; F < E; F++) {
+            const E = QJ + ZF(.12, .88) * VJ, F = WF(C + 60, D - 60, B());
+            M(Y, E, F, 66) || (BH(.45) ? Y.o.push(WJ(E, F, ZF(16, 30), BH(.5) ? 1 : 16, K(UJ, 80))) : Y.o.push(XJ(E, F, ZF(46, 96), ZF(0, PE), J(UJ, 1) | (BH(.3) ? 32 : 0), K(UJ, 70))));
+        }
+        const F = TJ, H = (C + D) / 2, I = TE(VJ * .3, 190);
+        for (let B = 0; B < 4; B++) {
+            const C = B / 4 * QE + ZF(0, 1), D = F + WE(C) * I, E = H + RE(C) * I * .7;
+            M(Y, D, E, 62) || Y.o.push(WJ(D, E, ZF(13, 21), 1, K(UJ, 56)));
+        }
+        Y.i.push(ZJ(BH(.25) ? 1 : 2, BH(.5) ? QJ + 55 : SJ - 55, (C + D) / 2, CH(IJ(Y.rg))));
+    }
+    function W(Y) {
+        const B = YH(2, 3);
+        for (let C = 0; C < B; C++) {
+            const D = Y.y + Y.h * (.2 + C * .62 / B + ZF(-.04, .04)), E = YH(3, 5), F = TE(VJ * .74, 330), H = TJ - F / 2 + ZF(-40, 40), I = {
+                n: E,
+                l: 0,
+                cap: E,
+                x: TJ,
+                y: D,
+                m: []
+            };
+            Y.bk.push(I);
+            for (let B = 0; B < E; B++) {
+                const C = XJ(H + (B + .5) * F / E, D, 30, PE / 2 + ZF(-.2, .2), NF);
+                C.bk = I;
+                I.m.push(C);
+                Y.o.push(C);
+            }
+            Y.o.push(WJ(H - 42, D, 20, 1), WJ(H + F + 42, D, 20, 1));
+            for (let B = 0; B < E; B++) {
+                Y.i.push(ZJ(0, H + (B + .5) * F / E, D - 54));
+            }
+        }
+        Y.i.push(ZJ(BH(.4) ? 4 : 2, TJ + ZF(-.3, .3) * VJ, Y.y + Y.h * .92, YH(0, 6)));
+    }
+    function X(Y) {
+        const B = TE(VJ * .8, 380), C = TJ + ZF(-.1, .1) * VJ, D = YH(3, 4);
+        for (let E = 0; E < D; E++) {
+            const F = Y.y + Y.h * (.14 + E * .74 / D), H = C + ZF(-.34, .34) * B, I = UE(86, 150 - RJ * 20);
+            for (const D of [ -1, 1 ]) {
+                const E = D < 0 ? C - B / 2 : C + B / 2, J = H + D * I / 2;
+                VE(E - J) > 30 && Y.o.push(AJ(J, F, E, F + ZF(-14, 14), 4));
+            }
+            Y.o.push(XJ(H, F + Y.h * .37 / D, TE(B * .34, 150), ZF(0, PE), 1, {
+                w: DH() * ZF(.8, 1.7 + RJ * .4)
+            }));
+            Y.i.push(ZJ(0, H, F + 40), ZJ(0, H + ZF(-30, 30), F + 86));
+        }
+        Y.i.push(ZJ(BH(.5) ? 1 : 4, C, Y.y + Y.h * .96, YH(0, 6)));
+    }
+    function A(Y, B) {
+        const C = TJ, D = Y.y + Y.h * .5, E = TE(VJ * .38, 250);
+        Y.cx = C;
+        Y.cy = D;
+        F(Y, C, D, E, .78 * PE, 2.16 * PE, 1);
+        const H = BH(.4);
+        for (let B = 0; B < 3; B++) {
+            Y.o.push(XJ(C, D, E * .46, B * PE / 3, 1, {
+                w: DH() * .55
+            }));
+        }
+        Y.i.push(ZJ(H ? 3 : 1, C, D - E * .72));
+        Y.i.push(ZJ(2, C - E * .6, D + E * .3, CH(IJ(B))));
+        Y.i.push(ZJ(2, C + E * .6, D + E * .3, YH(0, 6)));
+        for (let B = 0; B < 6; B++) {
+            Y.i.push(ZJ(0, C + WE(B / 6 * QE) * E * .78, D + RE(B / 6 * QE) * E * .78));
+        }
+    }
+    function Z(Y) {
+        const B = TJ, C = Y.y + Y.h * .4;
+        U(Y);
+        S(Y, 1, 0, C + 300, 1);
+        Y.o.push(WJ(B, C, 26, 1));
+        for (let D = 0; D < 7; D++) {
+            Y.i.push(ZJ(2, B + 74 * (D - 3), C + 420, D));
+        }
+        Y.i.push(ZJ(1, B, Y.y + 150));
+    }
+    function YY(Y, B) {
+        const C = IJ(B), D = BJ[B][6] / 6, E = (B, C, D, E) => {
+            for (let F = 0; F < 10; F++) {
+                const F = ZF(QJ + 45, SJ - 45), H = Y.y + ZF(D, E) * Y.h;
+                if (!M(Y, F, H, 34)) {
+                    Y.i.push(ZJ(B, F, H, C));
+                    return;
+                }
+            }
+        };
+        if (BH(.75)) {
+            const B = YH(5, 9), C = QJ + ZF(.1, .5) * VJ, D = Y.y + ZF(.15, .5) * Y.h, E = DH(), F = ZF(150, 330), H = ZF(-190, 240);
+            for (let I = 0; I < B; I++) {
+                const J = I / (B - 1), K = C + E * F * J, L = D + H * RE(J * PE) + J * 150;
+                K > QJ + 25 && K < SJ - 25 && !M(Y, K, L, 26) && Y.i.push(ZJ(0, K, L));
+            }
+        }
+        BH(.62 * D) && E(2, BH(.7) ? CH(C) : YH(0, 6), .15, .85);
+        BH(.3 * D) && E(BH(.3) ? 4 : 1, YH(0, 6), .02, .16);
+        BH(.16 * D) && E(4, YH(0, 6), .3, .8);
+        if (BH(.24 * D)) {
+            const B = BH(.5) ? QJ + 90 : SJ - 90, C = Y.y + ZF(.25, .7) * Y.h;
+            for (let D = 0; D < 4; D++) {
+                Y.o.push(XJ(B + (D < 2 ? 0 : D > 2 ? 62 : -62), C + (D < 2 ? D ? 62 : -62 : 0), 62, D < 2 ? PE / 2 : 0, 4));
+            }
+            Y.i.push(ZJ(0, B, C), ZJ(0, B - 34, C), ZJ(0, B + 34, C), ZJ(BH(.4) ? 1 : 2, B, C - 34, YH(0, 6)));
+        }
+    }
+    function BY(B) {
+        OJ = B || YF() * 1e9 | 0;
+        Y(OJ);
+        MI = [];
+        KJ = -900;
+        LJ = -400;
+        MJ = EF;
+        NJ = 0;
+        PJ = null;
+        const C = {
+            y: -900,
+            h: 1400,
+            l: -400,
+            r: EF,
+            pl: -400,
+            pr: EF,
+            o: [],
+            i: [],
+            rg: 0,
+            k: 0,
+            v: 0,
+            z: 0,
+            bk: []
+        };
+        C.o.push(AJ(-400, -900, -400, 500, 0), AJ(EF, -900, EF, 500, 0), AJ(-400, -900, EF, -900, 1), WJ(-140, 60, 26, 1), WJ(150, 250, 26, 1), WJ(-60, 420, 22, 1));
+        for (let Y = 0; Y < 7; Y++) {
+            C.i.push(ZJ(0, Y * 74 - 220, 150 + RE(Y * .9) * 90));
+        }
+        C.i.push(ZJ(2, 250, -60, 1), ZJ(2, -260, 380, 2));
+        MI.push(C);
+        KJ = 500;
+        while (KJ < 3e3) {
+            N();
+        }
+    }
+    function CY() {
+        while (KJ < TH.y + 3200) {
+            N();
+        }
+        const Y = MI[0];
+        if (TH.y < Y.y + 40) {
+            TH.y = Y.y + 40;
+            TH.vy < 0 && (TH.vy = VE(TH.vy) * .6);
+        }
+    }
+    function DY(Y) {
+        OK = -545;
+        PK = FF;
+        for (const B of MI) {
+            if (Y >= B.y && Y < B.y + B.h) {
+                const C = (Y - B.y) / B.h;
+                OK = WF(B.pl, B.l, C);
+                PK = WF(B.pr, B.r, C);
+                return;
+            }
+        }
+    }
+    function EY(Y, B, C) {
+        QK = SK = 0;
+        const D = Y.z;
+        if (!D) {
+            return;
+        }
+        const E = (C - Y.y) / Y.h, F = RE(E * 7 + NH * 1.4);
+        if (D === 1) {
+            const C = WE((B - Y.l) / (Y.r - Y.l) * QE * 1.5);
+            C > .1 && (SK = -1437.5 * C);
+        } else if (D === 2) {
+            const D = (Y.l + Y.r) / 2 - B, E = Y.y + Y.h * .5 - C, F = AE(D, E) + 60, H = TE(1, 300 / F) * CF * .8;
+            QK = D / F * H;
+            SK = E / F * H;
+        } else if (D === 3) {
+            QK = F * CF * .62;
+        } else if (D === 4) {
+            SK = -2500 * RF(TE(E, 1 - E) * 6, 0, 1);
+        } else if (D === 5) {
+            const D = B - (Y.l + Y.r) / 2, E = C - (Y.y + Y.h * .5), F = AE(D, E) + 80, H = 875 * TE(1, 340 / F);
+            QK = -E / F * H;
+            SK = D / F * H;
+        } else {
+            const D = (Y.l + Y.r) / 2 + RE(C * .0016 + Y.y * .01) * (Y.r - Y.l) * .3;
+            QK = RF(5 * (D - B), -1250, CF);
+            SK = 687.5;
+        }
+    }
+    function FY(Y, B) {
+        const C = [];
+        for (const D of MI) {
+            D.y + D.h > Y && D.y < B && C.push(D);
+        }
+        return C;
+    }
+    function HY() {
+        const Y = AE(TH.vx, TH.vy);
+        if (Y > DF) {
+            TH.vx = TH.vx / Y * DF;
+            TH.vy = TH.vy / Y * DF;
+        }
+        if (!isFinite(Y)) {
+            TH.vx = 0;
+            TH.vy = 200;
+        }
+        if (!isFinite(TH.x + TH.y)) {
+            TH.x = 0;
+            TH.y = FI;
+        }
+    }
+    function IY(Y) {
+        const B = TH.ra;
+        if (B) {
+            B.u = 1;
+            B.l = TE(B.l, .12);
+        }
+        TH.ra = null;
+        if (Y) {
+            TH.vx *= 1.06;
+            TH.vy *= 1.06;
+        }
+        PB(0);
+    }
+    function JY(Y) {
+        const B = TH.ra, C = B.x2 - B.x1, D = B.y2 - B.y1, E = AE(C, D);
+        if (B.u || E < 8) {
+            IY(1);
+            return 0;
+        }
+        const F = C / E, H = D / E;
+        let I = TH.vx * F + TH.vy * H;
+        I = I * .998 + (UH * F + RH * H) * Y;
+        if (VE(I) < 370) {
+            const Y = UH * F + RH * H;
+            I = 370 * (Y ? Y > 0 ? 1 : -1 : I >= 0 ? 1 : -1);
+        }
+        TH.rt += I * Y / E;
+        TH.vx = F * I;
+        TH.vy = H * I;
+        if (TH.rt < 0 || TH.rt > 1) {
+            TH.rt = RF(TH.rt, 0, 1);
+            if (!(TH.rw > 0)) {
+                IY(1);
+                return 0;
+            }
+            TH.rw -= Y;
+            TH.vx = -TH.vx;
+            TH.vy = -TH.vy;
+            TH.rt = RF(TH.rt, .02, .98);
+            NB(400);
+        }
+        const J = F * TH.rs;
+        TH.x = B.x1 + C * TH.rt + -H * TH.rs * 22;
+        TH.y = B.y1 + D * TH.rt + J * 22;
+        YF() < .5 && LC(TH.x, TH.y, 3, 0, 60, LF[4], .1 * -TH.vx, .1 * -TH.vy);
+        return 1;
+    }
+    function KY() {
+        if (!TH.te) {
+            return;
+        }
+        TH.te = null;
+        const Y = 1.34 + 150 / (AE(TH.vx, TH.vy) || 1);
+        TH.vx *= Y;
+        TH.vy *= Y;
+        HY();
+        LC(TH.x, TH.y, 10, 0, 260);
+        OB(0);
+    }
+    function LY() {
+        const Y = TH.te;
+        let B = TH.x - Y.x, C = TH.y - Y.y;
+        const D = AE(B, C);
+        if (D < 1 || D <= Y.l) {
+            return;
+        }
+        B /= D;
+        C /= D;
+        TH.x = Y.x + B * Y.l;
+        TH.y = Y.y + C * Y.l;
+        const E = TH.vx * B + TH.vy * C;
+        if (E > 0) {
+            TH.vx -= E * B;
+            TH.vy -= E * C;
+        }
+        const F = AE(TH.vx, TH.vy);
+        if (F > 1 && F < 1500) {
+            const Y = UE(1.004, 320 / F);
+            TH.vx *= Y;
+            TH.vy *= Y;
+        }
+    }
+    function MY(Y) {
+        const B = TF(4) ? 180 + EI * 24 : EI > 4 ? 60 + EI * 24 : 0;
+        for (const C of VK) {
+            for (const D of C.i) {
+                if (D.g) {
+                    continue;
+                }
+                const C = TH.x - D.x, E = TH.y - D.y, F = AE(C, E);
+                if (F < 43) {
+                    CB(D);
+                } else if (B && !D.t && F < B) {
+                    const B = TE(1, 700 * Y / F);
+                    D.x += C * B;
+                    D.y += E * B;
+                }
+            }
+        }
+    }
+    function NY(Y) {
+        for (const Y of VK) {
+            for (const B of Y.o) {
+                B.k || OY(B);
+            }
+        }
+        if (TK > 0) {
+            TK -= Y;
+        } else {
+            for (let Y = 0; Y < NI.length; Y++) {
+                if (AY(NI[Y])) {
+                    break;
+                }
+            }
+        }
+    }
+    function OY(Y) {
+        H(Y);
+        const C = L(Y, TH.x, TH.y) + BF;
+        if (KK > C) {
+            return;
+        }
+        const D = IK, E = JK, F = FK, J = HK, K = C - KK;
+        if (Y.m & 8 && TH.ph > 0) {
+            return;
+        }
+        I(Y, F, J);
+        let M = TH.vx - CK, N = TH.vy - DK;
+        const O = M * D + N * E;
+        if (Y.m & 4) {
+            if (-O > (TH.rp > 0 ? 300 : 900) * (TF(3) ? .5 : 1)) {
+                QY(Y, F, J, 0, 0);
+                return;
+            }
+        }
+        TH.x += D * K;
+        TH.y += E * K;
+        TH.ra && IY(0);
+        if (O >= 0) {
+            return;
+        }
+        const P = Y.m & 1, Q = Y.m & 2;
+        Y.f = 1;
+        Y.m & NF && PY(Y, F, J);
+        const S = (1 + (P ? 1.32 - RF(TH.sp / DF, 0, 1) * .72 : Q ? .12 : .44)) * -O;
+        M += S * D;
+        N += S * E;
+        const V = -E, T = D, U = M * V + N * T, R = TE(VE(U), (Q ? 1.15 : .3) * S) * (U < 0 ? -1 : 1);
+        M -= R * V;
+        N -= R * T;
+        TH.vx = M + CK;
+        TH.vy = N + DK;
+        HY();
+        const W = -O;
+        HB(W, Q ? 1 : P ? 2 : 0, Y.x + Y.y);
+        PH = TE(26, PH + W * (P ? .008 : .0035));
+        LC(F, J, RF(W * .012, 1, 14) | 0, 1, TE(W * .35, 420), UK(Y));
+        if (P && W > 150) {
+            KI++;
+            LI = 1.6;
+            const Y = (18 + W * .05) * EI * (TF(6) ? 2 : 1) | 0;
+            DI += Y;
+            if (TF(6)) {
+                const Y = ZE(B() * 7);
+                XH[Y] = TE(ZK(), XH[Y] + 2.4);
+            }
+            if (W > 620) {
+                OC(F, J, "+" + Y, LF[2]);
+                JC(F, J, 60 + TE(W * .2, 190), HM[6] + 30);
+                VH = UE(VH, .045);
+            }
+        }
+    }
+    function PY(Y, B, C) {
+        if (Y.lt) {
+            return;
+        }
+        const D = Y.bk;
+        Y.lt = 1;
+        if (!D) {
+            return;
+        }
+        D.l++;
+        DI += 60 * EI | 0;
+        JB(D.l / D.n);
+        LC(B, C, 10, 0, 260, 48);
+        if (D.l < D.n) {
+            return;
+        }
+        D.l = 0;
+        for (const Y of D.m) {
+            Y.lt = 0;
+        }
+        const E = 420 * D.n * EI | 0;
+        DI += E;
+        CI += D.n * 2;
+        for (let Y = 0; Y < 7; Y++) {
+            XH[Y] = TE(ZK(), XH[Y] + 5);
+        }
+        OC(D.x, D.y, "BANK +" + E, 48);
+        JC(D.x, D.y, 320, 48);
+        QH = UE(QH, .4);
+        SH = 48;
+        PH = TE(30, PH + 12);
+        VH = UE(VH, .07);
+        KB();
+    }
+    function QY(Y, B, C, D, E) {
+        Y.k = 1;
+        const F = UK(Y);
+        PH = TE(32, PH + 10 - E);
+        LC(B, C, 18, 2, 460, F);
+        VY(B, C, Y, F);
+        JC(B, C, 150, F);
+        IB(E);
+        const H = 60 * EI * (1 + E * .5) | 0;
+        DI += H;
+        KI++;
+        LI = 1.6;
+        if (!E) {
+            OC(B, C, "+" + H, 45);
+            VH = UE(VH, .05);
+        }
+        if (E > 3) {
+            return;
+        }
+        const I = 150 * (TF(3) ? 2 : 1);
+        for (const D of VK) {
+            for (const F of D.o) {
+                if (F === Y || F.k || F.kt || !(F.m & 4)) {
+                    continue;
+                }
+                const D = AE(F.x - B, F.y - C);
+                if (D < I + F.r) {
+                    F.kt = .04 + D / I * .1;
+                    F.kd = E + 1;
+                }
+            }
+        }
+        TH.vx *= .9;
+        TH.vy *= .9;
+    }
+    function SY(Y) {
+        for (const B of MI) {
+            for (const C of B.o) {
+                if (C.kt && !C.k && !((C.kt -= Y) > 0)) {
+                    H(C);
+                    QY(C, YK, BK, 0, C.kd);
+                }
+            }
+        }
+    }
+    function VY(Y, B, C, D) {
+        for (let E = 0; E < 7; E++) {
+            const E = ZF(0, QE), F = ZF(90, 420);
+            KC(Y, B, WE(E) * F, RE(E) * F, ZF(.5, 1.1), D, 4, ZF(3, 8) * (C.t ? 1 : 1.4));
+        }
+    }
+    function TY(Y) {
+        const B = AE(TH.vx, TH.vy);
+        VK = FY(TH.y - 420 - B * Y, TH.y + 420 + B * Y);
+        let C = UH, D = RH;
+        for (const Y of VK) {
+            if (Y.z && TH.y >= Y.y && TH.y < Y.y + Y.h) {
+                EY(Y, TH.x, TH.y);
+                C += QK;
+                D += SK;
+                break;
+            }
+        }
+        if (TH.te) {
+            TH.te.t -= Y;
+            TH.vx += C * Y;
+            TH.vy += D * Y;
+            TH.te.t <= 0 && KY();
+        } else if (TH.ra) {} else {
+            TH.vx += C * Y;
+            TH.vy += D * Y;
+        }
+        HY();
+        let E = AE(TH.vx, TH.vy);
+        const F = 1400 * (TF(2) ? 1.5 : 1);
+        if (E > F) {
+            const B = UE(0, 1 - (E / F - 1) * (TF(2) ? .6 : 1.5) * Y);
+            TH.vx *= B;
+            TH.vy *= B;
+            E *= B;
+        }
+        const H = RF(SE.ceil(E * Y / (BF * .55)), 1, 8), I = Y / H;
+        for (let Y = 0; Y < H; Y++) {
+            if (TH.ra) {
+                if (!JY(I)) {
+                    TH.x += TH.vx * I;
+                    TH.y += TH.vy * I;
+                }
+            } else {
+                TH.x += TH.vx * I;
+                TH.y += TH.vy * I;
+            }
+            TH.te && LY();
+            NY(I);
+            MY(I);
+        }
+        DY(TH.y);
+        if (TH.x < OK + BF) {
+            TH.x = OK + BF;
+            TH.vx < 0 && (TH.vx = .55 * -TH.vx + 60);
+        }
+        if (TH.x > PK - BF) {
+            TH.x = PK - BF;
+            TH.vx > 0 && (TH.vx = .55 * -TH.vx - 60);
+        }
+        TH.ph > 0 && (TH.ph -= Y);
+        TH.rp > 0 && (TH.rp -= Y);
+        if (TH.gt > 0) {
+            TH.gt -= Y;
+            if (TH.gt <= 0) {
+                UH = 0;
+                RH = CF;
+            }
+        }
+        TH.sp = AE(TH.vx, TH.vy);
+        TH.sp > 30 && (TH.a = XE(TH.vy, TH.vx));
+    }
+    function UY(Y) {
+        for (let B = 0; B < 7; B++) {
+            if (JI[B] > 0 && PF[B][0] === Y) {
+                return PF[B][1];
+            }
+        }
+        return 1;
+    }
+    function RY() {
+        if (MH !== 1 || !TH.al) {
+            return;
+        }
+        if (XH[AH] <= .5) {
+            WK = AH;
+            XK = .5;
+            BC();
+            return;
+        }
+        const Y = WI - TH.x, B = XI - TH.y, C = TE(1, HF / (AE(Y, B) || 1)), D = TH.x + Y * C, E = TH.y + B * C;
+        if (!ZI) {
+            ZI = 1;
+            YJ = 0;
+        }
+        AI = {
+            x1: D,
+            y1: E,
+            x2: D,
+            y2: E,
+            e: MF[AH],
+            c: AH,
+            l: 0,
+            u: 0,
+            paid: 0,
+            n: TF(8) ? 2 : 1
+        };
+        NI.push(AI);
+        while (NI.length > 5 + (TF(7) ? 2 : 0)) {
+            TH.ra === NI.shift() && IY(0);
+        }
+        TH.te && KY();
+    }
+    function WY() {
+        const Y = AI;
+        if (!Y) {
+            return;
+        }
+        const B = WI - Y.x1, C = XI - Y.y1, D = AE(B, C);
+        if (D < 1) {
+            return;
+        }
+        let E = TE(D, 210);
+        if (E > Y.paid) {
+            const B = JF[Y.c] * AK(), C = (E - Y.paid) * B;
+            if (XH[Y.c] >= C) {
+                XH[Y.c] -= C;
+                Y.paid = E;
+            } else {
+                E = Y.paid += XH[Y.c] / B;
+                XH[Y.c] = 0;
+                if (XK <= 0) {
+                    WK = Y.c;
+                    XK = .6;
+                    BC();
+                }
+            }
+        }
+        Y.x2 = Y.x1 + B / D * E;
+        Y.y2 = Y.y1 + C / D * E;
+        XY(Y);
+    }
+    function XY(Y) {
+        for (const B of NI) {
+            if (B === Y || B.u || B.e === Y.e) {
+                continue;
+            }
+            const C = E(Y.x1, Y.y1, Y.x2, Y.y2, B.x1, B.y1, B.x2, B.y2);
+            if (C) {
+                Y.e = B.e = Y.e | B.e;
+                SI.push({
+                    x: C[0],
+                    y: C[1],
+                    t: .55
+                });
+                AB();
+            }
+        }
+    }
+    function AY(Y) {
+        const B = Y.x2 - Y.x1, C = Y.y2 - Y.y1, E = AE(B, C);
+        if (Y.u || Y === AI || Y === TH.ra || E < 22) {
+            return 0;
+        }
+        const F = D(Y.x1, Y.y1, Y.x2, Y.y2, TH.x, TH.y), H = Y.x1 + B * F, I = Y.y1 + C * F;
+        let J = TH.x - H, K = TH.y - I;
+        const L = AE(J, K);
+        if (L > 22) {
+            return 0;
+        }
+        const M = B / E, N = C / E;
+        if (L < .001) {
+            J = -N;
+            K = M;
+        } else {
+            J /= L;
+            K /= L;
+        }
+        ZY(Y, J, K, H, I, F, M, N, E);
+        TK = .05;
+        return 1;
+    }
+    function ZY(Y, B, C, D, E, F, H, I, J) {
+        const K = Y.e, L = YL(J);
+        let M = 1;
+        if (K & 64) {
+            const D = UY(6);
+            if (K & 16) {
+                TH.ph = .8 * D;
+            } else {
+                let E = 0;
+                for (const B of NI) {
+                    if (B !== Y && !B.u && B.e & 64) {
+                        E = B;
+                        break;
+                    }
+                }
+                MC(TH.x, TH.y);
+                if (E) {
+                    const Y = XE(E.y2 - E.y1, E.x2 - E.x1) - XE(I, H), B = WE(Y), C = RE(Y), D = TH.vx * B - TH.vy * C, F = TH.vx * C + TH.vy * B, J = 30 / (AE(D, F) || 1);
+                    TH.vx = D;
+                    TH.vy = F;
+                    TH.x = (E.x1 + E.x2) / 2 + D * J;
+                    TH.y = (E.y1 + E.y2) / 2 + F * J;
+                    E.u = 1;
+                    E.l = .12;
+                } else {
+                    const Y = AE(TH.vx, TH.vy), E = 300 * D * L;
+                    if (Y < 60) {
+                        TH.x += B * E;
+                        TH.y += C * E;
+                        TH.vx = B * 460;
+                        TH.vy = C * 460;
+                    } else {
+                        const B = E / Y;
+                        TH.x += TH.vx * B;
+                        TH.y += TH.vy * B;
+                    }
+                }
+                DY(TH.y);
+                TH.x = RF(TH.x, OK + BF, PK - BF);
+                TH.ph = .34 * D * L;
+                TH.vx *= 1.07;
+                TH.vy *= 1.07;
+                MC(TH.x, TH.y);
+            }
+            SB();
+        }
+        if (K & 16) {
+            TH.te && KY();
+            TH.ra = Y;
+            TH.rt = F;
+            TH.rw = UY(4) > 1 ? 4 : 0;
+            TH.rs = B * -I + C * H >= 0 ? 1 : -1;
+            const D = UE(AE(TH.vx, TH.vy), 340 + 180 * L), E = TH.vx * H + TH.vy * I >= 0 ? 1 : -1;
+            TH.vx = H * D * E;
+            TH.vy = I * D * E;
+            M = 0;
+            PB(1);
+        } else if (K & 8) {
+            TH.ra && IY(0);
+            const B = UY(3);
+            TH.te = {
+                x: Y.x1,
+                y: Y.y1,
+                l: UE(J * B, 30),
+                t: (1.4 + L) * B
+            };
+            OB(1);
+        }
+        if (K & 32) {
+            UH = B * CF;
+            RH = C * CF;
+            TH.gt = 2.9 * UY(5) * L;
+            QB(C);
+            LC(D, E, 10, 3, 150, LF[5]);
+        }
+        const N = K & 4;
+        if (K & 2) {
+            const Y = AE(TH.vx, TH.vy), B = N ? UE(Y * 1.34, 560 + 320 * L) : UE(Y * .99, 250 + 250 * L);
+            TH.vx = H * B;
+            TH.vy = I * B;
+            MB(N);
+        } else if (N) {
+            const Y = TH.vx * B + TH.vy * C, D = (1.25 + .6 * L) * UY(2);
+            TH.vx -= (1 + D) * Y * B;
+            TH.vy -= (1 + D) * Y * C;
+            const E = TH.vx * B + TH.vy * C, F = TE(300 + 300 * L, VE(Y) * 1.6);
+            if (E < F) {
+                TH.vx += (F - E) * B;
+                TH.vy += (F - E) * C;
+            }
+            NB(VE(Y));
+        } else if (!(K & 89)) {
+            const Y = TH.vx * B + TH.vy * C;
+            if (Y < 0) {
+                TH.vx -= 1.55 * Y * B;
+                TH.vy -= 1.55 * Y * C;
+            }
+        }
+        if (K & 1) {
+            const Y = UY(0);
+            let F, H, I = AE(TH.vx, TH.vy);
+            if (I < 50) {
+                F = B;
+                H = C;
+                I = 0;
+            } else {
+                F = TH.vx / I;
+                H = TH.vy / I;
+                const Y = F * B + H * C;
+                if (Y < 0) {
+                    F -= 2 * Y * B;
+                    H -= 2 * Y * C;
+                }
+            }
+            const J = I * 1.5 + 440 * Y * L;
+            TH.vx = F * J;
+            TH.vy = H * J;
+            TH.rp = .85;
+            PH = TE(26, PH + 7);
+            JC(D, E, 120 + 160 * L, LF[0]);
+            LC(D, E, 26, 0, 220, LF[0], 420 * -F, 420 * -H);
+            const K = (90 + 110 * L) * Y;
+            for (const Y of VK) {
+                for (const B of Y.o) {
+                    if (!B.k && !B.kt && B.m & 4 && AE(B.x - D, B.y - E) < K + B.r) {
+                        B.kt = .02;
+                        B.kd = 0;
+                    }
+                }
+            }
+            LB(J);
+        }
+        HY();
+        if (M && ! --Y.n) {
+            Y.u = 1;
+            Y.l = .22;
+        }
+        NC(Y, D, E);
+        YB(K);
+    }
+    function YB(Y) {
+        const B = ZH;
+        RK = 7;
+        ZH |= Y & 127;
+        if (ZH === B) {
+            return;
+        }
+        let C = 0;
+        for (let Y = 0; Y < 7; Y++) {
+            ZH & MF[Y] && C++;
+        }
+        if (!(C <= YI)) {
+            YI = C;
+            if (C === 7) {
+                return BB();
+            }
+            if (C === 3 || C === 5) {
+                for (let Y = 0; Y < 7; Y++) {
+                    XH[Y] = TE(ZK(), XH[Y] + 6);
+                }
+                OC(TH.x, TH.y - 30, "SPECTRUM " + C + "/7", LF[C]);
+                ZB();
+            }
+        }
+    }
+    function BB() {
+        BI = 3.2;
+        for (let Y = 0; Y < 7; Y++) {
+            XH[Y] = TE(ZK(), XH[Y] + 26);
+        }
+        EI = TE(12, EI + 1.5);
+        DI += 1200 * EI | 0;
+        QH = 1;
+        SH = -1;
+        PH = TE(32, PH + 14);
+        OC(TH.x, TH.y - 46, "FULL SPECTRUM", -1);
+        XB();
+        ZH = 0;
+        YI = 0;
+    }
+    function CB(Y) {
+        Y.g = 1;
+        if (Y.t === 0) {
+            KI++;
+            LI = 1.4;
+            CI += TF(9) ? 3 : 1;
+            DI += 10 * EI * (1 + KI * .05) * (TF(9) ? 3 : 1) | 0;
+            VB(KI);
+        } else if (Y.t === 1) {
+            CI += 15;
+            DI += 500 * EI | 0;
+            OC(Y.x, Y.y, "CROWN +15", 48);
+            QH = UE(QH, .45);
+            SH = 48;
+            UB();
+        } else if (Y.t === 2) {
+            XH[Y.c] = TE(ZK(), XH[Y.c] + 40);
+            RB(Y.c);
+            LC(Y.x, Y.y, 12, 3, 190, LF[Y.c]);
+        } else if (Y.t === 3) {
+            for (let Y = 0; Y < 7; Y++) {
+                XH[Y] = ZK();
+            }
+            QH = 1;
+            SH = -1;
+            OC(Y.x, Y.y, "PRISM WELL", -1);
+            WB();
+        } else {
+            JI[Y.c] = PF[Y.c][2];
+            OC(Y.x, Y.y, QF[Y.c], PF[Y.c][0] > 6 ? -1 : LF[PF[Y.c][0]]);
+            YC();
+        }
+    }
+    function DB() {
+        if (KL) {
+            KL.state === "suspended" && KL.resume();
+            return;
+        }
+        const Y = window.AudioContext || window.webkitAudioContext;
+        if (!Y) {
+            return;
+        }
+        KL = new Y;
+        EL = KL.createBiquadFilter();
+        EL.type = "lowpass";
+        EL.frequency.value = 2e4;
+        BL = KL.createGain();
+        BL.gain.value = TI.m ? 0 : .8;
+        EL.connect(BL).connect(KL.destination);
+        CL = KL.createGain();
+        CL.gain.value = .85;
+        CL.connect(EL);
+        DL = KL.createGain();
+        DL.gain.value = .5;
+        DL.connect(EL);
+        const B = KL.sampleRate * 2;
+        FL = KL.createBuffer(1, B, KL.sampleRate);
+        const C = FL.getChannelData(0);
+        for (let Y = 0; Y < B; Y++) {
+            C[Y] = YF() * 2 - 1;
+        }
+        IL = KL.createOscillator();
+        IL.type = "sawtooth";
+        IL.frequency.value = 220;
+        JL = KL.createBiquadFilter();
+        JL.type = "bandpass";
+        JL.frequency.value = 1400;
+        JL.Q.value = 6;
+        HL = KL.createGain();
+        HL.gain.value = 0;
+        IL.connect(JL).connect(HL).connect(CL);
+        IL.start();
+        ML = KL.currentTime + .1;
+    }
+    function EB(Y, B, C, D, E, F, H) {
+        if (!SL()) {
+            return;
+        }
+        const I = H || VL(), J = KL.createOscillator(), K = KL.createGain();
+        J.type = Y;
+        J.frequency.setValueAtTime(UE(8, B), I);
+        C && C !== B && J.frequency.exponentialRampToValueAtTime(UE(8, C), I + D);
+        K.gain.setValueAtTime(1e-4, I);
+        K.gain.exponentialRampToValueAtTime(UE(1e-4, E), I + .008);
+        K.gain.exponentialRampToValueAtTime(1e-4, I + D);
+        J.connect(K).connect(F || CL);
+        J.start(I);
+        J.stop(I + D + .02);
+        LL++;
+    }
+    function FB(Y, B, C, D, E, F, H, I) {
+        if (!SL()) {
+            return;
+        }
+        const J = I || VL(), K = KL.createBufferSource();
+        K.buffer = FL;
+        K.loop = 1;
+        K.playbackRate.value = .7 + YF() * .6;
+        const L = KL.createBiquadFilter();
+        L.type = C;
+        L.frequency.setValueAtTime(UE(20, D), J);
+        E !== D && L.frequency.exponentialRampToValueAtTime(UE(20, E), J + Y);
+        L.Q.value = F || 1;
+        const M = KL.createGain();
+        M.gain.setValueAtTime(1e-4, J);
+        M.gain.exponentialRampToValueAtTime(UE(1e-4, B), J + .005);
+        M.gain.exponentialRampToValueAtTime(1e-4, J + Y);
+        K.connect(L).connect(M).connect(H || CL);
+        K.start(J);
+        K.stop(J + Y + .02);
+        LL++;
+    }
+    function HB(Y, B, C) {
+        if (Y < 60) {
+            return;
+        }
+        const D = RF(Y / 2200, .04, .55);
+        FB(.03 + D * .12, D * .7, "lowpass", 300 + Y * 1.6, 140, 1);
+        Y > 380 && EB("triangle", 120 + Y * .05, 44, .1 + D * .12, D * .8);
+        if (B > 1) {
+            const Y = PL[HI % 4], B = VE(C | 0), E = 64 + Y[(B >> 5) % Y.length] + 12 * (B >> 9 & 1);
+            EB("sine", OL(E), OL(E) * 1.5, .17, D * .55);
+            EB("triangle", OL(E + 12), 0, .1, D * .3);
+        } else {
+            B && EB("sine", 90, 42, .25, D * .5);
+        }
+    }
+    function IB(Y) {
+        const B = 1 / (1 + Y * .5);
+        FB(.3 * B, .45 * B, "bandpass", 2600 * (1 + Y * .3), 300, 1.4);
+        EB("triangle", 160 * (1 + Y * .22), 38, .34 * B, .5 * B);
+        FB(.09, .3 * B, "highpass", 4e3, 9e3, 1);
+    }
+    function JB(Y) {
+        const B = 76 + Y * 12 | 0;
+        EB("square", OL(B), OL(B + 7), .07, .13);
+        EB("triangle", OL(B + 12), 0, .13, .1);
+    }
+    function KB() {
+        TB(72, [ 0, 4, 7, 12, 16, 19 ], .45, .13, "square", .04, 12);
+        FB(.7, .24, "bandpass", 700, 6e3, .8);
+        EB("sine", 90, 300, .4, .3);
+    }
+    function LB(Y) {
+        const B = RF(Y / 2600, .16, .5);
+        EB("sawtooth", 150, 780 + Y * .2, .22, B * .5);
+        FB(.34, B * .7, "bandpass", 700, 4200, 1.1);
+        EB("sine", 70, 34, .3, B * .8);
+    }
+    function MB(Y) {
+        EB("square", Y ? 700 : 940, Y ? 2e3 : 1680, .07, .16);
+        FB(.05, .12, "highpass", 2600, 5200, 1);
+        Y && EB("sine", 320, 900, .16, .2);
+    }
+    function NB(Y) {
+        const B = RF(Y / 1400, .12, .4);
+        EB("sine", 180 + Y * .1, 700 + Y * .3, .1, B);
+        EB("sine", 700 + Y * .3, 210, .22, B * .8);
+    }
+    function OB(Y) {
+        if (Y) {
+            EB("triangle", 240, 720, 1.1, .13);
+            FB(.06, .1, "bandpass", 900, 2400, 3);
+        } else {
+            EB("sawtooth", 900, 190, .13, .26);
+            FB(.1, .22, "bandpass", 1800, 500, 2);
+        }
+    }
+    function PB(Y) {
+        if (KL) {
+            HL && HL.gain.setTargetAtTime(Y && !TI.m ? .12 : 0, VL(), .03);
+            Y && EB("square", 1200, 2400, .05, .1);
+        }
+    }
+    function QB(Y) {
+        const B = Y < 0;
+        EB("sine", B ? 120 : 460, B ? 460 : 110, .5, .3);
+        EB("triangle", B ? 240 : 700, B ? 700 : 200, .38, .12);
+        FB(.4, .1, "lowpass", 900, 200, 1);
+    }
+    function SB() {
+        EB("sawtooth", 2600, 260, .1, .2);
+        FB(.08, .18, "highpass", 7e3, 1400, 2);
+        EB("sine", 90, 240, .22, .26);
+    }
+    function VB(Y) {
+        const B = 74 + TE(Y, 14) * 2;
+        EB("square", OL(B), 0, .06, .1);
+        EB("sine", OL(B + 12), 0, .1, .12);
+    }
+    function TB(Y, B, C, D, E, F, H) {
+        if (!KL) {
+            return;
+        }
+        const I = VL();
+        B.forEach((B, J) => EB(E, OL(Y + B), H ? OL(Y + B + H) : 0, C, D, 0, I + J * F));
+    }
+    function UB() {
+        TB(72, TL, .5, .12, "triangle", .045);
+    }
+    function RB(Y) {
+        EB("triangle", OL(64 + Y * 2), OL(76 + Y * 2), .16, .16);
+    }
+    function WB() {
+        TB(60, PL[1], .5, .13, "sine", .06, 12);
+        FB(.9, .16, "bandpass", 800, 6e3, .8);
+    }
+    function XB() {
+        TB(60, PL[1], .7, .12, "sawtooth", .05, 12);
+        TB(84, TL, 1.5, .1, "sine", 0);
+        KL && FB(1.2, .2, "bandpass", 400, 8e3, .7, 0, VL() + .3);
+    }
+    function AB() {
+        EB("square", 1500, 2600, .05, .09);
+        EB("sine", 900, 1800, .1, .09);
+    }
+    function ZB() {
+        EB("triangle", OL(76), OL(83), .18, .12);
+    }
+    function YC() {
+        TB(62, [ 0, 5, 10 ], .12, .1, "square", .06, 2);
+    }
+    function BC() {
+        EB("sine", 150, 70, .12, .18);
+        FB(.06, .07, "lowpass", 500, 200, 1);
+    }
+    function CC(Y) {
+        EB("sine", 70 + Y * 40, 50, .18, .12 + Y * .18);
+    }
+    function DC() {
+        TB(72, [ 0, -3, -6, -9, -12, -15, -18 ], .8, .1, "sawtooth", .04, -30);
+        FB(1, .3, "lowpass", 3e3, 90, 1);
+        EB("sine", 120, 30, 1.1, .3);
+    }
+    function EC(Y) {
+        EB("square", Y ? 900 : 620, Y ? 1200 : 500, .04, .07);
+    }
+    function FC() {
+        TB(48, [ 0, 7, 12, 16, 19 ], 1.6, .1, "triangle", 0);
+        FB(1.4, .22, "bandpass", 300, 5e3, .6);
+    }
+    function HC() {
+        LL = 0;
+        if (!KL) {
+            return;
+        }
+        const Y = VL(), B = RF(TH.sp / DF, 0, 1), C = MH === 1 && TH.al, D = (B, C, D) => B.setTargetAtTime(C, Y, D);
+        D(HL.gain, TH.ra && !TI.m && C ? .1 + B * .12 : 0, .04);
+        D(JL.frequency, 700 + TH.sp * 1.4, .04);
+        D(IL.frequency, 90 + TH.sp * .22, .04);
+        D(EL.frequency, OH > .05 ? 480 : MH === 2 ? 700 : 2e4, .1);
+        D(DL.gain, TI.m ? 0 : MH === 1 ? .5 : .34, .2);
+        C ? IC() : ML = Y + .1;
+    }
+    function IC() {
+        const Y = 40 + HI * 5 % 11, B = PL[HI % 4], C = QL[HI % 3], D = RF(TH.sp / 1400, 0, 1.5) + (BI > 0 ? .6 : 0), E = 15 / ((88 + HI * 7) * (OH > .5 ? .5 : 1)), F = UL[HI], H = RL[HI], I = VL();
+        for (let J = 8; ML < I + .16 && J--; ) {
+            const J = UE(ML, I), K = NL, L = K & 15, M = K >> 4, N = (M * 2 + (L > 7 ? 1 : 0)) % B.length, O = Y - 12 + B[N];
+            if (F >> L & 1) {
+                EB("sine", 130, 42, .17, .5, DL, J);
+                FB(.03, .12, "lowpass", 900, 200, 1, DL, J);
+            }
+            H >> L & 1 && EB(C, OL(O), 0, .2, .3, DL, J);
+            if (!L) {
+                for (const C of [ 0, 3 + (B[2] > 3 ? 1 : 0), 7 ]) {
+                    EB("triangle", OL(Y + B[N] + C), 0, E * 15, .1, DL, J);
+                }
+            }
+            D > .25 && L & 1 && FB(.03, .04 + D * .03, "highpass", 7e3, 6500, 1, DL, J);
+            D > .5 && L % 4 == 2 && FB(.09, .13, "bandpass", 1900, 900, 1.2, DL, J);
+            if (D > .8 && !(L & 1)) {
+                const D = OL(Y + 12 + B[(K * 3 + M) % B.length]);
+                EB(C, D, D, .1, .09, DL, J);
+            }
+            NL++;
+            ML = J + E;
+        }
+    }
+    function JC(Y, B, C, D) {
+        VI.length > 26 && VI.shift();
+        VI.push({
+            x: Y,
+            y: B,
+            r: 0,
+            R: C,
+            h: D,
+            t: 1
+        });
+    }
+    function KC(Y, B, C, D, E, F, H, I) {
+        OI.length > 420 && OI.shift();
+        OI.push({
+            x: Y,
+            y: B,
+            vx: C,
+            vy: D,
+            l: E,
+            L: E,
+            h: F,
+            k: H,
+            s: I,
+            a: ZF(0, QE),
+            w: ZF(-9, 9)
+        });
+    }
+    function LC(Y, B, C, D, E, F, H, I) {
+        const J = F === void 0 ? LF[AH] : F, K = D === 1 ? TI.e[3] : D;
+        for (let D = 0; D < C; D++) {
+            const C = ZF(0, QE), D = ZF(.3, 1) * E;
+            KC(Y, B, (H || 0) + WE(C) * D, (I || 0) + RE(C) * D, ZF(.18, .55), J + ZF(-18, 18), K, ZF(1.4, 3.6));
+        }
+    }
+    function MC(Y, B) {
+        KC(Y, B, 0, 0, .4, LF[6], 2, 8);
+        LC(Y, B, 12, 0, 320, LF[6]);
+    }
+    function NC(Y, B, C) {
+        for (let D = 0; D < 7; D++) {
+            Y.e & MF[D] && LC(B, C, 5, 0, 240, LF[D]);
+        }
+        KC(B, C, 0, 0, .3, LF[Y.c], 2, 6);
+    }
+    function OC(Y, B, C, D) {
+        QI.push({
+            x: Y,
+            y: B,
+            t: C,
+            h: D,
+            l: 1.15
+        });
+    }
+    function PC(Y) {
+        for (let B = OI.length; B--; ) {
+            const C = OI[B];
+            if ((C.l -= Y) <= 0) {
+                OI.splice(B, 1);
+            } else {
+                C.x += C.vx * Y;
+                C.y += C.vy * Y;
+                if (C.k !== 2) {
+                    C.vy += 400 * Y;
+                    C.vx *= .985;
+                    C.vy *= .985;
+                }
+                C.k === 4 && (C.a += C.w * Y);
+            }
+        }
+        for (let B = VI.length; B--; ) {
+            const C = VI[B];
+            C.r += (C.R - C.r) * TE(1, 9 * Y);
+            (C.t -= Y * 2.2) <= 0 && VI.splice(B, 1);
+        }
+        for (let B = QI.length; B--; ) {
+            const C = QI[B];
+            C.y -= 46 * Y;
+            (C.l -= Y) <= 0 && QI.splice(B, 1);
+        }
+        for (let B = SI.length; B--; ) {
+            (SI[B].t -= Y) <= 0 && SI.splice(B, 1);
+        }
+    }
+    function QC(Y) {
+        const B = PJ;
+        WH.x = XF(WH.x, B ? B.cx : TH.x + RF(TH.vx * .12, -180, 180), B ? 3.5 : 7.5, Y);
+        WH.y = XF(WH.y, B ? B.cy : TH.y + RF(TH.vy * .24, -117.8, 155), B ? 3.5 : 7.5, Y);
+        WH.z = XF(WH.z, B ? .82 : 1 / (1 + TH.sp / 5200), 4, Y);
+        LH = TE(KH / 620, JH / 846) * WH.z;
+        const C = UE(0, 611 - JH / 2 / LH);
+        WH.x = RF(WH.x, -C, C);
+        PH = UE(0, PH - PH * 7 * Y - 4 * Y);
+        const D = TE(PH, 24);
+        IM = ZF(-D, D);
+        JM = ZF(-D, D);
+    }
+    function SC(Y) {
+        const B = PM(HI);
+        for (let C = 0; C < 8; C++) {
+            HM[C] = C % 3 || C > 6 ? XF(HM[C], B[C], 1.6, Y) : OM(HM[C], B[C], 1.6, Y);
+        }
+    }
+    function VC() {
+        const Y = IH.createLinearGradient(0, 0, 0, KH);
+        Y.addColorStop(0, EH(HM[0] | 0, HM[1] | 0, HM[2] | 0));
+        Y.addColorStop(1, EH(HM[3] | 0, HM[4] | 0, HM[5] | 0));
+        IH.fillStyle = Y;
+        IH.fillRect(0, 0, JH, KH);
+        const B = QM[HI];
+        IH.lineWidth = UE(1, 2.4 * LH);
+        for (let Y = 0; Y < 2; Y++) {
+            const D = Y ? .4 : .16, E = Y ? 330 : 560, F = Y ? .085 : .045, H = WH.x * D, I = WH.y * D, J = JH / 2 / LH, K = KH / 2 / LH, L = ZE((H + J) / E), M = ZE((I + K) / E);
+            for (let Y = ZE((I - K) / E); Y <= M; Y++) {
+                for (let D = ZE((H - J) / E); D <= L; D++) {
+                    const J = C(D * 31 + B[0], Y * 17);
+                    if (J < .5) {
+                        continue;
+                    }
+                    const K = (D + .15 + C(D, Y) * .7) * E, L = (Y + .15 + C(Y, D + 9) * .7) * E, M = HM[6] + 60 * (J - .5) | 0;
+                    IH.fillStyle = EH(M, 60, HM[7] | 0, F);
+                    IH.strokeStyle = EH(M, 70, HM[7] | 0, F * 2);
+                    TC(B, JH / 2 + (K - H) * LH, KH / 2 + (L - I) * LH, E * (.16 + J * .3) * LH, J);
+                }
+            }
+        }
+    }
+    function TC(Y, B, D, E, F) {
+        const H = Y[1], I = Y[2];
+        WL();
+        if (Y[0]) {
+            if (Y[0] < 2) {
+                for (let Y = 0; Y < H; Y++) {
+                    const J = Y / H * QE + F * 4, K = E * (I < 0 ? .6 + C(Y, F * 99) * .5 : Y & 1 ? I / 10 : 1);
+                    FM(Y, B + WE(J) * K, D + RE(J) * K);
+                }
+                IH.closePath();
+                IH.fill();
+            } else {
+                const Y = I < 0 ? 2.4 : QE, C = VE(I);
+                for (let C = 1; C <= H; C++) {
+                    WL();
+                    ZL(B, D, E * (1 - C * .22), F * QE, F * QE + Y);
+                    IH.stroke();
+                }
+                WL();
+                for (let Y = 0; Y < C; Y++) {
+                    const H = Y / C * QE + NH * .06 * (F > .7 ? -1 : 1);
+                    YM(B + WE(H) * E * .5, D + RE(H) * E * .5);
+                    BM(B + WE(H) * E, D + RE(H) * E);
+                }
+                IH.stroke();
+            }
+        } else {
+            const Y = 4 + (F * 4 | 0), H = D + .34 * (E *= .58);
+            for (let D = 0; D < Y; D++) {
+                const I = D / (Y - 1) - .5, J = E * (.3 + .34 * WE(I * 2.6) + C(D * 7, F * 400) * .16), K = B + I * E * 1.7, L = H - J * (.72 + C(D, F * 90) * .5);
+                YM(K + J, L);
+                ZL(K, L, J);
+            }
+            YM(B - E * .95, H);
+            IH.roundRect(B - E * .95, H - E * .34, E * 1.9, E * .34, E * .17);
+            IH.fill();
+        }
+    }
+    function UC(Y) {
+        const B = Y.m, C = B & NF ? Y.lt ? 6 : 5 : B & 2 ? 0 : B & 4 ? 1 : B & 8 ? 2 : B & 32 ? 3 : B & 16 ? 4 : -1;
+        if (C < 0) {
+            return B & 1 ? [ EH(HM[6] + 30 | 0, 92, 48), EH(HM[6] + 40 | 0, 100, 80) ] : [ EH(HM[6] | 0, 52, 19), EH(HM[6] | 0, 84, UE(58, HM[7]) | 0) ];
+        }
+        const D = SM[C];
+        return [ EH(D[0], D[1], D[2]), EH(D[0], D[3], D[4]) ];
+    }
+    function RC() {
+        const Y = NM(0) - 200, B = NM(KH) + 200, C = UE(2, 13 * LH), D = UE(1, 5 * LH), E = EH(HM[6] | 0, 34, UE(4, HM[2] * .42) | 0);
+        IH.lineCap = "round";
+        for (const F of MI) {
+            if (F.y + F.h < Y || F.y > B) {
+                continue;
+            }
+            const I = LM(F.y), J = LM(F.y + F.h);
+            IH.fillStyle = E;
+            for (const Y of [ -9e3, 9e3 ]) {
+                WL();
+                YM(Y, I);
+                BM(KM(Y < 0 ? F.pl : F.pr), I);
+                BM(KM(Y < 0 ? F.l : F.r), J);
+                BM(Y, J);
+                IH.fill();
+            }
+            F.z && WC(F);
+            for (const Y of F.o) {
+                if (Y.k) {
+                    continue;
+                }
+                H(Y);
+                const B = UC(Y), E = KM(YK), F = LM(BK), I = Y.f > 0 ? Y.f = UE(0, Y.f - .05) : 0, J = Y.kt > 0 ? 1 : 0;
+                if (I || J) {
+                    IH.save();
+                    IH.translate(E, F);
+                    IH.scale(1 + I * .3, 1 + I * .3);
+                    IH.translate(-E, -F);
+                    J && (IH.globalAlpha = .5 + YF() * .5);
+                }
+                if (Y.t) {
+                    const E = WE(EK) * Y.r, F = RE(EK) * Y.r;
+                    CM(KM(YK - E), LM(BK - F), KM(YK + E), LM(BK + F), C, B[0]);
+                    XL(D, B[1]);
+                    if (Y.m & 4) {
+                        IH.setLineDash([ 6 * LH, 7 * LH ]);
+                        XL(UE(1, 2 * LH), "hsl(48 100% 80% / .85)");
+                        IH.setLineDash([]);
+                    }
+                    I && XL(UE(1, (2 + I * 5) * LH), EH(HM[6] + 30 | 0, 100, 85, I));
+                } else {
+                    DM(E, F, Y.r * LH, B[0], B[1], UE(1, (2.5 + I * 4) * LH));
+                    Y.m & 1 && DM(E, F, Y.r * LH * .55, 0, B[1], UE(1, 1.6 * LH));
+                    I && DM(E, F, (Y.r + 6 + I * 22) * LH, 0, EH(HM[6] + 30 | 0, 100, 80, I), UE(1, 2 * LH));
+                }
+                if (I || J) {
+                    IH.globalAlpha = 1;
+                    IH.restore();
+                }
+            }
+            for (const Y of F.bk) {
+                if (Y.l) {
+                    const B = KM(Y.x), C = LM(Y.y) - 46 * LH;
+                    for (let D = 0; D < Y.n; D++) {
+                        DM(B + 13 * (D - (Y.n - 1) / 2) * LH, C, 4 * LH, D < Y.l ? "hsl(48 100% 68%)" : "hsl(48 30% 32%)");
+                    }
+                }
+            }
+            for (const Y of F.i) {
+                Y.g || XC(Y);
+            }
+        }
+    }
+    function WC(Y) {
+        const B = UE(Y.y, NM(0) - 100), D = TE(Y.y + Y.h, NM(KH) + 100) - B;
+        if (D <= 0) {
+            return;
+        }
+        const E = Y.z, F = E === 1 ? 190 : E === 2 ? 288 : E === 3 ? 24 : E === 4 ? 262 : E === 5 ? 150 : 186, H = NH * (E === 3 ? 60 : E === 6 ? 320 : 200) * (E === 1 || E === 4 ? -1 : 1);
+        IH.lineCap = "round";
+        for (let E = 0; E < 24; E++) {
+            const I = C(E * 13, Y.y | 0), J = WF(Y.l + 30, Y.r - 30, C(E, 7)), K = B + ((I * D + H) % D + D) % D;
+            EY(Y, J, K);
+            const L = AE(QK, SK);
+            if (L < 1) {
+                continue;
+            }
+            const M = TE(64, L * .05);
+            CM(KM(J), LM(K), KM(J + QK / L * M), LM(K + SK / L * M), UE(1, 2.2 * LH), EH(F, 90, 72, .16 + I * .18));
+        }
+    }
+    function XC(Y) {
+        const B = KM(Y.x), C = LM(Y.y), D = LH, E = 1 + RE(NH * 3 + Y.x * .02) * .12, F = Y.t;
+        if (!F) {
+            DM(B, C, 9 * D * E, YN, "hsl(38 100% 84%)", UE(1, 2.2 * D));
+            return;
+        }
+        if (F === 3) {
+            for (let Y = 0; Y < 7; Y++) {
+                const F = Y / 7 * QE + NH * .6;
+                WL();
+                ZL(B, C, 24 * D * E, F, F + .8);
+                XL(7 * D, FH(Y, 62));
+            }
+            DM(B, C, 13 * D * E, "#fff");
+            return;
+        }
+        const H = F === 1, I = F === 2, J = I ? Y.c : PF[Y.c][0], K = H ? 10 : I ? 6 : 3, L = (H ? 16 : I ? 12 : 15) * D * E;
+        IH.save();
+        IH.translate(B, C);
+        IH.rotate(NH * (H ? .8 : I ? 1.4 : -1) + Y.c);
+        EM(K, H ? YN : I ? FH(J, 58) : J > 6 ? "#fff" : FH(J, 60), I ? FH(J, 86) : "#fff", UE(1, 2 * D), Y => {
+            const B = Y / K * QE, C = L * (H && Y & 1 ? .44 : 1);
+            FM(Y, WE(B) * C, RE(B) * C);
+        });
+        IH.restore();
+    }
+    function AC(Y, B) {
+        const C = [];
+        for (let B = 0; B < 7; B++) {
+            Y.e & MF[B] && C.push(B);
+        }
+        if (C.length < 2) {
+            return FH(C[0] | 0, 62, B);
+        }
+        const D = IH.createLinearGradient(KM(Y.x1), LM(Y.y1), KM(Y.x2), LM(Y.y2));
+        C.forEach((Y, E) => D.addColorStop(E / (C.length - 1), FH(Y, 64, B)));
+        return D;
+    }
+    function ZC() {
+        IH.lineCap = "round";
+        for (const Y of NI) {
+            const B = Y.u ? RF(Y.l / .22, 0, 1) : 1, C = KM(Y.x1), D = LM(Y.y1), E = KM(Y.x2), F = LM(Y.y2);
+            CM(C, D, E, F, UE(4, 22 * LH), AC(Y, B * .18));
+            XL(UE(3, 15 * LH), "hsl(266 55% 5% / " + B * .8 + ")");
+            XL(UE(2, 10 * LH), AC(Y, B));
+            XL(UE(1, 4 * LH), "hsl(0 0% 100% / " + B * .55 + ")");
+            if (!Y.u) {
+                DM(C, D, (4.5 + RE(NH * 4 + Y.x1) * .8) * LH, 0, FH(Y.c, 80, .9), UE(1, 2 * LH));
+                const B = E - C, H = F - D, I = AE(B, H);
+                if (I > 16) {
+                    const C = B / I, D = H / I, J = 9 * LH;
+                    EM(3, FH(Y.c, 78, .95), 0, 0, Y => {
+                        const B = [ 0, 2.6, -2.6 ][Y], H = WE(B) * J, I = RE(B) * J;
+                        FM(Y, E + H * C - I * D, F + I * C + H * D);
+                    });
+                }
+                for (let B = 1; B < Y.n; B++) {
+                    DM((C + E) / 2 + B * 8 * LH, (D + F) / 2, 2.6 * LH, "#fff");
+                }
+            }
+            if (Y === TH.ra) {
+                IH.setLineDash([ 4 * LH, 9 * LH ]);
+                IH.lineDashOffset = 90 * -NH * LH;
+                XL(UE(1, 3 * LH), "hsl(190 100% 88% / .9)");
+                IH.setLineDash([]);
+            }
+        }
+        for (const Y of SI) {
+            const B = Y.t / .55;
+            DM(KM(Y.x), LM(Y.y), (6 + 26 * (1 - B)) * LH, 0, "hsl(0 0% 100% / " + B + ")", UE(1, 3 * LH));
+        }
+        if (TH.te) {
+            const Y = KM(TH.te.x), B = LM(TH.te.y);
+            DM(Y, B, TH.te.l * LH, 0, FH(3, 60, .17), UE(1, 1.4 * LH));
+            CM(Y, B, KM(TH.x), LM(TH.y), UE(1, 3.4 * LH), FH(3, 70));
+            DM(Y, B, 8 * LH, FH(3, 62));
+            DM(Y, B, (12 + RE(NH * 9) * 3) * LH, 0, FH(3, 80, .8), UE(1, 2 * LH));
+        }
+    }
+    function YD() {
+        IH.lineCap = "round";
+        for (const Y of VI) {
+            const B = RF(Y.t, 0, 1);
+            DM(KM(Y.x), LM(Y.y), Y.r * LH, 0, EH(Y.h | 0, 100, 78, B * .7), UE(1, 5 * B * LH));
+        }
+        for (const Y of OI) {
+            const B = RF(Y.l / Y.L, 0, 1), C = KM(Y.x), D = LM(Y.y);
+            if (Y.k === 4) {
+                IH.save();
+                IH.translate(C, D);
+                IH.rotate(Y.a);
+                const E = Y.s * LH * (.4 + B * .6);
+                EM(4, EH(Y.h | 0, 70, 38 + B * 26, B), EH(Y.h | 0, 90, 78, B), UE(1, 1.2 * LH), Y => FM(Y, [ -1, .8, 1.2, -.6 ][Y] * E, [ -.7, -1.1, .9, 1 ][Y] * E));
+                IH.restore();
+                continue;
+            }
+            Y.k === 2 ? DM(C, D, (1 - B) * Y.s * 9 * LH, 0, EH(Y.h | 0, 100, 75, B), UE(1, 3 * B * LH)) : CM(C, D, C - Y.vx * (Y.k ? .02 : .012) * LH, D - Y.vy * (Y.k ? .02 : .012) * LH, UE(1, Y.s * (Y.k ? 1 : B) * LH), EH(Y.h | 0, Y.k ? 70 : 100, Y.k ? 55 : 68, B));
+        }
+        for (const Y of QI) {
+            const B = RF(Y.l, 0, 1);
+            FD(Y.t, KM(Y.x), LM(Y.y), 17 * LH / BN, Y.h < 0 ? "hsl(0 0% 100% / " + B + ")" : EH(Y.h | 0, 100, 70, B), 1);
+        }
+    }
+    function BD() {
+        const Y = PI.length ? PI[PI.length - 1] : 0;
+        if (!Y || AE(TH.x - Y.x, TH.y - Y.y) > 7) {
+            PI.push({
+                x: TH.x,
+                y: TH.y,
+                h: BI > 0 ? -1 : LF[AH]
+            });
+            while (PI.length > 26 + RF(TH.sp / 34, 0, 34)) {
+                PI.shift();
+            }
+        }
+    }
+    function CD() {
+        const Y = PI.length, B = TI.e[2];
+        IH.lineCap = "round";
+        for (let C = 1; C < Y; C++) {
+            if (B === 1 && C % 2) {
+                continue;
+            }
+            const D = C / Y, E = PI[C - 1], F = PI[C];
+            CM(KM(E.x), LM(E.y), KM(F.x), LM(F.y), UE(1, 15 * D * LH * (B === 2 ? .6 + YF() * .8 : 1)), EH((F.h < 0 ? (NH * 400 + C * 26) % 360 : F.h) | 0, 100, 60 + D * 18, D * .8));
+        }
+    }
+    function DD(Y, B, C, D) {
+        const E = C ? "#fff" : Y === 1 ? "hsl(268 40% 12%)" : Y === 2 ? "hsl(190 100% 72%)" : "hsl(300 40% 96%)", F = C ? FH(ZE(NH * 6) % 7, 70) : Y === 2 ? "hsl(300 100% 70%)" : "hsl(280 45% 62%)", H = RE(NH * 13), I = ZE(NH * 5);
+        IH.lineCap = "round";
+        WL();
+        YM(-13, 0);
+        for (let Y = 1; Y < 5; Y++) {
+            BM(-13 - Y * 6, RE(NH * 9 - Y * .8) * (2 + Y * 1.6));
+        }
+        XL(5, FH((I + 2) % 7, 65));
+        XL(2.4, FH((I + 5) % 7, 80));
+        for (let Y = 0; Y < 4; Y++) {
+            const B = 15 * (Y >> 1) - 8, C = H * (Y & 1 ? 1 : -1) * (Y > 1 ? -1 : 1);
+            WL();
+            YM(B, 6);
+            BM(B + C * 5, 15);
+            BM(B + C * 8 + 2, 20);
+            XL(3, E);
+        }
+        WL();
+        IH.ellipse(0, 0, 17, 11, 0, 0, QE);
+        AL(E);
+        XL(2, F);
+        WL();
+        YM(8, -6);
+        IH.quadraticCurveTo(20, -14, 25, -12);
+        IH.quadraticCurveTo(31, -11, 30, -5);
+        BM(20, -1);
+        IH.closePath();
+        AL(E);
+        XL(2, F);
+        for (let Y = 0; Y < 4; Y++) {
+            WL();
+            YM(6 + Y * 4, -7 - Y);
+            IH.quadraticCurveTo(2 + Y * 4, -16 - Y * 1.5, 9 + Y * 4, -18 - Y);
+            XL(3.4, FH((I + Y) % 7, 66));
+        }
+        IH.save();
+        IH.translate(26, -12);
+        IH.rotate(-.62);
+        const J = D === 1 ? 24 : 15, K = IH.createLinearGradient(0, 0, 0, -J);
+        K.addColorStop(0, FH(0, 65));
+        K.addColorStop(1, FH(B, 82));
+        EM(3, K, "#fff", 1.2, Y => FM(Y, [ -3, 3, 0 ][Y], [ 0, 0, -J ][Y]));
+        if (!D) {
+            for (let Y = 0; Y < 4; Y++) {
+                const B = Y / 4;
+                CM(B * 6 * .5 - 3, -J * B, 3 - B * 6 * .5, -J * B - 2, 1.1, FH((I + Y) % 7, 84));
+            }
+        }
+        D === 2 && EM(10, "#fff", FH(B, 88), 1, Y => {
+            const B = Y / 10 * QE + NH * 2, C = Y & 1 ? 2.4 : 6;
+            FM(Y, WE(B) * C, -J + RE(B) * C);
+        });
+        IH.restore();
+        DM(26, -8, 1.7, MH === 1 && TH.st > KF ? "#f44" : "#2a1836");
+    }
+    function ED() {
+        const Y = LH, B = KM(TH.x), C = LM(TH.y);
+        IH.save();
+        IH.translate(B, C);
+        IH.rotate(TH.a);
+        IH.scale(Y, Y);
+        DD(TI.e[0], AH, BI > 0 || TH.ph > 0, TI.e[1]);
+        IH.restore();
+        DM(B, C, 24 * Y, 0, TH.rp > 0 ? "hsl(6 100% 62%)" : FH(AH, 70, .55), UE(1, (TH.rp > 0 ? 3 : 2) * Y));
+        if (TH.st > KF) {
+            const D = (TH.st - KF) / 1.5;
+            WL();
+            ZL(B, C, (33 + RE(NH * 22) * 4) * Y, -PE / 2, -PE / 2 + QE * (1 - D));
+            XL(UE(2, 4 * Y), "hsl(" + (30 - D * 30) + " 100% 60%)");
+        }
+    }
+    function FD(Y, B, C, D, E, F, H) {
+        IH.font = (F ? "bold " : "") + (D * BN | 0) + "px monospace";
+        IH.textAlign = H || "center";
+        IH.textBaseline = "middle";
+        IH.fillStyle = E;
+        IH.fillText(Y, B, C);
+    }
+    function HD(Y, B, C, D, E, F, H) {
+        const I = EN(Y, B, C, D);
+        CN.push({
+            x: Y,
+            y: B,
+            w: C,
+            h: D,
+            fn: F
+        });
+        DN(Y - C / 2, B - D / 2, C, D, 8 * BN);
+        AL(I ? H || ZM : AM);
+        XL(2 * BN, I ? RM : ZM);
+        FD(E, Y, B + BN, 15, I ? RM : WM, 1);
+    }
+    function ID() {
+        for (const Y of CN) {
+            if (EN(Y.x, Y.y, Y.w, Y.h)) {
+                EC(1);
+                Y.fn();
+                return 1;
+            }
+        }
+        return 0;
+    }
+    function JD() {
+        const Y = 30 * BN, B = 240 * BN, C = UE(TH.y, 0);
+        DM(Y, Y, 9 * BN, YN);
+        FD(CI + (TI.c ? " (" + (TI.c + CI) + ")" : ""), Y + 16 * BN, Y, 16, YN, 1, "left");
+        FD(DI | 0, JH - Y, Y, 19, RM, 1, "right");
+        EI > 1.05 && FD("x" + EI.toFixed(1), JH - Y, Y + 22 * BN, 15, FH(2, 70), 1, "right");
+        if (KI > 3) {
+            const B = 1 + TE(KI, 30) * .02, C = RF(LI / 1.6, 0, 1);
+            FD(KI + " CHAIN", JH - Y, Y + 46 * BN, 15 * B, EH(48, 100, 60 + KI, C), 1, "right");
+        }
+        IH.fillStyle = XM;
+        IH.fillRect(JH / 2 - B / 2, Y + 12 * BN, B, 4 * BN);
+        IH.fillStyle = EH(HM[6] | 0, 90, 70);
+        IH.fillRect(JH / 2 - B / 2, Y + 12 * BN, B * RF(C % OF / OF, 0, 1), 4 * BN);
+        FD(BJ[HI][0] + (MK(TH.y) ? " +" + MK(TH.y) : ""), JH / 2, 18 * BN, 14, WM, 1);
+        FD((C / 10 | 0) + "m", JH / 2 + B / 2 + 24 * BN, Y + 14 * BN, 13, XM, 0, "left");
+        KD();
+        let D = 0;
+        for (let B = 0; B < 7; B++) {
+            JI[B] > 0 && FD(QF[B] + " " + JI[B].toFixed(1), JH - Y, Y + (30 + 16 * D++) * BN, 12, PF[B][0] > 6 ? RM : FH(PF[B][0], 70), 1, "right");
+        }
+        for (let B = 0, C = 0; B < VF; B++) {
+            TF(B) && FD(SF[B * 2], Y - 12 * BN, (58 + 15 * C++) * BN, 11, FH(B % 7, 72), 1, "left");
+        }
+        II > 0 && FD(BJ[HI][0], JH / 2, KH * .3, 42, "hsl(0 0% 100% / " + RF(II, 0, 1) * RF(3.2 - II, 0, 1) + ")", 1);
+        if (!TI.t) {
+            const Y = [ "DRAG TO DRAW A RAINBOW RAIL", "PRESS 1-7 OR SCROLL TO CHANGE COLOUR", "PIGMENT IS FINITE - GRAB SHARDS" ][ZI];
+            Y && FD(Y, JH / 2, KH - 118 * BN, 15, WM, 1);
+        }
+        if (OH > .05) {
+            IH.fillStyle = "hsl(275 60% 60% / " + OH * .1 + ")";
+            IH.fillRect(0, 0, JH, KH);
+            FD("FOCUS VAULT", JH / 2, KH - 96 * BN, 16, WM, 1);
+        }
+    }
+    function KD() {
+        const Y = 44 * BN, B = JH / 2 - 25 * Y / 7, C = KH - 40 * BN, D = 26 * BN;
+        for (let E = 0; E < 7; E++) {
+            const F = B + E * Y * 50 / 44, H = E === AH, I = XH[E] / IF, J = F + Y / 2;
+            DN(F, C - D / 2, Y, D, 5 * BN);
+            AL("hsl(270 30% 8% / .8)");
+            IH.save();
+            IH.clip();
+            IH.fillStyle = FH(E, H ? 60 : 42, WK === E && XK > 0 ? .4 + RE(NH * 40) * .3 : 1);
+            IH.fillRect(F, C + D / 2 - D * I, Y, D * I);
+            IH.restore();
+            DN(F, C - D / 2, Y, D, 5 * BN);
+            XL((H ? 2.6 : 1.2) * BN, H ? RM : FH(E, 55, .8));
+            FD("ROYGBIV"[E], J, C, H ? 15 : 12, H ? RM : WM, 1);
+            FD(E + 1, J, C - D / 2 - 9 * BN, 10, H ? RM : XM);
+            ZH & MF[E] && DM(J, C + D / 2 + 8 * BN, 2.6 * BN, FH(E, 75));
+            CN.push({
+                x: J,
+                y: C,
+                w: Y,
+                h: D,
+                fn: () => UD(E)
+            });
+        }
+        YI > 2 && FD(YI + "/7", B - 18 * BN, C, 13, RM, 1);
+    }
+    function LD() {
+        if (MH !== 1 || AI || !TH.al) {
+            return;
+        }
+        const Y = WI - TH.x, B = XI - TH.y, C = AE(Y, B);
+        C > HF && DM(KM(TH.x + Y / C * HF), LM(TH.y + B / C * HF), 4 * BN, FH(AH, 60, .8));
+    }
+    function MD(Y, B, C, D, E, F) {
+        IH.fillStyle = "hsl(275 45% 5% / .8)";
+        IH.fillRect(0, 0, JH, KH);
+        if (Y) {
+            DN(JH / 2 - Y * BN / 2, KH / 2 - B * BN / 2, Y * BN, B * BN, 14 * BN);
+            AL("hsl(272 40% 9% / .96)");
+            XL(2 * BN, ZM);
+            FD(C, JH / 2, KH / 2 - (B / 2 - 34) * BN, 27, RM, 1);
+        }
+        for (let Y = 0; Y < D.length; Y++) {
+            FD(D[Y], JH / 2, KH / 2 - (B / 2 - 78) * BN + Y * 22 * BN, F || 13.5, WM, F ? 1 : 0);
+        }
+        for (const Y of E) {
+            HD(JH / 2 + Y[0] * BN, KH / 2 + Y[1] * BN, Y[2] * BN, 40 * BN, Y[3], Y[4], Y[5]);
+        }
+    }
+    function ND() {
+        TI.m ^= 1;
+        BL && (BL.gain.value = TI.m ? 0 : .8);
+        XD();
+    }
+    function OD() {
+        MD(0, 0, 0, [], [ [ 0, -30, 190, "PLAY", AD, "hsl(300 80% 55%)" ], [ -105, 26, 130, "STORE", () => {
+            MH = 4;
+        } ], [ 105, 26, 130, TI.m ? "UNMUTE" : "MUTE", ND ] ]);
+        const Y = KH * .3;
+        for (let B = 0; B < 7; B++) {
+            IH.font = "bold " + (66 * BN | 0) + "px monospace";
+            IH.textAlign = "center";
+            IH.fillStyle = FH(B, 60, .5);
+            IH.fillText("PRISMFALL", JH / 2 + RE(NH * 1.2 + B * .5) * 5 * BN, Y + 2.4 * (B - 3) * BN);
+        }
+        FD("PRISMFALL", JH / 2, Y, 66, RM, 1);
+        FD("you never steer the unicorn - you draw the physics", JH / 2, Y + 46 * BN, 15, WM);
+        [ "DRAG near the unicorn - drawings STAY until used - longer = stronger", "R push - O aim - Y spring - G tether - B rail - I gravity - V warp", 0, "X lets go - 1-7 or SCROLL picks a colour" ].forEach((Y, B) => Y && FD(Y, JH / 2, KH - 122 * BN + B * 19 * BN, 13, B === 1 ? WM : B > 2 ? XM : RM, !B));
+        const B = IH.createLinearGradient(JH / 2 - 300 * BN, 0, JH / 2 + 300 * BN, 0);
+        for (let Y = 0; Y < 7; Y++) {
+            B.addColorStop(Y / 6, FH(Y, 68));
+        }
+        FD("CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs", JH / 2, KH - 84 * BN, 13, B, 1);
+        NE(JH / 2, KH * .3 - 74 * BN), OE(JH - 190 * BN, KH / 2 - 40 * BN);
+        TI.b && FD("BEST " + TI.b + "   DEPTH " + (TI.d / 10 | 0) + "m   COINS " + TI.c, JH / 2, KH / 2 + 82 * BN, 14, XM);
+    }
+    function PD() {
+        MD(470, 330, "RUN OVER", [ "SCORE   " + (DI | 0), "DEPTH   " + (FI / 10 | 0) + "m", "REGION  " + BJ[HI][0], "COINS   +" + CI, "BEST    " + TI.b, DI >= TI.b && DI ? "NEW BEST!" : "" ], [ [ 0, 62, 210, "RETRY  (R)", AD, "hsl(300 80% 55%)" ], [ -105, 114, 130, "STORE", () => {
+            MH = 4;
+        } ], [ 105, 114, 130, "MENU", () => {
+            MH = 0;
+        } ] ], 16);
+    }
+    function QD() {
+        IH.fillStyle = "hsl(275 45% 5% / .86)";
+        IH.fillRect(0, 0, JH, KH);
+        const Y = KH / 2;
+        for (let B = 0; B < 7; B++) {
+            IH.font = "bold " + (44 * BN | 0) + "px monospace";
+            IH.textAlign = "center";
+            IH.fillStyle = FH(B, 60, .45);
+            IH.fillText("PRISM ASCENSION", JH / 2 + RE(NH * 1.6 + B * .5) * 4 * BN, Y - 168 * BN + 1.8 * (B - 3) * BN);
+        }
+        FD("PRISM ASCENSION", JH / 2, Y - 168 * BN, 44, RM, 1);
+        FD("DESCENT " + (descent + 1) + " DONE - the shaft begins again, harder", JH / 2, Y - 128 * BN, 15, WM);
+        FD("TAKE ONE. IT IS YOURS FOR THE REST OF THE RUN.", JH / 2, Y - 104 * BN, 13, XM);
+        dsel = -1;
+        const B = 300 * BN, C = 190 * BN;
+        for (let D = 0; D < draft.length; D++) {
+            const E = draft[D], F = JH / 2 + (D - (draft.length - 1) / 2) * (B + 26 * BN), H = Y + 4 * BN, I = EN(F, H, B, C);
+            I && (dsel = D);
+            DN(F - B / 2, H - C / 2, B, C, 14 * BN);
+            AL(I ? "hsl(285 45% 17% / .98)" : "hsl(272 40% 10% / .96)");
+            XL((I ? 3 : 1.6) * BN, I ? RM : FH(E % 7, 60));
+            DN(F - B / 2 + 16 * BN, H - C / 2 + 16 * BN, B - 32 * BN, 5 * BN, 3 * BN);
+            AL(FH(E % 7, 62));
+            FD(SF[E * 2], F, H - 34 * BN, 21, RM, 1);
+            const J = SF[E * 2 + 1].split(" ");
+            let K = "", L = 0;
+            IH.font = (13 * BN | 0) + "px monospace";
+            for (let Y = 0; Y <= J.length; Y++) {
+                const C = K ? K + " " + J[Y] : J[Y];
+                if (Y < J.length && IH.measureText(C).width < B - 44 * BN) {
+                    K = C;
+                } else {
+                    FD(K, F, H + (4 + 19 * L++) * BN, 13, WM);
+                    K = J[Y] || "";
+                }
+            }
+            FD("PRESS " + (D + 1), F, H + C / 2 - 22 * BN, 12, I ? RM : XM, 1);
+            CN.push({
+                x: F,
+                y: H,
+                w: B,
+                h: C,
+                fn: () => BE(D)
+            });
+        }
+    }
+    function SD() {
+        MD(340, 296, "PAUSED", [], [ [ 0, -40, 200, "RESUME", () => {
+            MH = 1;
+        } ], [ 0, 8, 200, "RESTART  (R)", AD ], [ 0, 56, 200, TI.m ? "UNMUTE" : "MUTE", ND ], [ 0, 104, 200, "QUIT RUN", () => {
+            ZD();
+            MH = 3;
+        } ] ]);
+    }
+    function VD() {
+        MD(560, 470, "PRISM STORE", [ TI.c + " COINS - cosmetics only, never power" ], [ [ 0, 200, 150, "BACK", FN ] ], 14);
+        HN = -1;
+        const Y = JH / 2 - 240 * BN;
+        for (let B = 0; B < 12; B++) {
+            const C = B / 3 | 0, D = B % 3, E = Y + D * 150 * BN, F = KH / 2 - 118 * BN + C * 48 * BN, H = UM(C, D), I = TI.e[C] === D, J = EN(E + 66 * BN, F, 140 * BN, 38 * BN);
+            if (J) {
+                HN = C;
+                IN = D;
+            }
+            DN(E, F - 19 * BN, 140 * BN, 38 * BN, 7 * BN);
+            AL(I ? ZM : H ? AM : "hsl(275 25% 10%)");
+            XL((I ? 2.4 : 1) * BN, I || J ? RM : XM);
+            FD(VM[B], E + 66 * BN, F - 5 * BN, 11, H ? RM : WM, 1);
+            FD(H ? I ? "EQUIPPED" : "EQUIP" : TM[D] + "c", E + 66 * BN, F + 9 * BN, 10, H ? XM : TI.c < TM[D] ? "hsl(0 60% 60%)" : YN);
+            CN.push({
+                x: E + 66 * BN,
+                y: F,
+                w: 140 * BN,
+                h: 38 * BN,
+                fn: () => TD(C, D)
+            });
+        }
+        IH.save();
+        IH.translate(JH / 2, KH / 2 + 122 * BN);
+        IH.scale(1.9 * BN, 1.9 * BN);
+        DD(HN === 0 ? IN : TI.e[0], ZE(NH * 3) % 7, 0, HN === 1 ? IN : TI.e[1]);
+        IH.restore();
+    }
+    function TD(Y, B) {
+        if (UM(Y, B)) {
+            TI.e[Y] = B;
+            XD();
+        } else if (TI.c >= TM[B]) {
+            TI.c -= TM[B];
+            TI.o |= 1 << Y * 3 + B;
+            TI.e[Y] = B;
+            XD();
+            YC();
+        } else {
+            BC();
+        }
+    }
+    function UD(Y) {
+        if ((Y = (Y + 7) % 7) !== AH) {
+            AH = Y;
+            EC(1);
+            LC(TH.x, TH.y, 6, 0, 130, LF[Y]);
+            if (ZI === 1) {
+                ZI = 2;
+                YJ = 0;
+            }
+        }
+    }
+    function RD() {
+        const Y = TE(devicePixelRatio || 1, 2);
+        JH = HH.width = innerWidth * Y | 0;
+        KH = HH.height = innerHeight * Y | 0;
+        BN = TE(JH / 1280, KH / 720);
+    }
+    function WD(Y) {
+        const B = JH / innerWidth;
+        UI = Y.clientX * B;
+        RI = Y.clientY * B;
+        WI = MM(UI);
+        XI = NM(RI);
+    }
+    function XD() {
+        try {
+            localStorage[UF] = [ TI.c, TI.b, TI.d, TI.o, TI.m, TI.t ].concat(TI.e).join();
+        } catch (Y) {}
+    }
+    function AD(Y) {
+        DB();
+        MH = 1;
+        DI = 0;
+        CI = 0;
+        EI = 1;
+        FI = 0;
+        HI = 0;
+        II = 3.2;
+        ZH = 0;
+        YI = 0;
+        RK = 0;
+        BI = 0;
+        KI = 0;
+        LI = 0;
+        LN = 0;
+        OH = 0;
+        PJ = null;
+        PH = 0;
+        QH = 0;
+        VH = 0;
+        boon = 0;
+        draft = [];
+        dsel = -1;
+        descent = 0;
+        XH = [ IF, IF, IF, IF, IF, IF, IF ];
+        JI = [ 0, 0, 0, 0, 0, 0, 0 ];
+        NI = [];
+        OI = [];
+        PI = [];
+        QI = [];
+        SI = [];
+        VI = [];
+        AI = null;
+        TH.x = 0;
+        TH.y = -320;
+        TH.vy = 300;
+        TH.a = PE / 2;
+        TH.ra = null;
+        TH.te = null;
+        TH.ph = 0;
+        TH.rp = 0;
+        TH.st = 0;
+        TH.gt = 0;
+        TH.al = 1;
+        TH.sp = 300;
+        TH.rw = 0;
+        UH = 0;
+        RH = CF;
+        WH.x = TH.x;
+        WH.y = TH.y;
+        WH.z = 1;
+        HM = PM(0);
+        BY(Y);
+        TH.vx = ZF(-70, 70);
+        ZI = TI.t ? 3 : 0;
+        YJ = 0;
+        NL = 0;
+        KL && (ML = KL.currentTime + .05);
+        PB(0);
+    }
+    function ZD() {
+        TI.c += CI;
+        TI.b = UE(TI.b, DI | 0);
+        TI.d = UE(TI.d, FI | 0);
+        TI.t || (TI.t = 1);
+        XD();
+        PB(0);
+        LE(DI | 0, FI | 0);
+    }
+    function YE() {
+        const Y = [];
+        for (let B = 0; B < VF; B++) {
+            TF(B) || Y.push(B);
+        }
+        if (Y.length) {
+            draft = [ Y.splice(ZE(B() * Y.length), 1)[0] ];
+            Y.length && draft.push(Y[ZE(B() * Y.length)]);
+            dsel = -1;
+            MH = 5;
+            QH = 1;
+            SH = -1;
+            XB();
+        } else {
+            descent++;
+        }
+    }
+    function BE(Y) {
+        if (!(MH !== 5 || Y >= draft.length)) {
+            boon |= 1 << draft[Y];
+            descent++;
+            MH = 1;
+            for (let Y = 0; Y < 7; Y++) {
+                XH[Y] = ZK();
+            }
+            DI += 5e3 * EI | 0;
+            OC(TH.x, TH.y - 40, SF[draft[Y] * 2], -1);
+            draft = [];
+            WB();
+        }
+    }
+    function CE() {
+        TH.al = 0;
+        LN = 1.3;
+        for (let Y = 0; Y < 7; Y++) {
+            LC(TH.x, TH.y, 16, 0, 520, LF[Y]);
+        }
+        KC(TH.x, TH.y, 0, 0, .7, -1, 2, 22);
+        PH = 30;
+        QH = .7;
+        SH = -1;
+        DC();
+        TH.ra && IY(0);
+        TH.te && KY();
+        MH !== 0 && ZD();
+    }
+    function DE(Y) {
+        CY();
+        PJ = null;
+        for (const Y of MI) {
+            Y.v && TH.y > Y.y + 120 && TH.y < Y.y + Y.h - 120 && (PJ = Y);
+        }
+        const B = OH;
+        OH = XF(OH, PJ ? 1 : 0, 3.5, Y);
+        if (B > .5 && OH <= .5) {
+            LC(TH.x, TH.y, 14, 0, 420, LF[6]);
+            MB(1);
+        }
+        TH.al && EE(Y);
+        SY(Y);
+        if (MH === 1 && MK(TH.y) > descent && TH.al) {
+            YE();
+            return;
+        }
+        const C = LK(TH.y);
+        if (C !== HI) {
+            HI = C;
+            II = 3.2;
+            QH = UE(QH, .35);
+            SH = EJ(HI);
+            FC();
+            DI += 500 * EI | 0;
+        }
+        if (TH.y > FI) {
+            DI += .05 * (TH.y - FI) * EI;
+            FI = TH.y;
+        }
+        EI = RF(1 + TH.sp / 950 + YI * .2 + (BI > 0 ? 2 : 0), 1, 12);
+        if (TH.al) {
+            const B = 2.4 * (TF(5) ? 1.8 : 1);
+            if (TH.sp < 118) {
+                TH.st += Y;
+                const C = RF((TH.st - KF) / (B - KF), 0, 1);
+                if ((MN -= Y) <= 0 && C > 0) {
+                    MN = UE(.16, .55 - C * .4);
+                    CC(C);
+                }
+                TH.st > B && CE();
+            } else if (TH.st > 0) {
+                TH.st > KF && LC(TH.x, TH.y, 8, 0, 260, LF[0]);
+                TH.st = UE(0, TH.st - Y * 2.6);
+            }
+        } else {
+            LN -= Y;
+            if (LN <= 0) {
+                if (MH === 0) {
+                    AD();
+                    MH = 0;
+                } else {
+                    MH = 3;
+                }
+            }
+        }
+        II -= Y;
+        XK -= Y;
+        BI -= Y;
+        for (let B = 0; B < 7; B++) {
+            JI[B] -= Y;
+        }
+        LI > 0 && (LI -= Y) <= 0 && (KI = 0);
+        if (RK > 0 && (RK -= Y) <= 0) {
+            ZH = 0;
+            YI = 0;
+        }
+        QH = UE(0, QH - Y * 2.4);
+        for (let B = NI.length; B--; ) {
+            const C = NI[B];
+            C.u && (C.l -= Y);
+            if (C.u && C.l <= 0 || C.y2 < TH.y - 2600) {
+                TH.ra === C && IY(1);
+                C === AI && (AI = null);
+                NI.splice(B, 1);
+            }
+        }
+        PC(Y);
+        TH.al && BD();
+        if (!TI.t) {
+            YJ += Y;
+            if (ZI === 2 && YJ > 9) {
+                ZI = 3;
+                TI.t = 1;
+                XD();
+            }
+        }
+    }
+    function EE(Y) {
+        JN += Y;
+        let B = 0;
+        while (JN >= NN && B < 8) {
+            TY(NN);
+            JN -= NN;
+            B++;
+        }
+        B >= 8 && (JN = 0);
+    }
+    function FE() {
+        CN = [];
+        BN = TE(JH / 1280, KH / 720);
+        VC();
+        RC();
+        ZC();
+        CD();
+        YD();
+        TH.al && ED();
+        MH !== 1 && MH !== 2 || JD();
+        if (QH > .01) {
+            IH.fillStyle = SH < 0 ? "hsl(" + (NH * 500 % 360 | 0) + " 100% 75% / " + QH * .5 + ")" : EH(SH | 0, 100, 72, QH * .45);
+            IH.fillRect(0, 0, JH, KH);
+        }
+        MH > 1 ? [ 0, 0, SD, PD, VD, QD ][MH]() : MH || OD();
+        LD();
+    }
+    async function HE(Y, B) {
+        try {
+            const C = await Y;
+            if (C && C.success) {
+                return C.data;
+            }
+            RN = (B || "call") + " failed: " + (C && C.message || "no reason given");
+            return null;
+        } catch (Y) {
+            RN = (B || "call") + " threw: " + String(Y && Y.message).slice(0, 60);
+            return null;
+        }
+    }
+    async function IE() {
+        const Y = ON();
+        if (!Y || !Y.getOrCreateLeaderboard) {
+            return;
+        }
+        const B = Y.LeaderboardSortOrder ? Y.LeaderboardSortOrder.DESC : 1, C = Y.LeaderboardDisplayType ? Y.LeaderboardDisplayType.NUMERIC : 0, D = await HE(Y.getOrCreateLeaderboard("prismfall-score", B, C), "score board"), E = await HE(Y.getOrCreateLeaderboard("prismfall-depth", B, C), "depth board");
+        D && (SN = D.id);
+        E && (VN = E.id);
+        SN || (RN = RN || "no leaderboard id");
+        KE();
+    }
+    function JE(Y) {
+        const B = ON();
+        try {
+            const C = B.getUserAvatarUrl ? B.getUserAvatarUrl(Y, B.AvatarSize ? B.AvatarSize.MEDIUM : 1) : PN.avatarUrl;
+            if (!C) {
+                return;
+            }
+            const D = new Image;
+            D.crossOrigin = "anonymous";
+            D.onload = () => {
+                QN = D;
+            };
+            D.src = C;
+        } catch (Y) {}
+    }
+    async function KE() {
+        const Y = ON();
+        if (!Y || !SN || WN) {
+            return;
+        }
+        WN = 1;
+        const B = await HE(Y.listLeaderboardEntries(SN, 0, 8, 0), "list");
+        if (B) {
+            TN = B.map(Y => [ Y.globalRank, Y.username || "player", Y.score ]);
+            RN = TN.length ? "" : "be the first to post a score";
+        }
+        const C = await HE(Y.getMyLeaderboardEntries(SN), "my entries");
+        C && C.length && (UN = C[0].globalRank | 0);
+        WN = 0;
+    }
+    function LE(Y, B) {
+        const C = ON();
+        if (!C || !SN || !Y) {
+            return;
+        }
+        const D = {
+            region: BJ[HI][0],
+            depth: B / 10 | 0,
+            descents: descent,
+            boons: SF.filter((Y, B) => !(B & 1) && TF(B >> 1)).join(",") || "none"
+        };
+        HE(C.uploadLeaderboardScore(SN, Y, 1, void 0, D), "upload").then(Y => {
+            if (Y) {
+                UN = Y.globalRank | 0;
+                RN = "rank #" + UN;
+            }
+            KE();
+        });
+        VN && HE(C.uploadLeaderboardScore(VN, B | 0, 1));
+        ME("Run over", "Scored " + Y);
+    }
+    function ME(Y, B) {
+        const C = ON();
+        try {
+            C && C.updateUserPresence && C.updateUserPresence({
+                status: Y,
+                details: B || ""
+            });
+        } catch (Y) {}
+    }
+    function NE(Y, B) {
+        if (!PN) {
+            return;
+        }
+        const C = 17 * BN, D = PN.username || "player";
+        if (QN) {
+            IH.save();
+            WL();
+            ZL(Y - 62 * BN, B, C);
+            IH.clip();
+            IH.drawImage(QN, Y - 62 * BN - C, B - C, C * 2, C * 2);
+            IH.restore();
+        } else {
+            DM(Y - 62 * BN, B, C, FH(D.charCodeAt(0) % 7, 46));
+            FD(D[0].toUpperCase(), Y - 62 * BN, B, 17, RM, 1);
+        }
+        DM(Y - 62 * BN, B, C, 0, ZM, 2 * BN);
+        FD(D, Y - 34 * BN, B - 7 * BN, 15, RM, 1, "left");
+        FD(UN ? "GLOBAL RANK #" + UN : "UNRANKED", Y - 34 * BN, B + 10 * BN, 11, XM, 0, "left");
+    }
+    function OE(Y, B) {
+        const C = 250 * BN;
+        DN(Y - C / 2, B - 130 * BN, C, 260 * BN, 12 * BN);
+        AL("hsl(272 40% 9% / .8)");
+        XL(1.4 * BN, XM);
+        FD("GLOBAL TOP 8", Y, B - 108 * BN, 13, RM, 1);
+        TN.length && RN && FD(RN, Y, B + 110 * BN, 10, XM);
+        if (!TN.length) {
+            const D = (RN || "loading...").split(" ");
+            let E = "", F = 0;
+            IH.font = (11 * BN | 0) + "px monospace";
+            for (let H = 0; H <= D.length; H++) {
+                const I = E ? E + " " + D[H] : D[H];
+                if (H < D.length && IH.measureText(I).width < C - 28 * BN) {
+                    E = I;
+                } else {
+                    FD(E, Y, B - 30 * BN + 15 * F++ * BN, 11, WM);
+                    E = D[H] || "";
+                }
+            }
+            return;
+        }
+        TN.forEach((D, E) => {
+            const F = B - 78 * BN + E * 24 * BN, H = PN && D[1] === PN.username;
+            FD("#" + D[0], Y - C / 2 + 16 * BN, F, 12, H ? YN : XM, H, "left");
+            FD(D[1].slice(0, 12), Y - C / 2 + 54 * BN, F, 12, H ? RM : WM, H, "left");
+            FD(D[2], Y + C / 2 - 16 * BN, F, 12, H ? YN : WM, H, "right");
+        });
+    }
+    const PE = Math.PI, QE = PE * 2, SE = Math, VE = SE.abs, TE = SE.min, UE = SE.max, RE = SE.sin, WE = SE.cos, XE = SE.atan2, AE = SE.hypot, ZE = SE.floor, YF = SE.random, BF = 17, CF = 1250, DF = 2900, EF = 400, FF = 545, HF = 305, IF = 100, JF = [ .088, .055, .062, .07, .05, .076, .095 ], KF = .9, LF = [ 0, 32, 54, 140, 200, 248, 312 ], MF = [ 1, 2, 4, 8, 16, 32, 64 ], NF = 64, OF = 15e3, PF = [ [ 0, 1.5, 10 ], [ 2, 1.5, 11 ], [ 3, 1.7, 12 ], [ 4, 2, 12 ], [ 5, 1.9, 11 ], [ 6, 1.9, 11 ], [ 7, .4, 12 ] ], QF = "OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY".split(" "), SF = "PRISM HEART|+30% pigment, refilled|AFTERGLOW|strokes cost 30% less|MOMENTUM|far less drag at speed|DEMOLITION|panels break at half the hit|LODESTONE|coins always pull to you|SECOND WIND|stall clock +80%|RESONANCE|bumpers pay double|WIDE PALETTE|+2 stroke slots|HARD LIGHT|strokes fire twice|GOLDEN HOUR|coins worth triple".split("|"), VF = SF.length >> 1, TF = Y => boon >> Y & 1, UF = "pf26_save", RF = (Y, B, C) => Y < B ? B : Y > C ? C : Y, WF = (Y, B, C) => Y + (B - Y) * C, XF = (Y, B, C, D) => WF(Y, B, 1 - SE.exp(-C * D));
+    let AF = 1;
+    const ZF = (Y, C) => Y + B() * (C - Y), YH = (Y, C) => ZE(Y + B() * (C - Y + 1)), BH = Y => B() < Y, CH = Y => Y[ZE(B() * Y.length)], DH = () => B() < .5 ? -1 : 1, EH = (Y, B, C, D) => "hsl(" + Y + " " + B + "% " + C + "%" + (D === void 0 ? "" : " / " + D) + ")", FH = (Y, B, C) => EH(LF[Y], 100, B, C), HH = document.getElementById("a"), IH = HH.getContext("2d");
+    let JH = 0, KH = 0, LH = 1, MH = 0, NH = 0, OH = 0, PH = 0, QH = 0, SH = 0, VH = 0;
+    const TH = {
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        a: 0,
+        sp: 0,
+        ra: null,
+        rt: 0,
+        rs: 1,
+        rw: 0,
+        te: null,
+        ph: 0,
+        rp: 0,
+        st: 0,
+        gt: 0,
+        al: 1
+    };
+    let UH = 0, RH = CF;
+    const WH = {
+        x: 0,
+        y: 0,
+        z: 1,
+        tz: 1
+    };
+    let XH = [], AH = 1, ZH = 0, YI = 0, BI = 0, CI = 0, DI = 0, EI = 1, FI = 0, HI = 0, II = 0, JI = [], KI = 0, LI = 0, MI = [], NI = [], OI = [], PI = [], QI = [], SI = [], VI = [];
+    const TI = {
+        c: 0,
+        b: 0,
+        d: 0,
+        o: 0,
+        e: [ 0, 0, 0, 0 ],
+        m: 0,
+        t: 0
+    };
+    let UI = 0, RI = 0, WI = 0, XI = 0, AI = null, ZI = 0, YJ = 0;
+    const BJ = [ [ "CLOUDBREAK", 206, 74, 88, 26, "0002100210", 5, 1, 5, 40 ], [ "SUNFORGE", 12, 34, 72, 19, "8574185741", 7, 3, 4, 196 ], [ "VERDANT COIL", 152, -74, 74, 17, "2622762262", 8, 5, 6, 320 ], [ "CRYSTAL CURRENT", 190, 44, 84, 15, "3303531333", 5, 6, 7, 25 ], [ "PRISM MINE", 276, -28, 62, 10, "6760671666", 9, 2, 6, 120 ], [ "INVERSION TEMPLE", 264, 52, 80, 13, "6465264636", 7, 4, 7, 75 ], [ "RAINBOW ENGINE", 300, -136, 90, 9, "0123456788", 9, 0, 9, -1 ] ], CJ = [ 180, 786794, 131494, 69971, 693042, 303957, 414347 ], DJ = "120132410656", EJ = Y => BJ[Y][1], FJ = Y => CJ[Y], HJ = (Y, B) => (Y >> 16 - B * 4 & 15) / 16, IJ = Y => Y > 5 ? [ YH(0, 6), YH(0, 6) ] : [ +DJ[Y * 2], +DJ[Y * 2 + 1] ], JJ = Y => BJ[Y][7];
+    let KJ = 0, LJ = -400, MJ = EF, NJ = 0, OJ = 1, PJ = null, QJ = 0, SJ = 0, VJ = 0, TJ = 0, UJ = 0, RJ = 0;
+    const WJ = (Y, B, C, D, E) => Object.assign({
+        t: 0,
+        x: Y,
+        y: B,
+        r: C,
+        g: 0,
+        m: D | 0
+    }, E), XJ = (Y, B, C, D, E, F) => Object.assign({
+        t: 1,
+        x: Y,
+        y: B,
+        r: C,
+        g: D,
+        m: E | 0
+    }, F), AJ = (Y, B, C, D, E, F) => XJ((Y + C) / 2, (B + D) / 2, AE(C - Y, D - B) / 2, XE(D - B, C - Y), E, F), ZJ = (Y, B, C, D) => ({
+        t: Y,
+        x: B,
+        y: C,
+        c: D | 0,
+        g: 0
+    });
+    let YK = 0, BK = 0, CK = 0, DK = 0, EK = 0, FK = 0, HK = 0, IK = 0, JK = 0, KK = 0;
+    const LK = Y => {
+        const B = ZE(UE(Y, 0) / OF);
+        return B < 7 ? B : B % 7;
+    }, MK = Y => ZE(ZE(UE(Y, 0) / OF) / 7), NK = Y => RF(ZE(UE(Y, 0) / OF) * .085 + MK(Y) * .3, 0, 2.4);
+    let OK = -545, PK = FF, QK = 0, SK = 0, VK = [], TK = 0;
+    const UK = Y => Y.m & 2 ? 280 : Y.m & 4 ? 20 : Y.m & 8 ? 285 : HM[6];
+    let RK = 0, WK = -1, XK = 0;
+    const AK = () => UY(7) * (TF(1) ? .7 : 1), ZK = () => TF(0) ? 130 : IF, YL = Y => .45 + TE(Y, 210) / 105 * .55;
+    let BL, CL, DL, EL, FL, HL, IL, JL, KL = null, LL = 0, ML = 0, NL = 0;
+    const OL = Y => 440 * SE.pow(2, (Y - 69) / 12), PL = [ [ 0, 2, 3, 5, 7, 8, 10 ], [ 0, 2, 4, 5, 7, 9, 11 ], [ 0, 3, 5, 7, 10, 12 ], [ 0, 1, 5, 6, 8, 11 ] ], QL = [ "triangle", "sawtooth", "square" ], SL = () => KL && !TI.m && LL < 26, VL = () => KL.currentTime, TL = [ 0, 4, 7, 12 ], UL = [ 4369, 4437, 4115, 4369, 4097, 1298, 21845 ], RL = [ 34953, 42149, 37266, 52429, 33924, 43177, 43691 ], WL = () => IH.beginPath(), XL = (Y, B) => {
+        IH.lineWidth = Y;
+        IH.strokeStyle = B;
+        IH.stroke();
+    }, AL = Y => {
+        IH.fillStyle = Y;
+        IH.fill();
+    }, ZL = (Y, B, C, D, E) => IH.arc(Y, B, C, D || 0, E === void 0 ? QE : E), YM = (Y, B) => IH.moveTo(Y, B), BM = (Y, B) => IH.lineTo(Y, B), CM = (Y, B, C, D, E, F) => {
+        WL();
+        YM(Y, B);
+        BM(C, D);
+        XL(E, F);
+    }, DM = (Y, B, C, D, E, F) => {
+        WL();
+        ZL(Y, B, C);
+        D && AL(D);
+        E && XL(F, E);
+    }, EM = (Y, B, C, D, E) => {
+        WL();
+        for (let B = 0; B < Y; B++) {
+            E(B);
+        }
+        IH.closePath();
+        B && AL(B);
+        C && XL(D, C);
+    }, FM = (Y, B, C) => (Y ? BM : YM)(B, C);
+    let HM = [ 232, 62, 12, 322, 52, 27, 288, 80 ], IM = 0, JM = 0;
+    const KM = Y => JH / 2 + (Y - WH.x) * LH + IM, LM = Y => KH / 2 + (Y - WH.y) * LH + JM, MM = Y => WH.x + (Y - JH / 2 - IM) / LH, NM = Y => WH.y + (Y - KH / 2 - JM) / LH, OM = (Y, B, C, D) => (Y + ((B - Y + 540) % 360 - 180) * (1 - SE.exp(-C * D)) + 360) % 360, PM = Y => {
+        const B = BJ[Y], C = B[1], D = B[4], E = B[9];
+        return [ C, 56, D, C + B[2], 64, D + 23, E < 0 ? NH * 16 % 360 : E, B[3] ];
+    }, QM = [ [ 0, 3, 0 ], [ 2, 1, 8 ], [ 2, 2, -3 ], [ 1, 5, 4 ], [ 1, 7, -1 ], [ 2, 3, 6 ], [ 2, 1, 4 ] ], SM = [ [ 276, 40, 7, 60, 26 ], [ 18, 74, 42, 100, 66 ], [ 292, 60, 30, 100, 74 ], [ 200, 80, 40, 100, 76 ], [ 140, 70, 34, 100, 70 ], [ 46, 38, 22, 90, 60 ], [ 46, 100, 60, 100, 92 ] ], VM = "CLOUD SHADOW NEON SPIRAL LANCE STARTIP RAINBOW DASHED COMET SPARKS SHARDS RINGS".split(" "), TM = [ 0, 180, 420 ], UM = (Y, B) => !B || TI.o >> Y * 3 + B & 1, RM = "#fff", WM = "hsl(0 0% 100% / .62)", XM = "hsl(0 0% 100% / .34)", AM = "hsl(282 40% 15% / .88)", ZM = "hsl(290 55% 50%)", YN = "hsl(48 100% 66%)";
+    let BN = 1, CN = [];
+    const DN = (Y, B, C, D, E) => {
+        WL();
+        IH.roundRect(Y, B, C, D, E);
+    }, EN = (Y, B, C, D) => UI > Y - C / 2 && UI < Y + C / 2 && RI > B - D / 2 && RI < B + D / 2, FN = () => {
+        MH = TI.b || DI ? 3 : 0;
+    };
+    let HN = -1, IN = -1;
+    document.body.style.cssText = "margin:0;overflow:hidden;background:#05030c";
+    HH.style.cssText = "position:fixed;width:100%;height:100%";
+    addEventListener("resize", RD);
+    addEventListener("contextmenu", Y => Y.preventDefault());
+    addEventListener("pointermove", Y => {
+        WD(Y);
+        AI && WY();
+    });
+    addEventListener("pointerdown", Y => {
+        DB();
+        WD(Y);
+        Y.button || ID() || MH !== 1 || RY();
+    });
+    addEventListener("pointerup", () => {
+        AI = null;
+    });
+    addEventListener("blur", () => {
+        AI = null;
+        MH === 1 && (MH = 2);
+    });
+    addEventListener("wheel", Y => {
+        if (MH === 1) {
+            Y.preventDefault();
+            UD(AH + (Y.deltaY > 0 ? 1 : -1));
+        }
+    }, {
+        passive: 0
+    });
+    addEventListener("keydown", Y => {
+        DB();
+        const B = Y.key, C = B.toLowerCase();
+        if (MH !== 5) {
+            if (B > "0" && B < "8") {
+                UD(+B - 1);
+            } else {
+                B !== "Escape" && C !== "p" || (MH = MH === 1 ? 2 : MH === 2 ? 1 : MH === 4 ? (FN(), 
+                MH) : MH);
+                C === "r" && MH > 1 && MH !== 5 && AD();
+                C === "m" && ND();
+                C === "x" && (TH.ra ? IY(1) : TH.te && KY());
+                B !== " " && B !== "Enter" || (MH === 2 ? MH = 1 : MH < 4 && AD());
+            }
+        } else {
+            B !== "1" && B !== "2" || BE(+B - 1);
+        }
+    });
+    document.addEventListener("visibilitychange", () => {
+        document.hidden && MH === 1 && (MH = 2);
+    });
+    let JN = 0, KN = 0, LN = 0, MN = 0;
+    const NN = 1 / 120;
+    (() => {
+        try {
+            const Y = (localStorage[UF] || "").split(",").map(Number);
+            if (Y.length < 9 || Y.some(isNaN)) {
+                return;
+            }
+            TI.c = RF(Y[0] | 0, 0, 1e9);
+            TI.b = RF(Y[1] | 0, 0, 1e12);
+            TI.d = RF(Y[2] | 0, 0, 1e12);
+            TI.o = Y[3] | 0;
+            TI.m = Y[4] ? 1 : 0;
+            TI.t = Y[5] ? 1 : 0;
+            for (let B = 0; B < 4; B++) {
+                const C = Y[6 + B] | 0;
+                TI.e[B] = C > 0 && C < 3 && UM(B, C) ? C : 0;
+            }
+        } catch (Y) {}
+    })();
+    RD();
+    AD();
+    MH = 0;
+    TH.al = 1;
+    requestAnimationFrame(function Y(B) {
+        requestAnimationFrame(Y);
+        const C = RF((B - KN) / 1e3, 0, .05);
+        KN = B;
+        let D = C * WF(1, .4, OH);
+        if (VH > 0) {
+            VH -= C;
+            D *= .12;
+        }
+        NH += D;
+        MH === 1 || MH === 0 ? DE(D) : MH === 3 && PC(D);
+        QC(C);
+        SC(C);
+        HC();
+        FE();
+    });
+    const ON = () => typeof Wavedash != "undefined" ? Wavedash : 0;
+    let PN = null, QN = null, SN = 0, VN = 0, TN = [], UN = 0, RN = "", WN = 0, XN = 0;
+    !function Y() {
+        const B = ON();
+        if (B) {
+            try {
+                B.init({
+                    deferEvents: 1
+                });
+                B.readyForEvents();
+                B.updateLoadProgressZeroToOne && B.updateLoadProgressZeroToOne(1);
+                B.loadComplete && B.loadComplete();
+            } catch (Y) {
+                RN = "init failed: " + String(Y && Y.message).slice(0, 60);
+                return;
+            }
+            try {
+                PN = B.getUser && B.getUser();
+                PN && PN.avatarUrl && JE(PN.userId);
+            } catch (Y) {}
+            RN = "connected" + (PN ? " as " + (PN.username || "?") : ", no user");
+            IE();
+            ME("In the shaft");
+        } else {
+            if (++XN < 40) {
+                RN = "waiting for the Wavedash SDK...";
+                setTimeout(Y, 250);
+                return;
+            }
+            RN = "no SDK on this page - scores stay local";
+        }
+    }();
+})();</script></html>

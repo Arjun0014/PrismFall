@@ -1,0 +1,17 @@
+{
+ "base": 16250,
+ "zip": 16224,
+ "order": [
+  "10_util.js",
+  "00_config.js",
+  "20_state.js",
+  "50_colors.js",
+  "40_physics.js",
+  "60_audio.js",
+  "30_world.js",
+  "70_render.js",
+  "80_hud.js",
+  "85_input.js",
+  "90_game.js"
+ ]
+}
