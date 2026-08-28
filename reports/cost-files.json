@@ -1,93 +1,93 @@
 {
- "base": 16327,
+ "base": 16347,
  "rows": [
   {
-   "label": "70_render.js",
-   "seq": 8,
-   "zip": 13399,
-   "min": 60551,
-   "packed": 17681,
-   "cost": 2928
-  },
-  {
-   "label": "30_world.js",
-   "seq": 4,
-   "zip": 13483,
-   "min": 62718,
-   "packed": 17790,
-   "cost": 2844
-  },
-  {
-   "label": "80_hud.js",
-   "seq": 11,
-   "zip": 14237,
-   "min": 67510,
-   "packed": 18791,
-   "cost": 2090
-  },
-  {
-   "label": "60_audio.js",
-   "seq": 7,
-   "zip": 14781,
-   "min": 69710,
-   "packed": 19514,
-   "cost": 1546
-  },
-  {
-   "label": "40_physics.js",
-   "seq": 5,
-   "zip": 15112,
-   "min": 69779,
-   "packed": 19957,
-   "cost": 1215
-  },
-  {
-   "label": "50_colors.js",
-   "seq": 6,
-   "zip": 15201,
-   "min": 69610,
-   "packed": 20073,
-   "cost": 1126
-  },
-  {
-   "label": "90_game.js",
+   "label": "render.js",
    "seq": 10,
-   "zip": 15366,
-   "min": 71876,
-   "packed": 20292,
-   "cost": 961
+   "zip": 13372,
+   "min": 60561,
+   "packed": 17647,
+   "cost": 2975
   },
   {
-   "label": "85_input.js",
-   "seq": 9,
-   "zip": 15860,
-   "min": 75684,
-   "packed": 20955,
-   "cost": 467
+   "label": "world.js",
+   "seq": 5,
+   "zip": 13482,
+   "min": 62722,
+   "packed": 17785,
+   "cost": 2865
   },
   {
-   "label": "10_util.js",
-   "seq": 2,
-   "zip": 16108,
-   "min": 76558,
-   "packed": 21281,
-   "cost": 219
+   "label": "hud.js",
+   "seq": 11,
+   "zip": 14213,
+   "min": 67533,
+   "packed": 18757,
+   "cost": 2134
   },
   {
-   "label": "00_config.js",
-   "seq": 1,
-   "zip": 16169,
-   "min": 77429,
-   "packed": 21362,
-   "cost": 158
+   "label": "audio.js",
+   "seq": 6,
+   "zip": 14745,
+   "min": 69740,
+   "packed": 19468,
+   "cost": 1602
   },
   {
-   "label": "20_state.js",
+   "label": "physics.js",
+   "seq": 4,
+   "zip": 15107,
+   "min": 69801,
+   "packed": 19949,
+   "cost": 1240
+  },
+  {
+   "label": "colors.js",
    "seq": 3,
-   "zip": 16405,
-   "min": 77343,
-   "packed": 21675,
-   "cost": -78
+   "zip": 15214,
+   "min": 69626,
+   "packed": 20099,
+   "cost": 1133
+  },
+  {
+   "label": "game.js",
+   "seq": 9,
+   "zip": 15337,
+   "min": 71909,
+   "packed": 20256,
+   "cost": 1010
+  },
+  {
+   "label": "input.js",
+   "seq": 8,
+   "zip": 15856,
+   "min": 75723,
+   "packed": 20952,
+   "cost": 491
+  },
+  {
+   "label": "util.js",
+   "seq": 7,
+   "zip": 16071,
+   "min": 76567,
+   "packed": 21232,
+   "cost": 276
+  },
+  {
+   "label": "config.js",
+   "seq": 1,
+   "zip": 16145,
+   "min": 77461,
+   "packed": 21330,
+   "cost": 202
+  },
+  {
+   "label": "state.js",
+   "seq": 2,
+   "zip": 16389,
+   "min": 77383,
+   "packed": 21652,
+   "cost": -42
   }
  ]
 }

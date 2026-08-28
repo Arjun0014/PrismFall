@@ -692,3 +692,67 @@ either), and the alphabet plateaus after ~375 probes.
 
 **16,558 → 16,197 B, −361 B, with no change to any feature, sound, effect,
 world, system, cosmetic or tuning value.**
+
+
+## Where the archive stands: 16,197 B
+
+Measured against the final build.
+
+### By source file (leave-one-out, real pipeline)
+
+| File | Archive cost |
+|---|---:|
+| render.js | 2,975 |
+| world.js | 2,865 |
+| hud.js | 2,134 |
+| audio.js | 1,602 |
+| physics.js | 1,240 |
+| colors.js | 1,133 |
+| game.js | 1,010 |
+| input.js | 491 |
+| util.js | 276 |
+| config.js | 202 |
+| state.js | -42 |
+| *packer decoder + zip container + interaction* | ~2,460 |
+
+### By content class
+
+| Class | Count | Archive cost |
+|---|---:|---:|
+| tuning numbers | 3,301 uses / 311 values | 2,700 |
+| string literals | 270 | 1,296 |
+| — of which English prose | 66 | 776 |
+| program structure | | ~12,200 |
+
+### Costed options that are still open, none of them taken
+
+Every row is a real archive measurement against this build. Nothing on this list
+has been applied and no lean build exists.
+
+| Option | Bytes | What it costs the game |
+|---|---:|---|
+| all 24 audio cues from one formula | 448 | every sound becomes a different sound |
+| remove all 24 audio cues | 679 | silence |
+| remove Ascension + all boons | 407 | the endgame |
+| remove particles + shockwaves | 392 | the impact read |
+| remove background motifs | 376 | region identity at a glance |
+| remove region force fields | 317 | the thing that makes a region a place |
+| remove store + cosmetics | 255 | coins stop being spendable |
+| remove the music arrangement | 249 | reactive music |
+| remove reward placement | 205 | coin arcs, destruction caches |
+| remove the title-screen copy | 185 | how anyone learns to play |
+| 9 world archetypes down to 7 | 177 | bowls and crusher lanes |
+| remove the trail | 94 | speed read |
+| remove the world filler pass | 81 | sparser screens |
+| remove focus vaults | 65 | prize rooms |
+| remove onboarding hints | 50 | first-run guidance |
+| 10 boons to 6 | 49 | Ascension variety |
+| 12 cosmetics to 6 | 18 | |
+| remove region gates | 18 | |
+| 7 boosters to 5 | 15 | |
+| 7 regions to 5 | 0 | nothing gained |
+
+**Everything on that list, taken together, is 3,632 B against a gap of 2,885 B.**
+Quantity reductions are near-worthless — halving the cosmetics, the boons and the
+boosters together buys 82 B, and dropping two whole regions buys nothing at all,
+because a table row is repeated text the model already predicts almost free.

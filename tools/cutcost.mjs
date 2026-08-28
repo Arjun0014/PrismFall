@@ -15,6 +15,7 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, existsSync
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { score, competitionTerser, rrOptions } from './measure.mjs';
+import { readSources } from './src.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(ROOT, 'src');
