@@ -414,10 +414,10 @@ function rewards(c, rg) {
   // A coin arc that teaches a trajectory.
   if (rp(.8)) {
     const n = ri(5, 9), x0 = bL + rf(.1, .5) * bW, y0 = c.y + rf(.16, .5) * c.h;
-    const dir = rs(), spread = rf(150, 300), rise = rf(-200, 240);
+    const d = rs() * rf(150, 300), rise = rf(-200, 240);
     for (let i = 0; i < n; i++) {
-      const t = i / (n - 1);
-      const x = x0 + dir * spread * t, y = y0 + rise * sin(t * PI) + t * 150;
+      const t = i / n;
+      const x = x0 + d * t, y = y0 + rise * sin(t * PI) + t * 150;
       if (x > bL + 26 && x < bR - 26 && !solidNear(c, x, y, 26)) c.i.push(item(I_COIN, x, y));
     }
   }

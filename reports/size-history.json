@@ -1385,5 +1385,57 @@
   "note": "EXP5 simpler filler clearance",
   "delta": -27,
   "left": -725
+ },
+ {
+  "date": "2026-08-28 22:03",
+  "quick": false,
+  "zip": 14033,
+  "min": 66698,
+  "raw": 114735,
+  "rr": 18530,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP2 coin arc",
+  "delta": -4,
+  "left": -721
+ },
+ {
+  "date": "2026-08-28 22:09",
+  "quick": false,
+  "zip": 14018,
+  "min": 66684,
+  "raw": 114722,
+  "rr": 18511,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -15,
+  "left": -706
+ },
+ {
+  "date": "2026-08-28 22:21",
+  "quick": false,
+  "zip": 14037,
+  "min": 66711,
+  "raw": 114762,
+  "rr": 18537,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 19,
+  "left": -725
+ },
+ {
+  "date": "2026-08-28 22:26",
+  "quick": false,
+  "zip": 14033,
+  "min": 66698,
+  "raw": 114735,
+  "rr": 18530,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -4,
+  "left": -721
  }
 ]
