@@ -1437,5 +1437,18 @@
   "note": "",
   "delta": -4,
   "left": -721
+ },
+ {
+  "date": "2026-08-28 22:34",
+  "quick": false,
+  "zip": 14033,
+  "min": 66698,
+  "raw": 114735,
+  "rr": 18530,
+  "tag": "roadroller",
+  "deep": true,
+  "note": "deep re-search",
+  "delta": 0,
+  "left": -721
  }
 ]

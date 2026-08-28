@@ -811,7 +811,7 @@
         for (let D = 0; D < B; D++) {
             const B = _.y + C * (D + 1), E = TJ(4, 7);
             for (let C = 0; C < E; C++) {
-                _.o.push(ZH(TH + 40 + (C + (D & 1 ? .5 : 0)) / (E - .3) * (VH - 90), B, SJ(14, 30), Z(XH, 0) | (UJ(.45) ? 1 : UJ(.25) ? CF : 0), __(XH, 60)));
+                _.o.push(ZH(TH + 40 + (C + (D & 1 ? .5 : 0)) / (E - .34) * (VH - 90), B, SJ(14, 30), Z(XH, 0) | (UJ(.45) ? 1 : UJ(.25) ? CF : 0), __(XH, 60)));
                 _.o[_.o.length - 1].m & CF && F_(_, _.o[_.o.length - 1], 3);
             }
         }
@@ -835,15 +835,15 @@
         for (let B = 0; B < 4; B++) {
             _.i.push(CI(0, H[0] + SJ(-26, 26), D + C + 70 + B * 48));
         }
-        _.i.push(CI(UJ(.3) ? 2 : 1, H[B - 1], D - C - 70, VJ(MH(_.rg))));
+        _.i.push(CI(UJ(.34) ? 2 : 1, H[B - 1], D - C - 70, VJ(MH(_.rg))));
         return H;
     }
     function I_(_) {
         const B = JE(VH * .4, 300), C = WH + SJ(-.2, .2) * VH, D = _.y + _.h * .6, E = B * ME(.12 * FE);
-        W(_, C, D, B, .12 * FE, .8 * FE, UJ(.3) ? 2 : 0);
+        W(_, C, D, B, .12 * FE, .8 * FE, UJ(.34) ? 2 : 0);
         _.o.push(ZH(C - E, D, 15, 1), ZH(C + E, D, 15, 1));
         _.i.push(CI(UJ(.3) ? 1 : 2, C, D + B * .5, VJ(MH(_.rg))));
-        UJ(.6) && _.o.push(_I(C, _.y + _.h * .16, SJ(60, 120), SJ(-.4, .4), 1, __(XH, 90)));
+        UJ(.6) && _.o.push(_I(C, _.y + _.h * .18, SJ(60, 120), SJ(-.4, .4), 1, __(XH, 90)));
     }
     function J_(_) {
         const B = KE(150, 240 - YH * 30), C = WH + SJ(-.2, .2) * VH, D = SJ(-90, 90);
@@ -884,7 +884,7 @@
             const C = B / 4 * GE + SJ(0, 1), D = E + ME(C) * G, H = F + LE(C) * G * .7;
             C_(_, D, H, 60) || _.o.push(ZH(D, H, SJ(13, 20), 1, __(XH, 60)));
         }
-        _.i.push(CI(UJ(.2) ? 1 : 2, UJ(.5) ? TH + 60 : UH - 60, (B + C) / 2, VJ(MH(_.rg))));
+        _.i.push(CI(UJ(.22) ? 1 : 2, UJ(.5) ? TH + 60 : UH - 60, (B + C) / 2, VJ(MH(_.rg))));
     }
     function M_(_) {
         const B = TJ(2, 3);
@@ -914,7 +914,7 @@
     function N_(_) {
         const B = TJ(3, 4);
         for (let C = 0; C < B; C++) {
-            const D = _.y + _.h * (.16 + C * .8 / B), E = H_(_, 1, 0, D, 1, 4)[0];
+            const D = _.y + _.h * (.15 + C * .8 / B), E = H_(_, 1, 0, D, 1, 4)[0];
             _.o.push(_I(E, D + _.h * .4 / B, JE(VH * .3, 150), SJ(0, FE), 1, {
                 w: WJ() * SJ(.8, 1.6 + YH * .4)
             }));
@@ -1136,7 +1136,7 @@
             W_("sine", GJ(E), GJ(E) * 1.6, .16, D * .5);
             W_("triangle", GJ(E + 12), 0, .1, D * .3);
         } else {
-            B && W_("sine", 90, 40, .2, D * .5);
+            B && W_("sine", 90, 40, .22, D * .5);
         }
     }
     function Z_(_) {
@@ -1150,7 +1150,7 @@
     }
     function BB() {
         KB(70, [ 0, 4, 7, 12, 16, 19 ], .5, .12, "square", .04, 12);
-        X_(.7, .2, "bandpass", 700, 6e3, .8);
+        X_(.7, .22, "bandpass", 700, 6e3, .8);
         W_("sine", 90, 300, .4, .3);
     }
     function CB(_) {
@@ -1274,7 +1274,7 @@
                     W_("triangle", GJ(_ + B[M] + C), 0, E * 15, .1, SI, I);
                 }
             }
-            D > .2 && K & 1 && X_(.03, .04 + D * .03, "highpass", 7e3, 6e3, 1, SI, I);
+            D > .22 && K & 1 && X_(.03, .04 + D * .03, "highpass", 7e3, 6e3, 1, SI, I);
             D > .5 && K % 4 == 2 && X_(.1, .12, "bandpass", 1800, 900, 1.2, SI, I);
             if (D > .8 && !(K & 1)) {
                 const D = GJ(_ + 12 + B[(J * 3 + L) % B.length]);
@@ -1360,7 +1360,7 @@
             y: B,
             t: C,
             h: D,
-            l: 1.2
+            l: 1.15
         });
     }
     function KC(_) {
@@ -1395,7 +1395,7 @@
     }
     function LC(_) {
         VF.x = QJ(VF.x, SF.x + OJ(SF.vx * .12, -180, 180), 7.5, _);
-        VF.y = QJ(VF.y, SF.y + OJ(SF.vy * .2, -124, 124), 7.5, _);
+        VF.y = QJ(VF.y, SF.y + OJ(SF.vy * .22, -124, 136.4), 7.5, _);
         VF.z = QJ(VF.z, 1 / (1 + SF.sp / 5200), 4, _);
         LF = JE(KF / 620, JF / 848) * VF.z;
         const B = KE(0, 605 - JF / 2 / LF);
@@ -1420,7 +1420,7 @@
         const B = SK[FG];
         IF.lineWidth = KE(1, 2.4 * LF);
         for (let _ = 0; _ < 2; _++) {
-            const C = _ ? .4 : .16, D = _ ? 300 : 500, E = _ ? .1 : .05, F = VF.x * C, G = VF.y * C, H = JF / 2 / LF, I = KF / 2 / LF, J = PE((F + H) / D), K = PE((G + I) / D);
+            const C = _ ? .4 : .16, D = _ ? 300 : 500, E = _ ? .09 : .05, F = VF.x * C, G = VF.y * C, H = JF / 2 / LF, I = KF / 2 / LF, J = PE((F + H) / D), K = PE((G + I) / D);
             for (let _ = PE((G - I) / D); _ <= K; _++) {
                 for (let C = PE((F - H) / D); C <= J; C++) {
                     const H = BC(C * 30 + B, _ * 17);
@@ -1965,7 +1965,7 @@
         QG = [];
         WG = null;
         SF.x = 0;
-        SF.y = -300;
+        SF.y = -320;
         SF.vy = 300;
         SF.a = FE / 2;
         SF.ra = null;
@@ -1999,11 +1999,11 @@
     }
     function QD() {
         SF.al = 0;
-        ML = 1.2;
+        ML = 1.3;
         for (let _ = 0; _ < 7; _++) {
             GC(SF.x, SF.y, 16, 0, 520, _F[_]);
         }
-        FC(SF.x, SF.y, 0, 0, .7, -1, 2, 20);
+        FC(SF.x, SF.y, 0, 0, .7, -1, 2, 22);
         OF = 30;
         PF = .7;
         QF = -1;
@@ -2020,7 +2020,7 @@
         if (B !== FG) {
             FG = B;
             GG = 3.2;
-            PF = KE(PF, .34);
+            PF = KE(PF, .35);
             QF = JH(FG);
             WB();
             CG += 500 * DG | 0;
@@ -2029,20 +2029,20 @@
             CG += .05 * (SF.y - EG) * DG;
             EG = SF.y;
         }
-        DG = OJ(1 + SF.sp / 900 + ZF * .2 + (_G > 0 ? 2 : 0), 1, 12);
+        DG = OJ(1 + SF.sp / 950 + ZF * .2 + (_G > 0 ? 2 : 0), 1, 12);
         if (SF.al) {
             const B = 2.4;
             if (SF.sp < 118) {
                 SF.st += _;
                 const C = OJ((SF.st - ZE) / (B - ZE), 0, 1);
                 if ((NL -= _) <= 0 && C > 0) {
-                    NL = KE(.16, .5 - C * .4);
+                    NL = KE(.16, .55 - C * .4);
                     TB(C);
                 }
                 SF.st > B && QD();
             } else if (SF.st > 0) {
-                SF.st > ZE && GC(SF.x, SF.y, 8, 0, 240, _F[0]);
-                SF.st = KE(0, SF.st - _ * 2.4);
+                SF.st > ZE && GC(SF.x, SF.y, 8, 0, 260, _F[0]);
+                SF.st = KE(0, SF.st - _ * 2.6);
             }
         } else {
             ML -= _;
@@ -2091,7 +2091,7 @@
     }
     function TD() {
         EL = [];
-        DL = JE(JF / 1400, KF / 700);
+        DL = JE(JF / 1280, KF / 720);
         NC();
         QC();
         UC();
@@ -2100,7 +2100,7 @@
         SF.al && ZC();
         MF !== 1 && MF !== 2 || DD();
         if (PF > .01) {
-            IF.fillStyle = QF < 0 ? "hsl(" + (NF * 500 % 360 | 0) + " 100% 75% / " + PF * .5 + ")" : XJ(QF | 0, 100, 70, PF * .5);
+            IF.fillStyle = QF < 0 ? "hsl(" + (NF * 500 % 360 | 0) + " 100% 75% / " + PF * .5 + ")" : XJ(QF | 0, 100, 72, PF * .45);
             IF.fillRect(0, 0, JF, KF);
         }
         MF > 1 ? [ 0, 0, KD, JD, LD ][MF]() : MF || ID();
@@ -2110,14 +2110,14 @@
         if ((_ = (_ + 7) % 7) !== XF) {
             XF = _;
             VB(1);
-            GC(SF.x, SF.y, 6, 0, 120, _F[_]);
+            GC(SF.x, SF.y, 6, 0, 130, _F[_]);
         }
     }
     function VD() {
         const _ = JE(devicePixelRatio || 1, 2);
         JF = HF.width = innerWidth * _ | 0;
         KF = HF.height = innerHeight * _ | 0;
-        DL = JE(JF / 1400, KF / 700);
+        DL = JE(JF / 1280, KF / 720);
     }
     function WD(_) {
         const B = JF / innerWidth;
