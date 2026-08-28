@@ -3,7 +3,7 @@
 // minification (Terser will not rename properties) and compress well.
 // ---------------------------------------------------------------------------
 
-const CV = document.getElementById('a');
+const CV = document.querySelector('canvas');
 const X = CV.getContext('2d');
 let W = 0, H = 0, SC = 1;      // canvas pixel size, world->screen scale
 

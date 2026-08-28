@@ -26,7 +26,9 @@ const rr = rrOptions();
 const filter = process.argv[2] || '';
 
 
-const files = readdirSync(SRC).filter((f) => f.endsWith('.js') && !/^9[5-9]_/.test(f)).sort();
+// Through readSources, so these tools compile the files in the same searched
+// order the build does -- alphabetical order is a different program.
+const files = readSources(false).map((f) => f.name);
 const base = Object.fromEntries(files.map((f) => [f, readFileSync(join(SRC, f), 'utf8')]));
 
 async function measure(mutate) {
@@ -67,70 +69,70 @@ const stub = (o, f, name) => {
 const CUTS = [
   // --- content quantity: the system survives, there is less inside it -------
   ['QTY  cosmetics 12 -> 6 (store intact)', (o) => {
-    sub(o, '80_hud.js', "const COSN = ('CLOUD SHADOW NEON SPIRAL LANCE STARTIP ' +\n  'RAINBOW DASHED COMET SPARKS SHARDS RINGS').split(' ');",
+    sub(o, 'hud.js', "const COSN = ('CLOUD SHADOW NEON SPIRAL LANCE STARTIP ' +\n  'RAINBOW DASHED COMET SPARKS SHARDS RINGS').split(' ');",
       "const COSN = 'CLOUD NEON SPIRAL STARTIP RAINBOW COMET SPARKS RINGS'.split(' ');");
-    sub(o, '80_hud.js', 'const COSP = [0, 180, 420];', 'const COSP = [0, 300];');
-    sub(o, '80_hud.js', 'const owned = (c, i) => !i || (SAVE.o >> (c * 3 + i)) & 1;',
+    sub(o, 'hud.js', 'const COSP = [0, 180, 420];', 'const COSP = [0, 300];');
+    sub(o, 'hud.js', 'const owned = (c, i) => !i || (SAVE.o >> (c * 3 + i)) & 1;',
       'const owned = (c, i) => !i || (SAVE.o >> (c * 2 + i)) & 1;');
-    o['80_hud.js'] = o['80_hud.js'].split('CATS * 3').join('CATS * 2').split('n % 3').join('n % 2')
+    o['hud.js'] = o['hud.js'].split('CATS * 3').join('CATS * 2').split('n % 3').join('n % 2')
       .split('n / 3 | 0').join('n / 2 | 0').split('c * 3 + i').join('c * 2 + i');
   }],
   ['QTY  boons 10 -> 6 (Ascension intact)', (o) => {
-    sub(o, '00_config.js', "'RESONANCE|bumpers pay double|WIDE PALETTE|+2 stroke slots|' +\n  'HARD LIGHT|strokes fire twice|GOLDEN HOUR|coins worth triple'",
+    sub(o, 'config.js', "'RESONANCE|bumpers pay double|WIDE PALETTE|+2 stroke slots|' +\n  'HARD LIGHT|strokes fire twice|GOLDEN HOUR|coins worth triple'",
       "'RESONANCE|bumpers pay double'");
   }],
   ['QTY  boosters 7 -> 5', (o) => {
-    sub(o, '00_config.js', "  [5, 1.9, 11],     // Indigo Flux    - gravity stays bent\n  [6, 1.9, 11],     // Violet Echo    - longer phase, longer warp\n", '');
-    sub(o, '00_config.js', "const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split(' ');",
+    sub(o, 'config.js', "  [5, 1.9, 11],     // Indigo Flux    - gravity stays bent\n  [6, 1.9, 11],     // Violet Echo    - longer phase, longer warp\n", '');
+    sub(o, 'config.js', "const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split(' ');",
       "const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL EFFICIENCY'.split(' ');");
   }],
   ['QTY  regions 7 -> 5', (o) => {
-    o['30_world.js'] = o['30_world.js'].replace(/\n[^\n]*'INVERSION TEMPLE'[^\n]*\n[^\n]*'RAINBOW ENGINE'[^\n]*/, '');
-    sub(o, '00_config.js', 'const NREG = 7;', 'const NREG = 5;');
-    o['30_world.js'] = o['30_world.js'].split('i < 7 ? i : i % 7').join('i < 5 ? i : i % 5')
+    o['world.js'] = o['world.js'].replace(/\n[^\n]*'INVERSION TEMPLE'[^\n]*\n[^\n]*'RAINBOW ENGINE'[^\n]*/, '');
+    sub(o, 'config.js', 'const NREG = 7;', 'const NREG = 5;');
+    o['world.js'] = o['world.js'].split('i < 7 ? i : i % 7').join('i < 5 ? i : i % 5')
       .split('/ REGD) / 7)').join('/ REGD) / 5)').split('r > 5 ?').join('r > 3 ?');
   }],
   ['QTY  world archetypes 9 -> 7 (drop bowl + crushers)', (o) => {
-    stub(o, '30_world.js', 'bowl'); stub(o, '30_world.js', 'crushers');
+    stub(o, 'world.js', 'bowl'); stub(o, 'world.js', 'crushers');
   }],
 
   // --- meta systems: no effect on moment-to-moment play ---------------------
   ['META store + cosmetics entirely', (o) => {
-    stub(o, '80_hud.js', 'screenStore'); stub(o, '80_hud.js', 'buyEquip');
+    stub(o, 'hud.js', 'screenStore'); stub(o, 'hud.js', 'buyEquip');
   }],
   ['META Ascension + all boons', (o) => {
-    stub(o, '80_hud.js', 'screenAscend'); stub(o, '90_game.js', 'ascend'); stub(o, '90_game.js', 'takeBoon');
+    stub(o, 'hud.js', 'screenAscend'); stub(o, 'game.js', 'ascend'); stub(o, 'game.js', 'takeBoon');
   }],
   ['META onboarding hints', (o) => {
-    sub(o, '80_hud.js', "    const t = ['DRAG TO DRAW A RAINBOW RAIL', 'PRESS 1-7 OR SCROLL TO CHANGE COLOUR',\n      'PIGMENT IS FINITE - GRAB SHARDS'][hint];", '    const t = 0;');
+    sub(o, 'hud.js', "    const t = ['DRAG TO DRAW A RAINBOW RAIL', 'PRESS 1-7 OR SCROLL TO CHANGE COLOUR',\n      'PIGMENT IS FINITE - GRAB SHARDS'][hint];", '    const t = 0;');
   }],
   ['META title screen copy block', (o) => {
-    const i = o['80_hud.js'].indexOf('  [\n    \'DRAG near the unicorn');
-    const j = o['80_hud.js'].indexOf('  if (WD) wdIdentity');
-    o['80_hud.js'] = o['80_hud.js'].slice(0, i) + o['80_hud.js'].slice(j);
+    const i = o['hud.js'].indexOf('  [\n    \'DRAG near the unicorn');
+    const j = o['hud.js'].indexOf('  if (WD) wdIdentity');
+    o['hud.js'] = o['hud.js'].slice(0, i) + o['hud.js'].slice(j);
   }],
 
   // --- content flourishes ---------------------------------------------------
-  ['CONTENT focus vaults', (o) => stub(o, '30_world.js', 'buildVault')],
-  ['CONTENT region gates', (o) => stub(o, '30_world.js', 'buildGate')],
-  ['CONTENT reward placement', (o) => stub(o, '30_world.js', 'rewards')],
-  ['CONTENT world filler pass', (o) => stub(o, '30_world.js', 'decorate')],
+  ['CONTENT focus vaults', (o) => stub(o, 'world.js', 'buildVault')],
+  ['CONTENT region gates', (o) => stub(o, 'world.js', 'buildGate')],
+  ['CONTENT reward placement', (o) => stub(o, 'world.js', 'rewards')],
+  ['CONTENT world filler pass', (o) => stub(o, 'world.js', 'decorate')],
 
   // --- looks and feel: measured so the trade is visible, NOT recommended ----
-  ['FEEL background motifs', (o) => { stub(o, '70_render.js', 'background'); stub(o, '70_render.js', 'motif'); }],
-  ['FEEL music arrangement', (o) => stub(o, '60_audio.js', 'musicTick')],
-  ['FEEL the trail', (o) => { stub(o, '70_render.js', 'pushTrail'); stub(o, '70_render.js', 'drawTrail'); }],
-  ['FEEL region force fields', (o) => { stub(o, '30_world.js', 'zoneF'); stub(o, '70_render.js', 'drawZone'); }],
+  ['FEEL background motifs', (o) => { stub(o, 'render.js', 'background'); stub(o, 'render.js', 'motif'); }],
+  ['FEEL music arrangement', (o) => stub(o, 'audio.js', 'musicTick')],
+  ['FEEL the trail', (o) => { stub(o, 'render.js', 'pushTrail'); stub(o, 'render.js', 'drawTrail'); }],
+  ['FEEL region force fields', (o) => { stub(o, 'world.js', 'zoneF'); stub(o, 'render.js', 'drawZone'); }],
   ['FEEL all 24 audio cues', (o) => {
     for (const n of ['sndHit', 'sndBreak', 'sndTarget', 'sndBank', 'sndBoost', 'sndVector', 'sndSpring',
       'sndTether', 'sndGrav', 'sndWarp', 'sndCoin', 'sndCrown', 'sndPig', 'sndWell', 'sndSpectrum',
       'sndFuse', 'sndRefund', 'sndPower', 'sndEmpty', 'sndStall', 'sndDeath', 'sndUI', 'sndGate']) {
-      try { stub(o, '60_audio.js', n); } catch { /* already gone */ }
+      try { stub(o, 'audio.js', n); } catch { /* already gone */ }
     }
   }],
   ['FEEL particles + shockwaves', (o) => {
     for (const n of ['burst', 'warpFX', 'strokeFX', 'drawParts', 'shock']) {
-      try { stub(o, '70_render.js', n); } catch { /* skip */ }
+      try { stub(o, 'render.js', n); } catch { /* skip */ }
     }
   }],
 ];

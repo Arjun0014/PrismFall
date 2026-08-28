@@ -582,3 +582,113 @@ Re-running the alphabet climb after the abbreviation change found
 default**. Two characters swapped. This axis clearly still has a little left in
 it each time the payload moves, which is the argument for `npm run mangle` being
 part of the routine rather than a one-off.
+
+### 24 — Formula-driven audio, measured rather than argued (worth 448 B)
+
+The proposal, stated precisely: instead of 24 hand-written cue recipes, derive
+every cue's waveform, pitch, sweep, duration and envelope arithmetically from
+its event id and whatever runtime value it already receives. This is **not** the
+audio patch VM of experiment 1 — that stored a packed parameter table and lost
+by 17 B because the table was dense novel data. A formula stores nothing at all.
+
+`tools/audioform.mjs` measures the ceiling. It replaces all 24 cue bodies with
+calls to one generator whose parameters come only from `id`, and weighs the real
+archive. The generator is deliberately the smallest thing that still makes a
+two-layer, pitch-swept, envelope-shaped sound, so the number is an upper bound.
+
+| | Archive | Minified |
+|---|---:|---:|
+| current | 16,230 | 77,281 |
+| all 24 cues from one formula | 15,782 | 74,733 |
+| **saving** | **448 B** | |
+
+For scale: deleting all 24 cues outright is worth 686 B, so the generator itself
+costs 238 B of that.
+
+**448 B, and every sound in the game becomes a different sound.** Sound design
+is not recoverable from a hash of the event id — `sndDeath`'s descending minor
+run and `sndSpectrum`'s stacked arpeggios are decisions, not parameters. This is
+recorded as a costed option, not applied. It is 15% of the remaining gap.
+
+### 25 — HTML shell and ZIP container, re-audited (−5 B)
+
+| Variant | Shell chars | Archive | Delta |
+|---|---:|---:|---:|
+| current `<canvas id=a>` + `getElementById` | 54 | 16,202 | — |
+| **`<canvas>` + `querySelector`** | **49** | **16,197** | **−5** |
+| `<body>` + canvas created in JS | 38 | 16,202 | 0 |
+| no `<body>` + `documentElement.appendChild` | 32 | 16,198 | −4 |
+
+Moving markup into the payload is a wash: the shell is deflated with
+high-entropy packed data so its characters cost ~1 B each, but the JS that
+replaces them costs about the same after packing. Dropping the `id` is a genuine
+−5 B and is taken; it was verified in Chromium and WebKit, 27 assertions each,
+not just in the smoke harness.
+
+**The first run of this audit was wrong and the bug is worth recording.** It
+compared source files by object identity (`f === CANVAS_SRC`) against a fresh
+array from `readSources()`, so the identity never matched: every variant was
+measured with a *trimmed shell and an unchanged payload*, a pairing that cannot
+run. It reported 22 B of savings that do not exist. `smoke()` did not catch it
+either, because the test harness's `getElementById` returns the canvas whatever
+id it is asked for. The number that exposed it was the real build: applying the
+"−15 B" variant for real produced exactly 16,202, no change.
+
+The container is at its floor and is on the record:
+
+```
+local file header          30 B
+file name "index.html"     10 B    required at top level by the rules
+central directory header   46 B
+file name again            10 B
+end of central directory   22 B
+---------------------------------
+fixed overhead            118 B
+```
+
+No extra fields, no data descriptor, no directory entry, no comment.
+
+### 26 — The deep path was shipping regressions (two separate bugs)
+
+Both found by noticing that `--deep` produced a *larger* archive than the fast
+build, twice.
+
+1. **The sweep's metric was too weak.** It scored candidates with a single
+   zopfli pass at 15 iterations and no ECT, while the build ships
+   `[15, 200, 1000, 4000]` + ECT. A model that led by 5 B on the cheap metric
+   came out 13 B behind on the real one — and the sweep then cached the loser.
+2. **The sweep built its candidates without `allowFreeVars`,** which the fast
+   path sets. So it was ranking, and then *shipping*, models built under options
+   the product does not use. Worth 15 B, and it made every deep run a
+   regression.
+
+Together with the `maxMemoryMB: 700` bug from experiment 10, that is three
+separate defects in the same twenty lines, all of the same shape: **the deep
+path evaluated candidates under conditions the shipping path does not use.**
+It now scores exactly what it ships, and the cached model competes on equal
+terms and wins ties.
+
+### 27 — Coordinate descent to a fixed point
+
+The three search axes are coupled: the alphabet that wins depends on the file
+order, which depends on the Terser flags. Alternating them:
+
+| Round | Change | Archive |
+|---|---|---:|
+| — | start of phase | 16,558 |
+| 1 | Terser flag descent | 16,481 |
+| 2 | alphabet search | 16,252 |
+| 3 | abbreviations 12 → 9 | 16,250 |
+| 4 | alphabet climb (restart) | 16,242 |
+| 5 | file order | 16,231 |
+| 6 | file order round 2 | 16,211 |
+| 7 | alphabet, re-searched on the new order | 16,202 |
+| 8 | shell `id` dropped | **16,197** |
+
+Rounds 5–7 are the point: the alphabet found by round 4 was **worse** than its
+predecessor once the file order moved, and had to be re-searched from scratch.
+Flags and file order are now both at a fixed point (no single move improves
+either), and the alphabet plateaus after ~375 probes.
+
+**16,558 → 16,197 B, −361 B, with no change to any feature, sound, effect,
+world, system, cosmetic or tuning value.**

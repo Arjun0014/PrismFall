@@ -47,7 +47,7 @@ const log = (...a) => { if (!QUIET) console.log(...a); };
 //
 // The alphabet below was then searched directly against the archive by
 // tools/mangle.mjs (family survey, then a hill-climb over swap / substitute /
-// drop / insert). Total against Terser's default: -244 B. It is 25 characters
+// drop / insert). Total against Terser's default: -310 B. It is 25 characters
 // long and mostly uppercase, which no amount of reasoning would have predicted;
 // the landscape is rugged and non-monotonic in length, so it was found by
 // measurement and it has to be RE-searched after any significant source change:
@@ -57,7 +57,7 @@ const log = (...a) => { if (!QUIET) console.log(...a); };
 // This is a build parameter, exactly like the Roadroller model. Nothing about
 // the game depends on it: Terser guarantees the names it emits are unique,
 // non-reserved and non-shadowing whatever alphabet it is handed.
-const NAME_LEAD = 'YCBDEFHIJKLMNOPVSQTURWXAZ';
+const NAME_LEAD = 'YBCDGFIHJKMLNOPWSVTURQXAZ';
 const NAME_TAIL = NAME_LEAD + '0123456789';
 
 /** A Terser `nth_identifier`. Omitting reset/sort is what disables the sort. */
@@ -165,7 +165,7 @@ async function terse(js, wrap) {
 // The doctype stays. Fourteen bytes is not worth putting the layout into
 // quirks mode.
 function html(script) {
-  return '<!doctype html><canvas id=a></canvas><script>' + script + '</script>';
+  return '<!doctype html><canvas></canvas><script>' + script + '</script>';
 }
 
 // The Wavedash page needs a viewport tag and a matching page background, and
@@ -175,7 +175,7 @@ function wavedashHtml(script) {
   return '<!doctype html><html lang=en><meta charset=utf-8>' +
     '<meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">' +
     '<title>PRISMFALL</title><style>html,body{margin:0;height:100%;background:#05030c;overflow:hidden}' +
-    'canvas{display:block}</style><canvas id=a></canvas><script>' + script + '</script></html>';
+    'canvas{display:block}</style><canvas></canvas><script>' + script + '</script></html>';
 }
 
 // Emitted next to the build so `wavedash dev` and the CLI upload both work
@@ -271,7 +271,11 @@ async function roadroll(js, deep) {
       // 700 this sweep used allocates 486 MB, which no phone will hand over.
       // The sweep returns its winner directly, so a different figure here does
       // not merely mis-measure -- it SHIPS. Worth 7 B and not available.
-      const pk = new Packer(inputs, Object.assign({ maxMemoryMB: RR_MEM }, model, { numAbbreviations: n }));
+      // allowFreeVars, like the fast path. Without it this sweep was ranking --
+      // and then SHIPPING -- models built under options the product does not
+      // use, which cost it 15 B and made every deep run a regression.
+      const pk = new Packer(inputs, Object.assign({ maxMemoryMB: RR_MEM, allowFreeVars: true },
+        model, { numAbbreviations: n }));
       const d = pk.makeDecoder();
       const out = d.firstLine + '\n' + d.secondLine;
       if (/<\/script/i.test(out)) continue;
