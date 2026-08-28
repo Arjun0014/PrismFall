@@ -60,7 +60,7 @@ const log = (...a) => { if (!QUIET) console.log(...a); };
 // This is a build parameter, exactly like the Roadroller model. Nothing about
 // the game depends on it: Terser guarantees the names it emits are unique,
 // non-reserved and non-shadowing whatever alphabet it is handed.
-const NAME_LEAD = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const NAME_LEAD = 'XBCDEFGHIJKONMLPQRYTUVWASZ';
 const NAME_TAIL = NAME_LEAD + '0123456789';
 
 /** A Terser `nth_identifier`. Omitting reset/sort is what disables the sort. */

@@ -25,8 +25,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 // no reason, and a prefix that no longer matches the real order is worse than
 // no prefix.
 export const ORDER = [
-  'config', 'state', 'colors', 'world', 'physics',
-  'render', 'util', 'audio', 'hud', 'input', 'game',
+  'config', 'state', 'colors', 'physics', 'world',
+  'render', 'util', 'audio', 'hud', 'game', 'input',
 ];
 
 // Platform glue is compiled into the Wavedash build only. The competition
