@@ -756,3 +756,68 @@ has been applied and no lean build exists.
 Quantity reductions are near-worthless — halving the cosmetics, the boons and the
 boosters together buys 82 B, and dropping two whole regions buys nothing at all,
 because a table row is repeated text the model already predicts almost free.
+
+---
+
+# Perceptual compression phase
+
+The rule changed here: internal implementation, tuning numbers, sound waveforms
+and rendering formulas no longer have to stay identical, provided the player
+experience is as good. Ascension and boons were approved for removal.
+
+## EXP 1 — Remove Ascension and boons (KEEP)
+
+| | |
+|---|---|
+| Before | 16,197 B |
+| After | **15,430 B** |
+| Delta | **−767 B** |
+| Tests | 165 sim, 21 gen, 35 audio, browser ×2 engines, wavedash — green |
+| Visual | screenshots re-captured; unicorn, strokes, tether, prism bar, HUD intact |
+
+Worth 767 B where stubbing the two screens measured 407, because a clean
+excision also removes the ten-row boon table, the HUD row, the input branch, the
+render pips, the stroke charge counter, and all fourteen sites across colours,
+physics and game that read a boon bit.
+
+The cycle boundary needed no replacement code at all: `regAt` already wraps and
+`difAt` already climbs with the lap count, and a lap boundary is also a region
+change, so it still flashes, names itself and sounds a gate.
+
+## EXP 2 — Formula-generated audio (REVERT, twice)
+
+The measured ceiling is real and unchanged: replacing all 23 cues with one
+generator whose parameters come only from the cue index saves **454 B**. Two
+attempts to collect part of that without making the sounds arbitrary:
+
+### 2a — the seven colour verbs as one spectrum rule
+
+Seven verbs, one sound transposed across the spectrum: Red lowest, Violet
+highest, which is the spectrum's own ordering by frequency, with one bit per
+colour saying whether the verb adds energy (rises) or bends it (falls).
+
+**−7 B.** Reverted.
+
+### 2b — the eight incidental cues from one derived tick
+
+Fusion, refund, purchase, menu, empty tank, pigment, target, coin: all one
+shape, with only the note stored and timbre, glide, length, level and the octave
+partner derived from the cue index. The signature sounds were left alone.
+
+**+10 B — worse.** All 35 audio assertions still passed, including "no two cues
+share a synthesis signature", so the cues stayed distinct. It simply costs more.
+Reverted.
+
+### Why the ceiling is unreachable without losing the design
+
+`O('square', NOTE(n), NOTE(n + 7), .07, .13)` is repeated call syntax whose
+numbers are drawn from the pool the whole game already uses — the model predicts
+it almost free. `tick(14, 76 + f * 12 | 0)` replaces that with an index that is
+itself novel information, plus a generator to interpret it.
+
+**The 454 B is not paid for by sharing the generator. It is paid for by deleting
+the parameters — and the parameters are the sound design.** Any version that
+keeps a cue's character keeps its parameters and therefore saves nothing. This
+closes the audio avenue: the only way to collect that 454 B is to accept
+arbitrary sounds, and that is not a compression change, it is a redesign with a
+worse result.

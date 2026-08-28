@@ -839,5 +839,57 @@
   "note": "EXP1 remove Ascension",
   "delta": -767,
   "left": -2118
+ },
+ {
+  "date": "2026-08-28 16:03",
+  "quick": false,
+  "zip": 15423,
+  "min": 72895,
+  "raw": 115381,
+  "rr": 20380,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -7,
+  "left": -2111
+ },
+ {
+  "date": "2026-08-28 16:03",
+  "quick": false,
+  "zip": 15430,
+  "min": 73417,
+  "raw": 115042,
+  "rr": 20386,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 7,
+  "left": -2118
+ },
+ {
+  "date": "2026-08-28 16:05",
+  "quick": false,
+  "zip": 15440,
+  "min": 73239,
+  "raw": 115787,
+  "rr": 20397,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 10,
+  "left": -2128
+ },
+ {
+  "date": "2026-08-28 16:06",
+  "quick": false,
+  "zip": 15430,
+  "min": 73417,
+  "raw": 115042,
+  "rr": 20386,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -10,
+  "left": -2118
  }
 ]
