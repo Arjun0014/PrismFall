@@ -1073,5 +1073,31 @@
   "note": "deep model re-search",
   "delta": -2,
   "left": -1934
+ },
+ {
+  "date": "2026-08-28 18:46",
+  "quick": false,
+  "zip": 14761,
+  "min": 70847,
+  "raw": 116474,
+  "rr": 19497,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP6a store+cosmetics -> WD only",
+  "delta": -485,
+  "left": -1449
+ },
+ {
+  "date": "2026-08-28 18:46",
+  "quick": false,
+  "zip": 14716,
+  "min": 70750,
+  "raw": 116782,
+  "rr": 19438,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP6a store fully eliminated",
+  "delta": -45,
+  "left": -1404
  }
 ]

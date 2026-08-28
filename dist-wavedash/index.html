@@ -1924,24 +1924,26 @@
         RD();
     }
     function JD() {
-        HD(0, 0, 0, [], [ [ 0, -30, 190, "PLAY", SD, "hsl(300 80% 55%)" ], [ -105, 26, 130, "STORE", () => {
+        const A = [ [ 0, -30, 190, "PLAY", SD, "hsl(300 80% 55%)" ], [ 105, 26, 130, TG.m ? "UNMUTE" : "MUTE", ID ] ];
+        A.push([ -105, 26, 130, "STORE", () => {
             NF = 4;
-        } ], [ 105, 26, 130, TG.m ? "UNMUTE" : "MUTE", ID ] ]);
-        const A = LF * .3;
-        for (let B = 0; B < 7; B++) {
+        } ]);
+        HD(0, 0, 0, [], A);
+        const B = LF * .3;
+        for (let A = 0; A < 7; A++) {
             JF.font = "bold " + (66 * IL | 0) + "px monospace";
             JF.textAlign = "center";
-            JF.fillStyle = EK(B, 60, .5);
-            JF.fillText("PRISMFALL", KF / 2 + ME(OF * 1.2 + B * .5) * 5 * IL, A + 2.4 * (B - 3) * IL);
+            JF.fillStyle = EK(A, 60, .5);
+            JF.fillText("PRISMFALL", KF / 2 + ME(OF * 1.2 + A * .5) * 5 * IL, B + 2.4 * (A - 3) * IL);
         }
-        BD("PRISMFALL", KF / 2, A, 66, CL, 1);
-        BD("you never steer the unicorn - you draw the physics", KF / 2, A + 46 * IL, 15, DL);
+        BD("PRISMFALL", KF / 2, B, 66, CL, 1);
+        BD("you never steer the unicorn - you draw the physics", KF / 2, B + 46 * IL, 15, DL);
         [ "DRAG near the unicorn - drawings STAY until used - longer = stronger", "R push - O aim - Y spring - G tether - B rail - I gravity - V warp", 0, "X lets go - 1-7 or SCROLL picks a colour" ].forEach((A, B) => A && BD(A, KF / 2, LF - 122 * IL + B * 19 * IL, 13, B === 1 ? DL : B > 2 ? EL : CL, !B));
-        const B = JF.createLinearGradient(KF / 2 - 300 * IL, 0, KF / 2 + 300 * IL, 0);
+        const C = JF.createLinearGradient(KF / 2 - 300 * IL, 0, KF / 2 + 300 * IL, 0);
         for (let A = 0; A < 7; A++) {
-            B.addColorStop(A / 6, EK(A, 68));
+            C.addColorStop(A / 6, EK(A, 68));
         }
-        BD("CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs", KF / 2, LF - 84 * IL, 13, B, 1);
+        BD("CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs", KF / 2, LF - 84 * IL, 13, C, 1);
         EE(KF / 2, LF * .3 - 74 * IL), FE(KF - 190 * IL, LF / 2 - 40 * IL);
         TG.b && BD("BEST " + TG.b + "   DEPTH " + (TG.d / 10 | 0) + "m   COINS " + TG.c, KF / 2, LF / 2 + 82 * IL, 14, EL);
     }
@@ -2029,7 +2031,9 @@
     }
     function RD() {
         try {
-            localStorage[HF] = [ TG.c, TG.b, TG.d, TG.o, TG.m, TG.t ].concat(TG.e).join();
+            const A = [ TG.b, TG.d, TG.m, TG.t ];
+            A.push(TG.c, TG.o, ...TG.e);
+            localStorage[HF] = A.join();
         } catch (A) {}
     }
     function SD(A) {
@@ -2517,18 +2521,20 @@
     (() => {
         try {
             const A = (localStorage[HF] || "").split(",").map(Number);
-            if (A.length < 9 || A.some(isNaN)) {
+            if (A.length < 4 || A.some(isNaN)) {
                 return;
             }
-            TG.c = UJ(A[0] | 0, 0, 1e9);
-            TG.b = UJ(A[1] | 0, 0, 1e12);
-            TG.d = UJ(A[2] | 0, 0, 1e12);
-            TG.o = A[3] | 0;
-            TG.m = A[4] ? 1 : 0;
-            TG.t = A[5] ? 1 : 0;
-            for (let B = 0; B < 4; B++) {
-                const C = A[6 + B] | 0;
-                TG.e[B] = C > 0 && C < 3 && BL(B, C) ? C : 0;
+            TG.b = UJ(A[0] | 0, 0, 1e12);
+            TG.d = UJ(A[1] | 0, 0, 1e12);
+            TG.m = A[2] ? 1 : 0;
+            TG.t = A[3] ? 1 : 0;
+            if (A.length > 9) {
+                TG.c = UJ(A[4] | 0, 0, 1e9);
+                TG.o = A[5] | 0;
+                for (let B = 0; B < 4; B++) {
+                    const C = A[6 + B] | 0;
+                    TG.e[B] = C > 0 && C < 3 && BL(B, C) ? C : 0;
+                }
             }
         } catch (A) {}
     })();

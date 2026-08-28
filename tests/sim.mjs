@@ -420,13 +420,16 @@ console.log('\n=== items / economy ===');
 console.log('\n=== persistence ===');
 {
   A.__eval('startRun(41);st=1');
-  A.__eval('SAVE.c=0;SAVE.b=0;SAVE.d=0;coins=7;score=1234;depth=5000;endRun()');
+  A.__eval('SAVE.b=0;SAVE.d=0;coins=7;score=1234;depth=5000;endRun()');
   ok(H.store.pf26_save !== undefined, 'save writes the namespaced key');
   ok(!Object.keys(H.store).some((k) => !k.startsWith('pf26_')), 'no foreign keys written', Object.keys(H.store).join(','));
-  ok(A.SAVE.c === 7 && A.SAVE.b === 1234, 'coins and best score persist', A.SAVE.c + '/' + A.SAVE.b);
+  // Coins are in-run feedback in the competition build -- there is nothing to
+  // spend them on, so nothing banks them. Best score and depth still persist.
+  ok(A.SAVE.b === 1234 && A.SAVE.d === 5000, 'best score and depth persist', A.SAVE.b + '/' + A.SAVE.d);
+  ok(H.store.pf26_save.split(',').length === 4, 'the competition record is four fields', H.store.pf26_save);
   // Reload path.
-  A.__eval('SAVE.c=0;SAVE.b=0;SAVE.d=0;SAVE.o=0;SAVE.e=[0,0,0];load()');
-  ok(A.SAVE.c === 7 && A.SAVE.b === 1234, 'values survive a reload', A.SAVE.c + '/' + A.SAVE.b);
+  A.__eval('SAVE.b=0;SAVE.d=0;load()');
+  ok(A.SAVE.b === 1234 && A.SAVE.d === 5000, 'values survive a reload', A.SAVE.b + '/' + A.SAVE.d);
   // Malformed storage must not crash or wipe.
   H.store.pf26_save = 'garbage,,,x';
   let threw = 0;
@@ -437,14 +440,22 @@ console.log('\n=== persistence ===');
   ok(!threw, 'empty storage does not throw');
 }
 {
-  // Store: buy, equip, and never gain power.
-  A.__eval('SAVE.c=1000;SAVE.o=0;SAVE.e=[0,0,0]');
-  A.__eval('buyEquip(0,1)');
-  ok(A.SAVE.e[0] === 1 && A.SAVE.c === 1000 - A.COSP[1], 'purchase deducts and equips', A.SAVE.c);
-  A.__eval('buyEquip(0,0)');
-  ok(A.SAVE.e[0] === 0, 'the free variant can always be equipped');
-  A.__eval('SAVE.c=0;SAVE.o=0;SAVE.e=[0,0,0];buyEquip(1,2)');
-  ok(A.SAVE.e[1] === 0, 'cannot buy without coins');
+  // Store: buy, equip, and never gain power. The store is a Wavedash-build
+  // feature now, so this asks for that build -- in the competition build it is
+  // compiled out and there is nothing here to assert about.
+  const W = boot({ wd: 1 }).api;
+  W.__eval('SAVE.c=1000;SAVE.o=0;SAVE.e=[0,0,0]');
+  W.__eval('buyEquip(0,1)');
+  ok(W.SAVE.e[0] === 1 && W.SAVE.c === 1000 - W.COSP[1], 'purchase deducts and equips', W.SAVE.c);
+  W.__eval('buyEquip(0,0)');
+  ok(W.SAVE.e[0] === 0, 'the free variant can always be equipped');
+  W.__eval('SAVE.c=0;SAVE.o=0;SAVE.e=[0,0,0];buyEquip(1,2)');
+  ok(W.SAVE.e[1] === 0, 'cannot buy without coins');
+  ok(typeof W.__eval('screenStore') === 'function', 'the Wavedash build has a store screen');
+  // That the COMPETITION build has none is a property of the compiled output,
+  // not of this harness -- boot() runs unminified source, where the definition
+  // is still present and merely unreachable. tools/build.mjs asserts it on the
+  // real bundle instead.
   // Cosmetics must not appear in any physics constant.
   const codeUsesCosmetics = /SAVE\.e/.test(A.__eval('physics.toString()')) ||
     /SAVE\.e/.test(A.__eval('hitOb.toString()')) ||
@@ -487,27 +498,27 @@ console.log('\n=== boosters ===');
 }
 
 // ---------------------------------------------------------------------------
-console.log('\n=== cosmetics ===');
+console.log('\n=== cosmetics (Wavedash build) ===');
 {
-  ok(A.COSN.length === 12, 'four categories of three cosmetics', A.COSN.length);
+  const W = boot({ wd: 1 }).api;
+  ok(W.COSN.length === 12, 'four categories of three cosmetics', W.COSN.length);
   // Equipping anything must leave the simulation bit-identical.
   const runTo = (equip) => {
-    A.__eval('SAVE.o=-1;SAVE.e=[' + equip.join(',') + ']');
-    A.__eval('startRun(4242);st=1');
-    const P = A.P;
+    W.__eval('SAVE.o=-1;SAVE.e=[' + equip.join(',') + ']');
+    W.__eval('startRun(4242);st=1');
+    const P = W.P;
     for (let i = 0; i < 900; i++) {
       if (i % 30 === 0) {
-        A.__eval('sel=' + (i / 30 | 0) % 7);
-        A.__eval('mwx=P.x+40;mwy=P.y-16;startStroke();mwx=P.x+140;mwy=P.y-16;moveStroke();drawing=null');
+        W.__eval('sel=' + (i / 30 | 0) % 7);
+        W.__eval('mwx=P.x+40;mwy=P.y-16;startStroke();mwx=P.x+140;mwy=P.y-16;moveStroke();drawing=null');
       }
-      A.__eval('update(1/60)');
+      W.__eval('update(1/60)');
     }
-    return [P.x, P.y, P.vx, P.vy, A.score, A.coins].map((v) => (v * 1000 | 0)).join(',');
+    return [P.x, P.y, P.vx, P.vy, W.score, W.coins].map((v) => (v * 1000 | 0)).join(',');
   };
   const plain = runTo([0, 0, 0, 0]);
   const fancy = runTo([2, 2, 2, 2]);
   ok(plain === fancy, 'cosmetics do not change the simulation at all');
-  A.__eval('SAVE.o=0;SAVE.e=[0,0,0,0]');
 }
 
 // ---------------------------------------------------------------------------
@@ -849,7 +860,10 @@ console.log('\n=== render smoke ===');
 {
   A.__eval('startRun(77);st=1');
   const before = H.counter.calls;
-  for (const s of [0, 1, 2, 3, 4]) {
+  // State 4 is the store, which the competition build does not have -- there is
+  // no way to reach it and no screen to draw. The Wavedash build is checked
+  // through all five in tests/wavedash.mjs.
+  for (const s of [0, 1, 2, 3]) {
     A.__eval('st=' + s);
     A.__eval('W=1920;H=1080;U=1');
     A.__eval('draw()');

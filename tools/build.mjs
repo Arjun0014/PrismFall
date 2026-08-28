@@ -330,6 +330,16 @@ async function main() {
   const min = await terse(raw, 0);
   writeFileSync(p('build', 'bundle.min.js'), min);
 
+  // The store and its cosmetics are a Wavedash-build feature. Every site that
+  // reads one is behind `WD`, which is 0 here, so Terser should fold the
+  // branches and drop the screen, the tables and the variant renderers as
+  // unreferenced -- but "should" is how COSN survived the first attempt, its
+  // `.split(' ')` initialiser being something Terser will not assume is pure.
+  // So the build asserts it rather than trusting it.
+  for (const mark of ['PRISM STORE', 'EQUIPPED', 'STARTIP', 'cosmetics only']) {
+    if (min.includes(mark)) throw new Error('store text reached the competition bundle: ' + mark);
+  }
+
   const candidates = [];
 
   // Candidate A: plain minified JS inlined.

@@ -8,7 +8,11 @@
 
 // Four cosmetic categories of three variants; variant 0 is always owned.
 // Cosmetics are render-only: they never touch collision, pigment or scoring.
-const COSN = ('CLOUD SHADOW NEON SPIRAL LANCE STARTIP ' +
+// Gated at the declaration, not just at its uses. Terser drops an unreferenced
+// const only when it can prove the initialiser is side-effect free, and it will
+// not assume that of `.split(' ')` -- so this table survived into the
+// competition build after everything that reads it had already gone.
+const COSN = WD && ('CLOUD SHADOW NEON SPIRAL LANCE STARTIP ' +
   'RAINBOW DASHED COMET SPARKS SHARDS RINGS').split(' ');
 const COSP = [0, 180, 420];
 const CATS = 4;
@@ -60,7 +64,9 @@ function uiClick() {
 function hud() {
   const p = 30 * U, bw = 240 * U, dep = mx(P.y, 0);
   CIR(p, p, 9 * U, UG);
-  txt(coins + (SAVE.c ? ' (' + (SAVE.c + coins) + ')' : ''), p + 16 * U, p, 16, UG, 1, 'left');
+  // Coins stay as in-run reward feedback in both builds; only the banked
+  // total beside them is a store thing.
+  txt(coins + (WD && SAVE.c ? ' (' + (SAVE.c + coins) + ')' : ''), p + 16 * U, p, 16, UG, 1, 'left');
   txt(score | 0, W - p, p, 19, W9, 1, 'right');
   if (mult > 1.05) txt('x' + mult.toFixed(1), W - p, p + 22 * U, 15, chsl(2, 70), 1, 'right');
   if (combo > 3) {
@@ -149,11 +155,11 @@ const back = () => { st = SAVE.b || score ? 3 : 0; };
 function mute() { SAVE.m ^= 1; if (mg) mg.gain.value = SAVE.m ? 0 : .8; save(); }
 
 function screenTitle() {
-  modal(0, 0, 0, [], [
-    [0, -30, 190, 'PLAY', startRun, 'hsl(300 80% 55%)'],
-    [-105, 26, 130, 'STORE', () => { st = 4; }],
-    [105, 26, 130, SAVE.m ? 'UNMUTE' : 'MUTE', mute],
-  ]);
+  // With no store to sit beside it, MUTE takes the middle of the second row.
+  const bs = [[0, -30, 190, 'PLAY', startRun, 'hsl(300 80% 55%)'],
+    [WD ? 105 : 0, 26, 130, SAVE.m ? 'UNMUTE' : 'MUTE', mute]];
+  if (WD) bs.push([-105, 26, 130, 'STORE', () => { st = 4; }]);
+  modal(0, 0, 0, [], bs);
   const cy = H * .3;
   for (let i = 0; i < 7; i++) {
     X.font = 'bold ' + (66 * U | 0) + 'px monospace';
@@ -180,7 +186,7 @@ function screenTitle() {
   if (WD) wdIdentity(W / 2, H * .3 - 74 * U), wdBoard(W - 190 * U, H / 2 - 40 * U);
   // Below the buttons, not at a fixed offset from the title: at 16:9 heights
   // the old position landed straight on top of PLAY.
-  if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm   COINS ' + SAVE.c,
+  if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm' + (WD ? '   COINS ' + SAVE.c : ''),
     W / 2, H / 2 + 82 * U, 14, W3);
 }
 
@@ -192,10 +198,13 @@ function screenResults() {
     'COINS   +' + coins,
     'BEST    ' + SAVE.b,
     score >= SAVE.b && score ? 'NEW BEST!' : '',
-  ], [
+  ], WD ? [
     [0, 62, 210, 'RETRY  (R)', startRun, 'hsl(300 80% 55%)'],
     [-105, 114, 130, 'STORE', () => { st = 4; }],
     [105, 114, 130, 'MENU', () => { st = 0; }],
+  ] : [
+    [0, 62, 210, 'RETRY  (R)', startRun, 'hsl(300 80% 55%)'],
+    [0, 114, 130, 'MENU', () => { st = 0; }],
   ], 16);
 }
 

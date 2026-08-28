@@ -109,28 +109,38 @@ async function runBrowser(name, launcher) {
   }
   await page.setViewportSize({ width: 1920, height: 1080 });
 
-  // Pause / store / results flow
+  // Pause / results flow
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
   if (SHOTS) await page.screenshot({ path: join(ROOT, 'reports', 'shots', name + '-pause.png') });
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
 
-  // Store: open it, hover every tile, buy and equip what is affordable.
-  await page.evaluate(() => { try { localStorage.pf26_save = '9000,500,4000,0,0,1,0,0,0,0'; } catch (e) {} });
+  // No store in the competition build -- it is a Wavedash feature, and
+  // tests/wavedash.mjs owns its coverage. What this build must still do is
+  // persist the four fields it keeps, and not choke on a ten-field record
+  // written by the Wavedash build against the same key.
+  await page.evaluate(() => { try { localStorage.pf26_save = '4242,3300,0,1,9000,0,1,2,1,0'; } catch (e) {} });
   await page.reload();
   await page.waitForTimeout(700);
-  await page.mouse.click(w / 2 - 105 * (w / 1280), h / 2 + 26 * (w / 1280));
+  const best = await page.evaluate(() => {
+    const c = document.querySelector('canvas');
+    return c && c.width > 100;
+  });
+  ok(best, 'a Wavedash-written save loads without breaking the build');
+
+  await page.evaluate(() => { try { localStorage.removeItem('pf26_save'); } catch (e) {} });
+  await page.reload();
+  await page.waitForTimeout(600);
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(900);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(150);
+  // Quit the run so endRun writes.
+  await page.mouse.click(w / 2, h / 2 + 104 * Math.min(w / 1280, h / 720));
   await page.waitForTimeout(400);
-  const U0 = Math.min(w / 1280, h / 720);
-  for (let n = 0; n < 12; n++) {
-    const c = (n / 3) | 0, i = n % 3;
-    await page.mouse.click(w / 2 - 240 * U0 + i * 150 * U0 + 66 * U0, h / 2 - 118 * U0 + c * 48 * U0);
-    await page.waitForTimeout(90);
-  }
   const saved = await page.evaluate(() => { try { return localStorage.pf26_save; } catch (e) { return ''; } });
-  ok(/^\d+(,-?\d+)+$/.test(saved), 'store writes a well-formed save (' + saved + ')');
-  ok(saved.split(',').slice(6).some((v) => +v > 0), 'purchases actually equip (' + saved + ')');
+  ok(/^\d+(,-?\d+){3}$/.test(saved), 'competition build writes a four-field save (' + saved + ')');
   await page.keyboard.press('Enter');
   await page.waitForTimeout(400);
 

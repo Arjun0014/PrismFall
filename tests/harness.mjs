@@ -118,7 +118,11 @@ export function boot(opts = {}) {
 
   // Wrap the bundle in a function body and return its internals. Because the
   // sources are plain top-level declarations, this exposes everything by name.
-  const src = bundle(true);
+  // boot({ wd: 1 }) compiles the Wavedash product instead of the competition
+  // one. The store and cosmetics live only in that build now, so their tests
+  // have to ask for it -- in the competition build they are compiled out and
+  // there is nothing there to assert about.
+  const src = bundle(true, opts.wd ? 1 : 0);
   const names = ('P C X CV st T slow shake flash pig sel chain chainN fullSpec coins score mult depth reg ' +
     'chunks strokes parts trail pops nodes SAVE Gx Gy W H SC U drawing pmx pmy mwx mwy hint boostT combo ' +
     'seed nextY vault NC wheel wsel chainT hitCd AC mg sfxG musG lpF railG railF railO voices mStep mNext ' +

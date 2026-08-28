@@ -66,8 +66,13 @@ let shocks = [];   // expanding shockwave rings from shatters and big hits
 
 // -- persistent -------------------------------------------------------------
 const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
-// c total coins, b best score, d best depth, o owned cosmetics bitmask,
-// e equipped [body, horn, trail, impact], m muted, t tutorial seen
+// b best score, d best depth, m muted, t tutorial seen -- both builds.
+// c banked coins, o owned cosmetics bitmask, e equipped [body, horn, trail,
+// impact] -- the Wavedash build only. The 13K competition build has no store,
+// so every one of those is left at 0 and every site that reads one is behind
+// `WD`, which is a compile-time 0 there: Terser folds the branch away and then
+// drops the store screen, the cosmetic tables and the four variant renderers
+// as unreferenced. One source tree, two products.
 
 // -- input ------------------------------------------------------------------
 let pmx = 0, pmy = 0;           // pointer in screen px

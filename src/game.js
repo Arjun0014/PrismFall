@@ -7,25 +7,32 @@ const HSTEP = 1 / 120;
 
 // --- persistence -----------------------------------------------------------
 // One namespaced key, comma separated, clamped on read. Never clears storage.
+// The four fields both builds need come first, so the competition build reads
+// and writes a four-field record and the Wavedash build appends the store's
+// six on the end. A record from either build loads in either build.
 function load() {
   try {
     const a = (localStorage[LS] || '').split(',').map(Number);
-    if (a.length < 9 || a.some(isNaN)) return;
-    SAVE.c = clamp(a[0] | 0, 0, 1e9);
-    SAVE.b = clamp(a[1] | 0, 0, 1e12);
-    SAVE.d = clamp(a[2] | 0, 0, 1e12);
-    SAVE.o = a[3] | 0;
-    SAVE.m = a[4] ? 1 : 0;
-    SAVE.t = a[5] ? 1 : 0;
-    for (let i = 0; i < CATS; i++) {
-      const v = a[6 + i] | 0;
-      SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
+    if (a.length < 4 || a.some(isNaN)) return;
+    SAVE.b = clamp(a[0] | 0, 0, 1e12);
+    SAVE.d = clamp(a[1] | 0, 0, 1e12);
+    SAVE.m = a[2] ? 1 : 0;
+    SAVE.t = a[3] ? 1 : 0;
+    if (WD && a.length > 9) {
+      SAVE.c = clamp(a[4] | 0, 0, 1e9);
+      SAVE.o = a[5] | 0;
+      for (let i = 0; i < CATS; i++) {
+        const v = a[6 + i] | 0;
+        SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
+      }
     }
   } catch (err) { /* storage unavailable - play anyway */ }
 }
 function save() {
   try {
-    localStorage[LS] = [SAVE.c, SAVE.b, SAVE.d, SAVE.o, SAVE.m, SAVE.t].concat(SAVE.e).join();
+    const a = [SAVE.b, SAVE.d, SAVE.m, SAVE.t];
+    if (WD) a.push(SAVE.c, SAVE.o, ...SAVE.e);
+    localStorage[LS] = a.join();
   } catch (err) { /* ignore */ }
 }
 
@@ -55,7 +62,7 @@ function startRun(sd) {
 }
 
 function endRun() {
-  SAVE.c += coins;
+  if (WD) SAVE.c += coins;
   SAVE.b = mx(SAVE.b, score | 0);
   SAVE.d = mx(SAVE.d, depth | 0);
   if (!SAVE.t) { SAVE.t = 1; }
@@ -181,7 +188,9 @@ function draw() {
       : hsl(flashH | 0, 100, 72, flash * .45);
     X.fillRect(0, 0, W, H);
   }
-  if (st > 1) [0, 0, screenPause, screenResults, screenStore][st]();
+  // WD && screenStore folds to 0 in the competition build, which is what
+  // drops the store screen, buyEquip and the cosmetic tables entirely.
+  if (st > 1) [0, 0, screenPause, screenResults, WD && screenStore][st]();
   else if (!st) screenTitle();
   cursor();
   if (DEBUG) {

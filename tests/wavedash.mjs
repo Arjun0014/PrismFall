@@ -95,6 +95,35 @@ for (const withSdk of [0, 1]) {
   ok(errs.length === 0, 'no console errors ' + label, errs.join(' | '));
   await page.close();
 }
+// The store is a Wavedash-build feature now, so its coverage lives here rather
+// than in tests/browser.mjs, which tests the competition build where it is
+// compiled out. Seeded with enough coins to afford everything, then every tile
+// is clicked.
+{
+  const page = await b.newPage({ viewport: { width: 1280, height: 720 } });
+  const errs = [];
+  page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto('http://localhost:8117/');
+  await page.waitForTimeout(600);
+  await page.evaluate(() => { try { localStorage.pf26_save = '500,4000,0,1,9000,0,0,0,0,0'; } catch (e) {} });
+  await page.reload();
+  await page.waitForTimeout(900);
+  console.log('\n=== wavedash store ===');
+  await page.mouse.click(640 - 105, 360 + 26);
+  await page.waitForTimeout(400);
+  for (let n = 0; n < 12; n++) {
+    const c = (n / 3) | 0, i = n % 3;
+    await page.mouse.click(640 - 240 + i * 150 + 66, 360 - 118 + c * 48);
+    await page.waitForTimeout(90);
+  }
+  const saved = await page.evaluate(() => { try { return localStorage.pf26_save; } catch (e) { return ''; } });
+  ok(/^\d+(,-?\d+)+$/.test(saved), 'store writes a well-formed save (' + saved + ')');
+  ok(saved.split(',').length > 9, 'the record carries the store fields (' + saved + ')');
+  ok(saved.split(',').slice(6).some((v) => +v > 0), 'purchases actually equip (' + saved + ')');
+  ok(errs.length === 0, 'no console errors in the store', errs.join(' | '));
+  await page.close();
+}
+
 await b.close();
 server.close();
 console.log(fail ? '\n' + fail + ' failed' : '\nall wavedash checks passed');
