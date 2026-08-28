@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Rendering: camera, region backdrops, world geometry, the procedural unicorn,
-// trail and particles. Everything is Canvas2D primitives — no assets.
+// trail and particles. Everything is Canvas2D primitives - no assets.
 //
 // Written for compressed size: one set of drawing shorthands, one particle
 // spawner, one polygon helper, and region identity carried by parameters
@@ -40,7 +40,7 @@ function pt(x, y, vx, vy, l, h, k, s) {
 }
 function burst(x, y, n, k, spd, hue, vx, vy) {
   const h = hue === undefined ? HUE[sel] : hue;
-  // k===1 is a generic world impact — the equipped Impact cosmetic restyles it.
+  // k===1 is a generic world impact - the equipped Impact cosmetic restyles it.
   const kk = k === 1 ? SAVE.e[3] : k;
   for (let i = 0; i < n; i++) {
     const a = rf(0, TAU), v = rf(.3, 1) * spd;
@@ -148,7 +148,7 @@ function background() {
 }
 
 // Motif families: [prim, a, b].
-// prim 0 blobs · 1 polygon(a sides, b/10 inner radius, b<0 rough)
+// prim 0 blobs - 1 polygon(a sides, b/10 inner radius, b<0 rough)
 // prim 2 rings(a) + spokes(|b|), b<0 = partial arcs instead of full rings.
 const MOT = [[0, 3, 0], [2, 1, 8], [2, 2, -3], [1, 5, 4], [1, 7, -1], [2, 3, 6], [2, 1, 4]];
 
@@ -334,7 +334,7 @@ function drawItem(it) {
 }
 
 // --- player strokes --------------------------------------------------------
-// A fused stroke paints a gradient through every colour it carries — that
+// A fused stroke paints a gradient through every colour it carries - that
 // gradient is the whole visual language of mixing.
 function strokeColor(s, a) {
   const bits = [];
@@ -482,7 +482,7 @@ function unicornBody(body, tint, white, horn) {
     SK(3.4, chsl((rb + i) % 7, 66));
   }
 
-  // Horn: 0 spiral, 1 long lance, 2 star tip. Purely decorative — the body is
+  // Horn: 0 spiral, 1 long lance, 2 star tip. Purely decorative - the body is
   // a circle of radius R whatever is equipped.
   X.save(); X.translate(26, -12); X.rotate(-.62);
   const hl = horn === 1 ? 24 : 15;

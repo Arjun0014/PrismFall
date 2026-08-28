@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// PRISMFALL — tuning constants.
+// PRISMFALL - tuning constants.
 //
 // World units: 1 unit ~= 1 screen pixel at 1280x720 with zoom 1.
 // The unicorn is a circle of radius R; everything else is built from
@@ -49,14 +49,14 @@ const STALLT = 2.4;    // seconds of stall before the run ends
 const STALLW = 0.9;    // stall seconds before the warning kicks in
 
 // -- colours ----------------------------------------------------------------
-// Red Orange Yellow Green Blue Indigo Violet — order never changes.
+// Red Orange Yellow Green Blue Indigo Violet - order never changes.
 const HUE = [0, 32, 54, 140, 200, 248, 312];
 const CBIT = [1, 2, 4, 8, 16, 32, 64];
 const ALL7 = 127;
 
 // -- material bits ----------------------------------------------------------
 const M_BUMP = 1;    // high restitution
-const M_DAMP = 2;    // void / dampener, eats speed — the main stall threat
+const M_DAMP = 2;    // void / dampener, eats speed - the main stall threat
 const M_BREAK = 4;   // shatters above an impact-energy threshold
 const M_PHASE = 8;   // solid unless the unicorn is phased (Violet)
 const M_ANCH = 16;   // drawn as a Green tether anchor

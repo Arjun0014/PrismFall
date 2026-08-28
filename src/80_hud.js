@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // HUD, prism selector, menus, results and the cosmetic store.
-// All immediate-mode on the same canvas — no DOM.
+// All immediate-mode on the same canvas - no DOM.
 //
 // The UI deliberately reuses a tiny fixed palette and a single modal helper:
 // every distinct colour string and layout number costs compressed bytes.
@@ -167,12 +167,12 @@ function screenTitle() {
     X.fillText('PRISMFALL', W / 2 + sin(T * 1.2 + i * .5) * 5 * U, cy + (i - 3) * 2.4 * U);
   }
   txt('PRISMFALL', W / 2, cy, 66, W9, 1);
-  txt('you never steer the unicorn — you draw the physics', W / 2, cy + 46 * U, 15, W6);
+  txt('you never steer the unicorn - you draw the physics', W / 2, cy + 46 * U, 15, W6);
   [
-    'DRAG near the unicorn · drawings STAY until used · longer = stronger',
-    'R push · O aim · Y spring · G tether · B rail · I gravity · V warp',
+    'DRAG near the unicorn - drawings STAY until used - longer = stronger',
+    'R push - O aim - Y spring - G tether - B rail - I gravity - V warp',
     0,   // the mixing line, painted below through the whole spectrum
-    'X lets go · 1-7 or SCROLL picks a colour',
+    'X lets go - 1-7 or SCROLL picks a colour',
   ].forEach((l, i) => l && txt(l, W / 2, H - 122 * U + i * 19 * U, 13,
     i === 1 ? W6 : i > 2 ? W3 : W9, !i));
   // Mixing is the deepest rule in the game -- two crossing strokes fuse and the
@@ -181,7 +181,7 @@ function screenTitle() {
   // demonstrates the thing it is describing.
   const mix = X.createLinearGradient(W / 2 - 300 * U, 0, W / 2 + 300 * U, 0);
   for (let i = 0; i < 7; i++) mix.addColorStop(i / 6, chsl(i, 68));
-  txt('CROSS TWO STROKES TO MIX THEM — O+Y aims AND springs', W / 2, H - 84 * U, 13, mix, 1);
+  txt('CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs', W / 2, H - 84 * U, 13, mix, 1);
   if (WD) wdIdentity(W / 2, H * .3 - 74 * U), wdBoard(W - 190 * U, H / 2 - 40 * U);
   // Below the buttons, not at a fixed offset from the title: at 16:9 heights
   // the old position landed straight on top of PLAY.
@@ -206,7 +206,7 @@ function screenResults() {
 
 // --- Ascension draft -------------------------------------------------------
 // Shown once a full seven-region descent is behind you. Two cards, one choice,
-// permanent for the rest of the run — the thing that makes the loop a new run
+// permanent for the rest of the run - the thing that makes the loop a new run
 // rather than a lap.
 function screenAscend() {
   X.fillStyle = 'hsl(275 45% 5% / .86)';
@@ -219,7 +219,7 @@ function screenAscend() {
     X.fillText('PRISM ASCENSION', W / 2 + sin(T * 1.6 + i * .5) * 4 * U, cy - 168 * U + (i - 3) * 1.8 * U);
   }
   txt('PRISM ASCENSION', W / 2, cy - 168 * U, 44, W9, 1);
-  txt('DESCENT ' + (descent + 1) + ' DONE · the shaft begins again, harder', W / 2, cy - 128 * U, 15, W6);
+  txt('DESCENT ' + (descent + 1) + ' DONE - the shaft begins again, harder', W / 2, cy - 128 * U, 15, W6);
   txt('TAKE ONE. IT IS YOURS FOR THE REST OF THE RUN.', W / 2, cy - 104 * U, 13, W3);
 
   dsel = -1;
@@ -264,7 +264,7 @@ function screenPause() {
 // --- store -----------------------------------------------------------------
 let prevCat = -1, prevIt = -1;
 function screenStore() {
-  modal(560, 470, 'PRISM STORE', [SAVE.c + ' COINS · cosmetics only, never power'],
+  modal(560, 470, 'PRISM STORE', [SAVE.c + ' COINS - cosmetics only, never power'],
     [[0, 200, 150, 'BACK', back]], 14);
   prevCat = -1;
   const x0 = W / 2 - 240 * U;

@@ -37,7 +37,7 @@ const REG = [
   // crusher lanes and rotors do the breaking for you if you build speed.
   ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4, 196],
   // Overgrown spiral. Anchors and springy pods everywhere, and a slipstream
-  // that curls you around them — the region the Green tether was built for.
+  // that curls you around them - the region the Green tether was built for.
   ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6, 320],
   // Glass river. Long rails, narrow throats, flow that carries you along them.
   ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7, 25],
@@ -87,7 +87,7 @@ const sgAB = (ax, ay, bx, by, m, e) =>
 const item = (t, x, y, c) => ({ t, x, y, c: c | 0, g: 0 });
 
 // Arcs are built from straight segments, so the collision kernel only ever
-// deals with circles and segments — and the facets suit the geometric look.
+// deals with circles and segments - and the facets suit the geometric look.
 function arcSegs(c, x, y, r, a0, a1, m) {
   const n = mx(3, (a1 - a0) * r / 80 | 0);
   for (let i = 0; i < n; i++) {
@@ -395,7 +395,7 @@ function crushers(c) {
 }
 
 // --- special rooms ---------------------------------------------------------
-// Focus Vault — a slow, enclosed prize room. Some of them hold a Prism Well
+// Focus Vault - a slow, enclosed prize room. Some of them hold a Prism Well
 // instead of a Crown Coin, which is the game's only full pigment refill.
 function buildVault(c, rg) {
   const cx = bX, cy = c.y + c.h * .5, r = mn(bW * .38, 250);

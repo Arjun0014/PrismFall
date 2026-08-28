@@ -67,9 +67,28 @@ async function terse(js) {
 
 // ------------------------------------------------------------------ html ----
 // The page styles itself from JS (see 85_input.js), so the shell is minimal.
+// The shell sits outside the Roadroller payload, so it is deflated alongside
+// the packed script rather than modelled by it, and every character in it is
+// paid for at close to full price. Measured, against the previous shell:
+//
+//   drop <title>            -22 B   the tab shows the filename instead
+//   drop <meta charset>     -24 B   safe only because the source is now ASCII
+//
+// Two apparently free trims were measured and are NOT taken, because both
+// silently stop the game running while still loading without a console error:
+//   omit </canvas>  a <script> inside <canvas> is fallback content, which a
+//                   browser that supports canvas never executes
+//   omit </script>  a script terminated by end-of-file rather than a closing
+//                   tag is not executed either
+// In both cases the page loads, throws nothing, and does nothing at all -- the
+// canvas sits at its default 300x150. Worth 15 B each and not worth having.
+//   drop <!doctype html>    -14 B   NOT TAKEN: that is quirks mode, and the
+//                                   canvas is sized from CSS percentages
+//
+// The doctype stays. Fourteen bytes is not worth putting the layout into
+// quirks mode.
 function html(script) {
-  return '<!doctype html><meta charset=utf-8><title>PRISMFALL</title><canvas id=a></canvas><script>' +
-    script + '</script>';
+  return '<!doctype html><canvas id=a></canvas><script>' + script + '</script>';
 }
 
 // The Wavedash page needs a viewport tag and a matching page background, and

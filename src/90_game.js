@@ -21,7 +21,7 @@ function load() {
       const v = a[6 + i] | 0;
       SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
     }
-  } catch (err) { /* storage unavailable — play anyway */ }
+  } catch (err) { /* storage unavailable - play anyway */ }
 }
 function save() {
   try {

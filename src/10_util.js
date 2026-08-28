@@ -7,7 +7,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 // Frame-rate independent exponential approach.
 const approach = (a, b, r, h) => lerp(a, b, 1 - M.exp(-r * h));
 
-// mulberry32 — 3 lines, good enough, fully seedable for regression replays.
+// mulberry32 - 3 lines, good enough, fully seedable for regression replays.
 let _rs = 1;
 function srnd(s) { _rs = s >>> 0; }
 function rr() {
@@ -23,7 +23,7 @@ const pick = (a) => a[flr(rr() * a.length)];
 // Random sign.
 const rs = () => (rr() < .5 ? -1 : 1);
 
-// Stateless hash for background motifs — infinite scenery with zero storage.
+// Stateless hash for background motifs - infinite scenery with zero storage.
 function hsh(x, y) {
   let h = M.imul(x | 0, 374761393) + M.imul(y | 0, 668265263);
   h = M.imul(h ^ (h >>> 13), 1274126177);
@@ -46,6 +46,6 @@ function segX(ax, ay, bx, by, cx, cy, dx, dy) {
   return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [ax + r1 * t, ay + r2 * t] : null;
 }
 
-// hsl helpers — every colour in the game comes from these two.
+// hsl helpers - every colour in the game comes from these two.
 const hsl = (h, s, l, a) => 'hsl(' + h + ' ' + s + '% ' + l + '%' + (a === undefined ? '' : ' / ' + a) + ')';
 const chsl = (c, l, a) => hsl(HUE[c], 100, l, a);

@@ -1,8 +1,8 @@
-<!doctype html><meta charset=utf-8><title>PRISMFALL</title><canvas id=a></canvas><script>(()=>{
+<!doctype html><canvas id=a></canvas><script>(()=>{
 const DEBUG=1,WD=0;
 // ==== 00_config.js ====
 // ---------------------------------------------------------------------------
-// PRISMFALL — tuning constants.
+// PRISMFALL - tuning constants.
 //
 // World units: 1 unit ~= 1 screen pixel at 1280x720 with zoom 1.
 // The unicorn is a circle of radius R; everything else is built from
@@ -52,14 +52,14 @@ const STALLT = 2.4;    // seconds of stall before the run ends
 const STALLW = 0.9;    // stall seconds before the warning kicks in
 
 // -- colours ----------------------------------------------------------------
-// Red Orange Yellow Green Blue Indigo Violet — order never changes.
+// Red Orange Yellow Green Blue Indigo Violet - order never changes.
 const HUE = [0, 32, 54, 140, 200, 248, 312];
 const CBIT = [1, 2, 4, 8, 16, 32, 64];
 const ALL7 = 127;
 
 // -- material bits ----------------------------------------------------------
 const M_BUMP = 1;    // high restitution
-const M_DAMP = 2;    // void / dampener, eats speed — the main stall threat
+const M_DAMP = 2;    // void / dampener, eats speed - the main stall threat
 const M_BREAK = 4;   // shatters above an impact-energy threshold
 const M_PHASE = 8;   // solid unless the unicorn is phased (Violet)
 const M_ANCH = 16;   // drawn as a Green tether anchor
@@ -126,7 +126,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 // Frame-rate independent exponential approach.
 const approach = (a, b, r, h) => lerp(a, b, 1 - M.exp(-r * h));
 
-// mulberry32 — 3 lines, good enough, fully seedable for regression replays.
+// mulberry32 - 3 lines, good enough, fully seedable for regression replays.
 let _rs = 1;
 function srnd(s) { _rs = s >>> 0; }
 function rr() {
@@ -142,7 +142,7 @@ const pick = (a) => a[flr(rr() * a.length)];
 // Random sign.
 const rs = () => (rr() < .5 ? -1 : 1);
 
-// Stateless hash for background motifs — infinite scenery with zero storage.
+// Stateless hash for background motifs - infinite scenery with zero storage.
 function hsh(x, y) {
   let h = M.imul(x | 0, 374761393) + M.imul(y | 0, 668265263);
   h = M.imul(h ^ (h >>> 13), 1274126177);
@@ -165,7 +165,7 @@ function segX(ax, ay, bx, by, cx, cy, dx, dy) {
   return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [ax + r1 * t, ay + r2 * t] : null;
 }
 
-// hsl helpers — every colour in the game comes from these two.
+// hsl helpers - every colour in the game comes from these two.
 const hsl = (h, s, l, a) => 'hsl(' + h + ' ' + s + '% ' + l + '%' + (a === undefined ? '' : ' / ' + a) + ')';
 const chsl = (c, l, a) => hsl(HUE[c], 100, l, a);
 
@@ -206,7 +206,7 @@ const P = {
   al: 1,         // alive
 };
 
-// gravity vector (mutable — Indigo and regions both write here)
+// gravity vector (mutable - Indigo and regions both write here)
 let Gx = 0, Gy = GRAV;
 
 // -- camera -----------------------------------------------------------------
@@ -245,8 +245,6 @@ const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
 let pmx = 0, pmy = 0;           // pointer in screen px
 let mwx = 0, mwy = 0;         // pointer in world units
 let drawing = null;           // stroke being drawn
-let wheel = null;             // radial Prism Wheel anchor [x, y] in screen px
-let wsel = 0;                 // wedge the pointer is currently over
 let hint = 0;                 // onboarding step
 let hintT = 0;
 
@@ -290,7 +288,7 @@ const REG = [
   // crusher lanes and rotors do the breaking for you if you build speed.
   ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4, 196],
   // Overgrown spiral. Anchors and springy pods everywhere, and a slipstream
-  // that curls you around them — the region the Green tether was built for.
+  // that curls you around them - the region the Green tether was built for.
   ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6, 320],
   // Glass river. Long rails, narrow throats, flow that carries you along them.
   ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7, 25],
@@ -340,7 +338,7 @@ const sgAB = (ax, ay, bx, by, m, e) =>
 const item = (t, x, y, c) => ({ t, x, y, c: c | 0, g: 0 });
 
 // Arcs are built from straight segments, so the collision kernel only ever
-// deals with circles and segments — and the facets suit the geometric look.
+// deals with circles and segments - and the facets suit the geometric look.
 function arcSegs(c, x, y, r, a0, a1, m) {
   const n = mx(3, (a1 - a0) * r / 80 | 0);
   for (let i = 0; i < n; i++) {
@@ -648,7 +646,7 @@ function crushers(c) {
 }
 
 // --- special rooms ---------------------------------------------------------
-// Focus Vault — a slow, enclosed prize room. Some of them hold a Prism Well
+// Focus Vault - a slow, enclosed prize room. Some of them hold a Prism Well
 // instead of a Crown Coin, which is the game's only full pigment refill.
 function buildVault(c, rg) {
   const cx = bX, cy = c.y + c.h * .5, r = mn(bW * .38, 250);
@@ -1238,7 +1236,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy, L) {
         P.y = (o2.y1 + o2.y2) / 2 + vy * k;
         o2.u = 1; o2.l = .12;
       } else {
-        // A lone Violet stroke is a dash along the current heading — or, from a
+        // A lone Violet stroke is a dash along the current heading - or, from a
         // standstill, straight off the face of the stroke, so Violet is also an
         // escape tool rather than a no-op when you need it most.
         const sp = hyp(P.vx, P.vy);
@@ -1403,8 +1401,8 @@ function grab(it) {
 // ==== 60_audio.js ====
 // ---------------------------------------------------------------------------
 // Procedural Web Audio. Everything is synthesised from two primitives:
-//   O() — an oscillator with a pitch sweep and an AD envelope
-//   N() — a slice of the shared noise buffer through a swept filter
+//   O() - an oscillator with a pitch sweep and an AD envelope
+//   N() - a slice of the shared noise buffer through a swept filter
 // The rail grind is a single continuous voice created once and only modulated,
 // so long runs never accumulate nodes.
 // ---------------------------------------------------------------------------
@@ -1534,38 +1532,38 @@ function sndBank() {
 }
 
 // --- the seven colours -----------------------------------------------------
-function sndBoost(ns) {                       // Red — rocket
+function sndBoost(ns) {                       // Red - rocket
   const v = clamp(ns / 2600, .16, .5);
   O('sawtooth', 150, 780 + ns * .2, .22, v * .5);
   N(.34, v * .7, 'bandpass', 700, 4200, 1.1);
   O('sine', 70, 34, .3, v * .8);
 }
-function sndVector(sup) {                     // Orange — directional snap
+function sndVector(sup) {                     // Orange - directional snap
   O('square', sup ? 700 : 940, sup ? 2000 : 1680, .07, .16);
   N(.05, .12, 'highpass', 2600, 5200, 1);
   if (sup) O('sine', 320, 900, .16, .2);
 }
-function sndSpring(imp) {                     // Yellow — elastic boing
+function sndSpring(imp) {                     // Yellow - elastic boing
   const v = clamp(imp / 1400, .12, .4);
   O('sine', 180 + imp * .1, 700 + imp * .3, .1, v);
   O('sine', 700 + imp * .3, 210, .22, v * .8);
 }
-function sndTether(on) {                      // Green — tension / thwip
+function sndTether(on) {                      // Green - tension / thwip
   if (on) { O('triangle', 240, 720, 1.1, .13); N(.06, .1, 'bandpass', 900, 2400, 3); }
   else { O('sawtooth', 900, 190, .13, .26); N(.1, .22, 'bandpass', 1800, 500, 2); }
 }
-function sndRail(on) {                        // Blue — continuous grind
+function sndRail(on) {                        // Blue - continuous grind
   if (!AC) return;
   if (railG) railG.gain.setTargetAtTime(on && !SAVE.m ? .12 : 0, now(), .03);
   if (on) O('square', 1200, 2400, .05, .1);
 }
-function sndGrav(ny) {                        // Indigo — gravity whoop
+function sndGrav(ny) {                        // Indigo - gravity whoop
   const up = ny < 0;
   O('sine', up ? 120 : 460, up ? 460 : 110, .5, .3);
   O('triangle', up ? 240 : 700, up ? 700 : 200, .38, .12);
   N(.4, .1, 'lowpass', 900, 200, 1);
 }
-function sndWarp() {                          // Violet — space
+function sndWarp() {                          // Violet - space
   O('sawtooth', 2600, 260, .1, .2);
   N(.08, .18, 'highpass', 7000, 1400, 2);
   O('sine', 90, 240, .22, .26);
@@ -1636,8 +1634,8 @@ function audioFrame() {
 // rhythm all key off the region index -- and density follows how fast you are
 // going, so the music reacts to the run instead of looping underneath it.
 // Rhythm masks: one bit per 16th note of the bar, LSB first.
-//   Cloudbreak four-on-the-floor · Sunforge driving · Verdant loose ·
-//   Crystal clean · Mine sparse and heavy · Temple off-kilter · Engine eighths
+//   Cloudbreak four-on-the-floor - Sunforge driving - Verdant loose -
+//   Crystal clean - Mine sparse and heavy - Temple off-kilter - Engine eighths
 const KICK = [0x1111, 0x1155, 0x1013, 0x1111, 0x1001, 0x0512, 0x5555];
 const BASSR = [0x8889, 0xa4a5, 0x9192, 0xcccd, 0x8484, 0xa8a9, 0xaaab];
 
@@ -1671,7 +1669,7 @@ function musicTick() {
 // ==== 70_render.js ====
 // ---------------------------------------------------------------------------
 // Rendering: camera, region backdrops, world geometry, the procedural unicorn,
-// trail and particles. Everything is Canvas2D primitives — no assets.
+// trail and particles. Everything is Canvas2D primitives - no assets.
 //
 // Written for compressed size: one set of drawing shorthands, one particle
 // spawner, one polygon helper, and region identity carried by parameters
@@ -1711,7 +1709,7 @@ function pt(x, y, vx, vy, l, h, k, s) {
 }
 function burst(x, y, n, k, spd, hue, vx, vy) {
   const h = hue === undefined ? HUE[sel] : hue;
-  // k===1 is a generic world impact — the equipped Impact cosmetic restyles it.
+  // k===1 is a generic world impact - the equipped Impact cosmetic restyles it.
   const kk = k === 1 ? SAVE.e[3] : k;
   for (let i = 0; i < n; i++) {
     const a = rf(0, TAU), v = rf(.3, 1) * spd;
@@ -1819,7 +1817,7 @@ function background() {
 }
 
 // Motif families: [prim, a, b].
-// prim 0 blobs · 1 polygon(a sides, b/10 inner radius, b<0 rough)
+// prim 0 blobs - 1 polygon(a sides, b/10 inner radius, b<0 rough)
 // prim 2 rings(a) + spokes(|b|), b<0 = partial arcs instead of full rings.
 const MOT = [[0, 3, 0], [2, 1, 8], [2, 2, -3], [1, 5, 4], [1, 7, -1], [2, 3, 6], [2, 1, 4]];
 
@@ -2005,7 +2003,7 @@ function drawItem(it) {
 }
 
 // --- player strokes --------------------------------------------------------
-// A fused stroke paints a gradient through every colour it carries — that
+// A fused stroke paints a gradient through every colour it carries - that
 // gradient is the whole visual language of mixing.
 function strokeColor(s, a) {
   const bits = [];
@@ -2153,7 +2151,7 @@ function unicornBody(body, tint, white, horn) {
     SK(3.4, chsl((rb + i) % 7, 66));
   }
 
-  // Horn: 0 spiral, 1 long lance, 2 star tip. Purely decorative — the body is
+  // Horn: 0 spiral, 1 long lance, 2 star tip. Purely decorative - the body is
   // a circle of radius R whatever is equipped.
   X.save(); X.translate(26, -12); X.rotate(-.62);
   const hl = horn === 1 ? 24 : 15;
@@ -2192,8 +2190,8 @@ function drawUnicorn() {
 
 // ==== 80_hud.js ====
 // ---------------------------------------------------------------------------
-// HUD, prism selector, radial wheel, menus, results and the cosmetic store.
-// All immediate-mode on the same canvas — no DOM.
+// HUD, prism selector, menus, results and the cosmetic store.
+// All immediate-mode on the same canvas - no DOM.
 //
 // The UI deliberately reuses a tiny fixed palette and a single modal helper:
 // every distinct colour string and layout number costs compressed bytes.
@@ -2317,44 +2315,14 @@ function prismBar() {
   if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 1);
 }
 
-// --- radial Prism Wheel ----------------------------------------------------
-// Held on the right mouse button, anchored where the pointer already is, so the
-// player never looks away from the unicorn. Flick toward a wedge, release to
-// commit. The game keeps running underneath it.
-function prismWheel() {
-  const r = 84 * U, cx = wheel[0], cy = wheel[1];
-  const dx = pmx - cx, dy = pmy - cy, d = hyp(dx, dy);
-  // Inside the dead zone the current colour stays selected.
-  wsel = d < 22 * U ? sel : flr(((at2(dy, dx) + PI * 2.5 + PI / 7) % TAU) / TAU * 7) % 7;
-  CIR(cx, cy, r * 1.06, 'hsl(272 45% 6% / .72)');
-  for (let i = 0; i < 7; i++) {
-    const a0 = i / 7 * TAU - PI / 2 - PI / 7, a1 = a0 + TAU / 7, on = i === wsel;
-    BP();
-    MT(cx, cy);
-    AR(cx, cy, on ? r * 1.1 : r, a0 + .02, a1 - .02);
-    X.closePath();
-    FL(chsl(i, on ? 58 : 30, on ? 1 : .8));
-    SK(on ? 2.6 * U : 1 * U, on ? W9 : chsl(i, 46, .7));
-    const am = (a0 + a1) / 2, tr = r * (on ? .8 : .72);
-    txt('ROYGBIV'[i], cx + cos(am) * tr, cy + sin(am) * tr, on ? 17 : 13, on ? W9 : W6, 1);
-    // Pigment left in this reservoir, as a ring arc — the wheel doubles as a gauge.
-    BP();
-    AR(cx, cy, r * .34, a0 + .04, lerp(a0 + .04, a1 - .04, pig[i] / PMAX));
-    SK(5 * U, chsl(i, 62));
-  }
-  CIR(cx, cy, 20 * U, 'hsl(272 45% 8% / .9)', W3, 1.5 * U);
-  txt(pig[wsel] | 0, cx, cy, 12, W6, 1);
-}
-
-// --- cursor ----------------------------------------------------------------
+// The reach ring: strokes may only start within SREACH of the unicorn, and
+// further clicks clamp back onto that circle. Showing the clamp point is the
+// one piece of pointer feedback that is about the rules rather than decoration,
+// so it survives while the drawn cursor does not.
 function cursor() {
-  if (st !== 1) { CIR(pmx, pmy, 7 * U, 0, W9, 2 * U); return; }
-  CIR(pmx, pmy, 9 * U, 0, chsl(sel, 70), 2.4 * U);
-  CIR(pmx, pmy, 2 * U, chsl(sel, 85));
-  if (!drawing && P.al) {
-    const dx = mwx - P.x, dy = mwy - P.y, d = hyp(dx, dy);
-    if (d > SREACH) CIR(w2sx(P.x + dx / d * SREACH), w2sy(P.y + dy / d * SREACH), 4 * U, chsl(sel, 60, .8));
-  }
+  if (st !== 1 || drawing || !P.al) return;
+  const dx = mwx - P.x, dy = mwy - P.y, d = hyp(dx, dy);
+  if (d > SREACH) CIR(w2sx(P.x + dx / d * SREACH), w2sy(P.y + dy / d * SREACH), 4 * U, chsl(sel, 60, .8));
 }
 
 // --- modal framework -------------------------------------------------------
@@ -2390,12 +2358,12 @@ function screenTitle() {
     X.fillText('PRISMFALL', W / 2 + sin(T * 1.2 + i * .5) * 5 * U, cy + (i - 3) * 2.4 * U);
   }
   txt('PRISMFALL', W / 2, cy, 66, W9, 1);
-  txt('you never steer the unicorn — you draw the physics', W / 2, cy + 46 * U, 15, W6);
+  txt('you never steer the unicorn - you draw the physics', W / 2, cy + 46 * U, 15, W6);
   [
-    'DRAG near the unicorn · drawings STAY until used · longer = stronger',
-    'R push · O aim · Y spring · G tether · B rail · I gravity · V warp',
+    'DRAG near the unicorn - drawings STAY until used - longer = stronger',
+    'R push - O aim - Y spring - G tether - B rail - I gravity - V warp',
     0,   // the mixing line, painted below through the whole spectrum
-    'X lets go · 1-7 or SCROLL picks a colour',
+    'X lets go - 1-7 or SCROLL picks a colour',
   ].forEach((l, i) => l && txt(l, W / 2, H - 122 * U + i * 19 * U, 13,
     i === 1 ? W6 : i > 2 ? W3 : W9, !i));
   // Mixing is the deepest rule in the game -- two crossing strokes fuse and the
@@ -2404,7 +2372,7 @@ function screenTitle() {
   // demonstrates the thing it is describing.
   const mix = X.createLinearGradient(W / 2 - 300 * U, 0, W / 2 + 300 * U, 0);
   for (let i = 0; i < 7; i++) mix.addColorStop(i / 6, chsl(i, 68));
-  txt('CROSS TWO STROKES TO MIX THEM — O+Y aims AND springs', W / 2, H - 84 * U, 13, mix, 1);
+  txt('CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs', W / 2, H - 84 * U, 13, mix, 1);
   if (WD) wdIdentity(W / 2, H * .3 - 74 * U), wdBoard(W - 190 * U, H / 2 - 40 * U);
   // Below the buttons, not at a fixed offset from the title: at 16:9 heights
   // the old position landed straight on top of PLAY.
@@ -2429,7 +2397,7 @@ function screenResults() {
 
 // --- Ascension draft -------------------------------------------------------
 // Shown once a full seven-region descent is behind you. Two cards, one choice,
-// permanent for the rest of the run — the thing that makes the loop a new run
+// permanent for the rest of the run - the thing that makes the loop a new run
 // rather than a lap.
 function screenAscend() {
   X.fillStyle = 'hsl(275 45% 5% / .86)';
@@ -2442,7 +2410,7 @@ function screenAscend() {
     X.fillText('PRISM ASCENSION', W / 2 + sin(T * 1.6 + i * .5) * 4 * U, cy - 168 * U + (i - 3) * 1.8 * U);
   }
   txt('PRISM ASCENSION', W / 2, cy - 168 * U, 44, W9, 1);
-  txt('DESCENT ' + (descent + 1) + ' DONE · the shaft begins again, harder', W / 2, cy - 128 * U, 15, W6);
+  txt('DESCENT ' + (descent + 1) + ' DONE - the shaft begins again, harder', W / 2, cy - 128 * U, 15, W6);
   txt('TAKE ONE. IT IS YOURS FOR THE REST OF THE RUN.', W / 2, cy - 104 * U, 13, W3);
 
   dsel = -1;
@@ -2487,7 +2455,7 @@ function screenPause() {
 // --- store -----------------------------------------------------------------
 let prevCat = -1, prevIt = -1;
 function screenStore() {
-  modal(560, 470, 'PRISM STORE', [SAVE.c + ' COINS · cosmetics only, never power'],
+  modal(560, 470, 'PRISM STORE', [SAVE.c + ' COINS - cosmetics only, never power'],
     [[0, 200, 150, 'BACK', back]], 14);
   prevCat = -1;
   const x0 = W / 2 - 240 * U;
@@ -2526,7 +2494,7 @@ function buyEquip(c, i) {
 
 // ==== 85_input.js ====
 // ---------------------------------------------------------------------------
-// Input: pointer drawing, colour selection (keys 1-7, wheel, HUD, radial),
+// Input: pointer drawing, colour selection (keys 1-7, scroll, prism bar),
 // pause/restart/mute.
 // ---------------------------------------------------------------------------
 
@@ -2541,7 +2509,7 @@ function setSel(i) {
 }
 
 document.body.style.cssText = 'margin:0;overflow:hidden;background:#05030c';
-CV.style.cssText = 'position:fixed;width:100%;height:100%;cursor:none';
+CV.style.cssText = 'position:fixed;width:100%;height:100%';
 
 function resize() {
   const d = mn(devicePixelRatio || 1, 2);
@@ -2564,17 +2532,12 @@ addEventListener('pointermove', (e) => { ptr(e); if (drawing) moveStroke(); });
 addEventListener('pointerdown', (e) => {
   audioInit();
   ptr(e);
-  // Right button opens the radial Prism Wheel; left draws / clicks UI.
-  if (e.button === 2) { if (st === 1) { wheel = [pmx, pmy]; wsel = sel; } return; }
   if (e.button) return;
   if (!uiClick() && st === 1) startStroke();
 });
 
-addEventListener('pointerup', (e) => {
-  if (e.button === 2) { if (wheel) { setSel(wsel); wheel = null; } return; }
-  drawing = null;
-});
-addEventListener('blur', () => { drawing = null; wheel = null; if (st === 1) st = 2; });
+addEventListener('pointerup', () => { drawing = null; });
+addEventListener('blur', () => { drawing = null; if (st === 1) st = 2; });
 
 addEventListener('wheel', (e) => {
   if (st !== 1) return;
@@ -2645,7 +2608,7 @@ function load() {
       const v = a[6 + i] | 0;
       SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
     }
-  } catch (err) { /* storage unavailable — play anyway */ }
+  } catch (err) { /* storage unavailable - play anyway */ }
 }
 function save() {
   try {
@@ -2663,7 +2626,7 @@ function startRun(sd) {
   pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
   boostT = [0, 0, 0, 0, 0, 0, 0];
   strokes = []; parts = []; trail = []; pops = []; nodes = []; shocks = [];
-  drawing = null; wheel = null;
+  drawing = null;
   P.x = 0; P.y = -320; P.vy = 300; P.a = PI / 2;
   P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300; P.rw = 0;
   Gx = 0; Gy = GRAV;
@@ -2838,7 +2801,6 @@ function draw() {
   }
   if (st > 1) [0, 0, screenPause, screenResults, screenStore, screenAscend][st]();
   else if (!st) screenTitle();
-  if (wheel && st === 1) prismWheel(); else wheel = null;
   cursor();
   if (DEBUG) {
     txt('seed ' + seed + '  v ' + (P.sp | 0) + '  chunks ' + chunks.length + '  parts ' + parts.length +

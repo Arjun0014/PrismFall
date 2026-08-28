@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Procedural Web Audio. Everything is synthesised from two primitives:
-//   O() — an oscillator with a pitch sweep and an AD envelope
-//   N() — a slice of the shared noise buffer through a swept filter
+//   O() - an oscillator with a pitch sweep and an AD envelope
+//   N() - a slice of the shared noise buffer through a swept filter
 // The rail grind is a single continuous voice created once and only modulated,
 // so long runs never accumulate nodes.
 // ---------------------------------------------------------------------------
@@ -131,38 +131,38 @@ function sndBank() {
 }
 
 // --- the seven colours -----------------------------------------------------
-function sndBoost(ns) {                       // Red — rocket
+function sndBoost(ns) {                       // Red - rocket
   const v = clamp(ns / 2600, .16, .5);
   O('sawtooth', 150, 780 + ns * .2, .22, v * .5);
   N(.34, v * .7, 'bandpass', 700, 4200, 1.1);
   O('sine', 70, 34, .3, v * .8);
 }
-function sndVector(sup) {                     // Orange — directional snap
+function sndVector(sup) {                     // Orange - directional snap
   O('square', sup ? 700 : 940, sup ? 2000 : 1680, .07, .16);
   N(.05, .12, 'highpass', 2600, 5200, 1);
   if (sup) O('sine', 320, 900, .16, .2);
 }
-function sndSpring(imp) {                     // Yellow — elastic boing
+function sndSpring(imp) {                     // Yellow - elastic boing
   const v = clamp(imp / 1400, .12, .4);
   O('sine', 180 + imp * .1, 700 + imp * .3, .1, v);
   O('sine', 700 + imp * .3, 210, .22, v * .8);
 }
-function sndTether(on) {                      // Green — tension / thwip
+function sndTether(on) {                      // Green - tension / thwip
   if (on) { O('triangle', 240, 720, 1.1, .13); N(.06, .1, 'bandpass', 900, 2400, 3); }
   else { O('sawtooth', 900, 190, .13, .26); N(.1, .22, 'bandpass', 1800, 500, 2); }
 }
-function sndRail(on) {                        // Blue — continuous grind
+function sndRail(on) {                        // Blue - continuous grind
   if (!AC) return;
   if (railG) railG.gain.setTargetAtTime(on && !SAVE.m ? .12 : 0, now(), .03);
   if (on) O('square', 1200, 2400, .05, .1);
 }
-function sndGrav(ny) {                        // Indigo — gravity whoop
+function sndGrav(ny) {                        // Indigo - gravity whoop
   const up = ny < 0;
   O('sine', up ? 120 : 460, up ? 460 : 110, .5, .3);
   O('triangle', up ? 240 : 700, up ? 700 : 200, .38, .12);
   N(.4, .1, 'lowpass', 900, 200, 1);
 }
-function sndWarp() {                          // Violet — space
+function sndWarp() {                          // Violet - space
   O('sawtooth', 2600, 260, .1, .2);
   N(.08, .18, 'highpass', 7000, 1400, 2);
   O('sine', 90, 240, .22, .26);
@@ -233,8 +233,8 @@ function audioFrame() {
 // rhythm all key off the region index -- and density follows how fast you are
 // going, so the music reacts to the run instead of looping underneath it.
 // Rhythm masks: one bit per 16th note of the bar, LSB first.
-//   Cloudbreak four-on-the-floor · Sunforge driving · Verdant loose ·
-//   Crystal clean · Mine sparse and heavy · Temple off-kilter · Engine eighths
+//   Cloudbreak four-on-the-floor - Sunforge driving - Verdant loose -
+//   Crystal clean - Mine sparse and heavy - Temple off-kilter - Engine eighths
 const KICK = [0x1111, 0x1155, 0x1013, 0x1111, 0x1001, 0x0512, 0x5555];
 const BASSR = [0x8889, 0xa4a5, 0x9192, 0xcccd, 0x8484, 0xa8a9, 0xaaab];
 

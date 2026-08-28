@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Wavedash platform integration — SDK init, player identity, leaderboards.
+// Wavedash platform integration - SDK init, player identity, leaderboards.
 //
 // This file is compiled into the WAVEDASH BUILD ONLY. The competition zip is
 // built without it and every call site is behind `if (WD)`, so the 13 KiB
@@ -7,7 +7,7 @@
 //
 // Nothing here is allowed to break the game. The platform injects the SDK at
 // runtime, so opening dist-wavedash/index.html directly (no sandbox, no SDK)
-// must still play perfectly — every entry point checks for the global first
+// must still play perfectly - every entry point checks for the global first
 // and every promise has a catch that shrugs.
 // ---------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ let wdMsg = '';         // one-line status shown under the board
 let wdBusy = 0;
 
 // The SDK's async calls all return { success, data, message }; this unwraps
-// that shape and turns any failure — rejected, offline, absent — into null,
+// that shape and turns any failure - rejected, offline, absent - into null,
 // which is the only thing the drawing code ever has to handle.
 async function wdOk(pr) {
   try {
@@ -35,7 +35,7 @@ async function wdOk(pr) {
 // --- boot ------------------------------------------------------------------
 function wdInit() {
   const S = WDS();
-  if (!S) { wdMsg = 'offline — scores stay local'; return; }
+  if (!S) { wdMsg = 'offline - scores stay local'; return; }
   try {
     S.init({ deferEvents: true });
     S.readyForEvents();
@@ -152,7 +152,7 @@ function wdBoard(x, y) {
   FL('hsl(272 40% 9% / .8)');
   SK(1.4 * U, W3);
   txt('GLOBAL TOP 8', x, y - 108 * U, 13, W9, 1);
-  if (!wdTop.length) { txt(wdMsg || 'loading…', x, y, 12, W3); return; }
+  if (!wdTop.length) { txt(wdMsg || 'loading...', x, y, 12, W3); return; }
   wdTop.forEach((e, i) => {
     const ry = y - 78 * U + i * 24 * U;
     const me = wdUser && e[1] === wdUser.username;

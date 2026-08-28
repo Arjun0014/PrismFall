@@ -117,7 +117,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy, L) {
         P.y = (o2.y1 + o2.y2) / 2 + vy * k;
         o2.u = 1; o2.l = .12;
       } else {
-        // A lone Violet stroke is a dash along the current heading — or, from a
+        // A lone Violet stroke is a dash along the current heading - or, from a
         // standstill, straight off the face of the stroke, so Violet is also an
         // escape tool rather than a no-op when you need it most.
         const sp = hyp(P.vx, P.vy);

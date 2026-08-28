@@ -34,7 +34,7 @@ const P = {
   al: 1,         // alive
 };
 
-// gravity vector (mutable — Indigo and regions both write here)
+// gravity vector (mutable - Indigo and regions both write here)
 let Gx = 0, Gy = GRAV;
 
 // -- camera -----------------------------------------------------------------
