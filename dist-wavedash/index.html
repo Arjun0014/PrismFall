@@ -822,25 +822,27 @@
             }
         }
     }
-    function H_(_, B, C, D, E) {
-        const F = Z(XH, 1), G = [];
+    function H_(_, B, C, D, E, F) {
+        const G = F || Z(XH, 1), H = [];
         for (let _ = 0; _ < B; _++) {
-            G.push(TH + (_ + SJ(.22, .8)) * VH / B);
+            H.push(TH + (_ + SJ(.22, .8)) * VH / B);
         }
-        let H = TH - 20, I = D - C;
+        let I = TH - 20, J = D - C;
         for (let E = 0; E <= B; E++) {
-            const J = E === B, K = KE(100, SJ(120, 200) - YH * 16), L = J ? UH + 20 : G[E] - K / 2, M = J ? D - C : D + C;
-            L - H > 26 && _.o.push(BI(H, I, L, M, F));
-            !J && C > 40 && UJ(.6) && _.o.push(ZH(L, M, 15, 1));
-            H = J ? L : G[E] + K / 2;
-            I = D + C;
+            const F = E === B, K = KE(100, SJ(120, 200) - YH * 16), L = F ? UH + 20 : H[E] - K / 2, M = F ? D - C : D + C;
+            L - I > 26 && _.o.push(BI(I, J, L, M, G));
+            !F && C > 40 && UJ(.6) && _.o.push(ZH(L, M, 15, 1));
+            I = F ? L : H[E] + K / 2;
+            J = D + C;
         }
-        if (!E) {
-            for (let B = 0; B < 4; B++) {
-                _.i.push(CI(0, G[0] + SJ(-26, 26), D + C + 70 + B * 48));
-            }
-            _.i.push(CI(UJ(.34) ? 2 : 1, G[B - 1], D - C - 70, VJ(MH(_.rg))));
+        if (E) {
+            return H;
         }
+        for (let B = 0; B < 4; B++) {
+            _.i.push(CI(0, H[0] + SJ(-26, 26), D + C + 70 + B * 48));
+        }
+        _.i.push(CI(UJ(.34) ? 2 : 1, H[B - 1], D - C - 70, VJ(MH(_.rg))));
+        return H;
     }
     function I_(_) {
         const B = JE(VH * .4, 300), C = WH + SJ(-.2, .2) * VH, D = _.y + _.h * .6, E = B * ME(.12 * FE);
@@ -916,19 +918,15 @@
         _.i.push(CI(UJ(.4) ? 4 : 2, WH + SJ(-.3, .3) * VH, _.y + _.h * .92, TJ(0, 6)));
     }
     function N_(_) {
-        const B = JE(VH * .8, 420), C = WH + SJ(-.1, .1) * VH, D = TJ(3, 4);
-        for (let E = 0; E < D; E++) {
-            const F = _.y + _.h * (.15 + E * .8 / D), G = C + SJ(-.3, .3) * B, H = KE(90, 150 - YH * 20);
-            for (const D of [ -1, 1 ]) {
-                const E = D < 0 ? C - B / 2 : C + B / 2, I = G + D * H / 2;
-                IE(E - I) > 30 && _.o.push(BI(I, F, E, F + SJ(-14, 14), 4));
-            }
-            _.o.push(_I(G, F + _.h * .4 / D, JE(B * .3, 150), SJ(0, FE), 1, {
+        const B = TJ(3, 4);
+        for (let C = 0; C < B; C++) {
+            const D = _.y + _.h * (.15 + C * .8 / B), E = H_(_, 1, 0, D, 1, 4)[0];
+            _.o.push(_I(E, D + _.h * .4 / B, JE(VH * .3, 150), SJ(0, FE), 1, {
                 w: WJ() * SJ(.8, 1.6 + YH * .4)
             }));
-            _.i.push(CI(0, G, F + 40), CI(0, G + SJ(-30, 30), F + 90));
+            _.i.push(CI(0, E, D + 40), CI(0, E + SJ(-30, 30), D + 90));
         }
-        _.i.push(CI(UJ(.5) ? 1 : 4, C, _.y + _.h * .96, TJ(0, 6)));
+        _.i.push(CI(UJ(.5) ? 1 : 4, WH, _.y + _.h * .96, TJ(0, 6)));
     }
     function O_(_) {
         const B = WH, C = _.y + _.h * .4;

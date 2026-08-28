@@ -118,7 +118,6 @@ let W = 0, H = 0, SC = 1;      // canvas pixel size, world->screen scale
 // 0 title  1 playing  2 paused  3 results  4 store
 let st = 0;
 let T = 0;        // wall-clock seconds since load (drives animation)
-let slow = 0;     // 0..1 focus-vault time dilation blend
 let shake = 0;    // camera shake energy
 let flash = 0;    // full-screen flash energy
 let flashH = 0;   // flash hue
@@ -172,8 +171,8 @@ let nodes = [];    // prism-node sparkles from stroke fusion
 let shocks = [];   // expanding shockwave rings from shatters and big hits
 
 // -- persistent -------------------------------------------------------------
-const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
-// b best score, d best depth, m muted, t tutorial seen -- both builds.
+const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0 };
+// b best score, d best depth, m muted -- both builds.
 // c banked coins, o owned cosmetics bitmask, e equipped [body, horn, trail,
 // impact] -- the Wavedash build only. The 13K competition build has no store,
 // so every one of those is left at 0 and every site that reads one is behind
@@ -185,8 +184,6 @@ const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
 let pmx = 0, pmy = 0;           // pointer in screen px
 let mwx = 0, mwy = 0;         // pointer in world units
 let drawing = null;           // stroke being drawn
-let hint = 0;                 // onboarding step
-let hintT = 0;
 
 // ==== colors.js ====
 // ---------------------------------------------------------------------------
@@ -221,7 +218,6 @@ function startStroke() {
   if (pig[sel] <= .5) { dryC = sel; dryT = .5; sndEmpty(); return; }
   const dx = mwx - P.x, dy = mwy - P.y, k = mn(1, SREACH / (hyp(dx, dy) || 1));
   const sx = P.x + dx * k, sy = P.y + dy * k;
-  if (!hint) { hint = 1; hintT = 0; }
   // n is the number of times the stroke may fire before it is spent; l is only
   // a fade timer, and only ticks once it has been. A drawing you never use
   // stays on the field for the whole run.
@@ -467,557 +463,6 @@ function grab(it) {
     pop(it.x, it.y, BNAME[it.c], BOOST[it.c][0] > 6 ? -1 : HUE[BOOST[it.c][0]]);
     sndPower();
   }
-}
-
-// ==== world.js ====
-// ---------------------------------------------------------------------------
-// World: region table, chunk grammar, obstacle + reward generation.
-//
-// The world is a ring of vertical chunks. Every chunk picks an archetype from
-// its region's weight string and decorates it with region material bias, so
-// world identity is systematic instead of seven separate generators.
-// ---------------------------------------------------------------------------
-
-// Archetype ids used inside the region weight strings. Funnel and Sieve are
-// the same builder with different parameters, so eight situations cost seven.
-// 0 PEG  1 FUNNEL  2 BOWL  3 SHAFT  4 ROTOR  5 SIEVE  6 CHAMBER
-// 7 TARGET BANK  8 CRUSHER LANE
-
-// Region row. Everything a region needs beyond these nine numbers is derived,
-// which costs far fewer compressed bytes than a table:
-//   0 name
-//   1 base hue        background gradient starts here
-//   2 hue spread      gradient end + geometry hue are offsets from the base
-//   3 geometry light
-//   4 background light
-//   5 archetype weights (one char per draw)
-//   6 filler density  extra scattered geometry per chunk
-//   7 zone type       the force field that gives the region its mechanic
-//   8 zone frequency  0..9, chunks in ten that carry the field
-//   9 geometry hue     absolute; -1 means "cycle" (the Rainbow Engine)
-// Affinity colours come from AFF, music from formulas in 60_audio.js.
-//
-// A region is a *mechanic* first and a palette second. Each row below pairs a
-// force field with the archetypes and materials that make that field matter,
-// so the seven descents ask genuinely different things of the player rather
-// than recolouring the same shaft.
-const REG = [
-  // Sky. Updraft columns hold you up, so descending is something you do on
-  // purpose. Round, soft, bumper-heavy: the region that teaches the verbs.
-  ['CLOUDBREAK', 206, 74, 88, 26, '0002100210', 5, Z_UP, 5, 40],
-  // Furnace. Almost everything is breakable and chains into its neighbours;
-  // crusher lanes and rotors do the breaking for you if you build speed.
-  ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4, 196],
-  // Overgrown spiral. Anchors and springy pods everywhere, and a slipstream
-  // that curls you around them - the region the Green tether was built for.
-  ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6, 320],
-  // Glass river. Long rails, narrow throats, flow that carries you along them.
-  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7, 25],
-  // Dark mine. Phase walls hide pockets, gravity wells drag you into them, and
-  // the reward density is the highest in the game.
-  ['PRISM MINE', 276, -28, 62, 10, '6760671666', 9, Z_WELL, 6, 120],
-  // Temple. Inversion fields turn the shaft upside down; the geometry is built
-  // to be read from both directions.
-  ['INVERSION TEMPLE', 264, 52, 80, 13, '6465264636', 7, Z_INV, 7, 75],
-  // The Engine. Every archetype, every field, maximum density.
-  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456788', 9, 0, 9, -1],
-];
-// Material bias per region, as five hex nibbles read left to right:
-//   BREAK PHASE DAMP BUMP MOVE, each out of 16.
-// This table is most of what a region feels like under the unicorn. Cloudbreak
-// is nearly all bumpers and nothing that eats speed; Sunforge is three quarters
-// breakable; the Mine is the only place that is genuinely sticky. Dampeners
-// stay scarce everywhere because they are the one material that can kill you.
-const BIAS = [0x000b4, 0xc016a, 0x201a6, 0x11153, 0xa9332, 0x4a355, 0x6528b];
-// Two affinity colours per region, one digit each, straight from the world spec:
-// Cloudbreak O+Y, Sunforge R+O, Verdant G+Y, Crystal B+O, Mine R+V, Temple I+V.
-const AFF = '120132410656';
-const regHue = (r) => REG[r][1];
-const bias = (r) => BIAS[r];
-const bit = (b, i) => (b >> (16 - i * 4) & 15) / 16;
-// The Rainbow Engine's affinity is "all colours", so it rolls fresh each time.
-const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]];
-
-const regZone = (r) => REG[r][7];
-let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
-let vault = null;   // chunk currently focusing the camera
-// Shared build context for the archetype builders: the playable span, its
-// centre and width, the region's material bias and the current difficulty.
-// Set once per chunk by genChunk so no builder has to take seven parameters.
-let bL = 0, bR = 0, bW = 0, bX = 0, bB = 0, bD = 0;
-
-// --- obstacle constructors -------------------------------------------------
-// One shape record covers both primitives: t 0 is a circle of radius r, t 1 is
-// a segment of half-length r at angle g. Sharing the field means the collision
-// probe, the renderer and the placement test all read the same two numbers.
-const ci = (x, y, r, m, e) => Object.assign({ t: 0, x, y, r, g: 0, m: m | 0 }, e);
-const sg = (x, y, r, g, m, e) => Object.assign({ t: 1, x, y, r, g, m: m | 0 }, e);
-// segment from A to B
-const sgAB = (ax, ay, bx, by, m, e) =>
-  sg((ax + bx) / 2, (ay + by) / 2, hyp(bx - ax, by - ay) / 2, at2(by - ay, bx - ax), m, e);
-
-const item = (t, x, y, c) => ({ t, x, y, c: c | 0, g: 0 });
-
-// Arcs are built from straight segments, so the collision kernel only ever
-// deals with circles and segments - and the facets suit the geometric look.
-function arcSegs(c, x, y, r, a0, a1, m) {
-  const n = mx(3, (a1 - a0) * r / 80 | 0);
-  for (let i = 0; i < n; i++) {
-    const b0 = lerp(a0, a1, i / n), b1 = lerp(a0, a1, (i + 1) / n);
-    c.o.push(sgAB(x + cos(b0) * r, y + sin(b0) * r, x + cos(b1) * r, y + sin(b1) * r, m));
-  }
-}
-
-// --- current transform of an obstacle --------------------------------------
-// Results land in scratch globals to avoid per-frame allocation.
-let _cx = 0, _cy = 0, _cvx = 0, _cvy = 0, _cg = 0;
-// Closest-point scratch, filled by near().
-let _px = 0, _py = 0, _nx = 0, _ny = 0, _pd = 0;
-function obT(o) {
-  _cx = o.x; _cy = o.y; _cvx = 0; _cvy = 0; _cg = o.g;
-  if (o.os) {
-    const p = o.os * T + o.op, s = sin(p), c = cos(p) * o.os;
-    _cx += o.ox * s; _cy += o.oy * s;
-    _cvx = o.ox * c; _cvy = o.oy * c;
-  }
-  if (o.w) _cg += o.w * T;
-}
-// Surface velocity of obstacle o at world point (px,py).
-function obVel(o, px, py) {
-  if (o.w) { _cvx += -o.w * (py - _cy); _cvy += o.w * (px - _cx); }
-}
-
-// --- material roll ---------------------------------------------------------
-function mat(b, allowBreak) {
-  return rp(bit(b, 2)) ? M_DAMP
-    : allowBreak && rp(bit(b, 0)) ? M_BREAK
-      : rp(bit(b, 1)) ? M_PHASE
-        : rp(bit(b, 3)) ? M_BUMP : 0;
-}
-// Optional motion decoration: a straight oscillation along a random axis.
-function moving(b, amp) {
-  if (!rp(bit(b, 4))) return null;
-  const a = rf(0, TAU);
-  return { ox: cos(a) * amp, oy: sin(a) * amp * .6, os: rf(.7, 1.9), op: rf(0, TAU) };
-}
-
-// --- region helpers --------------------------------------------------------
-const regAt = (y) => { const i = flr(mx(y, 0) / REGD); return i < 7 ? i : i % 7; };
-const loopAt = (y) => flr(flr(mx(y, 0) / REGD) / 7);
-const difAt = (y) => clamp(flr(mx(y, 0) / REGD) * .085 + loopAt(y) * .3, 0, 2.4);
-
-// Closest point on obstacle o (in whatever pose the scratch globals hold) to
-// (x,y). Leaves the point in _px/_py, the unit normal pointing back at the
-// query in _nx/_ny and the distance in _pd, and returns the obstacle's surface
-// radius so callers can compare. Shared by collision and by the generator's
-// placement probe, which used to carry its own copy of this arithmetic.
-function near(o, x, y) {
-  if (!o.t) {
-    _nx = x - _cx; _ny = y - _cy; _pd = hyp(_nx, _ny);
-    if (_pd < 1e-4) { _nx = 0; _ny = -1; _pd = 1e-4; } else { _nx /= _pd; _ny /= _pd; }
-    _px = _cx + _nx * o.r; _py = _cy + _ny * o.r;
-    return o.r;
-  }
-  const cg = cos(_cg) * o.r, sg2 = sin(_cg) * o.r;
-  const ax = _cx - cg, ay = _cy - sg2, bx = _cx + cg, by = _cy + sg2;
-  const t = segT(ax, ay, bx, by, x, y);
-  _px = ax + (bx - ax) * t; _py = ay + (by - ay) * t;
-  _nx = x - _px; _ny = y - _py; _pd = hyp(_nx, _ny);
-  if (_pd < 1e-4) { _nx = -sin(_cg); _ny = cos(_cg); _pd = 1e-4; } else { _nx /= _pd; _ny /= _pd; }
-  return ST;
-}
-
-// --- solidity probe --------------------------------------------------------
-// Deliberately measured against each obstacle's *base* pose, not its animated
-// one: placement has to be deterministic for a seed, and a moving arm sweeping
-// over a coin is the intended risk rather than a bad spawn.
-function solidNear(c, x, y, rad) {
-  for (const o of c.o) {
-    _cx = o.x; _cy = o.y; _cg = o.g;
-    if (near(o, x, y) + rad > _pd) return 1;
-  }
-  return 0;
-}
-
-// ---------------------------------------------------------------------------
-// Chunk generation
-// ---------------------------------------------------------------------------
-function genChunk() {
-  const y = nextY;
-  const rg = regAt(y), dif = difAt(y), b = bias(rg);
-  const boundary = flr((y + 1400) / REGD) > flr(y / REGD) && y > 200;
-
-  // Wall profile: side pockets widen the column, shafts narrow it.
-  const wide = rp(.25) ? 120 : 0;
-  const l = clamp(-COL + rf(-90, 70) - wide, -WMAX, -300);
-  const r = clamp(COL + rf(-70, 90) + wide, 300, WMAX);
-  const h = boundary ? 1200 : ri(700, 1200);
-
-  const c = { y, h, l, r, pl: prevL, pr: prevR, o: [], i: [], rg, k: 0, v: 0, z: 0, bk: [] };
-
-  // Walls, drawn as chunk-to-chunk segments so the column is continuous.
-  c.o.push(sgAB(prevL, y, l, y + h, 0), sgAB(prevR, y, r, y + h, 0));
-
-  bL = mx(prevL, l) + 30; bR = mn(prevR, r) - 30;
-  bW = bR - bL; bX = (bL + bR) / 2; bB = b; bD = dif;
-
-  if (boundary) buildGate(c);
-  else if (cIdx > 2 && rp(.1)) { c.v = 1; buildVault(c, rg); }
-  else {
-    const k = +REG[rg][5][ri(0, 9)];
-    c.k = k;
-    // The region's force field. It is what makes a descent feel like a place:
-    // Cloudbreak holds you up, the Temple turns you over, the Coil and the
-    // Current sweep you sideways, the Mine drags you into its pockets.
-    if (cIdx > 1 && ri(0, 9) < REG[rg][8]) c.z = regZone(rg) || ri(1, 5);
-    if (k === 1 || k === 5)
-      barrier(c, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 200), c.y + c.h * rf(.3, .6), 0);
-    else [pegField, 0, bowl, shaft, rotor, 0, chamber, targets, crushers][k](c);
-    decorate(c, REG[rg][6] + (dif * 1.6 | 0));
-    rewards(c, rg);
-  }
-
-  // Nothing is allowed to spawn inside solid geometry, whichever builder placed it.
-  c.i = c.i.filter((it) => !solidNear(c, it.x, it.y, R * .6));
-
-  prevL = l; prevR = r; nextY = y + h; cIdx++;
-  chunks.push(c);
-  if (chunks.length > CHUNKS) chunks.shift();
-  return c;
-}
-
-// Region-flavoured filler. Every archetype leaves gaps; this scatters small
-// interactive geometry into them so a screen always has something to hit,
-// which is what makes the game read as pinball rather than as empty shafts.
-// It refuses any spot that would crowd existing geometry, so it can never seal
-// a route it did not create.
-function decorate(c, n) {
-  // Keep trying until the quota is met: shaft and rotor chunks reject most
-  // candidates, and those are exactly the chunks that read as empty.
-  for (let tries = n * 6; n > 0 && tries--;) {
-    const x = rf(bL + 40, bR - 40), y = c.y + rf(.07, .93) * c.h;
-    const cir = rp(.6), rad = rf(13, 26), hl = rf(30, 70), a = rf(0, PI);
-    // Every extremity must clear existing geometry by more than the unicorn's
-    // diameter. That keeps the filler from ever closing a route: splitting a
-    // wide gap in two still leaves both halves passable.
-    const need = 48 + (cir ? rad : ST);
-    if (solidNear(c, x, y, need)) continue;
-    if (!cir) {
-      const dx = cos(a) * hl, dy = sin(a) * hl;
-      if (solidNear(c, x + dx, y + dy, need) || solidNear(c, x - dx, y - dy, need)) continue;
-    }
-    n--;
-    // Half the scatter is live pinball furniture: bumpers that kick, targets
-    // that light, panels that shatter. A screen should always contain
-    // something worth hitting on purpose.
-    c.o.push(cir
-      ? ci(x, y, rad, mat(bB, 0) | (rp(.5) ? M_BUMP : rp(.3) ? M_TGT : 0), moving(bB, 70))
-      : sg(x, y, hl, a, mat(bB, 1) | (rp(.22) ? M_ANCH : 0), moving(bB, 60)));
-    if (c.o[c.o.length - 1].m & M_TGT) tag(c, c.o[c.o.length - 1], 3);
-  }
-}
-
-// Register an obstacle as a member of a scoring bank. Every target in a bank
-// lights independently; lighting the last one pays the whole bank out and
-// resets it, so a bank is a repeatable objective rather than a one-off pickup.
-function tag(c, o, cap) {
-  let k = c.bk[c.bk.length - 1];
-  if (!k || k.n >= k.cap) { k = { n: 0, l: 0, cap, x: o.x, y: o.y, m: [] }; c.bk.push(k); }
-  k.n++; k.m.push(o);
-  o.bk = k;
-  o.m |= M_TGT;
-}
-
-// --- archetypes ------------------------------------------------------------
-function pegField(c) {
-  const rows = ri(4, 6), gap = c.h / (rows + 1);
-  for (let r = 0; r < rows; r++) {
-    const yy = c.y + gap * (r + 1), n = ri(4, 7);
-    for (let i = 0; i < n; i++) {
-      const t = (i + (r & 1 ? .5 : 0)) / (n - .34);
-      c.o.push(ci(bL + 40 + t * (bW - 90), yy, rf(14, 30),
-        mat(bB, 0) | (rp(.45) ? M_BUMP : rp(.25) ? M_TGT : 0), moving(bB, 60)));
-      if (c.o[c.o.length - 1].m & M_TGT) tag(c, c.o[c.o.length - 1], 3);
-    }
-  }
-}
-
-// One builder covers both the Funnel and the Sieve: a wall across the column
-// with n openings. `drop` slopes the outer ends up and the gap edges down,
-// which turns a flat sieve into a converging funnel.
-function barrier(c, n, drop, yy, quiet) {
-  const m = mat(bB, 1), cuts = [];
-  for (let i = 0; i < n; i++) cuts.push(bL + (i + rf(.22, .8)) * bW / n);
-  let px = bL - 20, py = yy - drop;
-  for (let i = 0; i <= n; i++) {
-    const last = i === n;
-    const gw = mx(100, rf(120, 200) - bD * 16);
-    const nx = last ? bR + 20 : cuts[i] - gw / 2, ny = last ? yy - drop : yy + drop;
-    if (nx - px > 26) c.o.push(sgAB(px, py, nx, ny, m));
-    if (!last && drop > 40 && rp(.6)) c.o.push(ci(nx, ny, 15, M_BUMP));
-    px = last ? nx : cuts[i] + gw / 2;
-    py = yy + drop;
-  }
-  if (quiet) return;
-  // Coins below the easiest gap, the prize above the least convenient one.
-  for (let i = 0; i < 4; i++) c.i.push(item(I_COIN, cuts[0] + rf(-26, 26), yy + drop + 70 + i * 48));
-  c.i.push(item(rp(.34) ? I_PIG : I_CROWN, cuts[n - 1], yy - drop - 70, pick(aff(c.rg))));
-}
-
-function bowl(c) {
-  const r = mn(bW * .4, 300), bx = bX + rf(-.2, .2) * bW, by = c.y + c.h * .6;
-  const rim = r * cos(.12 * PI);
-  arcSegs(c, bx, by, r, .12 * PI, .8 * PI, rp(.34) ? M_DAMP : 0);
-  c.o.push(ci(bx - rim, by, 15, M_BUMP), ci(bx + rim, by, 15, M_BUMP));
-  // Something worth the risk of dropping in.
-  c.i.push(item(rp(.3) ? I_CROWN : I_PIG, bx, by + r * .5, pick(aff(c.rg))));
-  if (rp(.6)) c.o.push(sg(bx, c.y + c.h * .18, rf(60, 120), rf(-.4, .4), M_BUMP, moving(bB, 90)));
-}
-
-function shaft(c) {
-  const w = mx(150, 240 - bD * 30), sx = bX + rf(-.2, .2) * bW;
-  const drift = rf(-90, 90);
-  c.o.push(sgAB(sx - w / 2, c.y, sx - w / 2 + drift, c.y + c.h, M_RAIL));
-  c.o.push(sgAB(sx + w / 2, c.y, sx + w / 2 + drift, c.y + c.h, M_RAIL));
-  for (let i = 0; i < 7; i++) c.i.push(item(I_COIN, sx + drift * (i / 7) + rf(-30, 30), c.y + 80 + i * (c.h - 150) / 6));
-  // Outside the shaft: an optional pocket the player has to leave the rail for.
-  if (rp(.6)) {
-    const ox = sx < bX ? bR - 70 : bL + 70;
-    const bp = rp(.5);
-    c.i.push(item(bp ? I_PIG : I_BOOST, ox, c.y + c.h * .5, bp ? pick(aff(c.rg)) : ri(0, 6)));
-  }
-}
-
-function rotor(c) {
-  const n = ri(1, 2);
-  for (let i = 0; i < n; i++) {
-    const rx = bX + rf(-.22, .22) * bW, ry = c.y + c.h * (n === 1 ? .5 : .3 + i * .4);
-    const arms = ri(2, 3), len = mn(bW * .3, 200), w = rs() * rf(.9, 1.9 + bD * .3);
-    for (let a = 0; a < arms; a++)
-      c.o.push(sg(rx, ry, len, a * PI / arms, M_BUMP, { w }));
-    c.o.push(ci(rx, ry, 18, 0));
-    c.i.push(item(I_COIN, rx, ry - len - 40), item(I_COIN, rx, ry + len + 40));
-  }
-}
-
-function chamber(c) {
-  const top = c.y + c.h * .16, bot = c.y + c.h * .8;
-  barrier(c, 1, 0, top, 1);
-  barrier(c, 1, 0, bot, 1);
-  const n = ri(4, 7);
-  for (let i = 0; i < n; i++) {
-    const ix = bL + rf(.12, .8) * bW, iy = lerp(top + 60, bot - 60, rr());
-    if (solidNear(c, ix, iy, 60)) continue;
-    if (rp(.5)) c.o.push(ci(ix, iy, rf(16, 30), rp(.5) ? M_BUMP : M_ANCH, moving(bB, 80)));
-    else c.o.push(sg(ix, iy, rf(48, 90), rf(0, PI), mat(bB, 1) | (rp(.3) ? M_RAIL : 0), moving(bB, 70)));
-  }
-  // A ring of orbit fodder around the middle: this is the archetype the Green
-  // tether and the Yellow spring are meant to be used in.
-  const mx2 = bX, my = (top + bot) / 2, rr2 = mn(bW * .3, 200);
-  for (let i = 0; i < 4; i++) {
-    const a = i / 4 * TAU + rf(0, 1), ix = mx2 + cos(a) * rr2, iy = my + sin(a) * rr2 * .7;
-    if (!solidNear(c, ix, iy, 60)) c.o.push(ci(ix, iy, rf(13, 20), M_BUMP, moving(bB, 60)));
-  }
-  // Side pocket with the good stuff
-  c.i.push(item(rp(.22) ? I_CROWN : I_PIG, rp(.5) ? bL + 60 : bR - 60, (top + bot) / 2, pick(aff(c.rg))));
-}
-
-// Drop-target banks: rows of lit-on-contact panels flanked by kickers. Clear a
-// whole bank and it pays out and re-arms, which is the loop that makes a
-// pinball table worth staying on rather than falling through.
-function targets(c) {
-  const rows = ri(2, 3);
-  for (let r = 0; r < rows; r++) {
-    const yy = c.y + c.h * (.2 + r * .6 / rows + rf(-.04, .04));
-    const n = ri(3, 5), span = mn(bW * .8, 300), x0 = bX - span / 2 + rf(-40, 40);
-    const k = { n, l: 0, cap: n, x: bX, y: yy, m: [] };
-    c.bk.push(k);
-    for (let i = 0; i < n; i++) {
-      const o = sg(x0 + (i + .5) * span / n, yy, 30, PI / 2 + rf(-.2, .2), M_TGT);
-      o.bk = k; k.m.push(o);
-      c.o.push(o);
-    }
-    // Kickers at both ends of the bank keep the ball in the lane.
-    c.o.push(ci(x0 - 40, yy, 20, M_BUMP), ci(x0 + span + 40, yy, 20, M_BUMP));
-    for (let i = 0; i < n; i++) c.i.push(item(I_COIN, x0 + (i + .5) * span / n, yy - 60));
-  }
-  c.i.push(item(rp(.4) ? I_BOOST : I_PIG, bX + rf(-.3, .3) * bW, c.y + c.h * .92, ri(0, 6)));
-}
-
-// Crusher lane: a corridor of breakable panels with counter-swinging arms that
-// do the demolition for you once you are moving. Sunforge's signature room.
-function crushers(c) {
-  const w = mn(bW * .8, 420), sx = bX + rf(-.1, .1) * bW;
-  const n = ri(3, 4);
-  for (let i = 0; i < n; i++) {
-    const yy = c.y + c.h * (.15 + i * .8 / n);
-    // A full-width breakable curtain with one deliberate gap.
-    const gapX = sx + rf(-.3, .3) * w, gw = mx(90, 150 - bD * 20);
-    for (const sd of [-1, 1]) {
-      const ex = sd < 0 ? sx - w / 2 : sx + w / 2;
-      const gx = gapX + sd * gw / 2;
-      if (abs(ex - gx) > 30) c.o.push(sgAB(gx, yy, ex, yy + rf(-14, 14), M_BREAK));
-    }
-    // The crusher itself: a heavy arm sweeping the lane.
-    c.o.push(sg(gapX, yy + c.h * .4 / n, mn(w * .3, 150), rf(0, PI), M_BUMP,
-      { w: rs() * rf(.8, 1.6 + bD * .4) }));
-    c.i.push(item(I_COIN, gapX, yy + 40), item(I_COIN, gapX + rf(-30, 30), yy + 90));
-  }
-  c.i.push(item(rp(.5) ? I_CROWN : I_BOOST, sx, c.y + c.h * .96, ri(0, 6)));
-}
-
-// --- special rooms ---------------------------------------------------------
-// Focus Vault - a slow, enclosed prize room. Some of them hold a Prism Well
-// instead of a Crown Coin, which is the game's only full pigment refill.
-function buildVault(c, rg) {
-  const cx = bX, cy = c.y + c.h * .5, r = mn(bW * .4, 240);
-  c.cx = cx; c.cy = cy;
-  arcSegs(c, cx, cy, r, .8 * PI, 2.4 * PI, M_BUMP);   // bowl with a top-left mouth
-  const well = rp(.4);
-  for (let a = 0; a < 3; a++) c.o.push(sg(cx, cy, r * .5, a * PI / 3, M_BUMP, { w: rs() * .5 }));
-  c.i.push(item(well ? I_WELL : I_CROWN, cx, cy - r * .8));
-  c.i.push(item(I_PIG, cx - r * .6, cy + r * .3, pick(aff(rg))));
-  c.i.push(item(I_PIG, cx + r * .6, cy + r * .3, ri(0, 6)));
-  for (let i = 0; i < 6; i++)
-    c.i.push(item(I_COIN, cx + cos(i / 6 * TAU) * r * .8, cy + sin(i / 6 * TAU) * r * .8));
-}
-
-// Region exit machine: a spinning prism above a closing throat, then a full
-// spectrum of pigment as a reward for getting through it.
-function buildGate(c) {
-  const cx = bX, cy = c.y + c.h * .4;
-  rotor(c);
-  barrier(c, 1, 0, cy + 300, 1);
-  c.o.push(ci(cx, cy, 26, M_BUMP));
-  for (let i = 0; i < 7; i++) c.i.push(item(I_PIG, cx + (i - 3) * 70, cy + 420, i));
-  c.i.push(item(I_CROWN, cx, c.y + 150));
-}
-
-// --- rewards ---------------------------------------------------------------
-function rewards(c, rg) {
-  const af = aff(rg);
-  // Reward density tracks the region's own density number, so the Prism Mine
-  // really is worth the risk it asks you to take and Cloudbreak stays airy.
-  const rich = REG[rg][6] / 6;
-  // Drop something valuable in the first free spot we find.
-  const place = (t, cc, lo, hi) => {
-    for (let a = 0; a < 10; a++) {
-      const x = rf(bL + 40, bR - 40), y = c.y + rf(lo, hi) * c.h;
-      if (!solidNear(c, x, y, 30)) { c.i.push(item(t, x, y, cc)); return; }
-    }
-  };
-  // A coin arc that teaches a trajectory.
-  if (rp(.8)) {
-    const n = ri(5, 9), x0 = bL + rf(.1, .5) * bW, y0 = c.y + rf(.16, .5) * c.h;
-    const dir = rs(), spread = rf(150, 300), rise = rf(-200, 240);
-    for (let i = 0; i < n; i++) {
-      const t = i / (n - 1);
-      const x = x0 + dir * spread * t, y = y0 + rise * sin(t * PI) + t * 150;
-      if (x > bL + 26 && x < bR - 26 && !solidNear(c, x, y, 26)) c.i.push(item(I_COIN, x, y));
-    }
-  }
-  // Pigment biased to the region affinity, but never exclusive to it.
-  if (rp(.6 * rich)) place(I_PIG, rp(.7) ? pick(af) : ri(0, 6), .16, .8);
-  // Upward temptation, above the entry line.
-  if (rp(.3 * rich)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 6), .02, .16);
-  if (rp(.16 * rich)) place(I_BOOST, ri(0, 6), .3, .8);
-  // Destruction cache: coins sealed behind breakable panels.
-  if (rp(.22 * rich)) {
-    const x = rp(.5) ? bL + 90 : bR - 90, y = c.y + rf(.22, .7) * c.h;
-    for (let i = 0; i < 4; i++)
-      c.o.push(sg(x + (i < 2 ? 0 : i > 2 ? 60 : -60), y + (i < 2 ? (i ? 60 : -60) : 0), 60, i < 2 ? PI / 2 : 0, M_BREAK));
-    c.i.push(item(I_COIN, x, y), item(I_COIN, x - 30, y), item(I_COIN, x + 30, y),
-      item(rp(.4) ? I_CROWN : I_PIG, x, y - 30, ri(0, 6)));
-  }
-}
-
-// --- lifecycle -------------------------------------------------------------
-function worldReset(sd) {
-  seed = sd || (rnd() * 1e9) | 0;
-  srnd(seed);
-  chunks = []; nextY = -900; prevL = -COL; prevR = COL; cIdx = 0; vault = null;
-  // Opening room: open, gentle, and it demonstrates bouncing within seconds.
-  const c = { y: -900, h: 1400, l: -COL, r: COL, pl: -COL, pr: COL, o: [], i: [], rg: 0, k: 0, v: 0, z: 0, bk: [] };
-  c.o.push(sgAB(-COL, -900, -COL, 500, 0), sgAB(COL, -900, COL, 500, 0),
-    sgAB(-COL, -900, COL, -900, M_BUMP),
-    ci(-150, 60, 26, M_BUMP), ci(150, 240, 26, M_BUMP), ci(-60, 420, 20, M_BUMP));
-  for (let i = 0; i < 7; i++) c.i.push(item(I_COIN, -200 + i * 70, 150 + sin(i * .9) * 90));
-  c.i.push(item(I_PIG, 240, -60, 1), item(I_PIG, -240, 420, 2));
-  chunks.push(c);
-  nextY = 500;
-  while (nextY < 3000) genChunk();
-}
-
-function worldUpdate() {
-  while (nextY < P.y + 3200) genChunk();
-  // Ceiling guard: never let the unicorn leave the retained world upward.
-  const top = chunks[0];
-  if (P.y < top.y + 40) { P.y = top.y + 40; if (P.vy < 0) P.vy = abs(P.vy) * .6; }
-}
-
-// --- column bounds ---------------------------------------------------------
-// The shaft walls are chunk-to-chunk segments, so the playable span at a given
-// height is an interpolation between the chunk's entry and exit walls. Warps,
-// portals and Indigo can all put the unicorn somewhere arbitrary, and relying
-// on segment collision alone let it end up behind a wall with nothing to push
-// it back. Results land in scratch globals to keep the physics step allocation
-// free.
-let _wl = -WMAX, _wr = WMAX;
-function wallsAt(y) {
-  _wl = -WMAX; _wr = WMAX;
-  for (const c of chunks) if (y >= c.y && y < c.y + c.h) {
-    const t = (y - c.y) / c.h;
-    _wl = lerp(c.pl, c.l, t); _wr = lerp(c.pr, c.r, t);
-    return;
-  }
-}
-
-// The force a chunk's field applies at (x,y), into the scratch pair _zx/_zy.
-// One switch, five fields, and every region gets a mechanic instead of a
-// repaint. Fields never kill: the worst any of them does is redirect you.
-let _zx = 0, _zy = 0;
-function zoneF(c, x, y) {
-  _zx = _zy = 0;
-  const z = c.z;
-  if (!z) return;
-  const t = (y - c.y) / c.h, ph = sin(t * 7 + T * 1.4);
-  if (z === Z_UP) {
-    // Updraft columns: three lanes of lift you can ride or dodge.
-    const lane = cos((x - c.l) / (c.r - c.l) * TAU * 1.6);
-    if (lane > .1) _zy = -GRAV * 1.2 * lane;
-  } else if (z === Z_WELL) {
-    // A gravity well at the chunk's heart, falling off with distance.
-    const dx = (c.l + c.r) / 2 - x, dy = c.y + c.h * .5 - y, d = hyp(dx, dy) + 60;
-    const k = mn(1, 300 / d) * GRAV * .8;
-    _zx = dx / d * k; _zy = dy / d * k;
-  } else if (z === Z_WIND) {
-    _zx = ph * GRAV * .6;
-  } else if (z === Z_INV) {
-    // Inversion: the shaft is upside down here, and the transition is soft
-    // enough at the edges that you always see it coming.
-    _zy = -GRAV * 2 * clamp(mn(t, 1 - t) * 6, 0, 1);
-  } else if (z === Z_FLOW) {
-    // The Coil: a rotation about the chunk's heart. Everything in Verdant is
-    // built to be swung around, and the field swings you too.
-    const cx = (c.l + c.r) / 2, cy = c.y + c.h * .5;
-    const dx = x - cx, dy = y - cy, d = hyp(dx, dy) + 80;
-    const k = GRAV * .7 * mn(1, 300 / d);
-    _zx = -dy / d * k; _zy = dx / d * k;
-  } else {
-    // The Current: a meandering channel that carries you down it. Unlike the
-    // Coil this one has a direction, which is what makes the Crystal region a
-    // race rather than a playground.
-    const cx = (c.l + c.r) / 2 + sin(y * .0016 + c.y * .01) * (c.r - c.l) * .3;
-    _zx = clamp((cx - x) * 5, -GRAV, GRAV);
-    _zy = GRAV * .5;
-  }
-}
-
-// Chunks overlapping a vertical span (used by physics + render).
-function nearChunks(y0, y1) {
-  const out = [];
-  for (const c of chunks) if (c.y + c.h > y0 && c.y < y1) out.push(c);
-  return out;
 }
 
 // ==== physics.js ====
@@ -1336,6 +781,863 @@ function physics(h) {
   if (P.sp > 30) P.a = at2(P.vy, P.vx);
 }
 
+// ==== world.js ====
+// ---------------------------------------------------------------------------
+// World: region table, chunk grammar, obstacle + reward generation.
+//
+// The world is a ring of vertical chunks. Every chunk picks an archetype from
+// its region's weight string and decorates it with region material bias, so
+// world identity is systematic instead of seven separate generators.
+// ---------------------------------------------------------------------------
+
+// Archetype ids used inside the region weight strings. Funnel and Sieve are
+// the same builder with different parameters, so eight situations cost seven.
+// 0 PEG  1 FUNNEL  2 BOWL  3 SHAFT  4 ROTOR  5 SIEVE  6 CHAMBER
+// 7 TARGET BANK  8 CRUSHER LANE
+
+// Region row. Everything a region needs beyond these nine numbers is derived,
+// which costs far fewer compressed bytes than a table:
+//   0 name
+//   1 base hue        background gradient starts here
+//   2 hue spread      gradient end + geometry hue are offsets from the base
+//   3 geometry light
+//   4 background light
+//   5 archetype weights (one char per draw)
+//   6 filler density  extra scattered geometry per chunk
+//   7 zone type       the force field that gives the region its mechanic
+//   8 zone frequency  0..9, chunks in ten that carry the field
+//   9 geometry hue     absolute; -1 means "cycle" (the Rainbow Engine)
+// Affinity colours come from AFF, music from formulas in 60_audio.js.
+//
+// A region is a *mechanic* first and a palette second. Each row below pairs a
+// force field with the archetypes and materials that make that field matter,
+// so the seven descents ask genuinely different things of the player rather
+// than recolouring the same shaft.
+const REG = [
+  // Sky. Updraft columns hold you up, so descending is something you do on
+  // purpose. Round, soft, bumper-heavy: the region that teaches the verbs.
+  ['CLOUDBREAK', 206, 74, 88, 26, '0002100210', 5, Z_UP, 5, 40],
+  // Furnace. Almost everything is breakable and chains into its neighbours;
+  // crusher lanes and rotors do the breaking for you if you build speed.
+  ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4, 196],
+  // Overgrown spiral. Anchors and springy pods everywhere, and a slipstream
+  // that curls you around them - the region the Green tether was built for.
+  ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6, 320],
+  // Glass river. Long rails, narrow throats, flow that carries you along them.
+  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7, 25],
+  // Dark mine. Phase walls hide pockets, gravity wells drag you into them, and
+  // the reward density is the highest in the game.
+  ['PRISM MINE', 276, -28, 62, 10, '6760671666', 9, Z_WELL, 6, 120],
+  // Temple. Inversion fields turn the shaft upside down; the geometry is built
+  // to be read from both directions.
+  ['INVERSION TEMPLE', 264, 52, 80, 13, '6465264636', 7, Z_INV, 7, 75],
+  // The Engine. Every archetype, every field, maximum density.
+  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456788', 9, 0, 9, -1],
+];
+// Material bias per region, as five hex nibbles read left to right:
+//   BREAK PHASE DAMP BUMP MOVE, each out of 16.
+// This table is most of what a region feels like under the unicorn. Cloudbreak
+// is nearly all bumpers and nothing that eats speed; Sunforge is three quarters
+// breakable; the Mine is the only place that is genuinely sticky. Dampeners
+// stay scarce everywhere because they are the one material that can kill you.
+const BIAS = [0x000b4, 0xc016a, 0x201a6, 0x11153, 0xa9332, 0x4a355, 0x6528b];
+// Two affinity colours per region, one digit each, straight from the world spec:
+// Cloudbreak O+Y, Sunforge R+O, Verdant G+Y, Crystal B+O, Mine R+V, Temple I+V.
+const AFF = '120132410656';
+const regHue = (r) => REG[r][1];
+const bias = (r) => BIAS[r];
+const bit = (b, i) => (b >> (16 - i * 4) & 15) / 16;
+// The Rainbow Engine's affinity is "all colours", so it rolls fresh each time.
+const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]];
+
+const regZone = (r) => REG[r][7];
+let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
+// Shared build context for the archetype builders: the playable span, its
+// centre and width, the region's material bias and the current difficulty.
+// Set once per chunk by genChunk so no builder has to take seven parameters.
+let bL = 0, bR = 0, bW = 0, bX = 0, bB = 0, bD = 0;
+
+// --- obstacle constructors -------------------------------------------------
+// One shape record covers both primitives: t 0 is a circle of radius r, t 1 is
+// a segment of half-length r at angle g. Sharing the field means the collision
+// probe, the renderer and the placement test all read the same two numbers.
+const ci = (x, y, r, m, e) => Object.assign({ t: 0, x, y, r, g: 0, m: m | 0 }, e);
+const sg = (x, y, r, g, m, e) => Object.assign({ t: 1, x, y, r, g, m: m | 0 }, e);
+// segment from A to B
+const sgAB = (ax, ay, bx, by, m, e) =>
+  sg((ax + bx) / 2, (ay + by) / 2, hyp(bx - ax, by - ay) / 2, at2(by - ay, bx - ax), m, e);
+
+const item = (t, x, y, c) => ({ t, x, y, c: c | 0, g: 0 });
+
+// Arcs are built from straight segments, so the collision kernel only ever
+// deals with circles and segments - and the facets suit the geometric look.
+function arcSegs(c, x, y, r, a0, a1, m) {
+  const n = mx(3, (a1 - a0) * r / 80 | 0);
+  for (let i = 0; i < n; i++) {
+    const b0 = lerp(a0, a1, i / n), b1 = lerp(a0, a1, (i + 1) / n);
+    c.o.push(sgAB(x + cos(b0) * r, y + sin(b0) * r, x + cos(b1) * r, y + sin(b1) * r, m));
+  }
+}
+
+// --- current transform of an obstacle --------------------------------------
+// Results land in scratch globals to avoid per-frame allocation.
+let _cx = 0, _cy = 0, _cvx = 0, _cvy = 0, _cg = 0;
+// Closest-point scratch, filled by near().
+let _px = 0, _py = 0, _nx = 0, _ny = 0, _pd = 0;
+function obT(o) {
+  _cx = o.x; _cy = o.y; _cvx = 0; _cvy = 0; _cg = o.g;
+  if (o.os) {
+    const p = o.os * T + o.op, s = sin(p), c = cos(p) * o.os;
+    _cx += o.ox * s; _cy += o.oy * s;
+    _cvx = o.ox * c; _cvy = o.oy * c;
+  }
+  if (o.w) _cg += o.w * T;
+}
+// Surface velocity of obstacle o at world point (px,py).
+function obVel(o, px, py) {
+  if (o.w) { _cvx += -o.w * (py - _cy); _cvy += o.w * (px - _cx); }
+}
+
+// --- material roll ---------------------------------------------------------
+function mat(b, allowBreak) {
+  return rp(bit(b, 2)) ? M_DAMP
+    : allowBreak && rp(bit(b, 0)) ? M_BREAK
+      : rp(bit(b, 1)) ? M_PHASE
+        : rp(bit(b, 3)) ? M_BUMP : 0;
+}
+// Optional motion decoration: a straight oscillation along a random axis.
+function moving(b, amp) {
+  if (!rp(bit(b, 4))) return null;
+  const a = rf(0, TAU);
+  return { ox: cos(a) * amp, oy: sin(a) * amp * .6, os: rf(.7, 1.9), op: rf(0, TAU) };
+}
+
+// --- region helpers --------------------------------------------------------
+const regAt = (y) => { const i = flr(mx(y, 0) / REGD); return i < 7 ? i : i % 7; };
+const loopAt = (y) => flr(flr(mx(y, 0) / REGD) / 7);
+const difAt = (y) => clamp(flr(mx(y, 0) / REGD) * .085 + loopAt(y) * .3, 0, 2.4);
+
+// Closest point on obstacle o (in whatever pose the scratch globals hold) to
+// (x,y). Leaves the point in _px/_py, the unit normal pointing back at the
+// query in _nx/_ny and the distance in _pd, and returns the obstacle's surface
+// radius so callers can compare. Shared by collision and by the generator's
+// placement probe, which used to carry its own copy of this arithmetic.
+function near(o, x, y) {
+  if (!o.t) {
+    _nx = x - _cx; _ny = y - _cy; _pd = hyp(_nx, _ny);
+    if (_pd < 1e-4) { _nx = 0; _ny = -1; _pd = 1e-4; } else { _nx /= _pd; _ny /= _pd; }
+    _px = _cx + _nx * o.r; _py = _cy + _ny * o.r;
+    return o.r;
+  }
+  const cg = cos(_cg) * o.r, sg2 = sin(_cg) * o.r;
+  const ax = _cx - cg, ay = _cy - sg2, bx = _cx + cg, by = _cy + sg2;
+  const t = segT(ax, ay, bx, by, x, y);
+  _px = ax + (bx - ax) * t; _py = ay + (by - ay) * t;
+  _nx = x - _px; _ny = y - _py; _pd = hyp(_nx, _ny);
+  if (_pd < 1e-4) { _nx = -sin(_cg); _ny = cos(_cg); _pd = 1e-4; } else { _nx /= _pd; _ny /= _pd; }
+  return ST;
+}
+
+// --- solidity probe --------------------------------------------------------
+// Deliberately measured against each obstacle's *base* pose, not its animated
+// one: placement has to be deterministic for a seed, and a moving arm sweeping
+// over a coin is the intended risk rather than a bad spawn.
+function solidNear(c, x, y, rad) {
+  for (const o of c.o) {
+    _cx = o.x; _cy = o.y; _cg = o.g;
+    if (near(o, x, y) + rad > _pd) return 1;
+  }
+  return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Chunk generation
+// ---------------------------------------------------------------------------
+function genChunk() {
+  const y = nextY;
+  const rg = regAt(y), dif = difAt(y), b = bias(rg);
+  const boundary = flr((y + 1400) / REGD) > flr(y / REGD) && y > 200;
+
+  // Wall profile: side pockets widen the column, shafts narrow it.
+  const wide = rp(.25) ? 120 : 0;
+  const l = clamp(-COL + rf(-90, 70) - wide, -WMAX, -300);
+  const r = clamp(COL + rf(-70, 90) + wide, 300, WMAX);
+  const h = boundary ? 1200 : ri(700, 1200);
+
+  const c = { y, h, l, r, pl: prevL, pr: prevR, o: [], i: [], rg, k: 0, v: 0, z: 0, bk: [] };
+
+  // Walls, drawn as chunk-to-chunk segments so the column is continuous.
+  c.o.push(sgAB(prevL, y, l, y + h, 0), sgAB(prevR, y, r, y + h, 0));
+
+  bL = mx(prevL, l) + 30; bR = mn(prevR, r) - 30;
+  bW = bR - bL; bX = (bL + bR) / 2; bB = b; bD = dif;
+
+  if (boundary) buildGate(c);
+  else {
+    const k = +REG[rg][5][ri(0, 9)];
+    c.k = k;
+    // The region's force field. It is what makes a descent feel like a place:
+    // Cloudbreak holds you up, the Temple turns you over, the Coil and the
+    // Current sweep you sideways, the Mine drags you into its pockets.
+    if (cIdx > 1 && ri(0, 9) < REG[rg][8]) c.z = regZone(rg) || ri(1, 5);
+    if (k === 1 || k === 5)
+      barrier(c, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 200), c.y + c.h * rf(.3, .6), 0);
+    else [pegField, 0, bowl, shaft, rotor, 0, chamber, targets, crushers][k](c);
+    decorate(c, REG[rg][6] + (dif * 1.6 | 0));
+    rewards(c, rg);
+  }
+
+  // Nothing is allowed to spawn inside solid geometry, whichever builder placed it.
+  c.i = c.i.filter((it) => !solidNear(c, it.x, it.y, R * .6));
+
+  prevL = l; prevR = r; nextY = y + h; cIdx++;
+  chunks.push(c);
+  if (chunks.length > CHUNKS) chunks.shift();
+  return c;
+}
+
+// Region-flavoured filler. Every archetype leaves gaps; this scatters small
+// interactive geometry into them so a screen always has something to hit,
+// which is what makes the game read as pinball rather than as empty shafts.
+// It refuses any spot that would crowd existing geometry, so it can never seal
+// a route it did not create.
+function decorate(c, n) {
+  // Keep trying until the quota is met: shaft and rotor chunks reject most
+  // candidates, and those are exactly the chunks that read as empty.
+  for (let tries = n * 6; n > 0 && tries--;) {
+    const x = rf(bL + 40, bR - 40), y = c.y + rf(.07, .93) * c.h;
+    const cir = rp(.6), rad = rf(13, 26), hl = rf(30, 70), a = rf(0, PI);
+    // Every extremity must clear existing geometry by more than the unicorn's
+    // diameter. That keeps the filler from ever closing a route: splitting a
+    // wide gap in two still leaves both halves passable.
+    const need = 48 + (cir ? rad : ST);
+    if (solidNear(c, x, y, need)) continue;
+    if (!cir) {
+      const dx = cos(a) * hl, dy = sin(a) * hl;
+      if (solidNear(c, x + dx, y + dy, need) || solidNear(c, x - dx, y - dy, need)) continue;
+    }
+    n--;
+    // Half the scatter is live pinball furniture: bumpers that kick, targets
+    // that light, panels that shatter. A screen should always contain
+    // something worth hitting on purpose.
+    c.o.push(cir
+      ? ci(x, y, rad, mat(bB, 0) | (rp(.5) ? M_BUMP : rp(.3) ? M_TGT : 0), moving(bB, 70))
+      : sg(x, y, hl, a, mat(bB, 1) | (rp(.22) ? M_ANCH : 0), moving(bB, 60)));
+    if (c.o[c.o.length - 1].m & M_TGT) tag(c, c.o[c.o.length - 1], 3);
+  }
+}
+
+// Register an obstacle as a member of a scoring bank. Every target in a bank
+// lights independently; lighting the last one pays the whole bank out and
+// resets it, so a bank is a repeatable objective rather than a one-off pickup.
+function tag(c, o, cap) {
+  let k = c.bk[c.bk.length - 1];
+  if (!k || k.n >= k.cap) { k = { n: 0, l: 0, cap, x: o.x, y: o.y, m: [] }; c.bk.push(k); }
+  k.n++; k.m.push(o);
+  o.bk = k;
+  o.m |= M_TGT;
+}
+
+// --- archetypes ------------------------------------------------------------
+function pegField(c) {
+  const rows = ri(4, 6), gap = c.h / (rows + 1);
+  for (let r = 0; r < rows; r++) {
+    const yy = c.y + gap * (r + 1), n = ri(4, 7);
+    for (let i = 0; i < n; i++) {
+      const t = (i + (r & 1 ? .5 : 0)) / (n - .34);
+      c.o.push(ci(bL + 40 + t * (bW - 90), yy, rf(14, 30),
+        mat(bB, 0) | (rp(.45) ? M_BUMP : rp(.25) ? M_TGT : 0), moving(bB, 60)));
+      if (c.o[c.o.length - 1].m & M_TGT) tag(c, c.o[c.o.length - 1], 3);
+    }
+  }
+}
+
+// One builder covers both the Funnel and the Sieve: a wall across the column
+// with n openings. `drop` slopes the outer ends up and the gap edges down,
+// which turns a flat sieve into a converging funnel.
+function barrier(c, n, drop, yy, quiet, mo) {
+  const m = mo || mat(bB, 1), cuts = [];
+  for (let i = 0; i < n; i++) cuts.push(bL + (i + rf(.22, .8)) * bW / n);
+  let px = bL - 20, py = yy - drop;
+  for (let i = 0; i <= n; i++) {
+    const last = i === n;
+    const gw = mx(100, rf(120, 200) - bD * 16);
+    const nx = last ? bR + 20 : cuts[i] - gw / 2, ny = last ? yy - drop : yy + drop;
+    if (nx - px > 26) c.o.push(sgAB(px, py, nx, ny, m));
+    if (!last && drop > 40 && rp(.6)) c.o.push(ci(nx, ny, 15, M_BUMP));
+    px = last ? nx : cuts[i] + gw / 2;
+    py = yy + drop;
+  }
+  if (quiet) return cuts;
+  // Coins below the easiest gap, the prize above the least convenient one.
+  for (let i = 0; i < 4; i++) c.i.push(item(I_COIN, cuts[0] + rf(-26, 26), yy + drop + 70 + i * 48));
+  c.i.push(item(rp(.34) ? I_PIG : I_CROWN, cuts[n - 1], yy - drop - 70, pick(aff(c.rg))));
+  return cuts;
+}
+
+function bowl(c) {
+  const r = mn(bW * .4, 300), bx = bX + rf(-.2, .2) * bW, by = c.y + c.h * .6;
+  const rim = r * cos(.12 * PI);
+  arcSegs(c, bx, by, r, .12 * PI, .8 * PI, rp(.34) ? M_DAMP : 0);
+  c.o.push(ci(bx - rim, by, 15, M_BUMP), ci(bx + rim, by, 15, M_BUMP));
+  // Something worth the risk of dropping in.
+  c.i.push(item(rp(.3) ? I_CROWN : I_PIG, bx, by + r * .5, pick(aff(c.rg))));
+  if (rp(.6)) c.o.push(sg(bx, c.y + c.h * .18, rf(60, 120), rf(-.4, .4), M_BUMP, moving(bB, 90)));
+}
+
+function shaft(c) {
+  const w = mx(150, 240 - bD * 30), sx = bX + rf(-.2, .2) * bW;
+  const drift = rf(-90, 90);
+  c.o.push(sgAB(sx - w / 2, c.y, sx - w / 2 + drift, c.y + c.h, M_RAIL));
+  c.o.push(sgAB(sx + w / 2, c.y, sx + w / 2 + drift, c.y + c.h, M_RAIL));
+  for (let i = 0; i < 7; i++) c.i.push(item(I_COIN, sx + drift * (i / 7) + rf(-30, 30), c.y + 80 + i * (c.h - 150) / 6));
+  // Outside the shaft: an optional pocket the player has to leave the rail for.
+  if (rp(.6)) {
+    const ox = sx < bX ? bR - 70 : bL + 70;
+    const bp = rp(.5);
+    c.i.push(item(bp ? I_PIG : I_BOOST, ox, c.y + c.h * .5, bp ? pick(aff(c.rg)) : ri(0, 6)));
+  }
+}
+
+function rotor(c) {
+  const n = ri(1, 2);
+  for (let i = 0; i < n; i++) {
+    const rx = bX + rf(-.22, .22) * bW, ry = c.y + c.h * (n === 1 ? .5 : .3 + i * .4);
+    const arms = ri(2, 3), len = mn(bW * .3, 200), w = rs() * rf(.9, 1.9 + bD * .3);
+    for (let a = 0; a < arms; a++)
+      c.o.push(sg(rx, ry, len, a * PI / arms, M_BUMP, { w }));
+    c.o.push(ci(rx, ry, 18, 0));
+    c.i.push(item(I_COIN, rx, ry - len - 40), item(I_COIN, rx, ry + len + 40));
+  }
+}
+
+function chamber(c) {
+  const top = c.y + c.h * .16, bot = c.y + c.h * .8;
+  barrier(c, 1, 0, top, 1);
+  barrier(c, 1, 0, bot, 1);
+  const n = ri(4, 7);
+  for (let i = 0; i < n; i++) {
+    const ix = bL + rf(.12, .8) * bW, iy = lerp(top + 60, bot - 60, rr());
+    if (solidNear(c, ix, iy, 60)) continue;
+    if (rp(.5)) c.o.push(ci(ix, iy, rf(16, 30), rp(.5) ? M_BUMP : M_ANCH, moving(bB, 80)));
+    else c.o.push(sg(ix, iy, rf(48, 90), rf(0, PI), mat(bB, 1) | (rp(.3) ? M_RAIL : 0), moving(bB, 70)));
+  }
+  // A ring of orbit fodder around the middle: this is the archetype the Green
+  // tether and the Yellow spring are meant to be used in.
+  const mx2 = bX, my = (top + bot) / 2, rr2 = mn(bW * .3, 200);
+  for (let i = 0; i < 4; i++) {
+    const a = i / 4 * TAU + rf(0, 1), ix = mx2 + cos(a) * rr2, iy = my + sin(a) * rr2 * .7;
+    if (!solidNear(c, ix, iy, 60)) c.o.push(ci(ix, iy, rf(13, 20), M_BUMP, moving(bB, 60)));
+  }
+  // Side pocket with the good stuff
+  c.i.push(item(rp(.22) ? I_CROWN : I_PIG, rp(.5) ? bL + 60 : bR - 60, (top + bot) / 2, pick(aff(c.rg))));
+}
+
+// Drop-target banks: rows of lit-on-contact panels flanked by kickers. Clear a
+// whole bank and it pays out and re-arms, which is the loop that makes a
+// pinball table worth staying on rather than falling through.
+function targets(c) {
+  const rows = ri(2, 3);
+  for (let r = 0; r < rows; r++) {
+    const yy = c.y + c.h * (.2 + r * .6 / rows + rf(-.04, .04));
+    const n = ri(3, 5), span = mn(bW * .8, 300), x0 = bX - span / 2 + rf(-40, 40);
+    const k = { n, l: 0, cap: n, x: bX, y: yy, m: [] };
+    c.bk.push(k);
+    for (let i = 0; i < n; i++) {
+      const o = sg(x0 + (i + .5) * span / n, yy, 30, PI / 2 + rf(-.2, .2), M_TGT);
+      o.bk = k; k.m.push(o);
+      c.o.push(o);
+    }
+    // Kickers at both ends of the bank keep the ball in the lane.
+    c.o.push(ci(x0 - 40, yy, 20, M_BUMP), ci(x0 + span + 40, yy, 20, M_BUMP));
+    for (let i = 0; i < n; i++) c.i.push(item(I_COIN, x0 + (i + .5) * span / n, yy - 60));
+  }
+  c.i.push(item(rp(.4) ? I_BOOST : I_PIG, bX + rf(-.3, .3) * bW, c.y + c.h * .92, ri(0, 6)));
+}
+
+// Crusher lane: a corridor of breakable panels with counter-swinging arms that
+// do the demolition for you once you are moving. Sunforge's signature room.
+// Crusher lane: a corridor of breakable curtains, each with one deliberate gap
+// and a heavy arm sweeping it. Sunforge's signature room.
+//
+// The curtain IS a barrier with its material forced breakable -- the same
+// builder the Funnel and the Sieve use -- so all this has to do is ask barrier
+// where it left the gap and put the arm and the bait there.
+function crushers(c) {
+  const n = ri(3, 4);
+  for (let i = 0; i < n; i++) {
+    const yy = c.y + c.h * (.15 + i * .8 / n);
+    const gx = barrier(c, 1, 0, yy, 1, M_BREAK)[0];
+    c.o.push(sg(gx, yy + c.h * .4 / n, mn(bW * .3, 150), rf(0, PI), M_BUMP,
+      { w: rs() * rf(.8, 1.6 + bD * .4) }));
+    c.i.push(item(I_COIN, gx, yy + 40), item(I_COIN, gx + rf(-30, 30), yy + 90));
+  }
+  c.i.push(item(rp(.5) ? I_CROWN : I_BOOST, bX, c.y + c.h * .96, ri(0, 6)));
+}
+
+// --- special rooms ---------------------------------------------------------
+function buildGate(c) {
+  const cx = bX, cy = c.y + c.h * .4;
+  rotor(c);
+  barrier(c, 1, 0, cy + 300, 1);
+  c.o.push(ci(cx, cy, 26, M_BUMP));
+  for (let i = 0; i < 7; i++) c.i.push(item(I_PIG, cx + (i - 3) * 70, cy + 420, i));
+  c.i.push(item(I_CROWN, cx, c.y + 150));
+}
+
+// --- rewards ---------------------------------------------------------------
+function rewards(c, rg) {
+  const af = aff(rg);
+  // Reward density tracks the region's own density number, so the Prism Mine
+  // really is worth the risk it asks you to take and Cloudbreak stays airy.
+  const rich = REG[rg][6] / 6;
+  // Drop something valuable in the first free spot we find.
+  const place = (t, cc, lo, hi) => {
+    for (let a = 0; a < 10; a++) {
+      const x = rf(bL + 40, bR - 40), y = c.y + rf(lo, hi) * c.h;
+      if (!solidNear(c, x, y, 30)) { c.i.push(item(t, x, y, cc)); return; }
+    }
+  };
+  // A coin arc that teaches a trajectory.
+  if (rp(.8)) {
+    const n = ri(5, 9), x0 = bL + rf(.1, .5) * bW, y0 = c.y + rf(.16, .5) * c.h;
+    const dir = rs(), spread = rf(150, 300), rise = rf(-200, 240);
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      const x = x0 + dir * spread * t, y = y0 + rise * sin(t * PI) + t * 150;
+      if (x > bL + 26 && x < bR - 26 && !solidNear(c, x, y, 26)) c.i.push(item(I_COIN, x, y));
+    }
+  }
+  // Pigment biased to the region affinity, but never exclusive to it.
+  if (rp(.6 * rich)) place(I_PIG, rp(.7) ? pick(af) : ri(0, 6), .16, .8);
+  // Upward temptation, above the entry line.
+  if (rp(.3 * rich)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 6), .02, .16);
+  if (rp(.16 * rich)) place(I_BOOST, ri(0, 6), .3, .8);
+  // The Prism Well is the game's only full refill. It used to be locked inside
+  // a Focus Vault; with those gone it becomes a rare find in its own right,
+  // still rare enough that hitting one feels like luck rather than supply.
+  if (rp(.07 * rich)) place(I_WELL, 0, .2, .8);
+  // Destruction cache: coins sealed behind breakable panels.
+  if (rp(.22 * rich)) {
+    const x = rp(.5) ? bL + 90 : bR - 90, y = c.y + rf(.22, .7) * c.h;
+    for (let i = 0; i < 4; i++)
+      c.o.push(sg(x + (i < 2 ? 0 : i > 2 ? 60 : -60), y + (i < 2 ? (i ? 60 : -60) : 0), 60, i < 2 ? PI / 2 : 0, M_BREAK));
+    c.i.push(item(I_COIN, x, y), item(I_COIN, x - 30, y), item(I_COIN, x + 30, y),
+      item(rp(.4) ? I_CROWN : I_PIG, x, y - 30, ri(0, 6)));
+  }
+}
+
+// --- lifecycle -------------------------------------------------------------
+function worldReset(sd) {
+  seed = sd || (rnd() * 1e9) | 0;
+  srnd(seed);
+  chunks = []; nextY = -900; prevL = -COL; prevR = COL; cIdx = 0;
+  // Opening room: open, gentle, and it demonstrates bouncing within seconds.
+  const c = { y: -900, h: 1400, l: -COL, r: COL, pl: -COL, pr: COL, o: [], i: [], rg: 0, k: 0, v: 0, z: 0, bk: [] };
+  c.o.push(sgAB(-COL, -900, -COL, 500, 0), sgAB(COL, -900, COL, 500, 0),
+    sgAB(-COL, -900, COL, -900, M_BUMP),
+    ci(-150, 60, 26, M_BUMP), ci(150, 240, 26, M_BUMP), ci(-60, 420, 20, M_BUMP));
+  for (let i = 0; i < 7; i++) c.i.push(item(I_COIN, -200 + i * 70, 150 + sin(i * .9) * 90));
+  c.i.push(item(I_PIG, 240, -60, 1), item(I_PIG, -240, 420, 2));
+  chunks.push(c);
+  nextY = 500;
+  while (nextY < 3000) genChunk();
+}
+
+function worldUpdate() {
+  while (nextY < P.y + 3200) genChunk();
+  // Ceiling guard: never let the unicorn leave the retained world upward.
+  const top = chunks[0];
+  if (P.y < top.y + 40) { P.y = top.y + 40; if (P.vy < 0) P.vy = abs(P.vy) * .6; }
+}
+
+// --- column bounds ---------------------------------------------------------
+// The shaft walls are chunk-to-chunk segments, so the playable span at a given
+// height is an interpolation between the chunk's entry and exit walls. Warps,
+// portals and Indigo can all put the unicorn somewhere arbitrary, and relying
+// on segment collision alone let it end up behind a wall with nothing to push
+// it back. Results land in scratch globals to keep the physics step allocation
+// free.
+let _wl = -WMAX, _wr = WMAX;
+function wallsAt(y) {
+  _wl = -WMAX; _wr = WMAX;
+  for (const c of chunks) if (y >= c.y && y < c.y + c.h) {
+    const t = (y - c.y) / c.h;
+    _wl = lerp(c.pl, c.l, t); _wr = lerp(c.pr, c.r, t);
+    return;
+  }
+}
+
+// The force a chunk's field applies at (x,y), into the scratch pair _zx/_zy.
+// One switch, five fields, and every region gets a mechanic instead of a
+// repaint. Fields never kill: the worst any of them does is redirect you.
+let _zx = 0, _zy = 0;
+function zoneF(c, x, y) {
+  _zx = _zy = 0;
+  const z = c.z;
+  if (!z) return;
+  const t = (y - c.y) / c.h, ph = sin(t * 7 + T * 1.4);
+  if (z === Z_UP) {
+    // Updraft columns: three lanes of lift you can ride or dodge.
+    const lane = cos((x - c.l) / (c.r - c.l) * TAU * 1.6);
+    if (lane > .1) _zy = -GRAV * 1.2 * lane;
+  } else if (z === Z_WELL) {
+    // A gravity well at the chunk's heart, falling off with distance.
+    const dx = (c.l + c.r) / 2 - x, dy = c.y + c.h * .5 - y, d = hyp(dx, dy) + 60;
+    const k = mn(1, 300 / d) * GRAV * .8;
+    _zx = dx / d * k; _zy = dy / d * k;
+  } else if (z === Z_WIND) {
+    _zx = ph * GRAV * .6;
+  } else if (z === Z_INV) {
+    // Inversion: the shaft is upside down here, and the transition is soft
+    // enough at the edges that you always see it coming.
+    _zy = -GRAV * 2 * clamp(mn(t, 1 - t) * 6, 0, 1);
+  } else if (z === Z_FLOW) {
+    // The Coil: a rotation about the chunk's heart. Everything in Verdant is
+    // built to be swung around, and the field swings you too.
+    const cx = (c.l + c.r) / 2, cy = c.y + c.h * .5;
+    const dx = x - cx, dy = y - cy, d = hyp(dx, dy) + 80;
+    const k = GRAV * .7 * mn(1, 300 / d);
+    _zx = -dy / d * k; _zy = dx / d * k;
+  } else {
+    // The Current: a meandering channel that carries you down it. Unlike the
+    // Coil this one has a direction, which is what makes the Crystal region a
+    // race rather than a playground.
+    const cx = (c.l + c.r) / 2 + sin(y * .0016 + c.y * .01) * (c.r - c.l) * .3;
+    _zx = clamp((cx - x) * 5, -GRAV, GRAV);
+    _zy = GRAV * .5;
+  }
+}
+
+// Chunks overlapping a vertical span (used by physics + render).
+function nearChunks(y0, y1) {
+  const out = [];
+  for (const c of chunks) if (c.y + c.h > y0 && c.y < y1) out.push(c);
+  return out;
+}
+
+// ==== audio.js ====
+// ---------------------------------------------------------------------------
+// Procedural Web Audio. Everything is synthesised from two primitives:
+//   O() - an oscillator with a pitch sweep and an AD envelope
+//   N() - a slice of the shared noise buffer through a swept filter
+// The rail grind is a single continuous voice created once and only modulated,
+// so long runs never accumulate nodes.
+// ---------------------------------------------------------------------------
+
+let AC = null, mg, sfxG, musG, lpF, nzBuf, railG, railO, railF;
+let voices = 0;                   // per-frame voice budget
+let mNext = 0, mStep = 0;         // music scheduler
+
+const NOTE = (n) => 420 * M.pow(2, (n - 70) / 12);
+const SCALE = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 4, 5, 7, 9, 11], [0, 3, 5, 7, 10, 12], [0, 1, 5, 6, 8, 11]];
+const WAVE = ['triangle', 'sawtooth', 'square'];
+
+function audioInit() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  const AX = window.AudioContext || window.webkitAudioContext;
+  if (!AX) return;
+  AC = new AX();
+
+  lpF = AC.createBiquadFilter(); lpF.type = 'lowpass'; lpF.frequency.value = 20000;
+  mg = AC.createGain(); mg.gain.value = SAVE.m ? 0 : .8;
+  lpF.connect(mg).connect(AC.destination);
+  sfxG = AC.createGain(); sfxG.gain.value = .8; sfxG.connect(lpF);
+  musG = AC.createGain(); musG.gain.value = .5; musG.connect(lpF);
+
+  const n = AC.sampleRate * 2;
+  nzBuf = AC.createBuffer(1, n, AC.sampleRate);
+  const d = nzBuf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = rnd() * 2 - 1;
+
+  // One always-on voice: the Blue rail grind. Built once, then only its gain
+  // and frequency are modulated, so long runs never leak nodes.
+  //
+  // There was a second continuous voice here -- a speed-driven wind bed. Even
+  // heavily damped it was fatiguing over a run, because it is on whenever you
+  // are moving and you are almost always moving. Speed already reads through
+  // the camera, the trail, the impacts and the music intensity, so the noise
+  // bed was carrying no information anyone needed.
+  railO = AC.createOscillator(); railO.type = 'sawtooth'; railO.frequency.value = 200;
+  railF = AC.createBiquadFilter(); railF.type = 'bandpass';
+  railF.frequency.value = 1400; railF.Q.value = 6;
+  railG = AC.createGain(); railG.gain.value = 0;
+  railO.connect(railF).connect(railG).connect(sfxG);
+  railO.start();
+
+  mNext = AC.currentTime + .1;
+}
+
+// Guards every synthesised voice: no context, muted, or over the frame budget.
+const ok = () => AC && !SAVE.m && voices < 26;
+const now = () => AC.currentTime;
+
+// Oscillator with an optional pitch sweep and an attack/decay envelope.
+// f1 of 0 (or equal to f0) means "hold the pitch".
+function O(w, f0, f1, dur, pk, dest, t0) {
+  if (!ok()) return;
+  const t = t0 || now();
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = w;
+  o.frequency.setValueAtTime(mx(8, f0), t);
+  if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(mx(8, f1), t + dur);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .008);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  o.connect(g).connect(dest || sfxG);
+  o.start(t); o.stop(t + dur + .02);
+  voices++;
+}
+
+function N(dur, pk, ft, f0, f1, q, dest, t0) {
+  if (!ok()) return;
+  const t = t0 || now();
+  const s = AC.createBufferSource();
+  s.buffer = nzBuf; s.loop = true;
+  s.playbackRate.value = .7 + rnd() * .6;
+  const f = AC.createBiquadFilter(); f.type = ft;
+  f.frequency.setValueAtTime(mx(20, f0), t);
+  if (f1 !== f0) f.frequency.exponentialRampToValueAtTime(mx(20, f1), t + dur);
+  f.Q.value = q || 1;
+  const g = AC.createGain();
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .005);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  s.connect(f).connect(g).connect(dest || sfxG);
+  s.start(t); s.stop(t + dur + .02);
+  voices++;
+}
+
+// --- collision / material --------------------------------------------------
+// Impact: one noise transient scaled by impulse, plus a body tone. kind 1 is a
+// dampener (dull thud), kind 2 a bumper (bright ping).
+function sndHit(imp, kind, tune) {
+  if (imp < 60) return;
+  const v = clamp(imp / 2400, .04, .5);
+  N(.03 + v * .12, v * .7, 'lowpass', 300 + imp * 1.6, 150, 1);
+  if (imp > 420) O('triangle', 120 + imp * .05, 40, .1 + v * .12, v * .8);
+  if (kind > 1) {
+    // The Organ: every bumper is tuned by its own position, in the current
+    // region's mode, so a column of them plays a phrase as you fall through it.
+    const sc = SCALE[reg % 4], q = abs(tune | 0);
+    const n = 64 + sc[(q >> 5) % sc.length] + 12 * (q >> 9 & 1);
+    O('sine', NOTE(n), NOTE(n) * 1.6, .16, v * .5);
+    O('triangle', NOTE(n + 12), 0, .1, v * .3);
+  } else if (kind) O('sine', 90, 40, .22, v * .5);
+}
+
+// Depth is the cascade generation: each ring of a chain reaction rings a
+// little higher and a little thinner, so a collapse sounds like one event
+// spreading outward instead of six identical crashes on the same frame.
+function sndBreak(d) {
+  const k = 1 / (1 + d * .5);
+  N(.3 * k, .5 * k, 'bandpass', 2600 * (1 + d * .3), 300, 1.4);
+  O('triangle', 150 * (1 + d * .2), 40, .3 * k, .5 * k);
+  N(.1, .3 * k, 'highpass', 4369, 9000, 1);
+}
+
+// A scoring target: pitch climbs with how much of the bank is already lit, so
+// you can hear how close a bank is without reading the pips.
+// --- cues that borrow -------------------------------------------------------
+// Seven rare events reuse a sound that already exists rather than carrying one
+// of their own. Every one still fires, still lands on the right beat, and still
+// carries its information in PITCH -- the part a player actually reads. A
+// target still climbs as its bank fills and pigment still pitches by colour,
+// because the sound they borrow is itself pitch-driven.
+//
+// What they give up is a timbre of their own, and they are the seven nobody
+// could describe from memory. The signature sounds -- impact, destruction, the
+// seven colour verbs, the coin, the crown, the bank, death, Full Spectrum --
+// are untouched.
+function sndTarget(f) { sndCoin(f * 8); }
+function sndBank() {
+  ARP(70, [0, 4, 7, 12, 16, 19], .5, .12, 'square', .04, 12);
+  N(.7, .22, 'bandpass', 700, 6000, .8);
+  O('sine', 90, 300, .4, .3);
+}
+
+// --- the seven colours -----------------------------------------------------
+function sndBoost(ns) {                       // Red - rocket
+  const v = clamp(ns / 2600, .16, .5);
+  O('sawtooth', 150, 700 + ns * .2, .2, v * .5);
+  N(.3, v * .7, 'bandpass', 700, 4369, 1.2);
+  O('sine', 70, 30, .3, v * .8);
+}
+function sndVector(sup) {                     // Orange - directional snap
+  O('square', sup ? 700 : 900, sup ? 1800 : 1500, .07, .16);
+  N(.05, .12, 'highpass', 2600, 5200, 1);
+  if (sup) O('sine', 300, 900, .16, .2);
+}
+function sndSpring(imp) {                     // Yellow - elastic boing
+  const v = clamp(imp / 1400, .12, .4);
+  O('sine', 180 + imp * .1, 700 + imp * .3, .1, v);
+  O('sine', 700 + imp * .3, 200, .2, v * .8);
+}
+function sndTether(on) {                      // Green - tension / thwip
+  if (on) { O('triangle', 240, 700, 1.2, .12); N(.06, .1, 'bandpass', 900, 2600, 3); }
+  else { O('sawtooth', 900, 200, .12, .25); N(.1, .2, 'bandpass', 1800, 500, 2); }
+}
+function sndRail(on) {                        // Blue - continuous grind
+  if (!AC) return;
+  if (railG) railG.gain.setTargetAtTime(on && !SAVE.m ? .12 : 0, now(), .03);
+  if (on) O('square', 1200, 2600, .05, .1);
+}
+function sndGrav(ny) {                        // Indigo - gravity whoop
+  const up = ny < 0;
+  O('sine', up ? 120 : 420, up ? 420 : 100, .5, .3);
+  O('triangle', up ? 240 : 700, up ? 700 : 200, .4, .12);
+  N(.4, .1, 'lowpass', 900, 200, 1);
+}
+function sndWarp() {                          // Violet - space
+  O('sawtooth', 2600, 240, .1, .2);
+  N(.085, .16, 'highpass', 7000, 1400, 2);
+  O('sine', 90, 240, .2, .25);
+}
+
+// --- rewards / systems -----------------------------------------------------
+function sndCoin(cmb) {
+  const n = 70 + mn(cmb, 14) * 2;
+  O('square', NOTE(n), 0, .06, .1);
+  O('sine', NOTE(n + 12), 0, .1, .12);
+}
+// One arpeggio/chord engine drives every musical reward cue.
+// offs = semitone offsets, gap = seconds between notes (0 = chord), up = glide.
+function ARP(root, offs, dur, pk, w, gap, up) {
+  if (!AC) return;
+  const t = now();
+  offs.forEach((o, i) => O(w, NOTE(root + o), up ? NOTE(root + o + up) : 0, dur, pk, 0, t + i * gap));
+}
+const MAJ = [0, 4, 7, 12];
+function sndCrown() { ARP(70, MAJ, .5, .12, 'triangle', .05); }
+function sndPig(c) { sndCoin(c); }
+function sndWell() { sndCrown(); }
+function sndSpectrum() {
+  ARP(60, SCALE[1], .7, .12, 'sawtooth', .05, 12);
+  ARP(90, MAJ, 1.6, .1, 'sine', 0);
+  if (AC) N(1.2, .2, 'bandpass', 420, 8000, .7, 0, now() + .3);
+}
+function sndFuse() { sndUI(1); }
+function sndRefund() { sndCoin(0); }
+function sndPower() { ARP(60, [0, 5, 10], .12, .1, 'square', .06, 2); }
+function sndEmpty() { sndUI(0); }
+function sndStall(u) { O('sine', 70 + u * 40, 48, .16, .12 + u * .16); }
+function sndDeath() {
+  ARP(70, [0, -3, -6, -9, -12, -15, -18], .8, .1, 'sawtooth', .04, -30);
+  N(1, .3, 'lowpass', 3000, 90, 1);
+  O('sine', 120, 30, 1.2, .3);
+}
+function sndUI(up) { O('square', up ? 900 : 620, up ? 1200 : 500, .04, .07); }
+function sndGate() { sndBank(); }
+
+// --- per-frame continuous layers ------------------------------------------
+// Continuous layers, updated once a frame:
+//  - the rail grind tracks rail speed
+//  - one master low-pass ducks everything inside a Focus Vault or a pause
+function audioFrame() {
+  voices = 0;
+  if (!AC) return;
+  const t = now(), n = clamp(P.sp / VMAX, 0, 1), play = st === 1 && P.al;
+  const set = (p, v, k) => p.setTargetAtTime(v, t, k);
+  set(railG.gain, P.ra && !SAVE.m && play ? .1 + n * .12 : 0, .04);
+  set(railF.frequency, 700 + P.sp * 1.4, .04);
+  set(railO.frequency, 90 + P.sp * .2, .04);
+  set(lpF.frequency, st === 2 ? 700 : 20000, .1);
+  set(musG.gain, SAVE.m ? 0 : st === 1 ? .5 : .3, .2);
+  if (play) musicTick();
+  else mNext = t + .1;
+}
+
+// A 16th-note scheduler that plays a real, if small, arrangement: kick, bass,
+// a sustained chord pad, hats and a lead. Region identity is a formula rather
+// than seven hand-written tracks -- root, mode, timbre, tempo and the bass
+// rhythm all key off the region index -- and density follows how fast you are
+// going, so the music reacts to the run instead of looping underneath it.
+// Rhythm masks: one bit per 16th note of the bar, LSB first.
+//   Cloudbreak four-on-the-floor - Sunforge driving - Verdant loose -
+//   Crystal clean - Mine sparse and heavy - Temple off-kilter - Engine eighths
+const KICK = [0x1111, 0x1155, 0x1013, 0x1111, 0x1001, 0x0512, 0x5555];
+const BASSR = [0x8889, 0xa4a5, 0x9192, 0xcccd, 0x8484, 0xa8a9, 0xaaab];
+
+function musicTick() {
+  const root = 40 + reg * 5 % 11, sc = SCALE[reg % 4], w = WAVE[reg % 3];
+  const inten = clamp(P.sp / VFAST, 0, 1.6) + (fullSpec > 0 ? .6 : 0);
+  const spb = 15 / (90 + reg * 7);
+  const kick = KICK[reg], bassr = BASSR[reg];
+  const t0 = now();
+  for (let guard = 8; mNext < t0 + .16 && guard--;) {
+    const t = mx(mNext, t0), i = mStep, b = i & 15, bar = i >> 4;
+    const deg = (bar * 2 + (b > 7 ? 1 : 0)) % sc.length;
+    const bass = root - 12 + sc[deg];
+
+    if (kick >> b & 1) { O('sine', 120, 40, .16, .5, musG, t); N(.03, .12, 'lowpass', 900, 200, 1, musG, t); }
+    if (bassr >> b & 1) O(w, NOTE(bass), 0, .2, .3, musG, t);
+    // Pad: a held triad at the top of every bar, which is what actually makes
+    // a region sound like a place rather than a drum loop.
+    if (!b) for (const o of [0, 3 + (sc[2] > 3 ? 1 : 0), 7])
+      O('triangle', NOTE(root + sc[deg] + o), 0, spb * 15, .1, musG, t);
+    if (inten > .22 && (b & 1)) N(.03, .04 + inten * .03, 'highpass', 7000, 6000, 1, musG, t);
+    if (inten > .5 && b % 4 === 2) N(.1, .12, 'bandpass', 1800, 900, 1.2, musG, t);
+    if (inten > .8 && !(b & 1)) {
+      const n = NOTE(root + 12 + sc[(i * 3 + bar) % sc.length]);
+      O(w, n, n, .1, .1, musG, t);
+    }
+    mStep++; mNext = t + spb;
+  }
+}
+
+// ==== util.js ====
+// ---------------------------------------------------------------------------
+// Math helpers + the deterministic PRNG used by every generator.
+// ---------------------------------------------------------------------------
+
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, t) => a + (b - a) * t;
+// Frame-rate independent exponential approach.
+const approach = (a, b, r, h) => lerp(a, b, 1 - M.exp(-r * h));
+
+// mulberry32 - 3 lines, good enough, fully seedable for regression replays.
+let _rs = 1;
+function srnd(s) { _rs = s >>> 0; }
+function rr() {
+  _rs = (_rs + 0x6d2b79f5) | 0;
+  let t = M.imul(_rs ^ (_rs >>> 15), 1 | _rs);
+  t = (t + M.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+const rf = (a, b) => a + rr() * (b - a);
+const ri = (a, b) => flr(a + rr() * (b - a + 1));
+const rp = (p) => rr() < p;
+const pick = (a) => a[flr(rr() * a.length)];
+// Random sign.
+const rs = () => (rr() < .5 ? -1 : 1);
+
+// Stateless hash for background motifs - infinite scenery with zero storage.
+function hsh(x, y) {
+  let h = M.imul(x | 0, 374761393) + M.imul(y | 0, 668265263);
+  h = M.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+
+// Closest point on segment (ax,ay)-(bx,by) to (px,py). Returns param 0..1.
+function segT(ax, ay, bx, by, px, py) {
+  const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy;
+  return l ? clamp(((px - ax) * dx + (py - ay) * dy) / l, 0, 1) : 0;
+}
+
+// Segment/segment intersection point, or null. Used for Prism Node fusion.
+function segX(ax, ay, bx, by, cx, cy, dx, dy) {
+  const r1 = bx - ax, r2 = by - ay, s1 = dx - cx, s2 = dy - cy;
+  const d = r1 * s2 - r2 * s1;
+  if (!d) return null;
+  const t = ((cx - ax) * s2 - (cy - ay) * s1) / d;
+  const u = ((cx - ax) * r2 - (cy - ay) * r1) / d;
+  return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [ax + r1 * t, ay + r2 * t] : null;
+}
+
+// hsl helpers - every colour in the game comes from these two.
+const hsl = (h, s, l, a) => 'hsl(' + h + ' ' + s + '% ' + l + '%' + (a === undefined ? '' : ' / ' + a) + ')';
+const chsl = (c, l, a) => hsl(HUE[c], 100, l, a);
+
 // ==== render.js ====
 // ---------------------------------------------------------------------------
 // Rendering: camera, region backdrops, world geometry, the procedural unicorn,
@@ -1419,10 +1721,9 @@ function partStep(h) {
 
 // --- camera ----------------------------------------------------------------
 function camUpdate(h) {
-  const v = vault;
-  C.x = approach(C.x, v ? v.cx : P.x + clamp(P.vx * .12, -180, 180), v ? 3.2 : 7.5, h);
-  C.y = approach(C.y, v ? v.cy : P.y + clamp(P.vy * .22, -.2 * VH, .22 * VH), v ? 3.2 : 7.5, h);
-  C.z = approach(C.z, v ? .8 : 1 / (1 + P.sp / 5200), 4, h);
+  C.x = approach(C.x, P.x + clamp(P.vx * .12, -180, 180), 7.5, h);
+  C.y = approach(C.y, P.y + clamp(P.vy * .22, -.2 * VH, .22 * VH), 7.5, h);
+  C.z = approach(C.z, 1 / (1 + P.sp / 5200), 4, h);
   SC = mn(H / VH, W / (COL * 2 + 48)) * C.z;
   // Keep the play column framed. Without this the velocity lead walks the
   // camera off the side of the world and half the screen becomes dead rock.
@@ -1855,327 +2156,6 @@ function drawUnicorn() {
   }
 }
 
-// ==== util.js ====
-// ---------------------------------------------------------------------------
-// Math helpers + the deterministic PRNG used by every generator.
-// ---------------------------------------------------------------------------
-
-const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
-const lerp = (a, b, t) => a + (b - a) * t;
-// Frame-rate independent exponential approach.
-const approach = (a, b, r, h) => lerp(a, b, 1 - M.exp(-r * h));
-
-// mulberry32 - 3 lines, good enough, fully seedable for regression replays.
-let _rs = 1;
-function srnd(s) { _rs = s >>> 0; }
-function rr() {
-  _rs = (_rs + 0x6d2b79f5) | 0;
-  let t = M.imul(_rs ^ (_rs >>> 15), 1 | _rs);
-  t = (t + M.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-}
-const rf = (a, b) => a + rr() * (b - a);
-const ri = (a, b) => flr(a + rr() * (b - a + 1));
-const rp = (p) => rr() < p;
-const pick = (a) => a[flr(rr() * a.length)];
-// Random sign.
-const rs = () => (rr() < .5 ? -1 : 1);
-
-// Stateless hash for background motifs - infinite scenery with zero storage.
-function hsh(x, y) {
-  let h = M.imul(x | 0, 374761393) + M.imul(y | 0, 668265263);
-  h = M.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
-
-// Closest point on segment (ax,ay)-(bx,by) to (px,py). Returns param 0..1.
-function segT(ax, ay, bx, by, px, py) {
-  const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy;
-  return l ? clamp(((px - ax) * dx + (py - ay) * dy) / l, 0, 1) : 0;
-}
-
-// Segment/segment intersection point, or null. Used for Prism Node fusion.
-function segX(ax, ay, bx, by, cx, cy, dx, dy) {
-  const r1 = bx - ax, r2 = by - ay, s1 = dx - cx, s2 = dy - cy;
-  const d = r1 * s2 - r2 * s1;
-  if (!d) return null;
-  const t = ((cx - ax) * s2 - (cy - ay) * s1) / d;
-  const u = ((cx - ax) * r2 - (cy - ay) * r1) / d;
-  return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [ax + r1 * t, ay + r2 * t] : null;
-}
-
-// hsl helpers - every colour in the game comes from these two.
-const hsl = (h, s, l, a) => 'hsl(' + h + ' ' + s + '% ' + l + '%' + (a === undefined ? '' : ' / ' + a) + ')';
-const chsl = (c, l, a) => hsl(HUE[c], 100, l, a);
-
-// ==== audio.js ====
-// ---------------------------------------------------------------------------
-// Procedural Web Audio. Everything is synthesised from two primitives:
-//   O() - an oscillator with a pitch sweep and an AD envelope
-//   N() - a slice of the shared noise buffer through a swept filter
-// The rail grind is a single continuous voice created once and only modulated,
-// so long runs never accumulate nodes.
-// ---------------------------------------------------------------------------
-
-let AC = null, mg, sfxG, musG, lpF, nzBuf, railG, railO, railF;
-let voices = 0;                   // per-frame voice budget
-let mNext = 0, mStep = 0;         // music scheduler
-
-const NOTE = (n) => 420 * M.pow(2, (n - 70) / 12);
-const SCALE = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 4, 5, 7, 9, 11], [0, 3, 5, 7, 10, 12], [0, 1, 5, 6, 8, 11]];
-const WAVE = ['triangle', 'sawtooth', 'square'];
-
-function audioInit() {
-  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
-  const AX = window.AudioContext || window.webkitAudioContext;
-  if (!AX) return;
-  AC = new AX();
-
-  lpF = AC.createBiquadFilter(); lpF.type = 'lowpass'; lpF.frequency.value = 20000;
-  mg = AC.createGain(); mg.gain.value = SAVE.m ? 0 : .8;
-  lpF.connect(mg).connect(AC.destination);
-  sfxG = AC.createGain(); sfxG.gain.value = .8; sfxG.connect(lpF);
-  musG = AC.createGain(); musG.gain.value = .5; musG.connect(lpF);
-
-  const n = AC.sampleRate * 2;
-  nzBuf = AC.createBuffer(1, n, AC.sampleRate);
-  const d = nzBuf.getChannelData(0);
-  for (let i = 0; i < n; i++) d[i] = rnd() * 2 - 1;
-
-  // One always-on voice: the Blue rail grind. Built once, then only its gain
-  // and frequency are modulated, so long runs never leak nodes.
-  //
-  // There was a second continuous voice here -- a speed-driven wind bed. Even
-  // heavily damped it was fatiguing over a run, because it is on whenever you
-  // are moving and you are almost always moving. Speed already reads through
-  // the camera, the trail, the impacts and the music intensity, so the noise
-  // bed was carrying no information anyone needed.
-  railO = AC.createOscillator(); railO.type = 'sawtooth'; railO.frequency.value = 200;
-  railF = AC.createBiquadFilter(); railF.type = 'bandpass';
-  railF.frequency.value = 1400; railF.Q.value = 6;
-  railG = AC.createGain(); railG.gain.value = 0;
-  railO.connect(railF).connect(railG).connect(sfxG);
-  railO.start();
-
-  mNext = AC.currentTime + .1;
-}
-
-// Guards every synthesised voice: no context, muted, or over the frame budget.
-const ok = () => AC && !SAVE.m && voices < 26;
-const now = () => AC.currentTime;
-
-// Oscillator with an optional pitch sweep and an attack/decay envelope.
-// f1 of 0 (or equal to f0) means "hold the pitch".
-function O(w, f0, f1, dur, pk, dest, t0) {
-  if (!ok()) return;
-  const t = t0 || now();
-  const o = AC.createOscillator(), g = AC.createGain();
-  o.type = w;
-  o.frequency.setValueAtTime(mx(8, f0), t);
-  if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(mx(8, f1), t + dur);
-  g.gain.setValueAtTime(1e-4, t);
-  g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .008);
-  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
-  o.connect(g).connect(dest || sfxG);
-  o.start(t); o.stop(t + dur + .02);
-  voices++;
-}
-
-function N(dur, pk, ft, f0, f1, q, dest, t0) {
-  if (!ok()) return;
-  const t = t0 || now();
-  const s = AC.createBufferSource();
-  s.buffer = nzBuf; s.loop = true;
-  s.playbackRate.value = .7 + rnd() * .6;
-  const f = AC.createBiquadFilter(); f.type = ft;
-  f.frequency.setValueAtTime(mx(20, f0), t);
-  if (f1 !== f0) f.frequency.exponentialRampToValueAtTime(mx(20, f1), t + dur);
-  f.Q.value = q || 1;
-  const g = AC.createGain();
-  g.gain.setValueAtTime(1e-4, t);
-  g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .005);
-  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
-  s.connect(f).connect(g).connect(dest || sfxG);
-  s.start(t); s.stop(t + dur + .02);
-  voices++;
-}
-
-// --- collision / material --------------------------------------------------
-// Impact: one noise transient scaled by impulse, plus a body tone. kind 1 is a
-// dampener (dull thud), kind 2 a bumper (bright ping).
-function sndHit(imp, kind, tune) {
-  if (imp < 60) return;
-  const v = clamp(imp / 2400, .04, .5);
-  N(.03 + v * .12, v * .7, 'lowpass', 300 + imp * 1.6, 150, 1);
-  if (imp > 420) O('triangle', 120 + imp * .05, 40, .1 + v * .12, v * .8);
-  if (kind > 1) {
-    // The Organ: every bumper is tuned by its own position, in the current
-    // region's mode, so a column of them plays a phrase as you fall through it.
-    const sc = SCALE[reg % 4], q = abs(tune | 0);
-    const n = 64 + sc[(q >> 5) % sc.length] + 12 * (q >> 9 & 1);
-    O('sine', NOTE(n), NOTE(n) * 1.6, .16, v * .5);
-    O('triangle', NOTE(n + 12), 0, .1, v * .3);
-  } else if (kind) O('sine', 90, 40, .22, v * .5);
-}
-
-// Depth is the cascade generation: each ring of a chain reaction rings a
-// little higher and a little thinner, so a collapse sounds like one event
-// spreading outward instead of six identical crashes on the same frame.
-function sndBreak(d) {
-  const k = 1 / (1 + d * .5);
-  N(.3 * k, .5 * k, 'bandpass', 2600 * (1 + d * .3), 300, 1.4);
-  O('triangle', 150 * (1 + d * .2), 40, .3 * k, .5 * k);
-  N(.1, .3 * k, 'highpass', 4369, 9000, 1);
-}
-
-// A scoring target: pitch climbs with how much of the bank is already lit, so
-// you can hear how close a bank is without reading the pips.
-function sndTarget(f) {
-  const n = 76 + f * 12 | 0;
-  O('square', NOTE(n), NOTE(n + 7), .07, .12);
-  O('triangle', NOTE(n + 12), 0, .12, .1);
-}
-function sndBank() {
-  ARP(70, [0, 4, 7, 12, 16, 19], .5, .12, 'square', .04, 12);
-  N(.7, .22, 'bandpass', 700, 6000, .8);
-  O('sine', 90, 300, .4, .3);
-}
-
-// --- the seven colours -----------------------------------------------------
-function sndBoost(ns) {                       // Red - rocket
-  const v = clamp(ns / 2600, .16, .5);
-  O('sawtooth', 150, 700 + ns * .2, .2, v * .5);
-  N(.3, v * .7, 'bandpass', 700, 4369, 1.2);
-  O('sine', 70, 30, .3, v * .8);
-}
-function sndVector(sup) {                     // Orange - directional snap
-  O('square', sup ? 700 : 900, sup ? 1800 : 1500, .07, .16);
-  N(.05, .12, 'highpass', 2600, 5200, 1);
-  if (sup) O('sine', 300, 900, .16, .2);
-}
-function sndSpring(imp) {                     // Yellow - elastic boing
-  const v = clamp(imp / 1400, .12, .4);
-  O('sine', 180 + imp * .1, 700 + imp * .3, .1, v);
-  O('sine', 700 + imp * .3, 200, .2, v * .8);
-}
-function sndTether(on) {                      // Green - tension / thwip
-  if (on) { O('triangle', 240, 700, 1.2, .12); N(.06, .1, 'bandpass', 900, 2600, 3); }
-  else { O('sawtooth', 900, 200, .12, .25); N(.1, .2, 'bandpass', 1800, 500, 2); }
-}
-function sndRail(on) {                        // Blue - continuous grind
-  if (!AC) return;
-  if (railG) railG.gain.setTargetAtTime(on && !SAVE.m ? .12 : 0, now(), .03);
-  if (on) O('square', 1200, 2600, .05, .1);
-}
-function sndGrav(ny) {                        // Indigo - gravity whoop
-  const up = ny < 0;
-  O('sine', up ? 120 : 420, up ? 420 : 100, .5, .3);
-  O('triangle', up ? 240 : 700, up ? 700 : 200, .4, .12);
-  N(.4, .1, 'lowpass', 900, 200, 1);
-}
-function sndWarp() {                          // Violet - space
-  O('sawtooth', 2600, 240, .1, .2);
-  N(.085, .16, 'highpass', 7000, 1400, 2);
-  O('sine', 90, 240, .2, .25);
-}
-
-// --- rewards / systems -----------------------------------------------------
-function sndCoin(cmb) {
-  const n = 70 + mn(cmb, 14) * 2;
-  O('square', NOTE(n), 0, .06, .1);
-  O('sine', NOTE(n + 12), 0, .1, .12);
-}
-// One arpeggio/chord engine drives every musical reward cue.
-// offs = semitone offsets, gap = seconds between notes (0 = chord), up = glide.
-function ARP(root, offs, dur, pk, w, gap, up) {
-  if (!AC) return;
-  const t = now();
-  offs.forEach((o, i) => O(w, NOTE(root + o), up ? NOTE(root + o + up) : 0, dur, pk, 0, t + i * gap));
-}
-const MAJ = [0, 4, 7, 12];
-function sndCrown() { ARP(70, MAJ, .5, .12, 'triangle', .05); }
-function sndPig(c) { O('triangle', NOTE(64 + c * 2), NOTE(70 + c * 2), .16, .16); }
-function sndWell() {
-  ARP(60, SCALE[1], .5, .12, 'sine', .06, 12);
-  N(.9, .16, 'bandpass', 720, 6000, .8);
-}
-function sndSpectrum() {
-  ARP(60, SCALE[1], .7, .12, 'sawtooth', .05, 12);
-  ARP(90, MAJ, 1.6, .1, 'sine', 0);
-  if (AC) N(1.2, .2, 'bandpass', 420, 8000, .7, 0, now() + .3);
-}
-function sndFuse() { O('square', 1400, 2600, .05, .1); O('sine', 900, 1800, .1, .1); }
-function sndRefund() { O('triangle', NOTE(70), NOTE(90), .16, .12); }
-function sndPower() { ARP(60, [0, 5, 10], .12, .1, 'square', .06, 2); }
-function sndEmpty() { O('sine', 150, 70, .12, .16); N(.06, .07, 'lowpass', 500, 200, 1); }
-function sndStall(u) { O('sine', 70 + u * 40, 48, .16, .12 + u * .16); }
-function sndDeath() {
-  ARP(70, [0, -3, -6, -9, -12, -15, -18], .8, .1, 'sawtooth', .04, -30);
-  N(1, .3, 'lowpass', 3000, 90, 1);
-  O('sine', 120, 30, 1.2, .3);
-}
-function sndUI(up) { O('square', up ? 900 : 620, up ? 1200 : 500, .04, .07); }
-function sndGate() {
-  ARP(48, [0, 7, 12, 16, 19], 1.6, .1, 'triangle', 0);
-  N(1.4, .2, 'bandpass', 300, 5200, .6);
-}
-
-// --- per-frame continuous layers ------------------------------------------
-// Continuous layers, updated once a frame:
-//  - the rail grind tracks rail speed
-//  - one master low-pass ducks everything inside a Focus Vault or a pause
-function audioFrame() {
-  voices = 0;
-  if (!AC) return;
-  const t = now(), n = clamp(P.sp / VMAX, 0, 1), play = st === 1 && P.al;
-  const set = (p, v, k) => p.setTargetAtTime(v, t, k);
-  set(railG.gain, P.ra && !SAVE.m && play ? .1 + n * .12 : 0, .04);
-  set(railF.frequency, 700 + P.sp * 1.4, .04);
-  set(railO.frequency, 90 + P.sp * .2, .04);
-  set(lpF.frequency, slow > .05 ? 500 : st === 2 ? 700 : 20000, .1);
-  set(musG.gain, SAVE.m ? 0 : st === 1 ? .5 : .3, .2);
-  if (play) musicTick();
-  else mNext = t + .1;
-}
-
-// A 16th-note scheduler that plays a real, if small, arrangement: kick, bass,
-// a sustained chord pad, hats and a lead. Region identity is a formula rather
-// than seven hand-written tracks -- root, mode, timbre, tempo and the bass
-// rhythm all key off the region index -- and density follows how fast you are
-// going, so the music reacts to the run instead of looping underneath it.
-// Rhythm masks: one bit per 16th note of the bar, LSB first.
-//   Cloudbreak four-on-the-floor - Sunforge driving - Verdant loose -
-//   Crystal clean - Mine sparse and heavy - Temple off-kilter - Engine eighths
-const KICK = [0x1111, 0x1155, 0x1013, 0x1111, 0x1001, 0x0512, 0x5555];
-const BASSR = [0x8889, 0xa4a5, 0x9192, 0xcccd, 0x8484, 0xa8a9, 0xaaab];
-
-function musicTick() {
-  const root = 40 + reg * 5 % 11, sc = SCALE[reg % 4], w = WAVE[reg % 3];
-  const inten = clamp(P.sp / VFAST, 0, 1.6) + (fullSpec > 0 ? .6 : 0);
-  const spb = 15 / ((90 + reg * 7) * (slow > .5 ? .5 : 1));
-  const kick = KICK[reg], bassr = BASSR[reg];
-  const t0 = now();
-  for (let guard = 8; mNext < t0 + .16 && guard--;) {
-    const t = mx(mNext, t0), i = mStep, b = i & 15, bar = i >> 4;
-    const deg = (bar * 2 + (b > 7 ? 1 : 0)) % sc.length;
-    const bass = root - 12 + sc[deg];
-
-    if (kick >> b & 1) { O('sine', 120, 40, .16, .5, musG, t); N(.03, .12, 'lowpass', 900, 200, 1, musG, t); }
-    if (bassr >> b & 1) O(w, NOTE(bass), 0, .2, .3, musG, t);
-    // Pad: a held triad at the top of every bar, which is what actually makes
-    // a region sound like a place rather than a drum loop.
-    if (!b) for (const o of [0, 3 + (sc[2] > 3 ? 1 : 0), 7])
-      O('triangle', NOTE(root + sc[deg] + o), 0, spb * 15, .1, musG, t);
-    if (inten > .22 && (b & 1)) N(.03, .04 + inten * .03, 'highpass', 7000, 6000, 1, musG, t);
-    if (inten > .5 && b % 4 === 2) N(.1, .12, 'bandpass', 1800, 900, 1.2, musG, t);
-    if (inten > .8 && !(b & 1)) {
-      const n = NOTE(root + 12 + sc[(i * 3 + bar) % sc.length]);
-      O(w, n, n, .1, .1, musG, t);
-    }
-    mStep++; mNext = t + spb;
-  }
-}
-
 // ==== hud.js ====
 // ---------------------------------------------------------------------------
 // HUD, prism selector, menus, results and the cosmetic store.
@@ -2270,16 +2250,9 @@ function hud() {
   if (regShow > 0)
     txt(REG[reg][0], W / 2, H * .3, 42,
       'hsl(0 0% 100% / ' + clamp(regShow, 0, 1) * clamp(3.2 - regShow, 0, 1) + ')', 1);
-  if (!SAVE.t) {
-    const t = ['DRAG TO DRAW A RAINBOW RAIL', 'PRESS 1-7 OR SCROLL TO CHANGE COLOUR',
-      'PIGMENT IS FINITE - GRAB SHARDS'][hint];
-    if (t) txt(t, W / 2, H - 118 * U, 15, W6, 1);
-  }
-  if (slow > .05) {
-    X.fillStyle = 'hsl(275 60% 60% / ' + slow * .1 + ')';
-    X.fillRect(0, 0, W, H);
-    txt('FOCUS VAULT', W / 2, H - 96 * U, 16, W6, 1);
-  }
+  // The in-run hints are gone from the 13K build. The title screen teaches the
+  // same three things -- drag to draw, the colour keys, pigment is finite --
+  // and it teaches them before the first frame instead of during it.
 }
 
 // Seven reservoirs: fill = pigment left, ring = selection, dot = chain state.
@@ -2352,9 +2325,9 @@ function screenTitle() {
     'DRAG near the unicorn - drawings STAY until used - longer = stronger',
     'R push - O aim - Y spring - G tether - B rail - I gravity - V warp',
     0,   // the mixing line, painted below through the whole spectrum
-    // '1-7 or SCROLL picks a colour' was here too and is now cut: the in-run
-    // hint teaches it. 'X lets go' stays because nothing else in the game does.
-    'X lets go',
+    // Back to the full line now that the in-run hints are gone: this is the
+    // only place left that teaches either half of it.
+    'X lets go - 1-7 or SCROLL picks a colour',
   ].forEach((l, i) => l && txt(l, W / 2, H - 122 * U + i * 19 * U, 13,
     i === 1 ? W6 : i > 2 ? W3 : W9, !i));
   // Mixing is the deepest rule in the game -- two crossing strokes fuse and the
@@ -2438,6 +2411,219 @@ function buyEquip(c, i) {
   } else sndEmpty();
 }
 
+// ==== game.js ====
+// ---------------------------------------------------------------------------
+// Game flow: persistence, run lifecycle, per-frame update and the main loop.
+// ---------------------------------------------------------------------------
+
+let acc = 0, last = 0, deadT = 0, stallSnd = 0;
+const HSTEP = 1 / 120;
+
+// --- persistence -----------------------------------------------------------
+// One namespaced key, comma separated, clamped on read. Never clears storage.
+// The four fields both builds need come first, so the competition build reads
+// and writes a four-field record and the Wavedash build appends the store's
+// six on the end. A record from either build loads in either build.
+function load() {
+  try {
+    const a = (localStorage[LS] || '').split(',').map(Number);
+    if (a.length < 3 || a.some(isNaN)) return;
+    SAVE.b = clamp(a[0] | 0, 0, 1e12);
+    SAVE.d = clamp(a[1] | 0, 0, 1e12);
+    SAVE.m = a[2] ? 1 : 0;
+    if (WD && a.length > 8) {
+      SAVE.c = clamp(a[3] | 0, 0, 1e9);
+      SAVE.o = a[4] | 0;
+      for (let i = 0; i < CATS; i++) {
+        const v = a[5 + i] | 0;
+        SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
+      }
+    }
+  } catch (err) { /* storage unavailable - play anyway */ }
+}
+function save() {
+  try {
+    const a = [SAVE.b, SAVE.d, SAVE.m];
+    if (WD) a.push(SAVE.c, SAVE.o, ...SAVE.e);
+    localStorage[LS] = a.join();
+  } catch (err) { /* ignore */ }
+}
+
+// --- run lifecycle ---------------------------------------------------------
+function startRun(sd) {
+  audioInit();
+  st = 1; score = 0; coins = 0; mult = 1; depth = 0; reg = 0; regShow = 3.2;
+  chain = 0; chainN = 0; chainT = 0; fullSpec = 0; combo = 0; comboT = 0;
+  deadT = 0; shake = 0; flash = 0; hstop = 0;
+  pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
+  boostT = [0, 0, 0, 0, 0, 0, 0];
+  strokes = []; parts = []; trail = []; pops = []; nodes = []; shocks = [];
+  drawing = null;
+  P.x = 0; P.y = -320; P.vy = 300; P.a = PI / 2;
+  P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300; P.rw = 0;
+  Gx = 0; Gy = GRAV;
+  C.x = P.x; C.y = P.y; C.z = 1;
+  pal = regPal(0);
+  worldReset(sd);
+  // After the seed is set, never before: otherwise the opening drift is drawn
+  // from whatever PRNG state the previous run happened to leave behind and a
+  // seeded replay is not actually reproducible.
+  P.vx = rf(-70, 70);
+  mStep = 0; if (AC) mNext = AC.currentTime + .05;
+  sndRail(0);
+}
+
+function endRun() {
+  if (WD) SAVE.c += coins;
+  SAVE.b = mx(SAVE.b, score | 0);
+  SAVE.d = mx(SAVE.d, depth | 0);
+  save();
+  sndRail(0);
+  if (WD) wdSubmit(score | 0, depth | 0);
+}
+
+function die() {
+  P.al = 0; deadT = 1.3;
+  for (let i = 0; i < 7; i++) burst(P.x, P.y, 16, 0, 520, HUE[i]);
+  pt(P.x, P.y, 0, 0, .7, -1, 2, 22);
+  shake = 30; flash = .7; flashH = -1;
+  sndDeath();
+  if (P.ra) detachRail(0);
+  if (P.te) releaseTether();
+  if (st !== 0) endRun();
+}
+
+// --- per-frame -------------------------------------------------------------
+function update(dt) {
+  worldUpdate();
+
+  if (P.al) physicsFrame(dt);
+
+  fuseStep(dt);
+
+  // Past the Rainbow Engine the shaft simply begins again, harder: regAt wraps
+  // and difAt keeps climbing with the loop count, so the cycle boundary needs no
+  // code of its own. It still announces itself, because a loop boundary is also
+  // a region change and those already flash, name themselves and sound a gate.
+
+  // region progression
+  const r = regAt(P.y);
+  if (r !== reg) {
+    reg = r; regShow = 3.2;
+    flash = mx(flash, .35); flashH = regHue(reg);
+    sndGate();
+    score += 500 * mult | 0;
+  }
+
+  // score + multiplier
+  if (P.y > depth) { score += (P.y - depth) * .05 * mult; depth = P.y; }
+  mult = clamp(1 + P.sp / 950 + chainN * .2 + (fullSpec > 0 ? 2 : 0), 1, 12);
+
+  // Stall is the only failure state: too slow for too long and the run ends.
+  if (P.al) {
+    const stallT = STALLT;
+    if (P.sp < STALLV) {
+      P.st += dt;
+      const u = clamp((P.st - STALLW) / (stallT - STALLW), 0, 1);
+      if ((stallSnd -= dt) <= 0 && u > 0) { stallSnd = mx(.16, .55 - u * .4); sndStall(u); }
+      if (P.st > stallT) die();
+    } else if (P.st > 0) {
+      if (P.st > STALLW) burst(P.x, P.y, 8, 0, 260, HUE[0]);
+      P.st = mx(0, P.st - dt * 2.6);
+    }
+  } else {
+    deadT -= dt;
+    if (deadT <= 0) { if (st === 0) { startRun(); st = 0; } else st = 3; }
+  }
+
+  // timers
+  regShow -= dt; dryT -= dt; fullSpec -= dt;
+  for (let i = 0; i < 7; i++) boostT[i] -= dt;
+  if (comboT > 0 && (comboT -= dt) <= 0) combo = 0;
+  if (chainT > 0 && (chainT -= dt) <= 0) { chain = 0; chainN = 0; }
+  flash = mx(0, flash - dt * 2.4);
+
+  // Strokes are permanent. Only a *spent* one runs a timer, and that timer is
+  // purely the fade that shows it was consumed. The single other way a drawing
+  // leaves the field is scrolling out of reach behind you, which the player
+  // never sees happen.
+  for (let i = strokes.length; i--;) {
+    const s = strokes[i];
+    if (s.u) s.l -= dt;
+    if ((s.u && s.l <= 0) || s.y2 < P.y - 2600) {
+      if (P.ra === s) detachRail(1);
+      if (s === drawing) drawing = null;
+      strokes.splice(i, 1);
+    }
+  }
+
+  partStep(dt);
+  if (P.al) pushTrail();
+}
+
+function physicsFrame(dt) {
+  acc += dt;
+  let n = 0;
+  while (acc >= HSTEP && n < 8) { physics(HSTEP); acc -= HSTEP; n++; }
+  if (n >= 8) acc = 0;
+}
+
+// --- draw ------------------------------------------------------------------
+function draw() {
+  btns = [];
+  U = mn(W / 1280, H / 720);
+  background();
+  drawWorld();
+  drawStrokes();
+  drawTrail();
+  drawParts();
+  if (P.al) drawUnicorn();
+  if (st === 1 || st === 2) hud();
+  if (flash > .01) {
+    X.fillStyle = flashH < 0
+      ? 'hsl(' + ((T * 500) % 360 | 0) + ' 100% 75% / ' + flash * .5 + ')'
+      : hsl(flashH | 0, 100, 72, flash * .45);
+    X.fillRect(0, 0, W, H);
+  }
+  // WD && screenStore folds to 0 in the competition build, which is what
+  // drops the store screen, buyEquip and the cosmetic tables entirely.
+  if (st > 1) [0, 0, screenPause, screenResults, WD && screenStore][st]();
+  else if (!st) screenTitle();
+  cursor();
+  if (DEBUG) {
+    txt('seed ' + seed + '  v ' + (P.sp | 0) + '  chunks ' + chunks.length + '  parts ' + parts.length +
+      '  reg ' + reg + '  st ' + P.st.toFixed(1), 8, H - 10, 12, '#0f0', 0, 'left');
+  }
+}
+
+// --- main loop -------------------------------------------------------------
+function frame(ts) {
+  requestAnimationFrame(frame);
+  const raw = clamp((ts - last) / 1000, 0, .05);
+  last = ts;
+  // Hit-stop: a shatter or a hard bumper freezes the simulation for a few
+  // frames while the particles keep moving. It costs four lines and it is the
+  // single largest contributor to a hit feeling like it landed.
+  let dt = raw;
+  if (hstop > 0) { hstop -= raw; dt *= .12; }
+  T += dt;
+  if (st === 1 || st === 0) update(dt);
+  else if (st === 3) partStep(dt);
+  camUpdate(raw);
+  palUpdate(raw);
+  audioFrame();
+  draw();
+}
+
+// --- boot ------------------------------------------------------------------
+load();
+resize();
+// The title screen shows a live world behind it.
+startRun();
+st = 0;
+P.al = 1;
+requestAnimationFrame(frame);
+
 // ==== input.js ====
 // ---------------------------------------------------------------------------
 // Input: pointer drawing, colour selection (keys 1-7, scroll, prism bar),
@@ -2451,7 +2637,6 @@ function setSel(i) {
   sel = i;
   sndUI(1);
   burst(P.x, P.y, 6, 0, 130, HUE[i]);
-  if (hint === 1) { hint = 2; hintT = 0; }
 }
 
 document.body.style.cssText = 'margin:0;overflow:hidden;background:#05030c';
@@ -2527,236 +2712,6 @@ if (DEBUG) {
   window.__speeds = () => ({ sp: P.sp | 0, mult: +mult.toFixed(1), combo, score: score | 0, strokes: strokes.length });
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden && st === 1) st = 2; });
-
-// ==== game.js ====
-// ---------------------------------------------------------------------------
-// Game flow: persistence, run lifecycle, per-frame update and the main loop.
-// ---------------------------------------------------------------------------
-
-let acc = 0, last = 0, deadT = 0, stallSnd = 0;
-const HSTEP = 1 / 120;
-
-// --- persistence -----------------------------------------------------------
-// One namespaced key, comma separated, clamped on read. Never clears storage.
-// The four fields both builds need come first, so the competition build reads
-// and writes a four-field record and the Wavedash build appends the store's
-// six on the end. A record from either build loads in either build.
-function load() {
-  try {
-    const a = (localStorage[LS] || '').split(',').map(Number);
-    if (a.length < 4 || a.some(isNaN)) return;
-    SAVE.b = clamp(a[0] | 0, 0, 1e12);
-    SAVE.d = clamp(a[1] | 0, 0, 1e12);
-    SAVE.m = a[2] ? 1 : 0;
-    SAVE.t = a[3] ? 1 : 0;
-    if (WD && a.length > 9) {
-      SAVE.c = clamp(a[4] | 0, 0, 1e9);
-      SAVE.o = a[5] | 0;
-      for (let i = 0; i < CATS; i++) {
-        const v = a[6 + i] | 0;
-        SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
-      }
-    }
-  } catch (err) { /* storage unavailable - play anyway */ }
-}
-function save() {
-  try {
-    const a = [SAVE.b, SAVE.d, SAVE.m, SAVE.t];
-    if (WD) a.push(SAVE.c, SAVE.o, ...SAVE.e);
-    localStorage[LS] = a.join();
-  } catch (err) { /* ignore */ }
-}
-
-// --- run lifecycle ---------------------------------------------------------
-function startRun(sd) {
-  audioInit();
-  st = 1; score = 0; coins = 0; mult = 1; depth = 0; reg = 0; regShow = 3.2;
-  chain = 0; chainN = 0; chainT = 0; fullSpec = 0; combo = 0; comboT = 0;
-  deadT = 0; slow = 0; vault = null; shake = 0; flash = 0; hstop = 0;
-  pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
-  boostT = [0, 0, 0, 0, 0, 0, 0];
-  strokes = []; parts = []; trail = []; pops = []; nodes = []; shocks = [];
-  drawing = null;
-  P.x = 0; P.y = -320; P.vy = 300; P.a = PI / 2;
-  P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300; P.rw = 0;
-  Gx = 0; Gy = GRAV;
-  C.x = P.x; C.y = P.y; C.z = 1;
-  pal = regPal(0);
-  worldReset(sd);
-  // After the seed is set, never before: otherwise the opening drift is drawn
-  // from whatever PRNG state the previous run happened to leave behind and a
-  // seeded replay is not actually reproducible.
-  P.vx = rf(-70, 70);
-  hint = SAVE.t ? 3 : 0; hintT = 0;
-  mStep = 0; if (AC) mNext = AC.currentTime + .05;
-  sndRail(0);
-}
-
-function endRun() {
-  if (WD) SAVE.c += coins;
-  SAVE.b = mx(SAVE.b, score | 0);
-  SAVE.d = mx(SAVE.d, depth | 0);
-  if (!SAVE.t) { SAVE.t = 1; }
-  save();
-  sndRail(0);
-  if (WD) wdSubmit(score | 0, depth | 0);
-}
-
-function die() {
-  P.al = 0; deadT = 1.3;
-  for (let i = 0; i < 7; i++) burst(P.x, P.y, 16, 0, 520, HUE[i]);
-  pt(P.x, P.y, 0, 0, .7, -1, 2, 22);
-  shake = 30; flash = .7; flashH = -1;
-  sndDeath();
-  if (P.ra) detachRail(0);
-  if (P.te) releaseTether();
-  if (st !== 0) endRun();
-}
-
-// --- per-frame -------------------------------------------------------------
-function update(dt) {
-  worldUpdate();
-
-  // Focus Vaults dilate presentation time only; the stall check below uses
-  // simulation speed, so slow motion can never fake a death.
-  vault = null;
-  for (const c of chunks) if (c.v && P.y > c.y + 120 && P.y < c.y + c.h - 120) vault = c;
-  const was = slow;
-  slow = approach(slow, vault ? 1 : 0, 3.5, dt);
-  if (was > .5 && slow <= .5) { burst(P.x, P.y, 14, 0, 420, HUE[6]); sndVector(1); }
-
-  if (P.al) physicsFrame(dt);
-
-  fuseStep(dt);
-
-  // Past the Rainbow Engine the shaft simply begins again, harder: regAt wraps
-  // and difAt keeps climbing with the loop count, so the cycle boundary needs no
-  // code of its own. It still announces itself, because a loop boundary is also
-  // a region change and those already flash, name themselves and sound a gate.
-
-  // region progression
-  const r = regAt(P.y);
-  if (r !== reg) {
-    reg = r; regShow = 3.2;
-    flash = mx(flash, .35); flashH = regHue(reg);
-    sndGate();
-    score += 500 * mult | 0;
-  }
-
-  // score + multiplier
-  if (P.y > depth) { score += (P.y - depth) * .05 * mult; depth = P.y; }
-  mult = clamp(1 + P.sp / 950 + chainN * .2 + (fullSpec > 0 ? 2 : 0), 1, 12);
-
-  // Stall is the only failure state: too slow for too long and the run ends.
-  if (P.al) {
-    const stallT = STALLT;
-    if (P.sp < STALLV) {
-      P.st += dt;
-      const u = clamp((P.st - STALLW) / (stallT - STALLW), 0, 1);
-      if ((stallSnd -= dt) <= 0 && u > 0) { stallSnd = mx(.16, .55 - u * .4); sndStall(u); }
-      if (P.st > stallT) die();
-    } else if (P.st > 0) {
-      if (P.st > STALLW) burst(P.x, P.y, 8, 0, 260, HUE[0]);
-      P.st = mx(0, P.st - dt * 2.6);
-    }
-  } else {
-    deadT -= dt;
-    if (deadT <= 0) { if (st === 0) { startRun(); st = 0; } else st = 3; }
-  }
-
-  // timers
-  regShow -= dt; dryT -= dt; fullSpec -= dt;
-  for (let i = 0; i < 7; i++) boostT[i] -= dt;
-  if (comboT > 0 && (comboT -= dt) <= 0) combo = 0;
-  if (chainT > 0 && (chainT -= dt) <= 0) { chain = 0; chainN = 0; }
-  flash = mx(0, flash - dt * 2.4);
-
-  // Strokes are permanent. Only a *spent* one runs a timer, and that timer is
-  // purely the fade that shows it was consumed. The single other way a drawing
-  // leaves the field is scrolling out of reach behind you, which the player
-  // never sees happen.
-  for (let i = strokes.length; i--;) {
-    const s = strokes[i];
-    if (s.u) s.l -= dt;
-    if ((s.u && s.l <= 0) || s.y2 < P.y - 2600) {
-      if (P.ra === s) detachRail(1);
-      if (s === drawing) drawing = null;
-      strokes.splice(i, 1);
-    }
-  }
-
-  partStep(dt);
-  if (P.al) pushTrail();
-
-  // onboarding
-  if (!SAVE.t) {
-    hintT += dt;
-    if (hint === 2 && hintT > 9) { hint = 3; SAVE.t = 1; save(); }
-  }
-}
-
-function physicsFrame(dt) {
-  acc += dt;
-  let n = 0;
-  while (acc >= HSTEP && n < 8) { physics(HSTEP); acc -= HSTEP; n++; }
-  if (n >= 8) acc = 0;
-}
-
-// --- draw ------------------------------------------------------------------
-function draw() {
-  btns = [];
-  U = mn(W / 1280, H / 720);
-  background();
-  drawWorld();
-  drawStrokes();
-  drawTrail();
-  drawParts();
-  if (P.al) drawUnicorn();
-  if (st === 1 || st === 2) hud();
-  if (flash > .01) {
-    X.fillStyle = flashH < 0
-      ? 'hsl(' + ((T * 500) % 360 | 0) + ' 100% 75% / ' + flash * .5 + ')'
-      : hsl(flashH | 0, 100, 72, flash * .45);
-    X.fillRect(0, 0, W, H);
-  }
-  // WD && screenStore folds to 0 in the competition build, which is what
-  // drops the store screen, buyEquip and the cosmetic tables entirely.
-  if (st > 1) [0, 0, screenPause, screenResults, WD && screenStore][st]();
-  else if (!st) screenTitle();
-  cursor();
-  if (DEBUG) {
-    txt('seed ' + seed + '  v ' + (P.sp | 0) + '  chunks ' + chunks.length + '  parts ' + parts.length +
-      '  reg ' + reg + '  st ' + P.st.toFixed(1), 8, H - 10, 12, '#0f0', 0, 'left');
-  }
-}
-
-// --- main loop -------------------------------------------------------------
-function frame(ts) {
-  requestAnimationFrame(frame);
-  const raw = clamp((ts - last) / 1000, 0, .05);
-  last = ts;
-  // Hit-stop: a shatter or a hard bumper freezes the simulation for a few
-  // frames while the particles keep moving. It costs four lines and it is the
-  // single largest contributor to a hit feeling like it landed.
-  let dt = raw * lerp(1, .4, slow);
-  if (hstop > 0) { hstop -= raw; dt *= .12; }
-  T += dt;
-  if (st === 1 || st === 0) update(dt);
-  else if (st === 3) partStep(dt);
-  camUpdate(raw);
-  palUpdate(raw);
-  audioFrame();
-  draw();
-}
-
-// --- boot ------------------------------------------------------------------
-load();
-resize();
-// The title screen shows a live world behind it.
-startRun();
-st = 0;
-P.al = 1;
-requestAnimationFrame(frame);
 
 
 })()</script>

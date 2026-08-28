@@ -1307,5 +1307,44 @@
   "note": "final compressor pass",
   "delta": 0,
   "left": -866
+ },
+ {
+  "date": "2026-08-28 21:23",
+  "quick": false,
+  "zip": 14132,
+  "min": 67326,
+  "raw": 114538,
+  "rr": 18664,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP1 one-loop motif",
+  "delta": -46,
+  "left": -820
+ },
+ {
+  "date": "2026-08-28 21:24",
+  "quick": false,
+  "zip": 14178,
+  "min": 67664,
+  "raw": 115189,
+  "rr": 18725,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 46,
+  "left": -866
+ },
+ {
+  "date": "2026-08-28 21:29",
+  "quick": false,
+  "zip": 14136,
+  "min": 67425,
+  "raw": 115168,
+  "rr": 18668,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP6 crushers from barrier",
+  "delta": -42,
+  "left": -824
  }
 ]

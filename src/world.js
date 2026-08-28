@@ -271,8 +271,8 @@ function pegField(c) {
 // One builder covers both the Funnel and the Sieve: a wall across the column
 // with n openings. `drop` slopes the outer ends up and the gap edges down,
 // which turns a flat sieve into a converging funnel.
-function barrier(c, n, drop, yy, quiet) {
-  const m = mat(bB, 1), cuts = [];
+function barrier(c, n, drop, yy, quiet, mo) {
+  const m = mo || mat(bB, 1), cuts = [];
   for (let i = 0; i < n; i++) cuts.push(bL + (i + rf(.22, .8)) * bW / n);
   let px = bL - 20, py = yy - drop;
   for (let i = 0; i <= n; i++) {
@@ -284,10 +284,11 @@ function barrier(c, n, drop, yy, quiet) {
     px = last ? nx : cuts[i] + gw / 2;
     py = yy + drop;
   }
-  if (quiet) return;
+  if (quiet) return cuts;
   // Coins below the easiest gap, the prize above the least convenient one.
   for (let i = 0; i < 4; i++) c.i.push(item(I_COIN, cuts[0] + rf(-26, 26), yy + drop + 70 + i * 48));
   c.i.push(item(rp(.34) ? I_PIG : I_CROWN, cuts[n - 1], yy - drop - 70, pick(aff(c.rg))));
+  return cuts;
 }
 
 function bowl(c) {
@@ -372,24 +373,22 @@ function targets(c) {
 
 // Crusher lane: a corridor of breakable panels with counter-swinging arms that
 // do the demolition for you once you are moving. Sunforge's signature room.
+// Crusher lane: a corridor of breakable curtains, each with one deliberate gap
+// and a heavy arm sweeping it. Sunforge's signature room.
+//
+// The curtain IS a barrier with its material forced breakable -- the same
+// builder the Funnel and the Sieve use -- so all this has to do is ask barrier
+// where it left the gap and put the arm and the bait there.
 function crushers(c) {
-  const w = mn(bW * .8, 420), sx = bX + rf(-.1, .1) * bW;
   const n = ri(3, 4);
   for (let i = 0; i < n; i++) {
     const yy = c.y + c.h * (.15 + i * .8 / n);
-    // A full-width breakable curtain with one deliberate gap.
-    const gapX = sx + rf(-.3, .3) * w, gw = mx(90, 150 - bD * 20);
-    for (const sd of [-1, 1]) {
-      const ex = sd < 0 ? sx - w / 2 : sx + w / 2;
-      const gx = gapX + sd * gw / 2;
-      if (abs(ex - gx) > 30) c.o.push(sgAB(gx, yy, ex, yy + rf(-14, 14), M_BREAK));
-    }
-    // The crusher itself: a heavy arm sweeping the lane.
-    c.o.push(sg(gapX, yy + c.h * .4 / n, mn(w * .3, 150), rf(0, PI), M_BUMP,
+    const gx = barrier(c, 1, 0, yy, 1, M_BREAK)[0];
+    c.o.push(sg(gx, yy + c.h * .4 / n, mn(bW * .3, 150), rf(0, PI), M_BUMP,
       { w: rs() * rf(.8, 1.6 + bD * .4) }));
-    c.i.push(item(I_COIN, gapX, yy + 40), item(I_COIN, gapX + rf(-30, 30), yy + 90));
+    c.i.push(item(I_COIN, gx, yy + 40), item(I_COIN, gx + rf(-30, 30), yy + 90));
   }
-  c.i.push(item(rp(.5) ? I_CROWN : I_BOOST, sx, c.y + c.h * .96, ri(0, 6)));
+  c.i.push(item(rp(.5) ? I_CROWN : I_BOOST, bX, c.y + c.h * .96, ri(0, 6)));
 }
 
 // --- special rooms ---------------------------------------------------------
