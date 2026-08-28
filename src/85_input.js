@@ -88,6 +88,8 @@ if (DEBUG) window.jumpReg = (r) => {
 if (DEBUG) {
   window.__chunks = () => chunks;
   window.__light = (o) => light(o, o.x, o.y);
+  window.__te = () => (P.te ? { l: P.te.l, t: P.te.t } : null);
+  window.__pos = () => [w2sx(P.x), w2sy(P.y)];
   window.__speeds = () => ({ sp: P.sp | 0, mult: +mult.toFixed(1), combo, score: score | 0, strokes: strokes.length });
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden && st === 1) st = 2; });

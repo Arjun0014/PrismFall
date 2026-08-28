@@ -51,12 +51,21 @@ await shot('feel-permanent-strokes');
 // --- green tether: drawn long, held mid-swing -------------------------------
 await page.keyboard.press('r');
 await page.waitForTimeout(400);
-await page.keyboard.press('f');
-await page.keyboard.press('4');
-// Long drag so the rope is unmistakably as long as the line.
-await drag(760, 470, 980, 620);
-await page.waitForTimeout(260);
-await shot('feel-tether');
+// Draw a long Green line straight through the unicorn and catch the frame the
+// rope is actually loaded, so the pin and the swept circle are both on screen.
+let caught = 0;
+for (let i = 0; i < 14 && !caught; i++) {
+  await page.keyboard.press('f');
+  await page.keyboard.press('4');
+  const [ux, uy] = await page.evaluate(() => window.__pos());
+  await drag(ux - 40, uy + 70, ux + 150, uy + 150);
+  for (let j = 0; j < 8 && !caught; j++) {
+    await page.waitForTimeout(60);
+    const te = await page.evaluate(() => window.__te());
+    if (te) { caught = te; await shot('feel-tether'); }
+  }
+}
+console.log('  tether ' + (caught ? JSON.stringify(caught) : 'NOT CAUGHT'));
 
 // --- destruction: park in Sunforge and detonate Red -------------------------
 await page.keyboard.press('r');

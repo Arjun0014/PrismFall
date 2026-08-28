@@ -280,6 +280,7 @@ let hintT = 0;
 //   6 filler density  extra scattered geometry per chunk
 //   7 zone type       the force field that gives the region its mechanic
 //   8 zone frequency  0..9, chunks in ten that carry the field
+//   9 geometry hue     absolute; -1 means "cycle" (the Rainbow Engine)
 // Affinity colours come from AFF, music from formulas in 60_audio.js.
 //
 // A region is a *mechanic* first and a palette second. Each row below pairs a
@@ -289,23 +290,23 @@ let hintT = 0;
 const REG = [
   // Sky. Updraft columns hold you up, so descending is something you do on
   // purpose. Round, soft, bumper-heavy: the region that teaches the verbs.
-  ['CLOUDBREAK', 206, 74, 88, 26, '0002100210', 5, Z_UP, 5],
+  ['CLOUDBREAK', 206, 74, 88, 26, '0002100210', 5, Z_UP, 5, 40],
   // Furnace. Almost everything is breakable and chains into its neighbours;
   // crusher lanes and rotors do the breaking for you if you build speed.
-  ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4],
+  ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4, 196],
   // Overgrown spiral. Anchors and springy pods everywhere, and a slipstream
   // that curls you around them — the region the Green tether was built for.
-  ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6],
+  ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6, 320],
   // Glass river. Long rails, narrow throats, flow that carries you along them.
-  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7],
+  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7, 25],
   // Dark mine. Phase walls hide pockets, gravity wells drag you into them, and
   // the reward density is the highest in the game.
-  ['PRISM MINE', 276, -28, 62, 10, '6760671666', 9, Z_WELL, 6],
+  ['PRISM MINE', 276, -28, 62, 10, '6760671666', 9, Z_WELL, 6, 120],
   // Temple. Inversion fields turn the shaft upside down; the geometry is built
   // to be read from both directions.
-  ['INVERSION TEMPLE', 264, 52, 80, 13, '6465264636', 7, Z_INV, 7],
+  ['INVERSION TEMPLE', 264, 52, 80, 13, '6465264636', 7, Z_INV, 7, 75],
   // The Engine. Every archetype, every field, maximum density.
-  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456788', 9, 0, 9],
+  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456788', 9, 0, 9, -1],
 ];
 // Material bias per region, as five hex nibbles read left to right:
 //   BREAK PHASE DAMP BUMP MOVE, each out of 16.
@@ -1776,14 +1777,18 @@ const s2wy = (y) => C.y + (y - H / 2 - shY) / SC;
 // Shortest-path hue interpolation so palettes cross-fade instead of spinning.
 const alerp = (a, b, r, h) => (a + (((b - a + 540) % 360) - 180) * (1 - M.exp(-r * h)) + 360) % 360;
 
-// Target palette derived from the region's three numbers:
-// [bgTopH, bgTopS, bgTopL, bgBotH, bgBotS, bgBotL, geoH, geoL]
-// Geometry takes the complement of the background's midpoint hue. Deriving the
-// obstacle colour from the same hue as the sky made every region a monotone
-// wash where nothing you could hit stood out from what you couldn't.
+// Target palette: [bgTopH, bgTopS, bgTopL, bgBotH, bgBotS, bgBotL, geoH, geoL]
+//
+// Geometry carries its own hue rather than a function of the sky's. Deriving it
+// as the sky's complement did guarantee contrast, but it also landed four of
+// the seven regions inside the same gold band, so half the game's obstacles
+// looked alike however different the backdrop was. The table's values are each
+// at least 90 degrees from their own background's midpoint and at least 35 from
+// every other region's. The Rainbow Engine's is -1, meaning it cycles -- which
+// is the one region that ought to.
 const regPal = (r) => {
-  const q = REG[r], hu = q[1], sp = q[2], bl = q[4];
-  return [hu, 56, bl, hu + sp, 64, bl + 23, hu + sp / 2 + 165, q[3]];
+  const q = REG[r], hu = q[1], sp = q[2], bl = q[4], g = q[9];
+  return [hu, 56, bl, hu + sp, 64, bl + 23, g < 0 ? (T * 16) % 360 : g, q[3]];
 };
 function palUpdate(h) {
   const t = regPal(reg);
@@ -2232,15 +2237,20 @@ const hot = (x, y, w, h) => pmx > x - w / 2 && pmx < x + w / 2 && pmy > y - h / 
 
 function btn(x, y, w, h, label, fn, accent) {
   const o = hot(x, y, w, h);
-  btns.push({ hot: o, fn });
+  btns.push({ x, y, w, h, fn });
   RR(x - w / 2, y - h / 2, w, h, 8 * U);
   FL(o ? accent || UE : UB);
   SK(2 * U, o ? W9 : UE);
   txt(label, x, y + U, 15, o ? W9 : W6, 1);
 }
 
+// Hit-test at click time, not at draw time. Caching each button's hover state
+// during draw meant a press at a position the pointer had not already been
+// hovering was tested against the *previous* frame's cursor and silently did
+// nothing -- fine for a mouse that drifts to the button first, broken for a
+// tap and for anything that clicks straight to a coordinate.
 function uiClick() {
-  for (const b of btns) if (b.hot) { sndUI(1); b.fn(); return 1; }
+  for (const b of btns) if (hot(b.x, b.y, b.w, b.h)) { sndUI(1); b.fn(); return 1; }
   return 0;
 }
 
@@ -2286,7 +2296,7 @@ function hud() {
   if (slow > .05) {
     X.fillStyle = 'hsl(275 60% 60% / ' + slow * .1 + ')';
     X.fillRect(0, 0, W, H);
-    txt('FOCUS VAULT', W / 2, 70 * U, 16, W6, 1);
+    txt('FOCUS VAULT', W / 2, H - 96 * U, 16, W6, 1);
   }
 }
 
@@ -2307,7 +2317,7 @@ function prismBar() {
     txt('ROYGBIV'[i], cx, y, on ? 15 : 12, on ? W9 : W6, 1);
     txt(i + 1, cx, y - h / 2 - 9 * U, 10, on ? W9 : W3);
     if (chain & CBIT[i]) CIR(cx, y + h / 2 + 8 * U, 2.6 * U, chsl(i, 75));
-    btns.push({ hot: hot(cx, y, w, h), fn: () => setSel(i) });
+    btns.push({ x: cx, y, w, h, fn: () => setSel(i) });
   }
   if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 1);
 }
@@ -2458,7 +2468,7 @@ function screenAscend() {
       line = words[w] || '';
     }
     txt('PRESS ' + (i + 1), x, y + ch / 2 - 22 * U, 12, o ? W9 : W3, 1);
-    btns.push({ hot: o, fn: () => takeBoon(i) });
+    btns.push({ x, y, w: cw, h: ch, fn: () => takeBoon(i) });
   }
 }
 
@@ -2489,7 +2499,7 @@ function screenStore() {
     txt(COSN[n], x + 66 * U, y - 5 * U, 11, own ? W9 : W6, 1);
     txt(own ? (eq ? 'EQUIPPED' : 'EQUIP') : COSP[i] + 'c', x + 66 * U, y + 9 * U, 10,
       own ? W3 : SAVE.c < COSP[i] ? 'hsl(0 60% 60%)' : UG);
-    btns.push({ hot: o, fn: () => buyEquip(c, i) });
+    btns.push({ x: x + 66 * U, y, w: 140 * U, h: 38 * U, fn: () => buyEquip(c, i) });
   }
   // Live preview through the real unicorn renderer.
   X.save();
@@ -2602,6 +2612,8 @@ if (DEBUG) window.jumpReg = (r) => {
 if (DEBUG) {
   window.__chunks = () => chunks;
   window.__light = (o) => light(o, o.x, o.y);
+  window.__te = () => (P.te ? { l: P.te.l, t: P.te.t } : null);
+  window.__pos = () => [w2sx(P.x), w2sy(P.y)];
   window.__speeds = () => ({ sp: P.sp | 0, mult: +mult.toFixed(1), combo, score: score | 0, strokes: strokes.length });
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden && st === 1) st = 2; });
@@ -2852,7 +2864,6 @@ function frame(ts) {
 
 // --- boot ------------------------------------------------------------------
 load();
-if (WD) wdInit();
 resize();
 // The title screen shows a live world behind it.
 startRun();

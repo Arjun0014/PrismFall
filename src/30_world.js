@@ -22,6 +22,7 @@
 //   6 filler density  extra scattered geometry per chunk
 //   7 zone type       the force field that gives the region its mechanic
 //   8 zone frequency  0..9, chunks in ten that carry the field
+//   9 geometry hue     absolute; -1 means "cycle" (the Rainbow Engine)
 // Affinity colours come from AFF, music from formulas in 60_audio.js.
 //
 // A region is a *mechanic* first and a palette second. Each row below pairs a
@@ -31,23 +32,23 @@
 const REG = [
   // Sky. Updraft columns hold you up, so descending is something you do on
   // purpose. Round, soft, bumper-heavy: the region that teaches the verbs.
-  ['CLOUDBREAK', 206, 74, 88, 26, '0002100210', 5, Z_UP, 5],
+  ['CLOUDBREAK', 206, 74, 88, 26, '0002100210', 5, Z_UP, 5, 40],
   // Furnace. Almost everything is breakable and chains into its neighbours;
   // crusher lanes and rotors do the breaking for you if you build speed.
-  ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4],
+  ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4, 196],
   // Overgrown spiral. Anchors and springy pods everywhere, and a slipstream
   // that curls you around them — the region the Green tether was built for.
-  ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6],
+  ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6, 320],
   // Glass river. Long rails, narrow throats, flow that carries you along them.
-  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7],
+  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7, 25],
   // Dark mine. Phase walls hide pockets, gravity wells drag you into them, and
   // the reward density is the highest in the game.
-  ['PRISM MINE', 276, -28, 62, 10, '6760671666', 9, Z_WELL, 6],
+  ['PRISM MINE', 276, -28, 62, 10, '6760671666', 9, Z_WELL, 6, 120],
   // Temple. Inversion fields turn the shaft upside down; the geometry is built
   // to be read from both directions.
-  ['INVERSION TEMPLE', 264, 52, 80, 13, '6465264636', 7, Z_INV, 7],
+  ['INVERSION TEMPLE', 264, 52, 80, 13, '6465264636', 7, Z_INV, 7, 75],
   // The Engine. Every archetype, every field, maximum density.
-  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456788', 9, 0, 9],
+  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456788', 9, 0, 9, -1],
 ];
 // Material bias per region, as five hex nibbles read left to right:
 //   BREAK PHASE DAMP BUMP MOVE, each out of 16.

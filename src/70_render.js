@@ -101,14 +101,18 @@ const s2wy = (y) => C.y + (y - H / 2 - shY) / SC;
 // Shortest-path hue interpolation so palettes cross-fade instead of spinning.
 const alerp = (a, b, r, h) => (a + (((b - a + 540) % 360) - 180) * (1 - M.exp(-r * h)) + 360) % 360;
 
-// Target palette derived from the region's three numbers:
-// [bgTopH, bgTopS, bgTopL, bgBotH, bgBotS, bgBotL, geoH, geoL]
-// Geometry takes the complement of the background's midpoint hue. Deriving the
-// obstacle colour from the same hue as the sky made every region a monotone
-// wash where nothing you could hit stood out from what you couldn't.
+// Target palette: [bgTopH, bgTopS, bgTopL, bgBotH, bgBotS, bgBotL, geoH, geoL]
+//
+// Geometry carries its own hue rather than a function of the sky's. Deriving it
+// as the sky's complement did guarantee contrast, but it also landed four of
+// the seven regions inside the same gold band, so half the game's obstacles
+// looked alike however different the backdrop was. The table's values are each
+// at least 90 degrees from their own background's midpoint and at least 35 from
+// every other region's. The Rainbow Engine's is -1, meaning it cycles -- which
+// is the one region that ought to.
 const regPal = (r) => {
-  const q = REG[r], hu = q[1], sp = q[2], bl = q[4];
-  return [hu, 56, bl, hu + sp, 64, bl + 23, hu + sp / 2 + 165, q[3]];
+  const q = REG[r], hu = q[1], sp = q[2], bl = q[4], g = q[9];
+  return [hu, 56, bl, hu + sp, 64, bl + 23, g < 0 ? (T * 16) % 360 : g, q[3]];
 };
 function palUpdate(h) {
   const t = regPal(reg);
