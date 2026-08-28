@@ -37,6 +37,47 @@ const log = (...a) => { if (!QUIET) console.log(...a); };
 
 
 // ---------------------------------------------------------------- terser ----
+// ---- mangled-name alphabet -------------------------------------------------
+// Terser draws mangled names from a 54-character alphabet that it sorts by how
+// often each character already appears in the source. That is the right move
+// for a Huffman-coded stream -- skew the histogram, shorten the common codes --
+// and the wrong one here, because a context-mixing coder cares about how
+// PREDICTABLE the next character is given the last few, not how often it occurs
+// overall. Simply switching the frequency sort off is worth 136 B.
+//
+// The alphabet below was then searched directly against the archive by
+// tools/mangle.mjs (family survey, then a hill-climb over swap / substitute /
+// drop / insert). Total against Terser's default: -229 B. It is 25 characters
+// long and mostly uppercase, which no amount of reasoning would have predicted;
+// the landscape is rugged and non-monotonic in length, so it was found by
+// measurement and it has to be RE-searched after any significant source change:
+//
+//   npm run mangle
+//
+// This is a build parameter, exactly like the Roadroller model. Nothing about
+// the game depends on it: Terser guarantees the names it emits are unique,
+// non-reserved and non-shadowing whatever alphabet it is handed.
+const NAME_LEAD = 'YBCDEFHIJKLMNOPQSVTURWXAZ';
+const NAME_TAIL = NAME_LEAD + '0123456789';
+
+/** A Terser `nth_identifier`. Omitting reset/sort is what disables the sort. */
+export function nameGen(lead = NAME_LEAD, tail = NAME_TAIL) {
+  const L = [...lead], T = [...tail];
+  return {
+    get(num) {
+      let ret = '', chars = L, base = L.length;
+      num++;
+      do {
+        num--;
+        ret += chars[num % base];
+        num = Math.floor(num / base);
+        chars = T; base = T.length;
+      } while (num > 0);
+      return ret;
+    },
+  };
+}
+
 export const TERSER_OPTS = {
   ecma: 2020,
   module: false,
@@ -73,7 +114,7 @@ export const TERSER_OPTS = {
     hoist_funs: true,
     drop_console: true,
   },
-  mangle: { toplevel: true },
+  mangle: { toplevel: true, nth_identifier: nameGen() },
   // Yes, pretty-printed. beautify + braces takes the bundle from 45,878 to
   // 74,393 characters -- 62% larger -- and the archive 14 B SMALLER, because
   // indentation and always-present braces are the most predictable text there
@@ -179,7 +220,7 @@ const RR_ABBREV = [4, 5, 6, 7, 8, 9, 10, 12, 16, 24, 32];
 // It is not available: the decoder allocates before the game exists, so a
 // phone that cannot hand over half a gigabyte does not get a smaller game, it
 // gets a blank canvas. One figure, used by every packer this file constructs.
-const RR_MEM = 150;
+export const RR_MEM = 150;
 
 async function roadroll(js, deep) {
   const { Packer, defaultSparseSelectors } = await import('roadroller');
@@ -211,30 +252,37 @@ async function roadroll(js, deep) {
   if (deep) {
     // Full model search at milestones, then sweep the abbreviation count on top
     // of whatever model it settled on. Cache both for the fast path.
+    //
+    // The cached model competes too, and wins ties. Roadroller's optimize() is
+    // a greedy walk with a random component, so re-running it on a changed
+    // payload can and does land somewhere WORSE than the model already in the
+    // cache -- measured at +22 B on the beautified bundle. A search allowed to
+    // overwrite its own best answer is not a search.
+    const prior = cached ? Object.assign({}, cached) : null;
     const res = await packer.optimize(2);
     const keep = {};
     for (const k of RR_KEYS) if (packer.options[k] !== undefined) keep[k] = packer.options[k];
     if (res && res.best) log('   roadroller model search -> est ' + (res.best.size | 0) + ' B');
     let best = null;
-    for (const n of RR_ABBREV) {
+    const models = prior ? [['searched', keep], ['cached', prior]] : [['searched', keep]];
+    for (const [tag, model] of models) for (const n of RR_ABBREV) {
       // 150 MB, like the main packer. Roadroller's own default is 150, and at
       // that setting the decoder allocates 120 MB before the game exists; the
       // 700 this sweep used allocates 486 MB, which no phone will hand over.
       // The sweep returns its winner directly, so a different figure here does
       // not merely mis-measure -- it SHIPS. Worth 7 B and not available.
-      const pk = new Packer(inputs, Object.assign({ maxMemoryMB: RR_MEM }, keep, { numAbbreviations: n }));
+      const pk = new Packer(inputs, Object.assign({ maxMemoryMB: RR_MEM }, model, { numAbbreviations: n }));
       const d = pk.makeDecoder();
       const out = d.firstLine + '\n' + d.secondLine;
       if (/<\/script/i.test(out)) continue;
       const z = await zipOf(html(out), [15]);
-      if (!best || z.length < best.zip) best = { n, zip: z.length, out };
+      if (!best || z.length < best.zip) best = { n, tag, model, zip: z.length, out };
     }
     if (best) {
-      keep.numAbbreviations = best.n;
-      log('   roadroller abbrev sweep -> ' + best.n + ' (zip ' + best.zip + ' B)');
+      log('   roadroller sweep -> ' + best.tag + ' model, abbrev ' + best.n + ' (zip ' + best.zip + ' B)');
+      writeFileSync(RR_CACHE, JSON.stringify(Object.assign({}, best.model, { numAbbreviations: best.n }), null, 1));
+      return best.out;
     }
-    writeFileSync(RR_CACHE, JSON.stringify(keep, null, 1));
-    if (best) return best.out;
   }
   const { firstLine, secondLine } = packer.makeDecoder();
   return firstLine + '\n' + secondLine;

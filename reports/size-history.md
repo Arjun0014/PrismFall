@@ -51,3 +51,6 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 11:38 |  | 120456 | 45877 | 21883 | **16558** | +7 | -3246 | roadroller |
 | 2026-08-28 12:41 | baseline for compression tournament | 120456 | 45877 | 21883 | **16558** | 0 | -3246 | roadroller |
 | 2026-08-28 12:59 | terflags: lhs_constants+beautify+braces+loops+unsafe_arrows+passes3 | 120456 | 77189 | 21784 | **16481** | -77 | -3169 | roadroller |
+| 2026-08-28 13:15 | deep re-search on beautified payload | 120456 | 77189 | 21813 | **16503** | +22 | -3191 | roadroller (deep) |
+| 2026-08-28 13:27 |  | 120456 | 77189 | 21784 | **16481** | -22 | -3169 | roadroller |
+| 2026-08-28 13:35 | searched mangle alphabet | 120456 | 77275 | 21483 | **16252** | -229 | -2940 | roadroller |

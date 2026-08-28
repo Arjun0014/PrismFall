@@ -1,44 +1,6 @@
 {
- "base": 16558,
- "best": 16481,
- "taken": [
-  "lhs_constants=false",
-  "fmt.beautify+braces",
-  "loops=false",
-  "unsafe_arrows=true",
-  "passes=3"
- ],
- "cfg": {
-  "ecma": 2020,
-  "module": false,
-  "toplevel": false,
-  "compress": {
-   "passes": 3,
-   "booleans_as_integers": true,
-   "pure_getters": true,
-   "hoist_funs": true,
-   "drop_console": true,
-   "toplevel": true,
-   "reduce_funcs": false,
-   "sequences": false,
-   "inline": false,
-   "unsafe": false,
-   "unsafe_arrows": true,
-   "unsafe_math": false,
-   "unsafe_methods": false,
-   "unsafe_comps": false,
-   "unsafe_undefined": false,
-   "lhs_constants": false,
-   "loops": false
-  },
-  "mangle": {
-   "toplevel": true
-  },
-  "format": {
-   "comments": false,
-   "wrap_func_args": false,
-   "beautify": true,
-   "braces": true
-  }
- }
+ "base": 16252,
+ "best": 16252,
+ "taken": [],
+ "patches": []
 }

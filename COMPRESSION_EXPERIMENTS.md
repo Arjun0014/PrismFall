@@ -324,3 +324,46 @@ to 2024, `hoist_props`, `hoist_vars`, `keep_fargs`, `evaluate`, `dead_code`,
 `unused`, `arguments`, `typeofs`, `properties`, `computed_props`, `arrows`,
 `switches`, `directives` and every quote style are all worth exactly **0 bytes**
 on this payload.
+
+### 13 — Compression-aware identifier naming (−229 B, the largest single win yet)
+
+Terser draws mangled names from a 54-character alphabet that it **sorts by how
+often each character already appears in the source**. That is exactly right for
+a Huffman-coded stream: skew the symbol histogram and the common symbols get
+short codes. It is the wrong heuristic here, because a context-mixing coder does
+not care how often a character occurs — it cares how predictable it is given the
+last few characters.
+
+`tools/mangle.mjs` supplies Terser a custom `nth_identifier` and scores the
+archive. This is the safest transformation available: Terser guarantees the
+names it emits are unique, non-reserved and non-shadowing whatever alphabet it
+draws from, so no candidate in the search can produce an invalid program.
+
+**Simply switching the frequency sort off is worth 136 B.** The rest came from
+searching the alphabet itself:
+
+| Alphabet | Zip | Delta |
+|---|---:|---:|
+| Terser default (frequency-sorted) | 16,481 | — |
+| fixed order, no frequency sort | 16,345 | −136 |
+| first 26 (`a`–`z`) | 16,340 | −141 |
+| first 22 | 16,290 | −191 |
+| 26 uppercase (`A`–`Z`) | 16,282 | −199 |
+| **hill-climbed, 25 chars** | **16,252** | **−229** |
+| first 6 | 16,558 | +77 |
+| first 3 | 16,643 | +162 |
+
+The winner is `YBCDEFHIJKLMNOPQSVTURWXAZ` — 25 characters, uppercase, `Y` first.
+No amount of reasoning would have produced that. The landscape is rugged and
+strongly non-monotonic in alphabet size (22 beats 24, 25, 26 and 27), so it was
+found by measurement and it has to be re-found after any significant source
+change: `npm run mangle`.
+
+Restricting the alphabet far enough to force longer names is a clear loss — at
+6 characters the archive is 77 B *worse* than the default and at 3 it is 162 B
+worse. So this is not "smaller alphabets pack better"; the alphabet has an
+optimum in both size and order, and neither is where a size heuristic would put
+it.
+
+Re-running the Terser flag descent on top of this found **no further moves**:
+the flag configuration and the alphabet are jointly at a fixed point.

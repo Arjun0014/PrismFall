@@ -17,8 +17,10 @@ const p = (...a) => join(ROOT, ...a);
 // ---- terser ---------------------------------------------------------------
 // The shipping configuration is owned by the build, not duplicated here, so a
 // search can never be run against a config the product does not actually use.
-export { TERSER_OPTS as TERSER_CUR } from './build.mjs';
-import { TERSER_OPTS as TERSER_CUR } from './build.mjs';
+// The competition build drops the IIFE, which is what makes compress.toplevel
+// valid; anything scoring against the archive must use that exact form.
+import { competitionTerser } from './measure.mjs';
+export const TERSER_CUR = competitionTerser();
 
 export async function terser(js, over = {}) {
   const opts = {

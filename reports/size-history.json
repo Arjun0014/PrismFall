@@ -605,5 +605,44 @@
   "note": "terflags: lhs_constants+beautify+braces+loops+unsafe_arrows+passes3",
   "delta": -77,
   "left": -3169
+ },
+ {
+  "date": "2026-08-28 13:15",
+  "quick": false,
+  "zip": 16503,
+  "min": 77189,
+  "raw": 120456,
+  "rr": 21813,
+  "tag": "roadroller",
+  "deep": true,
+  "note": "deep re-search on beautified payload",
+  "delta": 22,
+  "left": -3191
+ },
+ {
+  "date": "2026-08-28 13:27",
+  "quick": false,
+  "zip": 16481,
+  "min": 77189,
+  "raw": 120456,
+  "rr": 21784,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -22,
+  "left": -3169
+ },
+ {
+  "date": "2026-08-28 13:35",
+  "quick": false,
+  "zip": 16252,
+  "min": 77275,
+  "raw": 120456,
+  "rr": 21483,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "searched mangle alphabet",
+  "delta": -229,
+  "left": -2940
  }
 ]
