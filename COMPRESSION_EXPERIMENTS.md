@@ -485,3 +485,68 @@ Roadroller beats the strongest standard-library coder available by 21%, on a
 payload brotli is given every advantage on (maximum quality, 16 MB window, exact
 size hint). The final archive carries the game at **1.670 bits per minified
 character**. There is no compressor swap left that would help.
+
+### 19 — Retiring a distinct numeric value (−6 B, not applied)
+
+Experiment 14 failed because `122/2` retires the value 61 and introduces the
+value 122: the distinct-value count, which is what the census says costs money,
+did not go down. `tools/numpool.mjs` fixes exactly that by admitting only
+expressions whose every operand is a value the program already uses somewhere
+else, so the count really does drop by one.
+
+**178 of the 311 distinct values can be retired that way.** `.75` → `3/4`,
+`27` → `3*9`, `56` → `7*8`, `160` → `80*2` — all bit-exact, all built from
+numbers already in the file.
+
+| Strategy | Archive | Delta |
+|---|---:|---:|
+| baseline | 16,250 | — |
+| best single retirement (`1298` → `11*118`) | 16,244 | **−6** |
+| descending greedy over the 36 individual winners | 16,244 | −6 |
+| ascending greedy | 16,248 | −2 |
+| take all, then drop whatever hurts | 16,321 | +71 |
+| **all 36 winners together** | **16,343** | **+93** |
+
+36 of the 178 improve the archive *on their own*, by 1 to 6 bytes each. Applied
+together they are **93 bytes worse than doing nothing.**
+
+That result corrects a piece of reasoning that had looked solid, and the
+correction matters more than the six bytes: **8.7 bytes per distinct value is an
+average over the class, not a marginal cost.** The model does not store 311
+independent values and charge per entry — it prices each one in the context of
+the others, so retiring one frees far less than its share, and retiring many
+replaces a well-learned population of literals with a new population of
+arithmetic expressions it has to learn from scratch.
+
+Six bytes does not justify adding a post-Terser rewrite stage to the build (the
+substitution cannot live in the source, because `evaluate` folds it straight
+back), so this is recorded and not applied.
+
+### 20 — Top-level function reordering, done properly this time (−1 B)
+
+Experiment 4 hill-climbed function order with a brace-counting splitter that did
+not understand regex literals, scored the result with gzip as a proxy, reported
+−37 B, and produced a bundle that hung on load.
+
+`tools/ast.mjs` redoes it with acorn: spans are exact statement boundaries, the
+comment block above a declaration travels with it, and every rebuild is
+re-parsed before it is scored. Only function declarations move, which is safe
+because a function declaration is hoisted and fully initialised before any
+statement runs, so its position cannot change when it exists or what anything
+else sees; every other statement keeps its exact relative order, preserving
+evaluation order and every temporal dead zone.
+
+Scored against the real archive rather than gzip, the entire search is worth
+**one byte**, all of it in `60_audio.js`. The −37 B was an artefact of the proxy:
+gzip ranks duplication, and duplication is the one thing this archive does not
+pay for. Not applied.
+
+### 21 — Roadroller model count, re-searched on the new payload
+
+The payload is now 77,000 characters rather than 45,000, so the model count was
+re-run from scratch: ten counts from 12 to 32, each given its own `optimize(2)`
+and its own abbreviation sweep.
+
+**Twenty still wins.** The best alternative is +38 B and the worst is +130 B.
+The abbreviation sweep did find the cached value had drifted — 9 rather than 12,
+worth **−2 B**, which is applied.

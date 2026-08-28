@@ -56,3 +56,4 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 13:35 | searched mangle alphabet | 120456 | 77275 | 21483 | **16252** | -229 | -2940 | roadroller |
 | 2026-08-28 13:54 | deep model re-search after mangle+flags | 120456 | 77275 | 21497 | **16265** | +13 | -2953 | roadroller (deep) |
 | 2026-08-28 13:56 |  | 120456 | 77275 | 21483 | **16252** | -13 | -2940 | roadroller |
+| 2026-08-28 14:14 |  | 120456 | 77275 | 21467 | **16250** | -2 | -2938 | roadroller |

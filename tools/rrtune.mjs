@@ -99,10 +99,13 @@ if (isMainThread) {
   console.log('model count, each with its own optimize(2) and abbreviation sweep');
   const rows = await Promise.all(counts.map((n) =>
     submit({ rr: { sparseSelectors: defaultSparseSelectors(n) }, optimize: 2, abbrev: ABB })
-      .then((x) => ({ n, ...x }))));
+      // `models` is kept separate from `n`: packAndWeigh returns the winning
+      // ABBREVIATION count as `n`, and spreading it last silently relabelled
+      // every row with the same number.
+      .then((x) => ({ ...x, models: n }))));
   rows.sort((a, b) => a.zip - b.zip);
   for (const row of rows)
-    console.log('  ' + String(row.n).padStart(3) + ' models   zip ' + String(row.zip).padStart(6) +
+    console.log('  ' + String(row.models).padStart(3) + ' models   zip ' + String(row.zip).padStart(6) +
       '   (' + (row.zip - cur.zip > 0 ? '+' : '') + (row.zip - cur.zip) + ')   abbrev ' + row.n);
   const win = rows[0];
   if (win.zip < cur.zip) {
