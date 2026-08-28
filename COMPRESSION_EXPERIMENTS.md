@@ -367,3 +367,121 @@ it.
 
 Re-running the Terser flag descent on top of this found **no further moves**:
 the flag configuration and the alphabet are jointly at a fixed point.
+
+### 14 — Exact numeric-expression synthesis (0 of 155, abandoned)
+
+The idea: replace a rare literal with an arithmetic expression that evaluates to
+bit-identically the same double, built from characters that are already
+everywhere. No tuning value changes — `Object.is(eval(expr), value)` is the
+admission test, which rejects inexact division and the `0`/`-0` confusion, and
+every rewrite is an acorn-driven span replacement, never a textual match.
+
+It has to run after Terser, because `evaluate` folds every one of these straight
+back to the literal it came from.
+
+The minified bundle holds **3,301 numeric literals over 311 distinct values**;
+116 of those values occur exactly once. 155 of the 311 have an exact expression
+at nine characters or fewer.
+
+**Not one of the 155 improves the archive.** `61` → `(122/2)` adds 5 characters
+and costs 8 bytes; that is the shape of every single row.
+
+The reasoning behind the idea was wrong in a way worth recording. It assumed a
+literal like `.0525` is *novel* text at ~1.8 chars per archive byte while
+`21/400` is *common* text at ~8.5. It is not: with 3,301 numeric literals in the
+file, digit runs are among the most thoroughly modelled text in the program, and
+an expression is made of exactly the same kind of text. So the rewrite does not
+move content from the expensive class to the cheap one — it stays in the same
+class and there is simply more of it.
+
+Stated generally, and this rules out a whole family of ideas: **an
+exactness-preserving rewrite carries the same information by definition.** It
+can only win if it moves that information into a cheaper representation, and
+digits are already cheap.
+
+A control measured alongside it calibrates the whole phase: appending 33
+characters of genuinely novel text (`;var zzzUnlikelyName=12345678901;`) costs
+**34 archive bytes**. That is the exchange rate this project is working against —
+roughly **one archive byte per novel character** at the margin.
+
+### 15 — What the archive is made of (census)
+
+`tools/census.mjs` replaces one class of content in the minified bundle with a
+trivial stand-in of the same shape and weighs the result. None of these are
+candidate builds; the question is how much of PRISMFALL is English, how much is
+tuning numbers, and how much is program structure — which decides whether any
+amount of restructuring can close a given gap.
+
+| Class | Count | Source chars | Archive cost |
+|---|---:|---:|---:|
+| every numeric literal → `1` | 3,301 | 2,536 | **2,700 B** |
+| numeric literals except 0/1/2 → `1` | 2,010 | 2,536 | 2,401 B |
+| every string literal → `""` | 270 | 2,897 | **1,296 B** |
+| English prose only → `""` | 66 | 1,402 | 776 B |
+| *everything else — program structure* | | | **~12,250 B** |
+
+Two things follow.
+
+**Tuning numbers are the single largest content class in the game — 17% of the
+archive.** 3,301 uses of 311 distinct values. Note the exchange rate: collapsing
+them removes only 2,536 characters but 2,700 bytes, which is *more than a byte
+per character removed*. What is being paid for is not the digits, it is which
+value — roughly 8.7 B per distinct value. This is the same mechanism the
+constant-lattice experiments (#5/#6) found, and it is why they worked: they
+reduced the number of distinct values. It is also why they were rejected — the
+only way to have fewer distinct tuning values is to change the tuning.
+
+**The floor is arithmetical.** Deleting *every* string literal and collapsing
+*every* numeric literal to a single value — a game with no text and one tuning
+constant — is worth 3,996 B against a gap of 2,940. There is no combination of
+content reductions that reaches 13,312 B while leaving the game recognisable.
+
+### 16 — Free text shape (0 B, in both directions)
+
+Since `beautify + braces` bought 14 bytes for 28,515 extra characters (#12),
+the obvious follow-up is whether other predictable text is also free, or better
+than free. Every variant below is applied to the minified bundle with acorn span
+information, so nothing inside a string, template or regex is touched, and each
+one is smoke-tested before it is weighed.
+
+| Variant | Chars | Delta |
+|---|---:|---:|
+| CRLF line endings | +2,698 | **0** |
+| every newline doubled | +2,698 | **0** |
+| space after every comma | +2,928 | **0** |
+| space after every semicolon | +1,597 | **0** |
+| indentation doubled | +15,068 | **0** |
+| indentation as tabs | −11,301 | **0** |
+| blank line between top-level declarations | +176 | +10 |
+| a 64-character banner above every declaration | +11,616 | +10 |
+
+**You can add 15,068 characters to this program or remove 11,301, and the
+archive does not change by one byte.** Whitespace is not merely cheap here, it is
+free, and there is therefore no textual slack anywhere in the archive to
+reclaim — every byte in it is information. The `beautify + braces` win was not
+"more text is good"; it was a specific change to which tokens sit next to which.
+
+### 17 — Roadroller input splitting (impossible, not merely bad)
+
+The census makes a case for giving the game's 270 string literals their own
+stream with the text model rather than the JS one. Roadroller 2.1.0 answers
+directly:
+
+> Packer: this version of Roadroller supports exactly one JS or text input
+
+So the multi-stream idea cannot be tried at all with this packer, and the
+single-input type is settled by measurement: `type: 'text'` on the whole bundle
+is **+1,546 B** against `type: 'js'`.
+
+### 18 — Is the packer leaving anything on the table?
+
+| Coder | Bytes |
+|---|---:|
+| gzip -9 | 23,900 |
+| **brotli -q 11 -w 24** | **20,642** |
+| Roadroller + Zopfli/ECT zip | **16,252** |
+
+Roadroller beats the strongest standard-library coder available by 21%, on a
+payload brotli is given every advantage on (maximum quality, 16 MB window, exact
+size hint). The final archive carries the game at **1.670 bits per minified
+character**. There is no compressor swap left that would help.

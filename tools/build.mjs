@@ -275,7 +275,13 @@ async function roadroll(js, deep) {
       const d = pk.makeDecoder();
       const out = d.firstLine + '\n' + d.secondLine;
       if (/<\/script/i.test(out)) continue;
-      const z = await zipOf(html(out), [15]);
+      // Scored the way the archive is actually built. A single zopfli pass at
+      // 15 iterations and no ECT was cheap and WRONG: it ranked a model 5 B
+      // ahead that came out 13 B behind once the real ladder ran, and the
+      // sweep then cached the loser. A comparison is only as good as the
+      // metric it ranks on.
+      let z = await zipOf(html(out), [15, 200]);
+      z = ectShrink(z, 'rr-' + tag + '-' + n);
       if (!best || z.length < best.zip) best = { n, tag, model, zip: z.length, out };
     }
     if (best) {

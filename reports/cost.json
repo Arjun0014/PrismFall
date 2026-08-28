@@ -1,0 +1,3095 @@
+{
+ "base": 16327,
+ "rows": [
+  {
+   "label": "applyStroke",
+   "file": "50_colors.js",
+   "chars": 5304,
+   "seq": 47,
+   "zip": 15809,
+   "min": 73687,
+   "packed": 20885,
+   "cost": 518
+  },
+  {
+   "label": "hud",
+   "file": "80_hud.js",
+   "chars": 2043,
+   "seq": 41,
+   "zip": 15982,
+   "min": 75874,
+   "packed": 21111,
+   "cost": 345
+  },
+  {
+   "label": "unicornBody",
+   "file": "70_render.js",
+   "chars": 2097,
+   "seq": 169,
+   "zip": 16006,
+   "min": 75762,
+   "packed": 21143,
+   "cost": 321
+  },
+  {
+   "label": "update",
+   "file": "90_game.js",
+   "chars": 2717,
+   "seq": 136,
+   "zip": 16015,
+   "min": 75531,
+   "packed": 21164,
+   "cost": 312
+  },
+  {
+   "label": "drawWorld",
+   "file": "70_render.js",
+   "chars": 2452,
+   "seq": 53,
+   "zip": 16024,
+   "min": 75266,
+   "packed": 21173,
+   "cost": 303
+  },
+  {
+   "label": "screenAscend",
+   "file": "80_hud.js",
+   "chars": 2190,
+   "seq": 60,
+   "zip": 16031,
+   "min": 75720,
+   "packed": 21181,
+   "cost": 296
+  },
+  {
+   "label": "genChunk",
+   "file": "30_world.js",
+   "chars": 1960,
+   "seq": 140,
+   "zip": 16039,
+   "min": 76371,
+   "packed": 21188,
+   "cost": 288
+  },
+  {
+   "label": "hitOb",
+   "file": "40_physics.js",
+   "chars": 2684,
+   "seq": 256,
+   "zip": 16040,
+   "min": 76096,
+   "packed": 21191,
+   "cost": 287
+  },
+  {
+   "label": "screenTitle",
+   "file": "80_hud.js",
+   "chars": 1862,
+   "seq": 58,
+   "zip": 16059,
+   "min": 76308,
+   "packed": 21217,
+   "cost": 268
+  },
+  {
+   "label": "drawStrokes",
+   "file": "70_render.js",
+   "chars": 2647,
+   "seq": 88,
+   "zip": 16084,
+   "min": 75884,
+   "packed": 21247,
+   "cost": 243
+  },
+  {
+   "label": "screenStore",
+   "file": "80_hud.js",
+   "chars": 1241,
+   "seq": 62,
+   "zip": 16113,
+   "min": 76455,
+   "packed": 21289,
+   "cost": 214
+  },
+  {
+   "label": "rewards",
+   "file": "30_world.js",
+   "chars": 1838,
+   "seq": 245,
+   "zip": 16129,
+   "min": 76373,
+   "packed": 21310,
+   "cost": 198
+  },
+  {
+   "label": "physics",
+   "file": "40_physics.js",
+   "chars": 2412,
+   "seq": 262,
+   "zip": 16130,
+   "min": 76008,
+   "packed": 21307,
+   "cost": 197
+  },
+  {
+   "label": "musicTick",
+   "file": "60_audio.js",
+   "chars": 1312,
+   "seq": 26,
+   "zip": 16130,
+   "min": 76512,
+   "packed": 21307,
+   "cost": 197
+  },
+  {
+   "label": "motif",
+   "file": "70_render.js",
+   "chars": 1845,
+   "seq": 52,
+   "zip": 16146,
+   "min": 76243,
+   "packed": 21333,
+   "cost": 181
+  },
+  {
+   "label": "const BOONN",
+   "file": "00_config.js",
+   "chars": 659,
+   "seq": 296,
+   "zip": 16153,
+   "min": 77285,
+   "packed": 21341,
+   "cost": 174
+  },
+  {
+   "label": "audioInit",
+   "file": "60_audio.js",
+   "chars": 1541,
+   "seq": 174,
+   "zip": 16157,
+   "min": 76554,
+   "packed": 21349,
+   "cost": 170
+  },
+  {
+   "label": "const REG",
+   "file": "30_world.js",
+   "chars": 2330,
+   "seq": 227,
+   "zip": 16162,
+   "min": 77158,
+   "packed": 21353,
+   "cost": 165
+  },
+  {
+   "label": "drawParts",
+   "file": "70_render.js",
+   "chars": 1247,
+   "seq": 166,
+   "zip": 16175,
+   "min": 76495,
+   "packed": 21371,
+   "cost": 152
+  },
+  {
+   "label": "background",
+   "file": "70_render.js",
+   "chars": 1316,
+   "seq": 70,
+   "zip": 16176,
+   "min": 76497,
+   "packed": 21375,
+   "cost": 151
+  },
+  {
+   "label": "prismBar",
+   "file": "80_hud.js",
+   "chars": 1030,
+   "seq": 42,
+   "zip": 16176,
+   "min": 76641,
+   "packed": 21374,
+   "cost": 151
+  },
+  {
+   "label": "zoneF",
+   "file": "30_world.js",
+   "chars": 1583,
+   "seq": 19,
+   "zip": 16179,
+   "min": 76686,
+   "packed": 21371,
+   "cost": 148
+  },
+  {
+   "label": "drawItem",
+   "file": "70_render.js",
+   "chars": 1121,
+   "seq": 72,
+   "zip": 16186,
+   "min": 76688,
+   "packed": 21390,
+   "cost": 141
+  },
+  {
+   "label": "railStep",
+   "file": "40_physics.js",
+   "chars": 1184,
+   "seq": 251,
+   "zip": 16187,
+   "min": 76698,
+   "packed": 21386,
+   "cost": 140
+  },
+  {
+   "label": "drawZone",
+   "file": "70_render.js",
+   "chars": 1041,
+   "seq": 54,
+   "zip": 16202,
+   "min": 76869,
+   "packed": 21403,
+   "cost": 125
+  },
+  {
+   "label": "startRun",
+   "file": "90_game.js",
+   "chars": 1137,
+   "seq": 189,
+   "zip": 16215,
+   "min": 76728,
+   "packed": 21434,
+   "cost": 112
+  },
+  {
+   "label": "barrier",
+   "file": "30_world.js",
+   "chars": 1071,
+   "seq": 142,
+   "zip": 16219,
+   "min": 76910,
+   "packed": 21428,
+   "cost": 108
+  },
+  {
+   "label": "chamber",
+   "file": "30_world.js",
+   "chars": 1077,
+   "seq": 244,
+   "zip": 16221,
+   "min": 76839,
+   "packed": 21426,
+   "cost": 106
+  },
+  {
+   "label": "worldReset",
+   "file": "30_world.js",
+   "chars": 852,
+   "seq": 246,
+   "zip": 16222,
+   "min": 76859,
+   "packed": 21428,
+   "cost": 105
+  },
+  {
+   "label": "N",
+   "file": "60_audio.js",
+   "chars": 683,
+   "seq": 96,
+   "zip": 16230,
+   "min": 76901,
+   "packed": 21441,
+   "cost": 97
+  },
+  {
+   "label": "crushers",
+   "file": "30_world.js",
+   "chars": 1032,
+   "seq": 13,
+   "zip": 16233,
+   "min": 76922,
+   "packed": 21452,
+   "cost": 94
+  },
+  {
+   "label": "grab",
+   "file": "50_colors.js",
+   "chars": 895,
+   "seq": 130,
+   "zip": 16235,
+   "min": 76799,
+   "packed": 21457,
+   "cost": 92
+  },
+  {
+   "label": "camUpdate",
+   "file": "70_render.js",
+   "chars": 755,
+   "seq": 126,
+   "zip": 16237,
+   "min": 77133,
+   "packed": 21452,
+   "cost": 90
+  },
+  {
+   "label": "near",
+   "file": "30_world.js",
+   "chars": 1018,
+   "seq": 139,
+   "zip": 16239,
+   "min": 76887,
+   "packed": 21457,
+   "cost": 88
+  },
+  {
+   "label": "targets",
+   "file": "30_world.js",
+   "chars": 1030,
+   "seq": 12,
+   "zip": 16240,
+   "min": 76791,
+   "packed": 21463,
+   "cost": 87
+  },
+  {
+   "label": "shatter",
+   "file": "40_physics.js",
+   "chars": 1056,
+   "seq": 258,
+   "zip": 16247,
+   "min": 76849,
+   "packed": 21466,
+   "cost": 80
+  },
+  {
+   "label": "load",
+   "file": "90_game.js",
+   "chars": 678,
+   "seq": 187,
+   "zip": 16248,
+   "min": 77085,
+   "packed": 21467,
+   "cost": 79
+  },
+  {
+   "label": "startStroke",
+   "file": "50_colors.js",
+   "chars": 972,
+   "seq": 44,
+   "zip": 16250,
+   "min": 76984,
+   "packed": 21467,
+   "cost": 77
+  },
+  {
+   "label": "modal",
+   "file": "80_hud.js",
+   "chars": 690,
+   "seq": 182,
+   "zip": 16250,
+   "min": 77031,
+   "packed": 21479,
+   "cost": 77
+  },
+  {
+   "label": "hitStroke",
+   "file": "50_colors.js",
+   "chars": 673,
+   "seq": 46,
+   "zip": 16253,
+   "min": 77076,
+   "packed": 21479,
+   "cost": 74
+  },
+  {
+   "label": "audioFrame",
+   "file": "60_audio.js",
+   "chars": 757,
+   "seq": 122,
+   "zip": 16254,
+   "min": 77143,
+   "packed": 21473,
+   "cost": 73
+  },
+  {
+   "label": "drawUnicorn",
+   "file": "70_render.js",
+   "chars": 684,
+   "seq": 113,
+   "zip": 16254,
+   "min": 77076,
+   "packed": 21477,
+   "cost": 73
+  },
+  {
+   "label": "moveStroke",
+   "file": "50_colors.js",
+   "chars": 632,
+   "seq": 45,
+   "zip": 16260,
+   "min": 76994,
+   "packed": 21482,
+   "cost": 67
+  },
+  {
+   "label": "decorate",
+   "file": "30_world.js",
+   "chars": 1626,
+   "seq": 55,
+   "zip": 16261,
+   "min": 76907,
+   "packed": 21483,
+   "cost": 66
+  },
+  {
+   "label": "sndHit",
+   "file": "60_audio.js",
+   "chars": 897,
+   "seq": 97,
+   "zip": 16262,
+   "min": 77089,
+   "packed": 21482,
+   "cost": 65
+  },
+  {
+   "label": "partStep",
+   "file": "70_render.js",
+   "chars": 652,
+   "seq": 111,
+   "zip": 16262,
+   "min": 76824,
+   "packed": 21485,
+   "cost": 65
+  },
+  {
+   "label": "obStyle",
+   "file": "70_render.js",
+   "chars": 441,
+   "seq": 36,
+   "zip": 16263,
+   "min": 77230,
+   "packed": 21488,
+   "cost": 64
+  },
+  {
+   "label": "light",
+   "file": "40_physics.js",
+   "chars": 783,
+   "seq": 257,
+   "zip": 16265,
+   "min": 76992,
+   "packed": 21487,
+   "cost": 62
+  },
+  {
+   "label": "draw",
+   "file": "90_game.js",
+   "chars": 819,
+   "seq": 21,
+   "zip": 16266,
+   "min": 77187,
+   "packed": 21491,
+   "cost": 61
+  },
+  {
+   "label": "screenResults",
+   "file": "80_hud.js",
+   "chars": 437,
+   "seq": 59,
+   "zip": 16270,
+   "min": 77234,
+   "packed": 21493,
+   "cost": 57
+  },
+  {
+   "label": "shaft",
+   "file": "30_world.js",
+   "chars": 650,
+   "seq": 242,
+   "zip": 16271,
+   "min": 77090,
+   "packed": 21496,
+   "cost": 56
+  },
+  {
+   "label": "const P",
+   "file": "20_state.js",
+   "chars": 654,
+   "seq": 304,
+   "zip": 16274,
+   "min": 77099,
+   "packed": 21506,
+   "cost": 53
+  },
+  {
+   "label": "buildVault",
+   "file": "30_world.js",
+   "chars": 866,
+   "seq": 14,
+   "zip": 16275,
+   "min": 77030,
+   "packed": 21498,
+   "cost": 52
+  },
+  {
+   "label": "O",
+   "file": "60_audio.js",
+   "chars": 652,
+   "seq": 95,
+   "zip": 16275,
+   "min": 77047,
+   "packed": 21497,
+   "cost": 52
+  },
+  {
+   "label": "chainAdd",
+   "file": "50_colors.js",
+   "chars": 665,
+   "seq": 48,
+   "zip": 16278,
+   "min": 77096,
+   "packed": 21513,
+   "cost": 49
+  },
+  {
+   "label": "drawTrail",
+   "file": "70_render.js",
+   "chars": 423,
+   "seq": 168,
+   "zip": 16278,
+   "min": 77200,
+   "packed": 21512,
+   "cost": 49
+  },
+  {
+   "label": "const MSTY",
+   "file": "70_render.js",
+   "chars": 488,
+   "seq": 35,
+   "zip": 16282,
+   "min": 77427,
+   "packed": 21516,
+   "cost": 45
+  },
+  {
+   "label": "frame",
+   "file": "90_game.js",
+   "chars": 644,
+   "seq": 77,
+   "zip": 16283,
+   "min": 77310,
+   "packed": 21513,
+   "cost": 44
+  },
+  {
+   "label": "rotor",
+   "file": "30_world.js",
+   "chars": 464,
+   "seq": 243,
+   "zip": 16289,
+   "min": 77140,
+   "packed": 21520,
+   "cost": 38
+  },
+  {
+   "label": "items",
+   "file": "40_physics.js",
+   "chars": 709,
+   "seq": 254,
+   "zip": 16289,
+   "min": 77115,
+   "packed": 21527,
+   "cost": 38
+  },
+  {
+   "label": "bowl",
+   "file": "30_world.js",
+   "chars": 497,
+   "seq": 143,
+   "zip": 16290,
+   "min": 77226,
+   "packed": 21520,
+   "cost": 37
+  },
+  {
+   "label": "const COSN",
+   "file": "80_hud.js",
+   "chars": 267,
+   "seq": 112,
+   "zip": 16294,
+   "min": 77514,
+   "packed": 21521,
+   "cost": 33
+  },
+  {
+   "label": "segX",
+   "file": "10_util.js",
+   "chars": 428,
+   "seq": 293,
+   "zip": 16295,
+   "min": 77291,
+   "packed": 21527,
+   "cost": 32
+  },
+  {
+   "label": "const regPal",
+   "file": "70_render.js",
+   "chars": 764,
+   "seq": 68,
+   "zip": 16295,
+   "min": 77473,
+   "packed": 21529,
+   "cost": 32
+  },
+  {
+   "label": "tetherConstrain",
+   "file": "40_physics.js",
+   "chars": 571,
+   "seq": 253,
+   "zip": 16296,
+   "min": 77140,
+   "packed": 21528,
+   "cost": 31
+  },
+  {
+   "label": "fuse",
+   "file": "50_colors.js",
+   "chars": 357,
+   "seq": 266,
+   "zip": 16299,
+   "min": 77224,
+   "packed": 21539,
+   "cost": 28
+  },
+  {
+   "label": "screenPause",
+   "file": "80_hud.js",
+   "chars": 269,
+   "seq": 61,
+   "zip": 16299,
+   "min": 77352,
+   "packed": 21534,
+   "cost": 28
+  },
+  {
+   "label": "const BIAS",
+   "file": "30_world.js",
+   "chars": 512,
+   "seq": 228,
+   "zip": 16301,
+   "min": 77552,
+   "packed": 21546,
+   "cost": 26
+  },
+  {
+   "label": "burst",
+   "file": "70_render.js",
+   "chars": 415,
+   "seq": 107,
+   "zip": 16301,
+   "min": 77363,
+   "packed": 21539,
+   "cost": 26
+  },
+  {
+   "label": "resize",
+   "file": "85_input.js",
+   "chars": 173,
+   "seq": 22,
+   "zip": 16301,
+   "min": 77440,
+   "packed": 21537,
+   "cost": 26
+  },
+  {
+   "label": "obT",
+   "file": "30_world.js",
+   "chars": 257,
+   "seq": 99,
+   "zip": 16302,
+   "min": 77320,
+   "packed": 21534,
+   "cost": 25
+  },
+  {
+   "label": "tag",
+   "file": "30_world.js",
+   "chars": 435,
+   "seq": 56,
+   "zip": 16302,
+   "min": 77299,
+   "packed": 21544,
+   "cost": 25
+  },
+  {
+   "label": "const sgAB",
+   "file": "30_world.js",
+   "chars": 153,
+   "seq": 16,
+   "zip": 16303,
+   "min": 77528,
+   "packed": 21549,
+   "cost": 24
+  },
+  {
+   "label": "die",
+   "file": "90_game.js",
+   "chars": 282,
+   "seq": 193,
+   "zip": 16303,
+   "min": 77330,
+   "packed": 21545,
+   "cost": 24
+  },
+  {
+   "label": "rr",
+   "file": "10_util.js",
+   "chars": 191,
+   "seq": 285,
+   "zip": 16304,
+   "min": 77431,
+   "packed": 21541,
+   "cost": 23
+  },
+  {
+   "label": "const hot",
+   "file": "80_hud.js",
+   "chars": 101,
+   "seq": 180,
+   "zip": 16305,
+   "min": 77524,
+   "packed": 21546,
+   "cost": 22
+  },
+  {
+   "label": "arcSegs",
+   "file": "30_world.js",
+   "chars": 434,
+   "seq": 32,
+   "zip": 16307,
+   "min": 77354,
+   "packed": 21545,
+   "cost": 20
+  },
+  {
+   "label": "const alerp",
+   "file": "70_render.js",
+   "chars": 179,
+   "seq": 165,
+   "zip": 16307,
+   "min": 77523,
+   "packed": 21546,
+   "cost": 20
+  },
+  {
+   "label": "takeBoon",
+   "file": "90_game.js",
+   "chars": 401,
+   "seq": 192,
+   "zip": 16307,
+   "min": 77300,
+   "packed": 21548,
+   "cost": 20
+  },
+  {
+   "label": "hsh",
+   "file": "10_util.js",
+   "chars": 253,
+   "seq": 291,
+   "zip": 16308,
+   "min": 77445,
+   "packed": 21548,
+   "cost": 19
+  },
+  {
+   "label": "ptr",
+   "file": "85_input.js",
+   "chars": 131,
+   "seq": 23,
+   "zip": 16308,
+   "min": 77480,
+   "packed": 21554,
+   "cost": 19
+  },
+  {
+   "label": "fullSpectrum",
+   "file": "50_colors.js",
+   "chars": 307,
+   "seq": 129,
+   "zip": 16309,
+   "min": 77327,
+   "packed": 21548,
+   "cost": 18
+  },
+  {
+   "label": "btn",
+   "file": "80_hud.js",
+   "chars": 249,
+   "seq": 181,
+   "zip": 16309,
+   "min": 77311,
+   "packed": 21546,
+   "cost": 18
+  },
+  {
+   "label": "moving",
+   "file": "30_world.js",
+   "chars": 248,
+   "seq": 309,
+   "zip": 16310,
+   "min": 77427,
+   "packed": 21552,
+   "cost": 17
+  },
+  {
+   "label": "const BASSR",
+   "file": "60_audio.js",
+   "chars": 71,
+   "seq": 25,
+   "zip": 16310,
+   "min": 77556,
+   "packed": 21552,
+   "cost": 17
+  },
+  {
+   "label": "pegField",
+   "file": "30_world.js",
+   "chars": 546,
+   "seq": 141,
+   "zip": 16311,
+   "min": 77188,
+   "packed": 21551,
+   "cost": 16
+  },
+  {
+   "label": "pushTrail",
+   "file": "70_render.js",
+   "chars": 348,
+   "seq": 167,
+   "zip": 16311,
+   "min": 77297,
+   "packed": 21553,
+   "cost": 16
+  },
+  {
+   "label": "wallsAt",
+   "file": "30_world.js",
+   "chars": 212,
+   "seq": 249,
+   "zip": 16312,
+   "min": 77361,
+   "packed": 21552,
+   "cost": 15
+  },
+  {
+   "label": "strokeColor",
+   "file": "70_render.js",
+   "chars": 551,
+   "seq": 151,
+   "zip": 16312,
+   "min": 77280,
+   "packed": 21552,
+   "cost": 15
+  },
+  {
+   "label": "save",
+   "file": "90_game.js",
+   "chars": 155,
+   "seq": 188,
+   "zip": 16312,
+   "min": 77486,
+   "packed": 21553,
+   "cost": 15
+  },
+  {
+   "label": "ascend",
+   "file": "90_game.js",
+   "chars": 683,
+   "seq": 191,
+   "zip": 16312,
+   "min": 77258,
+   "packed": 21551,
+   "cost": 15
+  },
+  {
+   "label": "const PC",
+   "file": "00_config.js",
+   "chars": 52,
+   "seq": 269,
+   "zip": 16313,
+   "min": 77562,
+   "packed": 21553,
+   "cost": 14
+  },
+  {
+   "label": "const aff",
+   "file": "30_world.js",
+   "chars": 161,
+   "seq": 152,
+   "zip": 16313,
+   "min": 77542,
+   "packed": 21551,
+   "cost": 14
+  },
+  {
+   "label": "sndBreak",
+   "file": "60_audio.js",
+   "chars": 445,
+   "seq": 98,
+   "zip": 16313,
+   "min": 77389,
+   "packed": 21551,
+   "cost": 14
+  },
+  {
+   "label": "ARP",
+   "file": "60_audio.js",
+   "chars": 333,
+   "seq": 144,
+   "zip": 16313,
+   "min": 77438,
+   "packed": 21554,
+   "cost": 14
+  },
+  {
+   "label": "buildGate",
+   "file": "30_world.js",
+   "chars": 407,
+   "seq": 15,
+   "zip": 16314,
+   "min": 77361,
+   "packed": 21560,
+   "cost": 13
+  },
+  {
+   "label": "cursor",
+   "file": "80_hud.js",
+   "chars": 515,
+   "seq": 43,
+   "zip": 16314,
+   "min": 77396,
+   "packed": 21553,
+   "cost": 13
+  },
+  {
+   "label": "const back",
+   "file": "80_hud.js",
+   "chars": 53,
+   "seq": 183,
+   "zip": 16314,
+   "min": 77570,
+   "packed": 21558,
+   "cost": 13
+  },
+  {
+   "label": "const PI",
+   "file": "00_config.js",
+   "chars": 19,
+   "seq": 1,
+   "zip": 16315,
+   "min": 77597,
+   "packed": 21554,
+   "cost": 12
+  },
+  {
+   "label": "const BNAME",
+   "file": "00_config.js",
+   "chars": 84,
+   "seq": 295,
+   "zip": 16315,
+   "min": 77541,
+   "packed": 21554,
+   "cost": 12
+  },
+  {
+   "label": "const difAt",
+   "file": "30_world.js",
+   "chars": 81,
+   "seq": 138,
+   "zip": 16315,
+   "min": 77553,
+   "packed": 21556,
+   "cost": 12
+  },
+  {
+   "label": "clampV",
+   "file": "40_physics.js",
+   "chars": 322,
+   "seq": 9,
+   "zip": 16315,
+   "min": 77341,
+   "packed": 21554,
+   "cost": 12
+  },
+  {
+   "label": "const MOT",
+   "file": "70_render.js",
+   "chars": 268,
+   "seq": 71,
+   "zip": 16315,
+   "min": 77510,
+   "packed": 21551,
+   "cost": 12
+  },
+  {
+   "label": "const CV",
+   "file": "20_state.js",
+   "chars": 40,
+   "seq": 278,
+   "zip": 16316,
+   "min": 77576,
+   "packed": 21566,
+   "cost": 11
+  },
+  {
+   "label": "txt",
+   "file": "80_hud.js",
+   "chars": 328,
+   "seq": 132,
+   "zip": 16316,
+   "min": 77424,
+   "packed": 21556,
+   "cost": 11
+  },
+  {
+   "label": "buyEquip",
+   "file": "80_hud.js",
+   "chars": 227,
+   "seq": 184,
+   "zip": 16316,
+   "min": 77370,
+   "packed": 21558,
+   "cost": 11
+  },
+  {
+   "label": "const C",
+   "file": "20_state.js",
+   "chars": 117,
+   "seq": 306,
+   "zip": 16317,
+   "min": 77533,
+   "packed": 21566,
+   "cost": 10
+  },
+  {
+   "label": "const geoHue",
+   "file": "40_physics.js",
+   "chars": 93,
+   "seq": 261,
+   "zip": 16317,
+   "min": 77543,
+   "packed": 21556,
+   "cost": 10
+  },
+  {
+   "label": "sndGrav",
+   "file": "60_audio.js",
+   "chars": 243,
+   "seq": 160,
+   "zip": 16317,
+   "min": 77421,
+   "packed": 21558,
+   "cost": 10
+  },
+  {
+   "label": "const AR",
+   "file": "70_render.js",
+   "chars": 80,
+   "seq": 125,
+   "zip": 16317,
+   "min": 77539,
+   "packed": 21558,
+   "cost": 10
+  },
+  {
+   "label": "const regAt",
+   "file": "30_world.js",
+   "chars": 162,
+   "seq": 241,
+   "zip": 16318,
+   "min": 77539,
+   "packed": 21560,
+   "cost": 9
+  },
+  {
+   "label": "shards",
+   "file": "40_physics.js",
+   "chars": 274,
+   "seq": 260,
+   "zip": 16318,
+   "min": 77413,
+   "packed": 21558,
+   "cost": 9
+  },
+  {
+   "label": "const NOTE",
+   "file": "60_audio.js",
+   "chars": 50,
+   "seq": 172,
+   "zip": 16318,
+   "min": 77603,
+   "packed": 21559,
+   "cost": 9
+  },
+  {
+   "label": "const SCALE",
+   "file": "60_audio.js",
+   "chars": 106,
+   "seq": 116,
+   "zip": 16318,
+   "min": 77515,
+   "packed": 21560,
+   "cost": 9
+  },
+  {
+   "label": "const KICK",
+   "file": "60_audio.js",
+   "chars": 671,
+   "seq": 24,
+   "zip": 16318,
+   "min": 77561,
+   "packed": 21555,
+   "cost": 9
+  },
+  {
+   "label": "uiClick",
+   "file": "80_hud.js",
+   "chars": 491,
+   "seq": 40,
+   "zip": 16318,
+   "min": 77442,
+   "packed": 21569,
+   "cost": 9
+  },
+  {
+   "label": "physicsFrame",
+   "file": "90_game.js",
+   "chars": 149,
+   "seq": 194,
+   "zip": 16318,
+   "min": 77464,
+   "packed": 21558,
+   "cost": 9
+  },
+  {
+   "label": "const bit",
+   "file": "30_world.js",
+   "chars": 52,
+   "seq": 232,
+   "zip": 16319,
+   "min": 77572,
+   "packed": 21561,
+   "cost": 8
+  },
+  {
+   "label": "sndDeath",
+   "file": "60_audio.js",
+   "chars": 163,
+   "seq": 119,
+   "zip": 16319,
+   "min": 77450,
+   "packed": 21558,
+   "cost": 8
+  },
+  {
+   "label": "const M",
+   "file": "00_config.js",
+   "chars": 15,
+   "seq": 3,
+   "zip": 16320,
+   "min": 77584,
+   "packed": 21561,
+   "cost": 7
+  },
+  {
+   "label": "const AFF",
+   "file": "30_world.js",
+   "chars": 190,
+   "seq": 229,
+   "zip": 16320,
+   "min": 77592,
+   "packed": 21567,
+   "cost": 7
+  },
+  {
+   "label": "const _wl,_wr",
+   "file": "30_world.js",
+   "chars": 513,
+   "seq": 248,
+   "zip": 16320,
+   "min": 77601,
+   "packed": 21567,
+   "cost": 7
+  },
+  {
+   "label": "const VTX",
+   "file": "70_render.js",
+   "chars": 45,
+   "seq": 102,
+   "zip": 16320,
+   "min": 77578,
+   "packed": 21567,
+   "cost": 7
+  },
+  {
+   "label": "const pal",
+   "file": "70_render.js",
+   "chars": 46,
+   "seq": 103,
+   "zip": 16320,
+   "min": 77592,
+   "packed": 21564,
+   "cost": 7
+  },
+  {
+   "label": "pt",
+   "file": "70_render.js",
+   "chars": 161,
+   "seq": 106,
+   "zip": 16320,
+   "min": 77342,
+   "packed": 21559,
+   "cost": 7
+  },
+  {
+   "label": "const BOOST",
+   "file": "00_config.js",
+   "chars": 782,
+   "seq": 276,
+   "zip": 16321,
+   "min": 77517,
+   "packed": 21561,
+   "cost": 6
+  },
+  {
+   "label": "const item",
+   "file": "30_world.js",
+   "chars": 59,
+   "seq": 237,
+   "zip": 16321,
+   "min": 77586,
+   "packed": 21562,
+   "cost": 6
+  },
+  {
+   "label": "const BP",
+   "file": "70_render.js",
+   "chars": 31,
+   "seq": 123,
+   "zip": 16321,
+   "min": 77584,
+   "packed": 21567,
+   "cost": 6
+  },
+  {
+   "label": "const POLY",
+   "file": "70_render.js",
+   "chars": 187,
+   "seq": 34,
+   "zip": 16321,
+   "min": 77473,
+   "packed": 21561,
+   "cost": 6
+  },
+  {
+   "label": "palUpdate",
+   "file": "70_render.js",
+   "chars": 172,
+   "seq": 69,
+   "zip": 16321,
+   "min": 77452,
+   "packed": 21563,
+   "cost": 6
+  },
+  {
+   "label": "const RR",
+   "file": "80_hud.js",
+   "chars": 68,
+   "seq": 49,
+   "zip": 16321,
+   "min": 77539,
+   "packed": 21564,
+   "cost": 6
+  },
+  {
+   "label": "fuseStep",
+   "file": "40_physics.js",
+   "chars": 268,
+   "seq": 259,
+   "zip": 16322,
+   "min": 77394,
+   "packed": 21565,
+   "cost": 5
+  },
+  {
+   "label": "sndSpectrum",
+   "file": "60_audio.js",
+   "chars": 177,
+   "seq": 149,
+   "zip": 16322,
+   "min": 77462,
+   "packed": 21567,
+   "cost": 5
+  },
+  {
+   "label": "endRun",
+   "file": "90_game.js",
+   "chars": 205,
+   "seq": 190,
+   "zip": 16322,
+   "min": 77481,
+   "packed": 21567,
+   "cost": 5
+  },
+  {
+   "label": "const MAJ",
+   "file": "60_audio.js",
+   "chars": 26,
+   "seq": 145,
+   "zip": 16323,
+   "min": 77591,
+   "packed": 21575,
+   "cost": 4
+  },
+  {
+   "label": "const LIN",
+   "file": "70_render.js",
+   "chars": 82,
+   "seq": 30,
+   "zip": 16323,
+   "min": 77534,
+   "packed": 21571,
+   "cost": 4
+  },
+  {
+   "label": "const s2wx",
+   "file": "70_render.js",
+   "chars": 49,
+   "seq": 51,
+   "zip": 16323,
+   "min": 77572,
+   "packed": 21570,
+   "cost": 4
+  },
+  {
+   "label": "const owned",
+   "file": "80_hud.js",
+   "chars": 58,
+   "seq": 74,
+   "zip": 16323,
+   "min": 77576,
+   "packed": 21566,
+   "cost": 4
+  },
+  {
+   "label": "const X",
+   "file": "20_state.js",
+   "chars": 30,
+   "seq": 37,
+   "zip": 16324,
+   "min": 77483,
+   "packed": 21565,
+   "cost": 3
+  },
+  {
+   "label": "collideAll",
+   "file": "40_physics.js",
+   "chars": 292,
+   "seq": 255,
+   "zip": 16324,
+   "min": 77324,
+   "packed": 21567,
+   "cost": 3
+  },
+  {
+   "label": "const pw",
+   "file": "50_colors.js",
+   "chars": 283,
+   "seq": 265,
+   "zip": 16324,
+   "min": 77573,
+   "packed": 21564,
+   "cost": 3
+  },
+  {
+   "label": "const WAVE",
+   "file": "60_audio.js",
+   "chars": 48,
+   "seq": 173,
+   "zip": 16324,
+   "min": 77570,
+   "packed": 21568,
+   "cost": 3
+  },
+  {
+   "label": "const ok",
+   "file": "60_audio.js",
+   "chars": 126,
+   "seq": 175,
+   "zip": 16324,
+   "min": 77576,
+   "packed": 21567,
+   "cost": 3
+  },
+  {
+   "label": "sndVector",
+   "file": "60_audio.js",
+   "chars": 220,
+   "seq": 156,
+   "zip": 16324,
+   "min": 77461,
+   "packed": 21565,
+   "cost": 3
+  },
+  {
+   "label": "const FL",
+   "file": "70_render.js",
+   "chars": 49,
+   "seq": 124,
+   "zip": 16324,
+   "min": 77559,
+   "packed": 21565,
+   "cost": 3
+  },
+  {
+   "label": "const W6",
+   "file": "80_hud.js",
+   "chars": 34,
+   "seq": 115,
+   "zip": 16324,
+   "min": 77582,
+   "packed": 21568,
+   "cost": 3
+  },
+  {
+   "label": "const VH",
+   "file": "00_config.js",
+   "chars": 94,
+   "seq": 80,
+   "zip": 16325,
+   "min": 77609,
+   "packed": 21569,
+   "cost": 2
+  },
+  {
+   "label": "const ci",
+   "file": "30_world.js",
+   "chars": 398,
+   "seq": 235,
+   "zip": 16325,
+   "min": 77501,
+   "packed": 21570,
+   "cost": 2
+  },
+  {
+   "label": "const sg",
+   "file": "30_world.js",
+   "chars": 82,
+   "seq": 236,
+   "zip": 16325,
+   "min": 77498,
+   "packed": 21570,
+   "cost": 2
+  },
+  {
+   "label": "sndTether",
+   "file": "60_audio.js",
+   "chars": 245,
+   "seq": 158,
+   "zip": 16325,
+   "min": 77391,
+   "packed": 21569,
+   "cost": 2
+  },
+  {
+   "label": "const SK",
+   "file": "70_render.js",
+   "chars": 73,
+   "seq": 76,
+   "zip": 16325,
+   "min": 77528,
+   "packed": 21573,
+   "cost": 2
+  },
+  {
+   "label": "const CIR",
+   "file": "70_render.js",
+   "chars": 88,
+   "seq": 31,
+   "zip": 16325,
+   "min": 77536,
+   "packed": 21571,
+   "cost": 2
+  },
+  {
+   "label": "strokeFX",
+   "file": "70_render.js",
+   "chars": 155,
+   "seq": 109,
+   "zip": 16325,
+   "min": 77461,
+   "packed": 21572,
+   "cost": 2
+  },
+  {
+   "label": "worldUpdate",
+   "file": "30_world.js",
+   "chars": 250,
+   "seq": 247,
+   "zip": 16326,
+   "min": 77425,
+   "packed": 21568,
+   "cost": 1
+  },
+  {
+   "label": "const hitCd",
+   "file": "40_physics.js",
+   "chars": 14,
+   "seq": 8,
+   "zip": 16326,
+   "min": 77612,
+   "packed": 21579,
+   "cost": 1
+  },
+  {
+   "label": "const costMul",
+   "file": "50_colors.js",
+   "chars": 48,
+   "seq": 134,
+   "zip": 16326,
+   "min": 77579,
+   "packed": 21569,
+   "cost": 1
+  },
+  {
+   "label": "sndBoost",
+   "file": "60_audio.js",
+   "chars": 310,
+   "seq": 178,
+   "zip": 16326,
+   "min": 77423,
+   "packed": 21569,
+   "cost": 1
+  },
+  {
+   "label": "const W3",
+   "file": "80_hud.js",
+   "chars": 34,
+   "seq": 170,
+   "zip": 16326,
+   "min": 77582,
+   "packed": 21572,
+   "cost": 1
+  },
+  {
+   "label": "const UG",
+   "file": "80_hud.js",
+   "chars": 30,
+   "seq": 90,
+   "zip": 16326,
+   "min": 77586,
+   "packed": 21570,
+   "cost": 1
+  },
+  {
+   "label": "setSel",
+   "file": "85_input.js",
+   "chars": 247,
+   "seq": 185,
+   "zip": 16326,
+   "min": 77414,
+   "packed": 21568,
+   "cost": 1
+  },
+  {
+   "label": "mat",
+   "file": "30_world.js",
+   "chars": 256,
+   "seq": 308,
+   "zip": 16327,
+   "min": 77502,
+   "packed": 21571,
+   "cost": 0
+  },
+  {
+   "label": "const _zx,_zy",
+   "file": "30_world.js",
+   "chars": 248,
+   "seq": 18,
+   "zip": 16327,
+   "min": 77612,
+   "packed": 21573,
+   "cost": 0
+  },
+  {
+   "label": "const pmax",
+   "file": "50_colors.js",
+   "chars": 101,
+   "seq": 135,
+   "zip": 16327,
+   "min": 77596,
+   "packed": 21569,
+   "cost": 0
+  },
+  {
+   "label": "const HSTEP",
+   "file": "90_game.js",
+   "chars": 22,
+   "seq": 92,
+   "zip": 16327,
+   "min": 77599,
+   "packed": 21571,
+   "cost": 0
+  },
+  {
+   "label": "const hsl",
+   "file": "10_util.js",
+   "chars": 173,
+   "seq": 294,
+   "zip": 16328,
+   "min": 77536,
+   "packed": 21571,
+   "cost": -1
+  },
+  {
+   "label": "const T",
+   "file": "20_state.js",
+   "chars": 10,
+   "seq": 93,
+   "zip": 16328,
+   "min": 77580,
+   "packed": 21574,
+   "cost": -1
+  },
+  {
+   "label": "const loopAt",
+   "file": "30_world.js",
+   "chars": 52,
+   "seq": 137,
+   "zip": 16328,
+   "min": 77590,
+   "packed": 21572,
+   "cost": -1
+  },
+  {
+   "label": "sndBank",
+   "file": "60_audio.js",
+   "chars": 156,
+   "seq": 177,
+   "zip": 16328,
+   "min": 77455,
+   "packed": 21573,
+   "cost": -1
+  },
+  {
+   "label": "const btns",
+   "file": "80_hud.js",
+   "chars": 14,
+   "seq": 179,
+   "zip": 16328,
+   "min": 77614,
+   "packed": 21574,
+   "cost": -1
+  },
+  {
+   "label": "const bias",
+   "file": "30_world.js",
+   "chars": 28,
+   "seq": 231,
+   "zip": 16329,
+   "min": 77596,
+   "packed": 21577,
+   "cost": -2
+  },
+  {
+   "label": "detachRail",
+   "file": "40_physics.js",
+   "chars": 250,
+   "seq": 10,
+   "zip": 16329,
+   "min": 77476,
+   "packed": 21578,
+   "cost": -2
+  },
+  {
+   "label": "releaseTether",
+   "file": "40_physics.js",
+   "chars": 266,
+   "seq": 252,
+   "zip": 16329,
+   "min": 77452,
+   "packed": 21578,
+   "cost": -2
+  },
+  {
+   "label": "sndGate",
+   "file": "60_audio.js",
+   "chars": 119,
+   "seq": 121,
+   "zip": 16329,
+   "min": 77495,
+   "packed": 21572,
+   "cost": -2
+  },
+  {
+   "label": "const MT",
+   "file": "70_render.js",
+   "chars": 36,
+   "seq": 101,
+   "zip": 16329,
+   "min": 77579,
+   "packed": 21576,
+   "cost": -2
+  },
+  {
+   "label": "const s2wy",
+   "file": "70_render.js",
+   "chars": 49,
+   "seq": 83,
+   "zip": 16329,
+   "min": 77580,
+   "packed": 21576,
+   "cost": -2
+  },
+  {
+   "label": "const COSP",
+   "file": "80_hud.js",
+   "chars": 27,
+   "seq": 114,
+   "zip": 16329,
+   "min": 77597,
+   "packed": 21574,
+   "cost": -2
+  },
+  {
+   "label": "const W9",
+   "file": "80_hud.js",
+   "chars": 38,
+   "seq": 75,
+   "zip": 16329,
+   "min": 77598,
+   "packed": 21573,
+   "cost": -2
+  },
+  {
+   "label": "const UE",
+   "file": "80_hud.js",
+   "chars": 30,
+   "seq": 89,
+   "zip": 16329,
+   "min": 77586,
+   "packed": 21575,
+   "cost": -2
+  },
+  {
+   "label": "const now",
+   "file": "60_audio.js",
+   "chars": 33,
+   "seq": 94,
+   "zip": 16330,
+   "min": 77591,
+   "packed": 21578,
+   "cost": -3
+  },
+  {
+   "label": "sndRail",
+   "file": "60_audio.js",
+   "chars": 215,
+   "seq": 159,
+   "zip": 16330,
+   "min": 77471,
+   "packed": 21575,
+   "cost": -3
+  },
+  {
+   "label": "sndWarp",
+   "file": "60_audio.js",
+   "chars": 175,
+   "seq": 161,
+   "zip": 16330,
+   "min": 77479,
+   "packed": 21575,
+   "cost": -3
+  },
+  {
+   "label": "obVel",
+   "file": "30_world.js",
+   "chars": 155,
+   "seq": 100,
+   "zip": 16331,
+   "min": 77506,
+   "packed": 21577,
+   "cost": -4
+  },
+  {
+   "label": "sndSpring",
+   "file": "60_audio.js",
+   "chars": 212,
+   "seq": 157,
+   "zip": 16331,
+   "min": 77469,
+   "packed": 21577,
+   "cost": -4
+  },
+  {
+   "label": "warpFX",
+   "file": "70_render.js",
+   "chars": 96,
+   "seq": 108,
+   "zip": 16331,
+   "min": 77526,
+   "packed": 21580,
+   "cost": -4
+  },
+  {
+   "label": "const prevCat,prevIt",
+   "file": "80_hud.js",
+   "chars": 109,
+   "seq": 50,
+   "zip": 16331,
+   "min": 77620,
+   "packed": 21581,
+   "cost": -4
+  },
+  {
+   "label": "segT",
+   "file": "10_util.js",
+   "chars": 245,
+   "seq": 292,
+   "zip": 16332,
+   "min": 77468,
+   "packed": 21579,
+   "cost": -5
+  },
+  {
+   "label": "const regHue",
+   "file": "30_world.js",
+   "chars": 32,
+   "seq": 230,
+   "zip": 16332,
+   "min": 77595,
+   "packed": 21580,
+   "cost": -5
+  },
+  {
+   "label": "const regZone",
+   "file": "30_world.js",
+   "chars": 33,
+   "seq": 153,
+   "zip": 16332,
+   "min": 77596,
+   "packed": 21579,
+   "cost": -5
+  },
+  {
+   "label": "const dryC,dryT",
+   "file": "50_colors.js",
+   "chars": 24,
+   "seq": 264,
+   "zip": 16332,
+   "min": 77610,
+   "packed": 21578,
+   "cost": -5
+  },
+  {
+   "label": "sndCoin",
+   "file": "60_audio.js",
+   "chars": 213,
+   "seq": 162,
+   "zip": 16332,
+   "min": 77485,
+   "packed": 21580,
+   "cost": -5
+  },
+  {
+   "label": "const shX,shY",
+   "file": "70_render.js",
+   "chars": 21,
+   "seq": 104,
+   "zip": 16332,
+   "min": 77601,
+   "packed": 21581,
+   "cost": -5
+  },
+  {
+   "label": "const W,H,SC",
+   "file": "20_state.js",
+   "chars": 25,
+   "seq": 38,
+   "zip": 16333,
+   "min": 77514,
+   "packed": 21577,
+   "cost": -6
+  },
+  {
+   "label": "const pmx,pmy",
+   "file": "20_state.js",
+   "chars": 100,
+   "seq": 28,
+   "zip": 16333,
+   "min": 77603,
+   "packed": 21583,
+   "cost": -6
+  },
+  {
+   "label": "const NC",
+   "file": "40_physics.js",
+   "chars": 12,
+   "seq": 250,
+   "zip": 16333,
+   "min": 77602,
+   "packed": 21580,
+   "cost": -6
+  },
+  {
+   "label": "sndTarget",
+   "file": "60_audio.js",
+   "chars": 285,
+   "seq": 176,
+   "zip": 16333,
+   "min": 77477,
+   "packed": 21581,
+   "cost": -6
+  },
+  {
+   "label": "const UB",
+   "file": "80_hud.js",
+   "chars": 36,
+   "seq": 171,
+   "zip": 16333,
+   "min": 77580,
+   "packed": 21579,
+   "cost": -6
+  },
+  {
+   "label": "const SAVE",
+   "file": "20_state.js",
+   "chars": 148,
+   "seq": 27,
+   "zip": 16334,
+   "min": 77623,
+   "packed": 21584,
+   "cost": -7
+  },
+  {
+   "label": "solidNear",
+   "file": "30_world.js",
+   "chars": 458,
+   "seq": 6,
+   "zip": 16334,
+   "min": 77477,
+   "packed": 21583,
+   "cost": -7
+  },
+  {
+   "label": "nearChunks",
+   "file": "30_world.js",
+   "chars": 200,
+   "seq": 20,
+   "zip": 16334,
+   "min": 77485,
+   "packed": 21580,
+   "cost": -7
+  },
+  {
+   "label": "sndWell",
+   "file": "60_audio.js",
+   "chars": 110,
+   "seq": 148,
+   "zip": 16334,
+   "min": 77514,
+   "packed": 21582,
+   "cost": -7
+  },
+  {
+   "label": "const U",
+   "file": "80_hud.js",
+   "chars": 10,
+   "seq": 91,
+   "zip": 16334,
+   "min": 77501,
+   "packed": 21579,
+   "cost": -7
+  },
+  {
+   "label": "const HUE",
+   "file": "00_config.js",
+   "chars": 192,
+   "seq": 86,
+   "zip": 16335,
+   "min": 77590,
+   "packed": 21585,
+   "cost": -8
+  },
+  {
+   "label": "const Gx,Gy",
+   "file": "20_state.js",
+   "chars": 87,
+   "seq": 305,
+   "zip": 16335,
+   "min": 77582,
+   "packed": 21580,
+   "cost": -8
+  },
+  {
+   "label": "bst",
+   "file": "50_colors.js",
+   "chars": 242,
+   "seq": 133,
+   "zip": 16335,
+   "min": 77462,
+   "packed": 21579,
+   "cost": -8
+  },
+  {
+   "label": "const CATS",
+   "file": "80_hud.js",
+   "chars": 15,
+   "seq": 73,
+   "zip": 16335,
+   "min": 77612,
+   "packed": 21582,
+   "cost": -8
+  },
+  {
+   "label": "mute",
+   "file": "80_hud.js",
+   "chars": 81,
+   "seq": 57,
+   "zip": 16335,
+   "min": 77530,
+   "packed": 21583,
+   "cost": -8
+  },
+  {
+   "label": "const hstop",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 303,
+   "zip": 16336,
+   "min": 77630,
+   "packed": 21594,
+   "cost": -9
+  },
+  {
+   "label": "const mwx,mwy",
+   "file": "20_state.js",
+   "chars": 21,
+   "seq": 223,
+   "zip": 16336,
+   "min": 77603,
+   "packed": 21582,
+   "cost": -9
+  },
+  {
+   "label": "const hint",
+   "file": "20_state.js",
+   "chars": 13,
+   "seq": 225,
+   "zip": 16336,
+   "min": 77619,
+   "packed": 21588,
+   "cost": -9
+  },
+  {
+   "label": "const chainT",
+   "file": "50_colors.js",
+   "chars": 15,
+   "seq": 263,
+   "zip": 16336,
+   "min": 77619,
+   "packed": 21584,
+   "cost": -9
+  },
+  {
+   "label": "const LT",
+   "file": "70_render.js",
+   "chars": 36,
+   "seq": 29,
+   "zip": 16336,
+   "min": 77579,
+   "packed": 21581,
+   "cost": -9
+  },
+  {
+   "label": "const SMIN",
+   "file": "00_config.js",
+   "chars": 16,
+   "seq": 196,
+   "zip": 16337,
+   "min": 77604,
+   "packed": 21590,
+   "cost": -10
+  },
+  {
+   "label": "const SPENT",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 198,
+   "zip": 16337,
+   "min": 77607,
+   "packed": 21594,
+   "cost": -10
+  },
+  {
+   "label": "const LS",
+   "file": "00_config.js",
+   "chars": 102,
+   "seq": 299,
+   "zip": 16337,
+   "min": 77593,
+   "packed": 21583,
+   "cost": -10
+  },
+  {
+   "label": "sndFuse",
+   "file": "60_audio.js",
+   "chars": 88,
+   "seq": 150,
+   "zip": 16337,
+   "min": 77521,
+   "packed": 21582,
+   "cost": -10
+  },
+  {
+   "label": "sndUI",
+   "file": "60_audio.js",
+   "chars": 78,
+   "seq": 120,
+   "zip": 16337,
+   "min": 77538,
+   "packed": 21581,
+   "cost": -10
+  },
+  {
+   "label": "shock",
+   "file": "70_render.js",
+   "chars": 268,
+   "seq": 105,
+   "zip": 16337,
+   "min": 77455,
+   "packed": 21588,
+   "cost": -10
+  },
+  {
+   "label": "const COL",
+   "file": "00_config.js",
+   "chars": 16,
+   "seq": 81,
+   "zip": 16338,
+   "min": 77620,
+   "packed": 21591,
+   "cost": -11
+  },
+  {
+   "label": "const chsl",
+   "file": "10_util.js",
+   "chars": 49,
+   "seq": 277,
+   "zip": 16338,
+   "min": 77637,
+   "packed": 21594,
+   "cost": -11
+  },
+  {
+   "label": "const drawing",
+   "file": "20_state.js",
+   "chars": 19,
+   "seq": 224,
+   "zip": 16338,
+   "min": 77655,
+   "packed": 21590,
+   "cost": -11
+  },
+  {
+   "label": "const R",
+   "file": "00_config.js",
+   "chars": 92,
+   "seq": 5,
+   "zip": 16339,
+   "min": 77633,
+   "packed": 21590,
+   "cost": -12
+  },
+  {
+   "label": "const SLIM",
+   "file": "00_config.js",
+   "chars": 15,
+   "seq": 199,
+   "zip": 16339,
+   "min": 77606,
+   "packed": 21594,
+   "cost": -12
+  },
+  {
+   "label": "const rs",
+   "file": "10_util.js",
+   "chars": 54,
+   "seq": 290,
+   "zip": 16339,
+   "min": 77581,
+   "packed": 21584,
+   "cost": -12
+  },
+  {
+   "label": "const pig",
+   "file": "20_state.js",
+   "chars": 92,
+   "seq": 209,
+   "zip": 16339,
+   "min": 77621,
+   "packed": 21596,
+   "cost": -12
+  },
+  {
+   "label": "const vault",
+   "file": "30_world.js",
+   "chars": 17,
+   "seq": 233,
+   "zip": 16339,
+   "min": 77618,
+   "packed": 21588,
+   "cost": -12
+  },
+  {
+   "label": "sndPower",
+   "file": "60_audio.js",
+   "chars": 71,
+   "seq": 164,
+   "zip": 16339,
+   "min": 77551,
+   "packed": 21588,
+   "cost": -12
+  },
+  {
+   "label": "const w2sy",
+   "file": "70_render.js",
+   "chars": 49,
+   "seq": 128,
+   "zip": 16339,
+   "min": 77616,
+   "packed": 21589,
+   "cost": -12
+  },
+  {
+   "label": "const acc,last,deadT,stallSnd",
+   "file": "90_game.js",
+   "chars": 47,
+   "seq": 186,
+   "zip": 16339,
+   "min": 77606,
+   "packed": 21589,
+   "cost": -12
+  },
+  {
+   "label": "const CBIT",
+   "file": "00_config.js",
+   "chars": 38,
+   "seq": 87,
+   "zip": 16340,
+   "min": 77588,
+   "packed": 21586,
+   "cost": -13
+  },
+  {
+   "label": "const lerp",
+   "file": "10_util.js",
+   "chars": 42,
+   "seq": 301,
+   "zip": 16340,
+   "min": 77592,
+   "packed": 21593,
+   "cost": -13
+  },
+  {
+   "label": "const pick",
+   "file": "10_util.js",
+   "chars": 44,
+   "seq": 289,
+   "zip": 16340,
+   "min": 77590,
+   "packed": 21587,
+   "cost": -13
+  },
+  {
+   "label": "sndPig",
+   "file": "60_audio.js",
+   "chars": 83,
+   "seq": 147,
+   "zip": 16340,
+   "min": 77533,
+   "packed": 21585,
+   "cost": -13
+  },
+  {
+   "label": "sndRefund",
+   "file": "60_audio.js",
+   "chars": 69,
+   "seq": 163,
+   "zip": 16340,
+   "min": 77553,
+   "packed": 21590,
+   "cost": -13
+  },
+  {
+   "label": "sndStall",
+   "file": "60_audio.js",
+   "chars": 72,
+   "seq": 118,
+   "zip": 16340,
+   "min": 77544,
+   "packed": 21586,
+   "cost": -13
+  },
+  {
+   "label": "const NBOON",
+   "file": "00_config.js",
+   "chars": 32,
+   "seq": 297,
+   "zip": 16341,
+   "min": 77596,
+   "packed": 21589,
+   "cost": -14
+  },
+  {
+   "label": "const _rs",
+   "file": "10_util.js",
+   "chars": 89,
+   "seq": 283,
+   "zip": 16341,
+   "min": 77597,
+   "packed": 21595,
+   "cost": -14
+  },
+  {
+   "label": "pop",
+   "file": "70_render.js",
+   "chars": 64,
+   "seq": 110,
+   "zip": 16341,
+   "min": 77497,
+   "packed": 21591,
+   "cost": -14
+  },
+  {
+   "label": "const w2sx",
+   "file": "70_render.js",
+   "chars": 49,
+   "seq": 127,
+   "zip": 16341,
+   "min": 77616,
+   "packed": 21589,
+   "cost": -14
+  },
+  {
+   "label": "const VFAST",
+   "file": "00_config.js",
+   "chars": 19,
+   "seq": 79,
+   "zip": 16342,
+   "min": 77606,
+   "packed": 21593,
+   "cost": -15
+  },
+  {
+   "label": "const SNOM",
+   "file": "00_config.js",
+   "chars": 229,
+   "seq": 11,
+   "zip": 16342,
+   "min": 77603,
+   "packed": 21592,
+   "cost": -15
+  },
+  {
+   "label": "const PMAX",
+   "file": "00_config.js",
+   "chars": 96,
+   "seq": 201,
+   "zip": 16342,
+   "min": 77626,
+   "packed": 21597,
+   "cost": -15
+  },
+  {
+   "label": "const ALL7",
+   "file": "00_config.js",
+   "chars": 17,
+   "seq": 238,
+   "zip": 16342,
+   "min": 77603,
+   "packed": 21589,
+   "cost": -15
+  },
+  {
+   "label": "const hintT",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 226,
+   "zip": 16342,
+   "min": 77618,
+   "packed": 21590,
+   "cost": -15
+  },
+  {
+   "label": "const voices",
+   "file": "60_audio.js",
+   "chars": 15,
+   "seq": 267,
+   "zip": 16342,
+   "min": 77619,
+   "packed": 21590,
+   "cost": -15
+  },
+  {
+   "label": "sndEmpty",
+   "file": "60_audio.js",
+   "chars": 90,
+   "seq": 117,
+   "zip": 16342,
+   "min": 77533,
+   "packed": 21590,
+   "cost": -15
+  },
+  {
+   "label": "const VMAX",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 78,
+   "zip": 16343,
+   "min": 77610,
+   "packed": 21592,
+   "cost": -16
+  },
+  {
+   "label": "const SMAX",
+   "file": "00_config.js",
+   "chars": 409,
+   "seq": 195,
+   "zip": 16343,
+   "min": 77605,
+   "packed": 21592,
+   "cost": -16
+  },
+  {
+   "label": "const STALLV",
+   "file": "00_config.js",
+   "chars": 98,
+   "seq": 270,
+   "zip": 16343,
+   "min": 77605,
+   "packed": 21594,
+   "cost": -16
+  },
+  {
+   "label": "const REGD",
+   "file": "00_config.js",
+   "chars": 19,
+   "seq": 202,
+   "zip": 16343,
+   "min": 77614,
+   "packed": 21596,
+   "cost": -16
+  },
+  {
+   "label": "const bn",
+   "file": "00_config.js",
+   "chars": 34,
+   "seq": 298,
+   "zip": 16343,
+   "min": 77586,
+   "packed": 21590,
+   "cost": -16
+  },
+  {
+   "label": "const approach",
+   "file": "10_util.js",
+   "chars": 111,
+   "seq": 282,
+   "zip": 16343,
+   "min": 77590,
+   "packed": 21590,
+   "cost": -16
+  },
+  {
+   "label": "const ri",
+   "file": "10_util.js",
+   "chars": 49,
+   "seq": 287,
+   "zip": 16343,
+   "min": 77569,
+   "packed": 21593,
+   "cost": -16
+  },
+  {
+   "label": "const st",
+   "file": "20_state.js",
+   "chars": 161,
+   "seq": 39,
+   "zip": 16343,
+   "min": 77603,
+   "packed": 21590,
+   "cost": -16
+  },
+  {
+   "label": "const GRAV",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 17,
+   "zip": 16344,
+   "min": 77636,
+   "packed": 21594,
+   "cost": -17
+  },
+  {
+   "label": "const WMAX",
+   "file": "00_config.js",
+   "chars": 17,
+   "seq": 82,
+   "zip": 16344,
+   "min": 77616,
+   "packed": 21593,
+   "cost": -17
+  },
+  {
+   "label": "const CHUNKS",
+   "file": "00_config.js",
+   "chars": 97,
+   "seq": 275,
+   "zip": 16344,
+   "min": 77606,
+   "packed": 21599,
+   "cost": -17
+  },
+  {
+   "label": "const NREG",
+   "file": "00_config.js",
+   "chars": 15,
+   "seq": 203,
+   "zip": 16344,
+   "min": 77603,
+   "packed": 21592,
+   "cost": -17
+  },
+  {
+   "label": "sndCrown",
+   "file": "60_audio.js",
+   "chars": 64,
+   "seq": 146,
+   "zip": 16344,
+   "min": 77555,
+   "packed": 21591,
+   "cost": -17
+  },
+  {
+   "label": "const rp",
+   "file": "10_util.js",
+   "chars": 27,
+   "seq": 288,
+   "zip": 16345,
+   "min": 77592,
+   "packed": 21593,
+   "cost": -18
+  },
+  {
+   "label": "const _px,_py,_nx,_ny,_pd",
+   "file": "30_world.js",
+   "chars": 92,
+   "seq": 307,
+   "zip": 16345,
+   "min": 77612,
+   "packed": 21600,
+   "cost": -18
+  },
+  {
+   "label": "const TAU",
+   "file": "00_config.js",
+   "chars": 19,
+   "seq": 2,
+   "zip": 16346,
+   "min": 77618,
+   "packed": 21595,
+   "cost": -19
+  },
+  {
+   "label": "const SREACH",
+   "file": "00_config.js",
+   "chars": 19,
+   "seq": 197,
+   "zip": 16346,
+   "min": 77617,
+   "packed": 21597,
+   "cost": -19
+  },
+  {
+   "label": "const BRK_E",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 204,
+   "zip": 16346,
+   "min": 77604,
+   "packed": 21596,
+   "cost": -19
+  },
+  {
+   "label": "const flashH",
+   "file": "20_state.js",
+   "chars": 15,
+   "seq": 302,
+   "zip": 16346,
+   "min": 77639,
+   "packed": 21597,
+   "cost": -19
+  },
+  {
+   "label": "const _cx,_cy,_cvx,_cvy,_cg",
+   "file": "30_world.js",
+   "chars": 195,
+   "seq": 33,
+   "zip": 16346,
+   "min": 77624,
+   "packed": 21598,
+   "cost": -19
+  },
+  {
+   "label": "const STALLT",
+   "file": "00_config.js",
+   "chars": 19,
+   "seq": 84,
+   "zip": 16347,
+   "min": 77615,
+   "packed": 21600,
+   "cost": -20
+  },
+  {
+   "label": "const BRK_R",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 205,
+   "zip": 16347,
+   "min": 77604,
+   "packed": 21598,
+   "cost": -20
+  },
+  {
+   "label": "const BRK_CH",
+   "file": "00_config.js",
+   "chars": 19,
+   "seq": 206,
+   "zip": 16347,
+   "min": 77605,
+   "packed": 21599,
+   "cost": -20
+  },
+  {
+   "label": "const slow",
+   "file": "20_state.js",
+   "chars": 13,
+   "seq": 279,
+   "zip": 16347,
+   "min": 77623,
+   "packed": 21600,
+   "cost": -20
+  },
+  {
+   "label": "const sel",
+   "file": "20_state.js",
+   "chars": 12,
+   "seq": 210,
+   "zip": 16347,
+   "min": 77616,
+   "packed": 21602,
+   "cost": -20
+  },
+  {
+   "label": "const trail",
+   "file": "20_state.js",
+   "chars": 15,
+   "seq": 65,
+   "zip": 16347,
+   "min": 77632,
+   "packed": 21599,
+   "cost": -20
+  },
+  {
+   "label": "const rf",
+   "file": "10_util.js",
+   "chars": 40,
+   "seq": 286,
+   "zip": 16348,
+   "min": 77577,
+   "packed": 21597,
+   "cost": -21
+  },
+  {
+   "label": "const regShow",
+   "file": "20_state.js",
+   "chars": 16,
+   "seq": 218,
+   "zip": 16348,
+   "min": 77633,
+   "packed": 21604,
+   "cost": -21
+  },
+  {
+   "label": "const fullSpec",
+   "file": "20_state.js",
+   "chars": 17,
+   "seq": 213,
+   "zip": 16349,
+   "min": 77645,
+   "packed": 21607,
+   "cost": -22
+  },
+  {
+   "label": "const score",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 215,
+   "zip": 16349,
+   "min": 77654,
+   "packed": 21607,
+   "cost": -22
+  },
+  {
+   "label": "const boostT",
+   "file": "20_state.js",
+   "chars": 16,
+   "seq": 219,
+   "zip": 16349,
+   "min": 77626,
+   "packed": 21597,
+   "cost": -22
+  },
+  {
+   "label": "const abs,mn,mx,sin,cos,at2,hyp,flr,rnd",
+   "file": "00_config.js",
+   "chars": 135,
+   "seq": 4,
+   "zip": 16350,
+   "min": 77604,
+   "packed": 21603,
+   "cost": -23
+  },
+  {
+   "label": "const M_ANCH",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 272,
+   "zip": 16350,
+   "min": 77614,
+   "packed": 21602,
+   "cost": -23
+  },
+  {
+   "label": "const flash",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 281,
+   "zip": 16350,
+   "min": 77651,
+   "packed": 21605,
+   "cost": -23
+  },
+  {
+   "label": "const chainN",
+   "file": "20_state.js",
+   "chars": 15,
+   "seq": 212,
+   "zip": 16350,
+   "min": 77635,
+   "packed": 21608,
+   "cost": -23
+  },
+  {
+   "label": "const mNext,mStep",
+   "file": "60_audio.js",
+   "chars": 25,
+   "seq": 268,
+   "zip": 16350,
+   "min": 77622,
+   "packed": 21601,
+   "cost": -23
+  },
+  {
+   "label": "const STALLW",
+   "file": "00_config.js",
+   "chars": 19,
+   "seq": 85,
+   "zip": 16351,
+   "min": 77636,
+   "packed": 21603,
+   "cost": -24
+  },
+  {
+   "label": "const M_TGT",
+   "file": "00_config.js",
+   "chars": 17,
+   "seq": 274,
+   "zip": 16351,
+   "min": 77626,
+   "packed": 21607,
+   "cost": -24
+  },
+  {
+   "label": "const chain",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 211,
+   "zip": 16351,
+   "min": 77627,
+   "packed": 21601,
+   "cost": -24
+  },
+  {
+   "label": "const mult",
+   "file": "20_state.js",
+   "chars": 13,
+   "seq": 155,
+   "zip": 16351,
+   "min": 77658,
+   "packed": 21602,
+   "cost": -24
+  },
+  {
+   "label": "const M_RAIL",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 273,
+   "zip": 16352,
+   "min": 77618,
+   "packed": 21604,
+   "cost": -25
+  },
+  {
+   "label": "const clamp",
+   "file": "10_util.js",
+   "chars": 55,
+   "seq": 300,
+   "zip": 16352,
+   "min": 77671,
+   "packed": 21604,
+   "cost": -25
+  },
+  {
+   "label": "const M_PHASE",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 271,
+   "zip": 16353,
+   "min": 77627,
+   "packed": 21606,
+   "cost": -26
+  },
+  {
+   "label": "const shake",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 280,
+   "zip": 16353,
+   "min": 77651,
+   "packed": 21603,
+   "cost": -26
+  },
+  {
+   "label": "const coins",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 214,
+   "zip": 16353,
+   "min": 77627,
+   "packed": 21604,
+   "cost": -26
+  },
+  {
+   "label": "const depth",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 216,
+   "zip": 16353,
+   "min": 77624,
+   "packed": 21603,
+   "cost": -26
+  },
+  {
+   "label": "const reg",
+   "file": "20_state.js",
+   "chars": 12,
+   "seq": 217,
+   "zip": 16353,
+   "min": 77619,
+   "packed": 21607,
+   "cost": -26
+  },
+  {
+   "label": "const nodes",
+   "file": "20_state.js",
+   "chars": 15,
+   "seq": 67,
+   "zip": 16353,
+   "min": 77620,
+   "packed": 21612,
+   "cost": -26
+  },
+  {
+   "label": "const chunks",
+   "file": "20_state.js",
+   "chars": 95,
+   "seq": 221,
+   "zip": 16354,
+   "min": 77646,
+   "packed": 21604,
+   "cost": -27
+  },
+  {
+   "label": "const combo,comboT",
+   "file": "20_state.js",
+   "chars": 26,
+   "seq": 220,
+   "zip": 16355,
+   "min": 77656,
+   "packed": 21610,
+   "cost": -28
+  },
+  {
+   "label": "const M_DAMP",
+   "file": "00_config.js",
+   "chars": 17,
+   "seq": 239,
+   "zip": 16356,
+   "min": 77628,
+   "packed": 21611,
+   "cost": -29
+  },
+  {
+   "label": "const ST",
+   "file": "00_config.js",
+   "chars": 13,
+   "seq": 200,
+   "zip": 16357,
+   "min": 77666,
+   "packed": 21619,
+   "cost": -30
+  },
+  {
+   "label": "const M_BUMP",
+   "file": "00_config.js",
+   "chars": 96,
+   "seq": 7,
+   "zip": 16357,
+   "min": 77718,
+   "packed": 21618,
+   "cost": -30
+  },
+  {
+   "label": "const pops",
+   "file": "20_state.js",
+   "chars": 14,
+   "seq": 66,
+   "zip": 16359,
+   "min": 77614,
+   "packed": 21616,
+   "cost": -32
+  },
+  {
+   "label": "const bL,bR,bW,bX,bB,bD",
+   "file": "30_world.js",
+   "chars": 280,
+   "seq": 234,
+   "zip": 16359,
+   "min": 77563,
+   "packed": 21612,
+   "cost": -32
+  },
+  {
+   "label": "const M_BREAK",
+   "file": "00_config.js",
+   "chars": 18,
+   "seq": 240,
+   "zip": 16360,
+   "min": 77657,
+   "packed": 21613,
+   "cost": -33
+  },
+  {
+   "label": "const parts",
+   "file": "20_state.js",
+   "chars": 15,
+   "seq": 64,
+   "zip": 16360,
+   "min": 77626,
+   "packed": 21617,
+   "cost": -33
+  },
+  {
+   "label": "const nextY,prevL,prevR,cIdx,seed",
+   "file": "30_world.js",
+   "chars": 61,
+   "seq": 154,
+   "zip": 16360,
+   "min": 77627,
+   "packed": 21614,
+   "cost": -33
+  },
+  {
+   "label": "const strokes",
+   "file": "20_state.js",
+   "chars": 17,
+   "seq": 63,
+   "zip": 16361,
+   "min": 77662,
+   "packed": 21619,
+   "cost": -34
+  },
+  {
+   "label": "const shocks",
+   "file": "20_state.js",
+   "chars": 16,
+   "seq": 222,
+   "zip": 16366,
+   "min": 77634,
+   "packed": 21624,
+   "cost": -39
+  },
+  {
+   "label": "srnd",
+   "file": "10_util.js",
+   "chars": 35,
+   "seq": 284,
+   "zip": 16369,
+   "min": 77575,
+   "packed": 21625,
+   "cost": -42
+  },
+  {
+   "label": "const I_COIN,I_CROWN,I_PIG,I_WELL,I_BOOST",
+   "file": "00_config.js",
+   "chars": 145,
+   "seq": 208,
+   "zip": 16395,
+   "min": 77802,
+   "packed": 21660,
+   "cost": -68
+  },
+  {
+   "label": "const Z_UP,Z_WELL,Z_WIND,Z_INV,Z_FLOW,Z_RUSH",
+   "file": "00_config.js",
+   "chars": 572,
+   "seq": 207,
+   "zip": 16398,
+   "min": 77651,
+   "packed": 21661,
+   "cost": -71
+  },
+  {
+   "label": "const AC,mg,sfxG,musG,lpF,nzBuf,railG,railO,railF",
+   "file": "60_audio.js",
+   "chars": 63,
+   "seq": 131,
+   "zip": 16400,
+   "min": 77672,
+   "packed": 21670,
+   "cost": -73
+  }
+ ]
+}

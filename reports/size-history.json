@@ -644,5 +644,31 @@
   "note": "searched mangle alphabet",
   "delta": -229,
   "left": -2940
+ },
+ {
+  "date": "2026-08-28 13:54",
+  "quick": false,
+  "zip": 16265,
+  "min": 77275,
+  "raw": 120456,
+  "rr": 21497,
+  "tag": "roadroller",
+  "deep": true,
+  "note": "deep model re-search after mangle+flags",
+  "delta": 13,
+  "left": -2953
+ },
+ {
+  "date": "2026-08-28 13:56",
+  "quick": false,
+  "zip": 16252,
+  "min": 77275,
+  "raw": 120456,
+  "rr": 21483,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -13,
+  "left": -2940
  }
 ]
