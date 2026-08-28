@@ -26,7 +26,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 // no prefix.
 export const ORDER = [
   'config', 'state', 'colors', 'physics', 'world',
-  'render', 'util', 'audio', 'hud', 'game', 'input',
+  'audio', 'util', 'render', 'hud', 'game', 'input',
 ];
 
 // Platform glue is compiled into the Wavedash build only. The competition

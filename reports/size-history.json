@@ -1281,5 +1281,31 @@
   "note": "",
   "delta": -17,
   "left": -901
+ },
+ {
+  "date": "2026-08-28 20:31",
+  "quick": false,
+  "zip": 14178,
+  "min": 67664,
+  "raw": 115189,
+  "rr": 18725,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -35,
+  "left": -866
+ },
+ {
+  "date": "2026-08-28 20:33",
+  "quick": false,
+  "zip": 14178,
+  "min": 67664,
+  "raw": 115189,
+  "rr": 18725,
+  "tag": "roadroller",
+  "deep": true,
+  "note": "final compressor pass",
+  "delta": 0,
+  "left": -866
  }
 ]
