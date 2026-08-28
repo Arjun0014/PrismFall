@@ -120,7 +120,7 @@ async function runBrowser(name, launcher) {
   // tests/wavedash.mjs owns its coverage. What this build must still do is
   // persist the four fields it keeps, and not choke on a ten-field record
   // written by the Wavedash build against the same key.
-  await page.evaluate(() => { try { localStorage.pf26_save = '4242,3300,0,1,9000,0,1,2,1,0'; } catch (e) {} });
+  await page.evaluate(() => { try { localStorage.pf26_save = '4242,3300,0,9000,0,1,2,1,0'; } catch (e) {} });
   await page.reload();
   await page.waitForTimeout(700);
   const best = await page.evaluate(() => {
@@ -140,7 +140,7 @@ async function runBrowser(name, launcher) {
   await page.mouse.click(w / 2, h / 2 + 104 * Math.min(w / 1280, h / 720));
   await page.waitForTimeout(400);
   const saved = await page.evaluate(() => { try { return localStorage.pf26_save; } catch (e) { return ''; } });
-  ok(/^\d+(,-?\d+){3}$/.test(saved), 'competition build writes a four-field save (' + saved + ')');
+  ok(/^\d+(,-?\d+){2}$/.test(saved), 'competition build writes a three-field save (' + saved + ')');
   await page.keyboard.press('Enter');
   await page.waitForTimeout(400);
 

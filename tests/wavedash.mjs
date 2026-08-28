@@ -105,7 +105,7 @@ for (const withSdk of [0, 1]) {
   page.on('pageerror', (e) => errs.push(e.message));
   await page.goto('http://localhost:8117/');
   await page.waitForTimeout(600);
-  await page.evaluate(() => { try { localStorage.pf26_save = '500,4000,0,1,9000,0,0,0,0,0'; } catch (e) {} });
+  await page.evaluate(() => { try { localStorage.pf26_save = '500,4000,0,9000,0,0,0,0,0'; } catch (e) {} });
   await page.reload();
   await page.waitForTimeout(900);
   console.log('\n=== wavedash store ===');
@@ -118,8 +118,8 @@ for (const withSdk of [0, 1]) {
   }
   const saved = await page.evaluate(() => { try { return localStorage.pf26_save; } catch (e) { return ''; } });
   ok(/^\d+(,-?\d+)+$/.test(saved), 'store writes a well-formed save (' + saved + ')');
-  ok(saved.split(',').length > 9, 'the record carries the store fields (' + saved + ')');
-  ok(saved.split(',').slice(6).some((v) => +v > 0), 'purchases actually equip (' + saved + ')');
+  ok(saved.split(',').length > 8, 'the record carries the store fields (' + saved + ')');
+  ok(saved.split(',').slice(5).some((v) => +v > 0), 'purchases actually equip (' + saved + ')');
   ok(errs.length === 0, 'no console errors in the store', errs.join(' | '));
   await page.close();
 }

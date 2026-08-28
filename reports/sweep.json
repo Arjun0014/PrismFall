@@ -1,21 +1,209 @@
 {
- "base": 14707,
+ "base": 14312,
  "rows": [
   {
+   "label": "BG   whole background (gradient stays)",
+   "save": 264
+  },
+  {
+   "label": "LOW  world filler",
+   "save": 108
+  },
+  {
+   "label": "LOW  archetype: crushers",
+   "save": 103
+  },
+  {
+   "label": "LOW  archetype: bowl",
+   "save": 102
+  },
+  {
+   "label": "VFX  score pops",
+   "save": 100
+  },
+  {
+   "label": "SFX  sndHit silent",
+   "save": 94
+  },
+  {
+   "label": "VFX  the trail",
+   "save": 74
+  },
+  {
    "label": "RWD  coin arc",
-   "save": 78
+   "save": 68
   },
   {
    "label": "RWD  destruction cache",
+   "save": 59
+  },
+  {
+   "label": "LOW  archetype: rotor",
    "save": 56
   },
   {
-   "label": "RWD  mid booster",
+   "label": "LOW  onboarding hints",
+   "save": 53
+  },
+  {
+   "label": "VFX  debris fragments (k=4)",
+   "save": 52
+  },
+  {
+   "label": "LOW  archetype: pegField",
+   "save": 49
+  },
+  {
+   "label": "VFX  shockwaves",
+   "save": 40
+  },
+  {
+   "label": "MUS  bass",
+   "save": 39
+  },
+  {
+   "label": "LOW  region gates",
+   "save": 37
+  },
+  {
+   "label": "MUS  kick",
+   "save": 36
+  },
+  {
+   "label": "SFX  sndSpectrum silent",
+   "save": 33
+  },
+  {
+   "label": "SFX  sndBreak silent",
+   "save": 32
+  },
+  {
+   "label": "MUS  pad (the chord that makes a region a place)",
+   "save": 31
+  },
+  {
+   "label": "MUS  lead",
+   "save": 30
+  },
+  {
+   "label": "VFX  strokeFX",
+   "save": 29
+  },
+  {
+   "label": "SFX  sndGrav silent",
+   "save": 27
+  },
+  {
+   "label": "SFX  sndSpring silent",
+   "save": 27
+  },
+  {
+   "label": "SFX  sndDeath silent",
+   "save": 27
+  },
+  {
+   "label": "SFX  sndTether silent",
+   "save": 26
+  },
+  {
+   "label": "SFX  sndVector silent",
+   "save": 26
+  },
+  {
+   "label": "SFX  sndBoost silent",
+   "save": 23
+  },
+  {
+   "label": "SFX  sndWarp silent",
+   "save": 22
+  },
+  {
+   "label": "SFX  sndBank reuses sndCrown",
+   "save": 21
+  },
+  {
+   "label": "VFX  warpFX",
+   "save": 21
+  },
+  {
+   "label": "SFX  sndCoin silent",
+   "save": 17
+  },
+  {
+   "label": "MUS  hats",
    "save": 15
   },
   {
+   "label": "MUS  snare",
+   "save": 13
+  },
+  {
+   "label": "VFX  ring particles (k=2)",
+   "save": 12
+  },
+  {
+   "label": "SFX  sndStall reuses sndUI",
+   "save": 9
+  },
+  {
+   "label": "SFX  sndPower reuses sndBank",
+   "save": 8
+  },
+  {
    "label": "RWD  upward temptation",
-   "save": 14
+   "save": 8
+  },
+  {
+   "label": "RWD  mid booster",
+   "save": 4
+  },
+  {
+   "label": "SFX  sndCrown reuses sndBank",
+   "save": 3
+  },
+  {
+   "label": "SFX  sndFuse reuses sndUI",
+   "save": 0
+  },
+  {
+   "label": "SFX  sndRefund reuses sndCoin",
+   "save": 0
+  },
+  {
+   "label": "SFX  sndEmpty reuses sndUI",
+   "save": 0
+  },
+  {
+   "label": "SFX  sndTarget reuses sndCoin",
+   "save": 0
+  },
+  {
+   "label": "SFX  sndPig reuses sndCoin",
+   "save": 0
+  },
+  {
+   "label": "SFX  sndGate reuses sndBank",
+   "save": 0
+  },
+  {
+   "label": "BG   motif: clouds (prim 0)",
+   "err": "not found in render.js:   if (!k[0]) {"
+  },
+  {
+   "label": "BG   motif: rings+spokes (prim 2)",
+   "err": "not found in render.js:   } else {\n    const span = a2 < 0 ? 2.4 : TAU, n "
+  },
+  {
+   "label": "LOW  focus vaults",
+   "err": "no function buildVault in world.js"
+  },
+  {
+   "label": "SFX  sndWell reuses sndBank",
+   "save": -2
+  },
+  {
+   "label": "BG   both parallax layers -> one",
+   "save": -5
   }
  ]
 }

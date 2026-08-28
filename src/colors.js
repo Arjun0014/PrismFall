@@ -30,7 +30,6 @@ function startStroke() {
   if (pig[sel] <= .5) { dryC = sel; dryT = .5; sndEmpty(); return; }
   const dx = mwx - P.x, dy = mwy - P.y, k = mn(1, SREACH / (hyp(dx, dy) || 1));
   const sx = P.x + dx * k, sy = P.y + dy * k;
-  if (!hint) { hint = 1; hintT = 0; }
   // n is the number of times the stroke may fire before it is spent; l is only
   // a fade timer, and only ticks once it has been. A drawing you never use
   // stays on the field for the whole run.

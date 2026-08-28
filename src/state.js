@@ -64,8 +64,8 @@ let nodes = [];    // prism-node sparkles from stroke fusion
 let shocks = [];   // expanding shockwave rings from shatters and big hits
 
 // -- persistent -------------------------------------------------------------
-const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
-// b best score, d best depth, m muted, t tutorial seen -- both builds.
+const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0 };
+// b best score, d best depth, m muted -- both builds.
 // c banked coins, o owned cosmetics bitmask, e equipped [body, horn, trail,
 // impact] -- the Wavedash build only. The 13K competition build has no store,
 // so every one of those is left at 0 and every site that reads one is behind
@@ -77,5 +77,3 @@ const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };
 let pmx = 0, pmy = 0;           // pointer in screen px
 let mwx = 0, mwy = 0;         // pointer in world units
 let drawing = null;           // stroke being drawn
-let hint = 0;                 // onboarding step
-let hintT = 0;

@@ -10,7 +10,6 @@ function setSel(i) {
   sel = i;
   sndUI(1);
   burst(P.x, P.y, 6, 0, 130, HUE[i]);
-  if (hint === 1) { hint = 2; hintT = 0; }
 }
 
 document.body.style.cssText = 'margin:0;overflow:hidden;background:#05030c';

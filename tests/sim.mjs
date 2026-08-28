@@ -426,7 +426,7 @@ console.log('\n=== persistence ===');
   // Coins are in-run feedback in the competition build -- there is nothing to
   // spend them on, so nothing banks them. Best score and depth still persist.
   ok(A.SAVE.b === 1234 && A.SAVE.d === 5000, 'best score and depth persist', A.SAVE.b + '/' + A.SAVE.d);
-  ok(H.store.pf26_save.split(',').length === 4, 'the competition record is four fields', H.store.pf26_save);
+  ok(H.store.pf26_save.split(',').length === 3, 'the competition record is three fields', H.store.pf26_save);
   // Reload path.
   A.__eval('SAVE.b=0;SAVE.d=0;load()');
   ok(A.SAVE.b === 1234 && A.SAVE.d === 5000, 'values survive a reload', A.SAVE.b + '/' + A.SAVE.d);

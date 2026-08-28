@@ -91,11 +91,9 @@ function hud() {
   if (regShow > 0)
     txt(REG[reg][0], W / 2, H * .3, 42,
       'hsl(0 0% 100% / ' + clamp(regShow, 0, 1) * clamp(3.2 - regShow, 0, 1) + ')', 1);
-  if (!SAVE.t) {
-    const t = ['DRAG TO DRAW A RAINBOW RAIL', 'PRESS 1-7 OR SCROLL TO CHANGE COLOUR',
-      'PIGMENT IS FINITE - GRAB SHARDS'][hint];
-    if (t) txt(t, W / 2, H - 118 * U, 15, W6, 1);
-  }
+  // The in-run hints are gone from the 13K build. The title screen teaches the
+  // same three things -- drag to draw, the colour keys, pigment is finite --
+  // and it teaches them before the first frame instead of during it.
 }
 
 // Seven reservoirs: fill = pigment left, ring = selection, dot = chain state.
@@ -168,9 +166,9 @@ function screenTitle() {
     'DRAG near the unicorn - drawings STAY until used - longer = stronger',
     'R push - O aim - Y spring - G tether - B rail - I gravity - V warp',
     0,   // the mixing line, painted below through the whole spectrum
-    // '1-7 or SCROLL picks a colour' was here too and is now cut: the in-run
-    // hint teaches it. 'X lets go' stays because nothing else in the game does.
-    'X lets go',
+    // Back to the full line now that the in-run hints are gone: this is the
+    // only place left that teaches either half of it.
+    'X lets go - 1-7 or SCROLL picks a colour',
   ].forEach((l, i) => l && txt(l, W / 2, H - 122 * U + i * 19 * U, 13,
     i === 1 ? W6 : i > 2 ? W3 : W9, !i));
   // Mixing is the deepest rule in the game -- two crossing strokes fuse and the

@@ -13,16 +13,15 @@ const HSTEP = 1 / 120;
 function load() {
   try {
     const a = (localStorage[LS] || '').split(',').map(Number);
-    if (a.length < 4 || a.some(isNaN)) return;
+    if (a.length < 3 || a.some(isNaN)) return;
     SAVE.b = clamp(a[0] | 0, 0, 1e12);
     SAVE.d = clamp(a[1] | 0, 0, 1e12);
     SAVE.m = a[2] ? 1 : 0;
-    SAVE.t = a[3] ? 1 : 0;
-    if (WD && a.length > 9) {
-      SAVE.c = clamp(a[4] | 0, 0, 1e9);
-      SAVE.o = a[5] | 0;
+    if (WD && a.length > 8) {
+      SAVE.c = clamp(a[3] | 0, 0, 1e9);
+      SAVE.o = a[4] | 0;
       for (let i = 0; i < CATS; i++) {
-        const v = a[6 + i] | 0;
+        const v = a[5 + i] | 0;
         SAVE.e[i] = v > 0 && v < 3 && owned(i, v) ? v : 0;
       }
     }
@@ -30,7 +29,7 @@ function load() {
 }
 function save() {
   try {
-    const a = [SAVE.b, SAVE.d, SAVE.m, SAVE.t];
+    const a = [SAVE.b, SAVE.d, SAVE.m];
     if (WD) a.push(SAVE.c, SAVE.o, ...SAVE.e);
     localStorage[LS] = a.join();
   } catch (err) { /* ignore */ }
@@ -56,7 +55,6 @@ function startRun(sd) {
   // from whatever PRNG state the previous run happened to leave behind and a
   // seeded replay is not actually reproducible.
   P.vx = rf(-70, 70);
-  hint = SAVE.t ? 3 : 0; hintT = 0;
   mStep = 0; if (AC) mNext = AC.currentTime + .05;
   sndRail(0);
 }
@@ -65,7 +63,6 @@ function endRun() {
   if (WD) SAVE.c += coins;
   SAVE.b = mx(SAVE.b, score | 0);
   SAVE.d = mx(SAVE.d, depth | 0);
-  if (!SAVE.t) { SAVE.t = 1; }
   save();
   sndRail(0);
   if (WD) wdSubmit(score | 0, depth | 0);
@@ -148,12 +145,6 @@ function update(dt) {
 
   partStep(dt);
   if (P.al) pushTrail();
-
-  // onboarding
-  if (!SAVE.t) {
-    hintT += dt;
-    if (hint === 2 && hintT > 9) { hint = 3; SAVE.t = 1; save(); }
-  }
 }
 
 function physicsFrame(dt) {
