@@ -1116,12 +1116,12 @@
         const J = F === void 0 ? HF[II] : F, K = D === 1 ? BH.e[3] : D;
         for (let D = 0; D < C; D++) {
             const C = RL(0, NG), D = RL(.3, 1) * G;
-            ZY(Y, B, (I || 0) + TG(C) * D, (H || 0) + VG(C) * D, RL(.18, .55), J + RL(-18, 18), K, RL(1.4, 3.6));
+            ZY(Y, B, (I || 0) + TG(C) * D, (H || 0) + VG(C) * D, RL(.16, .5), J + RL(-18, 18), K, RL(1.4, 3.6));
         }
     }
     function BB(Y, B) {
         ZY(Y, B, 0, 0, .4, HF[6], 2, 8);
-        YB(Y, B, 12, 0, 320, HF[6]);
+        YB(Y, B, 12, 0, 300, HF[6]);
     }
     function CB(Y, B, C) {
         for (let D = 0; D < 7; D++) {
@@ -1147,7 +1147,7 @@
                 C.x += C.vx * Y;
                 C.y += C.vy * Y;
                 if (C.k !== 2) {
-                    C.vy += 400 * Y;
+                    C.vy += 420 * Y;
                     C.vx *= .985;
                     C.vy *= .985;
                 }
@@ -1157,11 +1157,11 @@
         for (let B = YH.length; B--; ) {
             const C = YH[B];
             C.r += (C.R - C.r) * WG(1, 9 * Y);
-            (C.t -= Y * 2.2) <= 0 && YH.splice(B, 1);
+            (C.t -= Y * 2.4) <= 0 && YH.splice(B, 1);
         }
         for (let B = AI.length; B--; ) {
             const C = AI[B];
-            C.y -= 46 * Y;
+            C.y -= 48 * Y;
             (C.l -= Y) <= 0 && AI.splice(B, 1);
         }
         for (let B = ZI.length; B--; ) {
@@ -1170,14 +1170,14 @@
     }
     function FB(Y) {
         const B = IJ;
-        GI.x = TL(GI.x, B ? B.cx : BI.x + SL(BI.vx * .12, -180, 180), B ? 3.5 : 7.5, Y);
-        GI.y = TL(GI.y, B ? B.cy : BI.y + SL(BI.vy * .24, -117.8, 155), B ? 3.5 : 7.5, Y);
-        GI.z = TL(GI.z, B ? .82 : 1 / (1 + BI.sp / 5200), 4, Y);
-        TF = WG(VF / 620, SF / 846) * GI.z;
-        const C = SG(0, 611 - SF / 2 / TF);
+        GI.x = TL(GI.x, B ? B.cx : BI.x + SL(BI.vx * .12, -180, 180), B ? 3.2 : 7.5, Y);
+        GI.y = TL(GI.y, B ? B.cy : BI.y + SL(BI.vy * .22, -124, 136.4), B ? 3.2 : 7.5, Y);
+        GI.z = TL(GI.z, B ? .8 : 1 / (1 + BI.sp / 5200), 4, Y);
+        TF = WG(VF / 620, SF / 848) * GI.z;
+        const C = SG(0, 605 - SF / 2 / TF);
         GI.x = SL(GI.x, -C, C);
         XF = SG(0, XF - XF * 7 * Y - 4 * Y);
-        const D = WG(XF, 24);
+        const D = WG(XF, 26);
         RK = RL(-D, D);
         QK = RL(-D, D);
     }
@@ -1196,14 +1196,14 @@
         const B = DM[PI];
         WF.lineWidth = SG(1, 2.4 * TF);
         for (let Y = 0; Y < 2; Y++) {
-            const C = Y ? .4 : .16, D = Y ? 330 : 560, G = Y ? .085 : .045, F = GI.x * C, I = GI.y * C, H = SF / 2 / TF, J = VF / 2 / TF, K = QG((F + H) / D), M = QG((I + J) / D);
+            const C = Y ? .4 : .16, D = Y ? 300 : 500, G = Y ? .09 : .05, F = GI.x * C, I = GI.y * C, H = SF / 2 / TF, J = VF / 2 / TF, K = QG((F + H) / D), M = QG((I + J) / D);
             for (let Y = QG((I - J) / D); Y <= M; Y++) {
                 for (let C = QG((F - H) / D); C <= K; C++) {
-                    const H = WD(C * 31 + B[0], Y * 17);
+                    const H = WD(C * 30 + B[0], Y * 17);
                     if (H < .5) {
                         continue;
                     }
-                    const J = (C + .15 + WD(C, Y) * .7) * D, K = (Y + .15 + WD(Y, C + 9) * .7) * D, M = UK[6] + 60 * (H - .5) | 0;
+                    const J = (C + .16 + WD(C, Y) * .7) * D, K = (Y + .16 + WD(Y, C + 9) * .7) * D, M = UK[6] + 60 * (H - .5) | 0;
                     WF.fillStyle = YN(M, 60, UK[7] | 0, G);
                     WF.strokeStyle = YN(M, 70, UK[7] | 0, G * 2);
                     JB(B, SF / 2 + (J - F) * TF, VF / 2 + (K - I) * TF, D * (.16 + H * .3) * TF, H);
@@ -1217,7 +1217,7 @@
         if (Y[0]) {
             if (Y[0] < 2) {
                 for (let Y = 0; Y < F; Y++) {
-                    const H = Y / F * NG + G * 4, J = D * (I < 0 ? .6 + WD(Y, G * 99) * .5 : Y & 1 ? I / 10 : 1);
+                    const H = Y / F * NG + G * 4, J = D * (I < 0 ? .6 + WD(Y, G * 90) * .5 : Y & 1 ? I / 10 : 1);
                     TK(Y, B + TG(H) * J, C + VG(H) * J);
                 }
                 WF.closePath();
@@ -1226,7 +1226,7 @@
                 const Y = I < 0 ? 2.4 : NG, H = PG(I);
                 for (let I = 1; I <= F; I++) {
                     KK();
-                    NK(B, C, D * (1 - I * .22), G * NG, G * NG + Y);
+                    NK(B, C, D * (1 - I * .2), G * NG, G * NG + Y);
                     WF.stroke();
                 }
                 KK();
@@ -1238,27 +1238,27 @@
                 WF.stroke();
             }
         } else {
-            const Y = 4 + (G * 4 | 0), F = C + .34 * (D *= .58);
+            const Y = 4 + (G * 4 | 0), F = C + .3 * (D *= .6);
             for (let C = 0; C < Y; C++) {
-                const I = C / (Y - 1) - .5, H = D * (.3 + .34 * TG(I * 2.6) + WD(C * 7, G * 400) * .16), J = B + I * D * 1.7, K = F - H * (.72 + WD(C, G * 90) * .5);
+                const I = C / (Y - 1) - .5, H = D * (.3 + .3 * TG(I * 2.4) + WD(C * 7, G * 420) * .16), J = B + I * D * 1.6, K = F - H * (.8 + WD(C, G * 90) * .5);
                 OK(J + H, K);
                 NK(J, K, H);
             }
             OK(B - D * .95, F);
-            WF.roundRect(B - D * .95, F - D * .34, D * 1.9, D * .34, D * .17);
+            WF.roundRect(B - D * .95, F - D * .3, D * 1.9, D * .3, D * .16);
             WF.fill();
         }
     }
     function KB(Y) {
         const B = Y.m, C = B & KF ? Y.lt ? 6 : 5 : B & 2 ? 0 : B & 4 ? 1 : B & 8 ? 2 : B & 32 ? 3 : B & 16 ? 4 : -1;
         if (C < 0) {
-            return B & 1 ? [ YN(UK[6] + 30 | 0, 92, 48), YN(UK[6] + 40 | 0, 100, 80) ] : [ YN(UK[6] | 0, 52, 19), YN(UK[6] | 0, 84, SG(58, UK[7]) | 0) ];
+            return B & 1 ? [ YN(UK[6] + 30 | 0, 90, 48), YN(UK[6] + 40 | 0, 100, 80) ] : [ YN(UK[6] | 0, 48, 19), YN(UK[6] | 0, 90, SG(58, UK[7]) | 0) ];
         }
         const D = GM[C];
         return [ YN(D[0], D[1], D[2]), YN(D[0], D[3], D[4]) ];
     }
     function MB() {
-        const Y = YM(0) - 200, B = YM(VF) + 200, C = SG(2, 13 * TF), D = SG(1, 5 * TF), G = YN(UK[6] | 0, 34, SG(4, UK[2] * .42) | 0);
+        const Y = YM(0) - 200, B = YM(VF) + 200, C = SG(2, 13 * TF), D = SG(1, 5 * TF), G = YN(UK[6] | 0, 30, SG(4, UK[2] * .42) | 0);
         WF.lineCap = "round";
         for (const F of UI) {
             if (F.y + F.h < Y || F.y > B) {
@@ -1297,11 +1297,11 @@
                         MK(SG(1, 2 * TF), "hsl(48 100% 80% / .85)");
                         WF.setLineDash([]);
                     }
-                    I && MK(SG(1, (2 + I * 5) * TF), YN(UK[6] + 30 | 0, 100, 85, I));
+                    I && MK(SG(1, (2 + I * 5) * TF), YN(UK[6] + 30 | 0, 100, 90, I));
                 } else {
-                    SK(G, F, Y.r * TF, B[0], B[1], SG(1, (2.5 + I * 4) * TF));
-                    Y.m & 1 && SK(G, F, Y.r * TF * .55, 0, B[1], SG(1, 1.6 * TF));
-                    I && SK(G, F, (Y.r + 6 + I * 22) * TF, 0, YN(UK[6] + 30 | 0, 100, 80, I), SG(1, 2 * TF));
+                    SK(G, F, Y.r * TF, B[0], B[1], SG(1, (2.4 + I * 4) * TF));
+                    Y.m & 1 && SK(G, F, Y.r * TF * .5, 0, B[1], SG(1, 1.6 * TF));
+                    I && SK(G, F, (Y.r + 6 + I * 20) * TF, 0, YN(UK[6] + 30 | 0, 100, 80, I), SG(1, 2 * TF));
                 }
                 if (I || H) {
                     WF.globalAlpha = 1;
@@ -1310,7 +1310,7 @@
             }
             for (const Y of F.bk) {
                 if (Y.l) {
-                    const B = XK(Y.x), C = AK(Y.y) - 46 * TF;
+                    const B = XK(Y.x), C = AK(Y.y) - 48 * TF;
                     for (let D = 0; D < Y.n; D++) {
                         SK(B + 13 * (D - (Y.n - 1) / 2) * TF, C, 4 * TF, D < Y.l ? "hsl(48 100% 68%)" : "hsl(48 30% 32%)");
                     }
@@ -1326,9 +1326,9 @@
         if (C <= 0) {
             return;
         }
-        const D = Y.z, G = D === 1 ? 190 : D === 2 ? 288 : D === 3 ? 24 : D === 4 ? 262 : D === 5 ? 150 : 186, F = RF * (D === 3 ? 60 : D === 6 ? 320 : 200) * (D === 1 || D === 4 ? -1 : 1);
+        const D = Y.z, G = D === 1 ? 190 : D === 2 ? 288 : D === 3 ? 24 : D === 4 ? 262 : D === 5 ? 150 : 186, F = RF * (D === 3 ? 60 : D === 6 ? 300 : 200) * (D === 1 || D === 4 ? -1 : 1);
         WF.lineCap = "round";
-        for (let D = 0; D < 24; D++) {
+        for (let D = 0; D < 26; D++) {
             const I = WD(D * 13, Y.y | 0), H = VL(Y.l + 30, Y.r - 30, WD(D, 7)), J = B + ((I * C + F) % C + C) % C;
             QY(Y, H, J);
             const K = RG(HK, JK);
@@ -1336,21 +1336,21 @@
                 continue;
             }
             const M = WG(64, K * .05);
-            WK(XK(H), AK(J), XK(H + HK / K * M), AK(J + JK / K * M), SG(1, 2.2 * TF), YN(G, 90, 72, .16 + I * .18));
+            WK(XK(H), AK(J), XK(H + HK / K * M), AK(J + JK / K * M), SG(1, 2.4 * TF), YN(G, 90, 70, .16 + I * .16));
         }
     }
     function NB(Y) {
         const B = XK(Y.x), C = AK(Y.y), D = TF, G = 1 + VG(RF * 3 + Y.x * .02) * .12, F = Y.t;
         if (!F) {
-            SK(B, C, 9 * D * G, JL, "hsl(38 100% 84%)", SG(1, 2.2 * D));
+            SK(B, C, 9 * D * G, JL, "hsl(38 100% 84%)", SG(1, 2.4 * D));
             return;
         }
         if (F === 3) {
             for (let Y = 0; Y < 7; Y++) {
                 const F = Y / 7 * NG + RF * .6;
                 KK();
-                NK(B, C, 24 * D * G, F, F + .8);
-                MK(7 * D, BN(Y, 62));
+                NK(B, C, 26 * D * G, F, F + .8);
+                MK(7 * D, BN(Y, 60));
             }
             SK(B, C, 13 * D * G, "#fff");
             return;
@@ -1359,8 +1359,8 @@
         WF.save();
         WF.translate(B, C);
         WF.rotate(RF * (I ? .8 : H ? 1.4 : -1) + Y.c);
-        VK(K, I ? JL : H ? BN(J, 58) : J > 6 ? "#fff" : BN(J, 60), H ? BN(J, 86) : "#fff", SG(1, 2 * D), Y => {
-            const B = Y / K * NG, C = M * (I && Y & 1 ? .44 : 1);
+        VK(K, I ? JL : H ? BN(J, 60) : J > 6 ? "#fff" : BN(J, 60), H ? BN(J, 90) : "#fff", SG(1, 2 * D), Y => {
+            const B = Y / K * NG, C = M * (I && Y & 1 ? .4 : 1);
             TK(Y, TG(B) * C, VG(B) * C);
         });
         WF.restore();
@@ -1371,7 +1371,7 @@
             Y.e & JF[B] && C.push(B);
         }
         if (C.length < 2) {
-            return BN(C[0] | 0, 62, B);
+            return BN(C[0] | 0, 60, B);
         }
         const D = WF.createLinearGradient(XK(Y.x1), AK(Y.y1), XK(Y.x2), AK(Y.y2));
         C.forEach((Y, G) => D.addColorStop(G / (C.length - 1), BN(Y, 64, B)));
@@ -1381,17 +1381,17 @@
         WF.lineCap = "round";
         for (const Y of RI) {
             const B = Y.u ? SL(Y.l / .22, 0, 1) : 1, C = XK(Y.x1), D = AK(Y.y1), G = XK(Y.x2), F = AK(Y.y2);
-            WK(C, D, G, F, SG(4, 22 * TF), OB(Y, B * .18));
+            WK(C, D, G, F, SG(4, 20 * TF), OB(Y, B * .16));
             MK(SG(3, 15 * TF), "hsl(266 55% 5% / " + B * .8 + ")");
             MK(SG(2, 10 * TF), OB(Y, B));
-            MK(SG(1, 4 * TF), "hsl(0 0% 100% / " + B * .55 + ")");
+            MK(SG(1, 4 * TF), "hsl(0 0% 100% / " + B * .5 + ")");
             if (!Y.u) {
                 SK(C, D, (4.5 + VG(RF * 4 + Y.x1) * .8) * TF, 0, BN(Y.c, 80, .9), SG(1, 2 * TF));
                 const B = G - C, I = F - D, H = RG(B, I);
                 if (H > 16) {
                     const C = B / H, D = I / H, J = 9 * TF;
-                    VK(3, BN(Y.c, 78, .95), 0, 0, Y => {
-                        const B = [ 0, 2.6, -2.6 ][Y], I = TG(B) * J, H = VG(B) * J;
+                    VK(3, BN(Y.c, 70, .95), 0, 0, Y => {
+                        const B = [ 0, 2.4, -2.4 ][Y], I = TG(B) * J, H = VG(B) * J;
                         TK(Y, G + I * C - H * D, F + H * C + I * D);
                     });
                 }
@@ -1404,14 +1404,14 @@
             }
         }
         for (const Y of ZI) {
-            const B = Y.t / .55;
+            const B = Y.t / .5;
             SK(XK(Y.x), AK(Y.y), (6 + 26 * (1 - B)) * TF, 0, "hsl(0 0% 100% / " + B + ")", SG(1, 3 * TF));
         }
         if (BI.te) {
             const Y = XK(BI.te.x), B = AK(BI.te.y);
-            SK(Y, B, BI.te.l * TF, 0, BN(3, 60, .17), SG(1, 1.4 * TF));
-            WK(Y, B, XK(BI.x), AK(BI.y), SG(1, 3.4 * TF), BN(3, 70));
-            SK(Y, B, 8 * TF, BN(3, 62));
+            SK(Y, B, BI.te.l * TF, 0, BN(3, 60, .16), SG(1, 1.4 * TF));
+            WK(Y, B, XK(BI.x), AK(BI.y), SG(1, 3.2 * TF), BN(3, 70));
+            SK(Y, B, 8 * TF, BN(3, 60));
             SK(Y, B, (12 + VG(RF * 9) * 3) * TF, 0, BN(3, 80, .8), SG(1, 2 * TF));
         }
     }
@@ -1419,7 +1419,7 @@
         WF.lineCap = "round";
         for (const Y of YH) {
             const B = SL(Y.t, 0, 1);
-            SK(XK(Y.x), AK(Y.y), Y.r * TF, 0, YN(Y.h | 0, 100, 78, B * .7), SG(1, 5 * B * TF));
+            SK(XK(Y.x), AK(Y.y), Y.r * TF, 0, YN(Y.h | 0, 100, 70, B * .7), SG(1, 5 * B * TF));
         }
         for (const Y of QI) {
             const B = SL(Y.l / Y.L, 0, 1), C = XK(Y.x), D = AK(Y.y);
@@ -1428,11 +1428,11 @@
                 WF.translate(C, D);
                 WF.rotate(Y.a);
                 const G = Y.s * TF * (.4 + B * .6);
-                VK(4, YN(Y.h | 0, 70, 38 + B * 26, B), YN(Y.h | 0, 90, 78, B), SG(1, 1.2 * TF), Y => TK(Y, [ -1, .8, 1.2, -.6 ][Y] * G, [ -.7, -1.1, .9, 1 ][Y] * G));
+                VK(4, YN(Y.h | 0, 70, 40 + B * 26, B), YN(Y.h | 0, 90, 70, B), SG(1, 1.2 * TF), Y => TK(Y, [ -1, .8, 1.2, -.6 ][Y] * G, [ -.7, -1.2, .9, 1 ][Y] * G));
                 WF.restore();
                 continue;
             }
-            Y.k === 2 ? SK(C, D, (1 - B) * Y.s * 9 * TF, 0, YN(Y.h | 0, 100, 75, B), SG(1, 3 * B * TF)) : WK(C, D, C - Y.vx * (Y.k ? .02 : .012) * TF, D - Y.vy * (Y.k ? .02 : .012) * TF, SG(1, Y.s * (Y.k ? 1 : B) * TF), YN(Y.h | 0, Y.k ? 70 : 100, Y.k ? 55 : 68, B));
+            Y.k === 2 ? SK(C, D, (1 - B) * Y.s * 9 * TF, 0, YN(Y.h | 0, 100, 70, B), SG(1, 3 * B * TF)) : WK(C, D, C - Y.vx * (Y.k ? .02 : .012) * TF, D - Y.vy * (Y.k ? .02 : .012) * TF, SG(1, Y.s * (Y.k ? 1 : B) * TF), YN(Y.h | 0, Y.k ? 70 : 100, 60, B));
         }
         for (const Y of AI) {
             const B = SL(Y.l, 0, 1);
@@ -1447,7 +1447,7 @@
                 y: BI.y,
                 h: KI > 0 ? -1 : HF[II]
             });
-            while (XI.length > 26 + SL(BI.sp / 34, 0, 34)) {
+            while (XI.length > 26 + SL(BI.sp / 30, 0, 30)) {
                 XI.shift();
             }
         }
@@ -1471,7 +1471,7 @@
         for (let Y = 1; Y < 5; Y++) {
             PK(-13 - Y * 6, VG(RF * 9 - Y * .8) * (2 + Y * 1.6));
         }
-        MK(5, BN((H + 2) % 7, 65));
+        MK(5, BN((H + 2) % 7, 60));
         MK(2.4, BN((H + 5) % 7, 80));
         for (let Y = 0; Y < 4; Y++) {
             const B = 15 * (Y >> 1) - 8, C = I * (Y & 1 ? 1 : -1) * (Y > 1 ? -1 : 1);
@@ -1487,8 +1487,8 @@
         MK(2, F);
         KK();
         OK(8, -6);
-        WF.quadraticCurveTo(20, -14, 25, -12);
-        WF.quadraticCurveTo(31, -11, 30, -5);
+        WF.quadraticCurveTo(20, -14, 26, -12);
+        WF.quadraticCurveTo(30, -11, 30, -5);
         PK(20, -1);
         WF.closePath();
         LK(G);
@@ -1496,28 +1496,28 @@
         for (let Y = 0; Y < 4; Y++) {
             KK();
             OK(6 + Y * 4, -7 - Y);
-            WF.quadraticCurveTo(2 + Y * 4, -16 - Y * 1.5, 9 + Y * 4, -18 - Y);
-            MK(3.4, BN((H + Y) % 7, 66));
+            WF.quadraticCurveTo(2 + Y * 4, -16 - Y * 1.6, 9 + Y * 4, -18 - Y);
+            MK(3.2, BN((H + Y) % 7, 60));
         }
         WF.save();
         WF.translate(26, -12);
-        WF.rotate(-.62);
-        const J = D === 1 ? 24 : 15, K = WF.createLinearGradient(0, 0, 0, -J);
-        K.addColorStop(0, BN(0, 65));
-        K.addColorStop(1, BN(B, 82));
+        WF.rotate(-.6);
+        const J = D === 1 ? 26 : 15, K = WF.createLinearGradient(0, 0, 0, -J);
+        K.addColorStop(0, BN(0, 60));
+        K.addColorStop(1, BN(B, 90));
         VK(3, K, "#fff", 1.2, Y => TK(Y, [ -3, 3, 0 ][Y], [ 0, 0, -J ][Y]));
         if (!D) {
             for (let Y = 0; Y < 4; Y++) {
                 const B = Y / 4;
-                WK(B * 6 * .5 - 3, -J * B, 3 - B * 6 * .5, -J * B - 2, 1.1, BN((H + Y) % 7, 84));
+                WK(B * 6 * .5 - 3, -J * B, 3 - B * 6 * .5, -J * B - 2, 1.2, BN((H + Y) % 7, 90));
             }
         }
-        D === 2 && VK(10, "#fff", BN(B, 88), 1, Y => {
+        D === 2 && VK(10, "#fff", BN(B, 90), 1, Y => {
             const B = Y / 10 * NG + RF * 2, C = Y & 1 ? 2.4 : 6;
             TK(Y, TG(B) * C, -J + VG(B) * C);
         });
         WF.restore();
-        SK(26, -8, 1.7, UF === 1 && BI.st > IF ? "#f44" : "#2a1836");
+        SK(26, -8, 1.6, UF === 1 && BI.st > IF ? "#f44" : "#2a1836");
     }
     function UB() {
         const Y = TF, B = XK(BI.x), C = AK(BI.y);
@@ -1527,11 +1527,11 @@
         WF.scale(Y, Y);
         TB(BH.e[0], II, KI > 0 || BI.ph > 0, BH.e[1]);
         WF.restore();
-        SK(B, C, 24 * Y, 0, BI.rp > 0 ? "hsl(6 100% 62%)" : BN(II, 70, .55), SG(1, (BI.rp > 0 ? 3 : 2) * Y));
+        SK(B, C, 24 * Y, 0, BI.rp > 0 ? "hsl(6 100% 62%)" : BN(II, 70, .5), SG(1, (BI.rp > 0 ? 3 : 2) * Y));
         if (BI.st > IF) {
             const D = (BI.st - IF) / 1.5;
             KK();
-            NK(B, C, (33 + VG(RF * 22) * 4) * Y, -LG / 2, -LG / 2 + NG * (1 - D));
+            NK(B, C, (33 + VG(RF * 20) * 4) * Y, -LG / 2, -LG / 2 + NG * (1 - D));
             MK(SG(2, 4 * Y), "hsl(" + (30 - D * 30) + " 100% 60%)");
         }
     }
@@ -1552,7 +1552,7 @@
         FM.gain.value = BH.m ? 0 : .8;
         JM.connect(FM).connect(OM.destination);
         IM = OM.createGain();
-        IM.gain.value = .85;
+        IM.gain.value = .8;
         IM.connect(JM);
         HM = OM.createGain();
         HM.gain.value = .5;
@@ -1565,7 +1565,7 @@
         }
         LM = OM.createOscillator();
         LM.type = "sawtooth";
-        LM.frequency.value = 220;
+        LM.frequency.value = 200;
         NM = OM.createBiquadFilter();
         NM.type = "bandpass";
         NM.frequency.value = 1400;
@@ -1618,77 +1618,77 @@
         if (Y < 60) {
             return;
         }
-        const D = SL(Y / 2200, .04, .55);
-        XB(.03 + D * .12, D * .7, "lowpass", 300 + Y * 1.6, 140, 1);
-        Y > 380 && QB("triangle", 120 + Y * .05, 44, .1 + D * .12, D * .8);
+        const D = SL(Y / 2400, .04, .5);
+        XB(.03 + D * .12, D * .7, "lowpass", 300 + Y * 1.6, 150, 1);
+        Y > 420 && QB("triangle", 120 + Y * .05, 40, .1 + D * .12, D * .8);
         if (B > 1) {
             const Y = TM[PI % 4], B = PG(C | 0), G = 64 + Y[(B >> 5) % Y.length] + 12 * (B >> 9 & 1);
-            QB("sine", VM(G), VM(G) * 1.5, .17, D * .55);
+            QB("sine", VM(G), VM(G) * 1.6, .16, D * .5);
             QB("triangle", VM(G + 12), 0, .1, D * .3);
         } else {
-            B && QB("sine", 90, 42, .25, D * .5);
+            B && QB("sine", 90, 40, .22, D * .5);
         }
     }
     function ZB(Y) {
         const B = 1 / (1 + Y * .5);
-        XB(.3 * B, .45 * B, "bandpass", 2600 * (1 + Y * .3), 300, 1.4);
-        QB("triangle", 160 * (1 + Y * .22), 38, .34 * B, .5 * B);
-        XB(.09, .3 * B, "highpass", 4e3, 9e3, 1);
+        XB(.3 * B, .5 * B, "bandpass", 2600 * (1 + Y * .3), 300, 1.4);
+        QB("triangle", 150 * (1 + Y * .2), 40, .3 * B, .5 * B);
+        XB(.1, .3 * B, "highpass", 4369, 9e3, 1);
     }
     function YC(Y) {
         const B = 76 + Y * 12 | 0;
-        QB("square", VM(B), VM(B + 7), .07, .13);
-        QB("triangle", VM(B + 12), 0, .13, .1);
+        QB("square", VM(B), VM(B + 7), .07, .12);
+        QB("triangle", VM(B + 12), 0, .12, .1);
     }
     function BC() {
-        MC(72, [ 0, 4, 7, 12, 16, 19 ], .45, .13, "square", .04, 12);
-        XB(.7, .24, "bandpass", 700, 6e3, .8);
+        MC(70, [ 0, 4, 7, 12, 16, 19 ], .5, .12, "square", .04, 12);
+        XB(.7, .22, "bandpass", 700, 6e3, .8);
         QB("sine", 90, 300, .4, .3);
     }
     function CC(Y) {
         const B = SL(Y / 2600, .16, .5);
-        QB("sawtooth", 150, 780 + Y * .2, .22, B * .5);
-        XB(.34, B * .7, "bandpass", 700, 4200, 1.1);
-        QB("sine", 70, 34, .3, B * .8);
+        QB("sawtooth", 150, 700 + Y * .2, .2, B * .5);
+        XB(.3, B * .7, "bandpass", 700, 4369, 1.2);
+        QB("sine", 70, 30, .3, B * .8);
     }
     function DC(Y) {
-        QB("square", Y ? 700 : 940, Y ? 2e3 : 1680, .07, .16);
+        QB("square", Y ? 700 : 900, Y ? 1800 : 1500, .07, .16);
         XB(.05, .12, "highpass", 2600, 5200, 1);
-        Y && QB("sine", 320, 900, .16, .2);
+        Y && QB("sine", 300, 900, .16, .2);
     }
     function GC(Y) {
         const B = SL(Y / 1400, .12, .4);
         QB("sine", 180 + Y * .1, 700 + Y * .3, .1, B);
-        QB("sine", 700 + Y * .3, 210, .22, B * .8);
+        QB("sine", 700 + Y * .3, 200, .2, B * .8);
     }
     function FC(Y) {
         if (Y) {
-            QB("triangle", 240, 720, 1.1, .13);
-            XB(.06, .1, "bandpass", 900, 2400, 3);
+            QB("triangle", 240, 700, 1.2, .12);
+            XB(.06, .1, "bandpass", 900, 2600, 3);
         } else {
-            QB("sawtooth", 900, 190, .13, .26);
-            XB(.1, .22, "bandpass", 1800, 500, 2);
+            QB("sawtooth", 900, 200, .12, .25);
+            XB(.1, .2, "bandpass", 1800, 500, 2);
         }
     }
     function IC(Y) {
         if (OM) {
             MM && MM.gain.setTargetAtTime(Y && !BH.m ? .12 : 0, QM(), .03);
-            Y && QB("square", 1200, 2400, .05, .1);
+            Y && QB("square", 1200, 2600, .05, .1);
         }
     }
     function HC(Y) {
         const B = Y < 0;
-        QB("sine", B ? 120 : 460, B ? 460 : 110, .5, .3);
-        QB("triangle", B ? 240 : 700, B ? 700 : 200, .38, .12);
+        QB("sine", B ? 120 : 420, B ? 420 : 100, .5, .3);
+        QB("triangle", B ? 240 : 700, B ? 700 : 200, .4, .12);
         XB(.4, .1, "lowpass", 900, 200, 1);
     }
     function JC() {
-        QB("sawtooth", 2600, 260, .1, .2);
-        XB(.08, .18, "highpass", 7e3, 1400, 2);
-        QB("sine", 90, 240, .22, .26);
+        QB("sawtooth", 2600, 240, .1, .2);
+        XB(.085, .16, "highpass", 7e3, 1400, 2);
+        QB("sine", 90, 240, .2, .25);
     }
     function KC(Y) {
-        const B = 74 + WG(Y, 14) * 2;
+        const B = 70 + WG(Y, 14) * 2;
         QB("square", VM(B), 0, .06, .1);
         QB("sine", VM(B + 12), 0, .1, .12);
     }
@@ -1700,48 +1700,48 @@
         B.forEach((B, J) => QB(G, VM(Y + B), I ? VM(Y + B + I) : 0, C, D, 0, H + J * F));
     }
     function LC() {
-        MC(72, XM, .5, .12, "triangle", .045);
+        MC(70, XM, .5, .12, "triangle", .05);
     }
     function NC(Y) {
-        QB("triangle", VM(64 + Y * 2), VM(76 + Y * 2), .16, .16);
+        QB("triangle", VM(64 + Y * 2), VM(70 + Y * 2), .16, .16);
     }
     function OC() {
-        MC(60, TM[1], .5, .13, "sine", .06, 12);
-        XB(.9, .16, "bandpass", 800, 6e3, .8);
+        MC(60, TM[1], .5, .12, "sine", .06, 12);
+        XB(.9, .16, "bandpass", 720, 6e3, .8);
     }
     function PC() {
         MC(60, TM[1], .7, .12, "sawtooth", .05, 12);
-        MC(84, XM, 1.5, .1, "sine", 0);
-        OM && XB(1.2, .2, "bandpass", 400, 8e3, .7, 0, QM() + .3);
+        MC(90, XM, 1.6, .1, "sine", 0);
+        OM && XB(1.2, .2, "bandpass", 420, 8e3, .7, 0, QM() + .3);
     }
     function WC() {
-        QB("square", 1500, 2600, .05, .09);
-        QB("sine", 900, 1800, .1, .09);
+        QB("square", 1400, 2600, .05, .1);
+        QB("sine", 900, 1800, .1, .1);
     }
     function SC() {
-        QB("triangle", VM(76), VM(83), .18, .12);
+        QB("triangle", VM(70), VM(90), .16, .12);
     }
     function VC() {
-        MC(62, [ 0, 5, 10 ], .12, .1, "square", .06, 2);
+        MC(60, [ 0, 5, 10 ], .12, .1, "square", .06, 2);
     }
     function TC() {
-        QB("sine", 150, 70, .12, .18);
+        QB("sine", 150, 70, .12, .16);
         XB(.06, .07, "lowpass", 500, 200, 1);
     }
     function UC(Y) {
-        QB("sine", 70 + Y * 40, 50, .18, .12 + Y * .18);
+        QB("sine", 70 + Y * 40, 48, .16, .12 + Y * .16);
     }
     function RC() {
-        MC(72, [ 0, -3, -6, -9, -12, -15, -18 ], .8, .1, "sawtooth", .04, -30);
+        MC(70, [ 0, -3, -6, -9, -12, -15, -18 ], .8, .1, "sawtooth", .04, -30);
         XB(1, .3, "lowpass", 3e3, 90, 1);
-        QB("sine", 120, 30, 1.1, .3);
+        QB("sine", 120, 30, 1.2, .3);
     }
     function QC(Y) {
         QB("square", Y ? 900 : 620, Y ? 1200 : 500, .04, .07);
     }
     function XC() {
         MC(48, [ 0, 7, 12, 16, 19 ], 1.6, .1, "triangle", 0);
-        XB(1.4, .22, "bandpass", 300, 5e3, .6);
+        XB(1.4, .2, "bandpass", 300, 5200, .6);
     }
     function AC() {
         PM = 0;
@@ -1751,17 +1751,17 @@
         const Y = QM(), B = SL(BI.sp / YF, 0, 1), C = UF === 1 && BI.al, D = (B, C, D) => B.setTargetAtTime(C, Y, D);
         D(MM.gain, BI.ra && !BH.m && C ? .1 + B * .12 : 0, .04);
         D(NM.frequency, 700 + BI.sp * 1.4, .04);
-        D(LM.frequency, 90 + BI.sp * .22, .04);
-        D(JM.frequency, QF > .05 ? 480 : UF === 2 ? 700 : 2e4, .1);
-        D(HM.gain, BH.m ? 0 : UF === 1 ? .5 : .34, .2);
+        D(LM.frequency, 90 + BI.sp * .2, .04);
+        D(JM.frequency, QF > .05 ? 500 : UF === 2 ? 700 : 2e4, .1);
+        D(HM.gain, BH.m ? 0 : UF === 1 ? .5 : .3, .2);
         C ? ZC() : WM = Y + .1;
     }
     function ZC() {
-        const Y = 40 + PI * 5 % 11, B = TM[PI % 4], C = UM[PI % 3], D = SL(BI.sp / 1400, 0, 1.5) + (KI > 0 ? .6 : 0), G = 15 / ((88 + PI * 7) * (QF > .5 ? .5 : 1)), F = AM[PI], I = ZM[PI], H = QM();
+        const Y = 40 + PI * 5 % 11, B = TM[PI % 4], C = UM[PI % 3], D = SL(BI.sp / 1400, 0, 1.6) + (KI > 0 ? .6 : 0), G = 15 / ((90 + PI * 7) * (QF > .5 ? .5 : 1)), F = AM[PI], I = ZM[PI], H = QM();
         for (let J = 8; WM < H + .16 && J--; ) {
             const J = SG(WM, H), K = SM, M = K & 15, L = K >> 4, N = (L * 2 + (M > 7 ? 1 : 0)) % B.length, O = Y - 12 + B[N];
             if (F >> M & 1) {
-                QB("sine", 130, 42, .17, .5, HM, J);
+                QB("sine", 120, 40, .16, .5, HM, J);
                 XB(.03, .12, "lowpass", 900, 200, 1, HM, J);
             }
             I >> M & 1 && QB(C, VM(O), 0, .2, .3, HM, J);
@@ -1770,11 +1770,11 @@
                     QB("triangle", VM(Y + B[N] + C), 0, G * 15, .1, HM, J);
                 }
             }
-            D > .25 && M & 1 && XB(.03, .04 + D * .03, "highpass", 7e3, 6500, 1, HM, J);
-            D > .5 && M % 4 == 2 && XB(.09, .13, "bandpass", 1900, 900, 1.2, HM, J);
+            D > .22 && M & 1 && XB(.03, .04 + D * .03, "highpass", 7e3, 6e3, 1, HM, J);
+            D > .5 && M % 4 == 2 && XB(.1, .12, "bandpass", 1800, 900, 1.2, HM, J);
             if (D > .8 && !(M & 1)) {
                 const D = VM(Y + 12 + B[(K * 3 + L) % B.length]);
-                QB(C, D, D, .1, .09, HM, J);
+                QB(C, D, D, .1, .1, HM, J);
             }
             SM++;
             WM = J + G;
@@ -2458,7 +2458,7 @@
         return [ C, 56, D, C + B[2], 64, D + 23, G < 0 ? RF * 16 % 360 : G, B[3] ];
     }, DM = [ [ 0, 3, 0 ], [ 2, 1, 8 ], [ 2, 2, -3 ], [ 1, 5, 4 ], [ 1, 7, -1 ], [ 2, 3, 6 ], [ 2, 1, 4 ] ], GM = [ [ 276, 40, 7, 60, 26 ], [ 18, 74, 42, 100, 66 ], [ 292, 60, 30, 100, 74 ], [ 200, 80, 40, 100, 76 ], [ 140, 70, 34, 100, 70 ], [ 46, 38, 22, 90, 60 ], [ 46, 100, 60, 100, 92 ] ];
     let FM, IM, HM, JM, KM, MM, LM, NM, OM = null, PM = 0, WM = 0, SM = 0;
-    const VM = Y => 440 * OG.pow(2, (Y - 69) / 12), TM = [ [ 0, 2, 3, 5, 7, 8, 10 ], [ 0, 2, 4, 5, 7, 9, 11 ], [ 0, 3, 5, 7, 10, 12 ], [ 0, 1, 5, 6, 8, 11 ] ], UM = [ "triangle", "sawtooth", "square" ], RM = () => OM && !BH.m && PM < 26, QM = () => OM.currentTime, XM = [ 0, 4, 7, 12 ], AM = [ 4369, 4437, 4115, 4369, 4097, 1298, 21845 ], ZM = [ 34953, 42149, 37266, 52429, 33924, 43177, 43691 ], YL = "CLOUD SHADOW NEON SPIRAL LANCE STARTIP RAINBOW DASHED COMET SPARKS SHARDS RINGS".split(" "), BL = [ 0, 180, 420 ], CL = (Y, B) => !B || BH.o >> Y * 3 + B & 1, DL = "#fff", GL = "hsl(0 0% 100% / .62)", FL = "hsl(0 0% 100% / .34)", IL = "hsl(282 40% 15% / .88)", HL = "hsl(290 55% 50%)", JL = "hsl(48 100% 66%)";
+    const VM = Y => 420 * OG.pow(2, (Y - 70) / 12), TM = [ [ 0, 2, 3, 5, 7, 8, 10 ], [ 0, 2, 4, 5, 7, 9, 11 ], [ 0, 3, 5, 7, 10, 12 ], [ 0, 1, 5, 6, 8, 11 ] ], UM = [ "triangle", "sawtooth", "square" ], RM = () => OM && !BH.m && PM < 26, QM = () => OM.currentTime, XM = [ 0, 4, 7, 12 ], AM = [ 4369, 4437, 4115, 4369, 4097, 1298, 21845 ], ZM = [ 34953, 42149, 37266, 52429, 33924, 43177, 43691 ], YL = "CLOUD SHADOW NEON SPIRAL LANCE STARTIP RAINBOW DASHED COMET SPARKS SHARDS RINGS".split(" "), BL = [ 0, 180, 420 ], CL = (Y, B) => !B || BH.o >> Y * 3 + B & 1, DL = "#fff", GL = "hsl(0 0% 100% / .62)", FL = "hsl(0 0% 100% / .34)", IL = "hsl(282 40% 15% / .88)", HL = "hsl(290 55% 50%)", JL = "hsl(48 100% 66%)";
     let KL = 1, ML = [];
     const LL = (Y, B, C, D, G) => {
         KK();

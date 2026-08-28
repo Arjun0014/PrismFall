@@ -10,7 +10,7 @@ let AC = null, mg, sfxG, musG, lpF, nzBuf, railG, railO, railF;
 let voices = 0;                   // per-frame voice budget
 let mNext = 0, mStep = 0;         // music scheduler
 
-const NOTE = (n) => 440 * M.pow(2, (n - 69) / 12);
+const NOTE = (n) => 420 * M.pow(2, (n - 70) / 12);
 const SCALE = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 4, 5, 7, 9, 11], [0, 3, 5, 7, 10, 12], [0, 1, 5, 6, 8, 11]];
 const WAVE = ['triangle', 'sawtooth', 'square'];
 
@@ -23,7 +23,7 @@ function audioInit() {
   lpF = AC.createBiquadFilter(); lpF.type = 'lowpass'; lpF.frequency.value = 20000;
   mg = AC.createGain(); mg.gain.value = SAVE.m ? 0 : .8;
   lpF.connect(mg).connect(AC.destination);
-  sfxG = AC.createGain(); sfxG.gain.value = .85; sfxG.connect(lpF);
+  sfxG = AC.createGain(); sfxG.gain.value = .8; sfxG.connect(lpF);
   musG = AC.createGain(); musG.gain.value = .5; musG.connect(lpF);
 
   const n = AC.sampleRate * 2;
@@ -39,7 +39,7 @@ function audioInit() {
   // are moving and you are almost always moving. Speed already reads through
   // the camera, the trail, the impacts and the music intensity, so the noise
   // bed was carrying no information anyone needed.
-  railO = AC.createOscillator(); railO.type = 'sawtooth'; railO.frequency.value = 220;
+  railO = AC.createOscillator(); railO.type = 'sawtooth'; railO.frequency.value = 200;
   railF = AC.createBiquadFilter(); railF.type = 'bandpass';
   railF.frequency.value = 1400; railF.Q.value = 6;
   railG = AC.createGain(); railG.gain.value = 0;
@@ -94,17 +94,17 @@ function N(dur, pk, ft, f0, f1, q, dest, t0) {
 // dampener (dull thud), kind 2 a bumper (bright ping).
 function sndHit(imp, kind, tune) {
   if (imp < 60) return;
-  const v = clamp(imp / 2200, .04, .55);
-  N(.03 + v * .12, v * .7, 'lowpass', 300 + imp * 1.6, 140, 1);
-  if (imp > 380) O('triangle', 120 + imp * .05, 44, .1 + v * .12, v * .8);
+  const v = clamp(imp / 2400, .04, .5);
+  N(.03 + v * .12, v * .7, 'lowpass', 300 + imp * 1.6, 150, 1);
+  if (imp > 420) O('triangle', 120 + imp * .05, 40, .1 + v * .12, v * .8);
   if (kind > 1) {
     // The Organ: every bumper is tuned by its own position, in the current
     // region's mode, so a column of them plays a phrase as you fall through it.
     const sc = SCALE[reg % 4], q = abs(tune | 0);
     const n = 64 + sc[(q >> 5) % sc.length] + 12 * (q >> 9 & 1);
-    O('sine', NOTE(n), NOTE(n) * 1.5, .17, v * .55);
+    O('sine', NOTE(n), NOTE(n) * 1.6, .16, v * .5);
     O('triangle', NOTE(n + 12), 0, .1, v * .3);
-  } else if (kind) O('sine', 90, 42, .25, v * .5);
+  } else if (kind) O('sine', 90, 40, .22, v * .5);
 }
 
 // Depth is the cascade generation: each ring of a chain reaction rings a
@@ -112,65 +112,65 @@ function sndHit(imp, kind, tune) {
 // spreading outward instead of six identical crashes on the same frame.
 function sndBreak(d) {
   const k = 1 / (1 + d * .5);
-  N(.3 * k, .45 * k, 'bandpass', 2600 * (1 + d * .3), 300, 1.4);
-  O('triangle', 160 * (1 + d * .22), 38, .34 * k, .5 * k);
-  N(.09, .3 * k, 'highpass', 4000, 9000, 1);
+  N(.3 * k, .5 * k, 'bandpass', 2600 * (1 + d * .3), 300, 1.4);
+  O('triangle', 150 * (1 + d * .2), 40, .3 * k, .5 * k);
+  N(.1, .3 * k, 'highpass', 4369, 9000, 1);
 }
 
 // A scoring target: pitch climbs with how much of the bank is already lit, so
 // you can hear how close a bank is without reading the pips.
 function sndTarget(f) {
   const n = 76 + f * 12 | 0;
-  O('square', NOTE(n), NOTE(n + 7), .07, .13);
-  O('triangle', NOTE(n + 12), 0, .13, .1);
+  O('square', NOTE(n), NOTE(n + 7), .07, .12);
+  O('triangle', NOTE(n + 12), 0, .12, .1);
 }
 function sndBank() {
-  ARP(72, [0, 4, 7, 12, 16, 19], .45, .13, 'square', .04, 12);
-  N(.7, .24, 'bandpass', 700, 6000, .8);
+  ARP(70, [0, 4, 7, 12, 16, 19], .5, .12, 'square', .04, 12);
+  N(.7, .22, 'bandpass', 700, 6000, .8);
   O('sine', 90, 300, .4, .3);
 }
 
 // --- the seven colours -----------------------------------------------------
 function sndBoost(ns) {                       // Red - rocket
   const v = clamp(ns / 2600, .16, .5);
-  O('sawtooth', 150, 780 + ns * .2, .22, v * .5);
-  N(.34, v * .7, 'bandpass', 700, 4200, 1.1);
-  O('sine', 70, 34, .3, v * .8);
+  O('sawtooth', 150, 700 + ns * .2, .2, v * .5);
+  N(.3, v * .7, 'bandpass', 700, 4369, 1.2);
+  O('sine', 70, 30, .3, v * .8);
 }
 function sndVector(sup) {                     // Orange - directional snap
-  O('square', sup ? 700 : 940, sup ? 2000 : 1680, .07, .16);
+  O('square', sup ? 700 : 900, sup ? 1800 : 1500, .07, .16);
   N(.05, .12, 'highpass', 2600, 5200, 1);
-  if (sup) O('sine', 320, 900, .16, .2);
+  if (sup) O('sine', 300, 900, .16, .2);
 }
 function sndSpring(imp) {                     // Yellow - elastic boing
   const v = clamp(imp / 1400, .12, .4);
   O('sine', 180 + imp * .1, 700 + imp * .3, .1, v);
-  O('sine', 700 + imp * .3, 210, .22, v * .8);
+  O('sine', 700 + imp * .3, 200, .2, v * .8);
 }
 function sndTether(on) {                      // Green - tension / thwip
-  if (on) { O('triangle', 240, 720, 1.1, .13); N(.06, .1, 'bandpass', 900, 2400, 3); }
-  else { O('sawtooth', 900, 190, .13, .26); N(.1, .22, 'bandpass', 1800, 500, 2); }
+  if (on) { O('triangle', 240, 700, 1.2, .12); N(.06, .1, 'bandpass', 900, 2600, 3); }
+  else { O('sawtooth', 900, 200, .12, .25); N(.1, .2, 'bandpass', 1800, 500, 2); }
 }
 function sndRail(on) {                        // Blue - continuous grind
   if (!AC) return;
   if (railG) railG.gain.setTargetAtTime(on && !SAVE.m ? .12 : 0, now(), .03);
-  if (on) O('square', 1200, 2400, .05, .1);
+  if (on) O('square', 1200, 2600, .05, .1);
 }
 function sndGrav(ny) {                        // Indigo - gravity whoop
   const up = ny < 0;
-  O('sine', up ? 120 : 460, up ? 460 : 110, .5, .3);
-  O('triangle', up ? 240 : 700, up ? 700 : 200, .38, .12);
+  O('sine', up ? 120 : 420, up ? 420 : 100, .5, .3);
+  O('triangle', up ? 240 : 700, up ? 700 : 200, .4, .12);
   N(.4, .1, 'lowpass', 900, 200, 1);
 }
 function sndWarp() {                          // Violet - space
-  O('sawtooth', 2600, 260, .1, .2);
-  N(.08, .18, 'highpass', 7000, 1400, 2);
-  O('sine', 90, 240, .22, .26);
+  O('sawtooth', 2600, 240, .1, .2);
+  N(.085, .16, 'highpass', 7000, 1400, 2);
+  O('sine', 90, 240, .2, .25);
 }
 
 // --- rewards / systems -----------------------------------------------------
 function sndCoin(cmb) {
-  const n = 74 + mn(cmb, 14) * 2;
+  const n = 70 + mn(cmb, 14) * 2;
   O('square', NOTE(n), 0, .06, .1);
   O('sine', NOTE(n + 12), 0, .1, .12);
 }
@@ -182,31 +182,31 @@ function ARP(root, offs, dur, pk, w, gap, up) {
   offs.forEach((o, i) => O(w, NOTE(root + o), up ? NOTE(root + o + up) : 0, dur, pk, 0, t + i * gap));
 }
 const MAJ = [0, 4, 7, 12];
-function sndCrown() { ARP(72, MAJ, .5, .12, 'triangle', .045); }
-function sndPig(c) { O('triangle', NOTE(64 + c * 2), NOTE(76 + c * 2), .16, .16); }
+function sndCrown() { ARP(70, MAJ, .5, .12, 'triangle', .05); }
+function sndPig(c) { O('triangle', NOTE(64 + c * 2), NOTE(70 + c * 2), .16, .16); }
 function sndWell() {
-  ARP(60, SCALE[1], .5, .13, 'sine', .06, 12);
-  N(.9, .16, 'bandpass', 800, 6000, .8);
+  ARP(60, SCALE[1], .5, .12, 'sine', .06, 12);
+  N(.9, .16, 'bandpass', 720, 6000, .8);
 }
 function sndSpectrum() {
   ARP(60, SCALE[1], .7, .12, 'sawtooth', .05, 12);
-  ARP(84, MAJ, 1.5, .1, 'sine', 0);
-  if (AC) N(1.2, .2, 'bandpass', 400, 8000, .7, 0, now() + .3);
+  ARP(90, MAJ, 1.6, .1, 'sine', 0);
+  if (AC) N(1.2, .2, 'bandpass', 420, 8000, .7, 0, now() + .3);
 }
-function sndFuse() { O('square', 1500, 2600, .05, .09); O('sine', 900, 1800, .1, .09); }
-function sndRefund() { O('triangle', NOTE(76), NOTE(83), .18, .12); }
-function sndPower() { ARP(62, [0, 5, 10], .12, .1, 'square', .06, 2); }
-function sndEmpty() { O('sine', 150, 70, .12, .18); N(.06, .07, 'lowpass', 500, 200, 1); }
-function sndStall(u) { O('sine', 70 + u * 40, 50, .18, .12 + u * .18); }
+function sndFuse() { O('square', 1400, 2600, .05, .1); O('sine', 900, 1800, .1, .1); }
+function sndRefund() { O('triangle', NOTE(70), NOTE(90), .16, .12); }
+function sndPower() { ARP(60, [0, 5, 10], .12, .1, 'square', .06, 2); }
+function sndEmpty() { O('sine', 150, 70, .12, .16); N(.06, .07, 'lowpass', 500, 200, 1); }
+function sndStall(u) { O('sine', 70 + u * 40, 48, .16, .12 + u * .16); }
 function sndDeath() {
-  ARP(72, [0, -3, -6, -9, -12, -15, -18], .8, .1, 'sawtooth', .04, -30);
+  ARP(70, [0, -3, -6, -9, -12, -15, -18], .8, .1, 'sawtooth', .04, -30);
   N(1, .3, 'lowpass', 3000, 90, 1);
-  O('sine', 120, 30, 1.1, .3);
+  O('sine', 120, 30, 1.2, .3);
 }
 function sndUI(up) { O('square', up ? 900 : 620, up ? 1200 : 500, .04, .07); }
 function sndGate() {
   ARP(48, [0, 7, 12, 16, 19], 1.6, .1, 'triangle', 0);
-  N(1.4, .22, 'bandpass', 300, 5000, .6);
+  N(1.4, .2, 'bandpass', 300, 5200, .6);
 }
 
 // --- per-frame continuous layers ------------------------------------------
@@ -220,9 +220,9 @@ function audioFrame() {
   const set = (p, v, k) => p.setTargetAtTime(v, t, k);
   set(railG.gain, P.ra && !SAVE.m && play ? .1 + n * .12 : 0, .04);
   set(railF.frequency, 700 + P.sp * 1.4, .04);
-  set(railO.frequency, 90 + P.sp * .22, .04);
-  set(lpF.frequency, slow > .05 ? 480 : st === 2 ? 700 : 20000, .1);
-  set(musG.gain, SAVE.m ? 0 : st === 1 ? .5 : .34, .2);
+  set(railO.frequency, 90 + P.sp * .2, .04);
+  set(lpF.frequency, slow > .05 ? 500 : st === 2 ? 700 : 20000, .1);
+  set(musG.gain, SAVE.m ? 0 : st === 1 ? .5 : .3, .2);
   if (play) musicTick();
   else mNext = t + .1;
 }
@@ -240,8 +240,8 @@ const BASSR = [0x8889, 0xa4a5, 0x9192, 0xcccd, 0x8484, 0xa8a9, 0xaaab];
 
 function musicTick() {
   const root = 40 + reg * 5 % 11, sc = SCALE[reg % 4], w = WAVE[reg % 3];
-  const inten = clamp(P.sp / VFAST, 0, 1.5) + (fullSpec > 0 ? .6 : 0);
-  const spb = 15 / ((88 + reg * 7) * (slow > .5 ? .5 : 1));
+  const inten = clamp(P.sp / VFAST, 0, 1.6) + (fullSpec > 0 ? .6 : 0);
+  const spb = 15 / ((90 + reg * 7) * (slow > .5 ? .5 : 1));
   const kick = KICK[reg], bassr = BASSR[reg];
   const t0 = now();
   for (let guard = 8; mNext < t0 + .16 && guard--;) {
@@ -249,17 +249,17 @@ function musicTick() {
     const deg = (bar * 2 + (b > 7 ? 1 : 0)) % sc.length;
     const bass = root - 12 + sc[deg];
 
-    if (kick >> b & 1) { O('sine', 130, 42, .17, .5, musG, t); N(.03, .12, 'lowpass', 900, 200, 1, musG, t); }
+    if (kick >> b & 1) { O('sine', 120, 40, .16, .5, musG, t); N(.03, .12, 'lowpass', 900, 200, 1, musG, t); }
     if (bassr >> b & 1) O(w, NOTE(bass), 0, .2, .3, musG, t);
     // Pad: a held triad at the top of every bar, which is what actually makes
     // a region sound like a place rather than a drum loop.
     if (!b) for (const o of [0, 3 + (sc[2] > 3 ? 1 : 0), 7])
       O('triangle', NOTE(root + sc[deg] + o), 0, spb * 15, .1, musG, t);
-    if (inten > .25 && (b & 1)) N(.03, .04 + inten * .03, 'highpass', 7000, 6500, 1, musG, t);
-    if (inten > .5 && b % 4 === 2) N(.09, .13, 'bandpass', 1900, 900, 1.2, musG, t);
+    if (inten > .22 && (b & 1)) N(.03, .04 + inten * .03, 'highpass', 7000, 6000, 1, musG, t);
+    if (inten > .5 && b % 4 === 2) N(.1, .12, 'bandpass', 1800, 900, 1.2, musG, t);
     if (inten > .8 && !(b & 1)) {
       const n = NOTE(root + 12 + sc[(i * 3 + bar) % sc.length]);
-      O(w, n, n, .1, .09, musG, t);
+      O(w, n, n, .1, .1, musG, t);
     }
     mStep++; mNext = t + spb;
   }

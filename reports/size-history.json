@@ -891,5 +891,57 @@
   "note": "",
   "delta": -10,
   "left": -2118
+ },
+ {
+  "date": "2026-08-28 16:18",
+  "quick": false,
+  "zip": 15292,
+  "min": 73360,
+  "raw": 116025,
+  "rr": 20209,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP3a cluster render+hud+audio 12%",
+  "delta": -138,
+  "left": -1980
+ },
+ {
+  "date": "2026-08-28 16:33",
+  "quick": false,
+  "zip": 15312,
+  "min": 73361,
+  "raw": 116026,
+  "rr": 20234,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP3a perceptual clustering render+hud+audio",
+  "delta": 20,
+  "left": -2000
+ },
+ {
+  "date": "2026-08-28 16:44",
+  "quick": false,
+  "zip": 15317,
+  "min": 73368,
+  "raw": 116033,
+  "rr": 20242,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP3a clustering, decay-guarded",
+  "delta": 5,
+  "left": -2005
+ },
+ {
+  "date": "2026-08-28 16:54",
+  "quick": false,
+  "zip": 15348,
+  "min": 73370,
+  "raw": 116035,
+  "rr": 20282,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP3a clustering render+audio only",
+  "delta": 31,
+  "left": -2036
  }
 ]
