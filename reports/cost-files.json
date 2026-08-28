@@ -1,93 +1,93 @@
 {
- "base": 16347,
+ "base": 15375,
  "rows": [
   {
    "label": "render.js",
-   "seq": 10,
-   "zip": 13372,
-   "min": 60561,
-   "packed": 17647,
-   "cost": 2975
+   "seq": 6,
+   "zip": 12459,
+   "min": 56749,
+   "packed": 16426,
+   "cost": 2916
   },
   {
    "label": "world.js",
    "seq": 5,
-   "zip": 13482,
-   "min": 62722,
-   "packed": 17785,
-   "cost": 2865
+   "zip": 12593,
+   "min": 58782,
+   "packed": 16604,
+   "cost": 2782
   },
   {
    "label": "hud.js",
-   "seq": 11,
-   "zip": 14213,
-   "min": 67533,
-   "packed": 18757,
-   "cost": 2134
+   "seq": 8,
+   "zip": 13603,
+   "min": 65595,
+   "packed": 17947,
+   "cost": 1772
   },
   {
    "label": "audio.js",
-   "seq": 6,
-   "zip": 14745,
-   "min": 69740,
-   "packed": 19468,
-   "cost": 1602
+   "seq": 7,
+   "zip": 13858,
+   "min": 65771,
+   "packed": 18287,
+   "cost": 1517
   },
   {
    "label": "physics.js",
    "seq": 4,
-   "zip": 15107,
-   "min": 69801,
-   "packed": 19949,
-   "cost": 1240
+   "zip": 14216,
+   "min": 66038,
+   "packed": 18766,
+   "cost": 1159
   },
   {
    "label": "colors.js",
    "seq": 3,
-   "zip": 15214,
-   "min": 69626,
-   "packed": 20099,
-   "cost": 1133
+   "zip": 14288,
+   "min": 65766,
+   "packed": 18869,
+   "cost": 1087
   },
   {
    "label": "game.js",
-   "seq": 9,
-   "zip": 15337,
-   "min": 71909,
-   "packed": 20256,
-   "cost": 1010
+   "seq": 11,
+   "zip": 14497,
+   "min": 68778,
+   "packed": 19136,
+   "cost": 878
   },
   {
    "label": "input.js",
-   "seq": 8,
-   "zip": 15856,
-   "min": 75723,
-   "packed": 20952,
-   "cost": 491
+   "seq": 10,
+   "zip": 14908,
+   "min": 71886,
+   "packed": 19686,
+   "cost": 467
   },
   {
    "label": "util.js",
-   "seq": 7,
-   "zip": 16071,
-   "min": 76567,
-   "packed": 21232,
-   "cost": 276
+   "seq": 9,
+   "zip": 15103,
+   "min": 72585,
+   "packed": 19946,
+   "cost": 272
   },
   {
    "label": "config.js",
    "seq": 1,
-   "zip": 16145,
-   "min": 77461,
-   "packed": 21330,
-   "cost": 202
+   "zip": 15398,
+   "min": 73833,
+   "packed": 20334,
+   "cost": -23
   },
   {
    "label": "state.js",
    "seq": 2,
-   "zip": 16389,
-   "min": 77383,
-   "packed": 21652,
-   "cost": -42
+   "zip": 15464,
+   "min": 73413,
+   "packed": 20424,
+   "cost": -89
   }
  ]
 }

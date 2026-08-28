@@ -1008,5 +1008,70 @@
   "note": "",
   "delta": 77,
   "left": -1971
+ },
+ {
+  "date": "2026-08-28 17:44",
+  "quick": false,
+  "zip": 15268,
+  "min": 73326,
+  "raw": 116548,
+  "rr": 20172,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "alphabet re-search after source changes",
+  "delta": -15,
+  "left": -1956
+ },
+ {
+  "date": "2026-08-28 17:46",
+  "quick": false,
+  "zip": 15248,
+  "min": 73302,
+  "raw": 116548,
+  "rr": 20151,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "file order re-search",
+  "delta": -20,
+  "left": -1936
+ },
+ {
+  "date": "2026-08-28 17:55",
+  "quick": false,
+  "zip": 15254,
+  "min": 73302,
+  "raw": 116548,
+  "rr": 20156,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 6,
+  "left": -1942
+ },
+ {
+  "date": "2026-08-28 17:55",
+  "quick": false,
+  "zip": 15248,
+  "min": 73302,
+  "raw": 116548,
+  "rr": 20151,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -6,
+  "left": -1936
+ },
+ {
+  "date": "2026-08-28 17:58",
+  "quick": false,
+  "zip": 15246,
+  "min": 73302,
+  "raw": 116548,
+  "rr": 20146,
+  "tag": "roadroller",
+  "deep": true,
+  "note": "deep model re-search",
+  "delta": -2,
+  "left": -1934
  }
 ]

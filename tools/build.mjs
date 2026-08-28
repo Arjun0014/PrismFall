@@ -47,17 +47,20 @@ const log = (...a) => { if (!QUIET) console.log(...a); };
 //
 // The alphabet below was then searched directly against the archive by
 // tools/mangle.mjs (family survey, then a hill-climb over swap / substitute /
-// drop / insert). Total against Terser's default: -310 B. It is 25 characters
-// long and mostly uppercase, which no amount of reasoning would have predicted;
-// the landscape is rugged and non-monotonic in length, so it was found by
-// measurement and it has to be RE-searched after any significant source change:
+// drop / insert). Total against Terser's default: -253 B.
+//
+// After the Ascension removal and the constant clustering it came back to the
+// plain 26-letter uppercase alphabet, and 700 probes could not beat it -- the
+// hand-searched 25-character permutation that won on the old source is now 14 B
+// WORSE. The optimum really does move with the payload, so re-search it after
+// any significant source change:
 //
 //   npm run mangle
 //
 // This is a build parameter, exactly like the Roadroller model. Nothing about
 // the game depends on it: Terser guarantees the names it emits are unique,
 // non-reserved and non-shadowing whatever alphabet it is handed.
-const NAME_LEAD = 'YBCDGFIHJKMLNOPWSVTURQXAZ';
+const NAME_LEAD = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const NAME_TAIL = NAME_LEAD + '0123456789';
 
 /** A Terser `nth_identifier`. Omitting reset/sort is what disables the sort. */

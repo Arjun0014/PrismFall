@@ -22,8 +22,8 @@
   393
  ],
  "precision": 16,
- "modelMaxCount": 4,
- "recipLearningRate": 3276,
+ "modelMaxCount": 3,
+ "recipLearningRate": 3584,
  "modelRecipBaseCount": 32,
  "numAbbreviations": 9
 }
