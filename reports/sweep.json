@@ -1,165 +1,157 @@
 {
- "base": 14312,
+ "base": 14185,
  "rows": [
   {
    "label": "BG   whole background (gradient stays)",
-   "save": 264
-  },
-  {
-   "label": "LOW  world filler",
-   "save": 108
+   "save": 255
   },
   {
    "label": "LOW  archetype: crushers",
-   "save": 103
+   "save": 107
+  },
+  {
+   "label": "LOW  world filler",
+   "save": 92
   },
   {
    "label": "LOW  archetype: bowl",
-   "save": 102
-  },
-  {
-   "label": "VFX  score pops",
-   "save": 100
-  },
-  {
-   "label": "SFX  sndHit silent",
-   "save": 94
-  },
-  {
-   "label": "VFX  the trail",
-   "save": 74
+   "save": 84
   },
   {
    "label": "RWD  coin arc",
-   "save": 68
+   "save": 79
+  },
+  {
+   "label": "VFX  score pops",
+   "save": 78
+  },
+  {
+   "label": "VFX  the trail",
+   "save": 76
+  },
+  {
+   "label": "SFX  sndHit silent",
+   "save": 71
   },
   {
    "label": "RWD  destruction cache",
-   "save": 59
+   "save": 58
   },
   {
    "label": "LOW  archetype: rotor",
-   "save": 56
-  },
-  {
-   "label": "LOW  onboarding hints",
-   "save": 53
+   "save": 58
   },
   {
    "label": "VFX  debris fragments (k=4)",
-   "save": 52
+   "save": 57
   },
   {
    "label": "LOW  archetype: pegField",
-   "save": 49
-  },
-  {
-   "label": "VFX  shockwaves",
-   "save": 40
-  },
-  {
-   "label": "MUS  bass",
-   "save": 39
-  },
-  {
-   "label": "LOW  region gates",
-   "save": 37
+   "save": 54
   },
   {
    "label": "MUS  kick",
-   "save": 36
-  },
-  {
-   "label": "SFX  sndSpectrum silent",
-   "save": 33
-  },
-  {
-   "label": "SFX  sndBreak silent",
-   "save": 32
+   "save": 34
   },
   {
    "label": "MUS  pad (the chord that makes a region a place)",
-   "save": 31
+   "save": 33
+  },
+  {
+   "label": "MUS  bass",
+   "save": 28
   },
   {
    "label": "MUS  lead",
-   "save": 30
-  },
-  {
-   "label": "VFX  strokeFX",
-   "save": 29
-  },
-  {
-   "label": "SFX  sndGrav silent",
-   "save": 27
-  },
-  {
-   "label": "SFX  sndSpring silent",
-   "save": 27
-  },
-  {
-   "label": "SFX  sndDeath silent",
-   "save": 27
-  },
-  {
-   "label": "SFX  sndTether silent",
    "save": 26
-  },
-  {
-   "label": "SFX  sndVector silent",
-   "save": 26
-  },
-  {
-   "label": "SFX  sndBoost silent",
-   "save": 23
-  },
-  {
-   "label": "SFX  sndWarp silent",
-   "save": 22
   },
   {
    "label": "SFX  sndBank reuses sndCrown",
-   "save": 21
+   "save": 25
   },
   {
-   "label": "VFX  warpFX",
-   "save": 21
+   "label": "LOW  region gates",
+   "save": 19
   },
   {
    "label": "SFX  sndCoin silent",
-   "save": 17
+   "save": 18
   },
   {
    "label": "MUS  hats",
-   "save": 15
+   "save": 17
   },
   {
    "label": "MUS  snare",
-   "save": 13
+   "save": 17
   },
   {
    "label": "VFX  ring particles (k=2)",
+   "save": 17
+  },
+  {
+   "label": "VFX  shockwaves",
+   "save": 17
+  },
+  {
+   "label": "SFX  sndBreak silent",
+   "save": 14
+  },
+  {
+   "label": "SFX  sndSpectrum silent",
+   "save": 14
+  },
+  {
+   "label": "SFX  sndGrav silent",
    "save": 12
   },
   {
-   "label": "SFX  sndStall reuses sndUI",
-   "save": 9
+   "label": "SFX  sndDeath silent",
+   "save": 12
   },
   {
    "label": "SFX  sndPower reuses sndBank",
+   "save": 10
+  },
+  {
+   "label": "SFX  sndTether silent",
+   "save": 10
+  },
+  {
+   "label": "SFX  sndStall reuses sndUI",
    "save": 8
   },
   {
    "label": "RWD  upward temptation",
-   "save": 8
+   "save": 7
   },
   {
    "label": "RWD  mid booster",
-   "save": 4
+   "save": 7
   },
   {
    "label": "SFX  sndCrown reuses sndBank",
-   "save": 3
+   "save": 6
+  },
+  {
+   "label": "SFX  sndVector silent",
+   "save": 6
+  },
+  {
+   "label": "VFX  warpFX",
+   "save": 6
+  },
+  {
+   "label": "VFX  strokeFX",
+   "save": 5
+  },
+  {
+   "label": "SFX  sndSpring silent",
+   "save": 4
+  },
+  {
+   "label": "SFX  sndBoost silent",
+   "save": 4
   },
   {
    "label": "SFX  sndFuse reuses sndUI",
@@ -182,6 +174,10 @@
    "save": 0
   },
   {
+   "label": "SFX  sndWell reuses sndBank",
+   "save": 0
+  },
+  {
    "label": "SFX  sndGate reuses sndBank",
    "save": 0
   },
@@ -194,16 +190,20 @@
    "err": "not found in render.js:   } else {\n    const span = a2 < 0 ? 2.4 : TAU, n "
   },
   {
+   "label": "BG   both parallax layers -> one",
+   "save": 0
+  },
+  {
    "label": "LOW  focus vaults",
    "err": "no function buildVault in world.js"
   },
   {
-   "label": "SFX  sndWell reuses sndBank",
-   "save": -2
+   "label": "LOW  onboarding hints",
+   "err": "not found in hud.js:     const t = ['DRAG TO DRAW A RAINBOW RAIL', 'PRE"
   },
   {
-   "label": "BG   both parallax layers -> one",
-   "save": -5
+   "label": "SFX  sndWarp silent",
+   "save": -1
   }
  ]
 }

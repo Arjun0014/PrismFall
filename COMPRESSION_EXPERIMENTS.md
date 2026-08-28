@@ -948,3 +948,85 @@ extra code needed to handle five instead of seven.
 
 **The arithmetic: the authorised list is 729 B against a gap of 1,934 B.** Taking
 all of it leaves 1,205 B, which can only come from the preserve list.
+
+---
+
+# 13K competition edition
+
+Rollback point before this phase: tag **`v-full-15246`** — every feature intact,
+all suites green.
+
+| # | Change | Before | After | Delta |
+|---|---|---:|---:|---:|
+| 6a | store + cosmetics become Wavedash-only | 15,246 | 14,716 | **−530** |
+| 6b | trim the redundant half of the title X line | 14,716 | 14,699 | −17 |
+| 7 | cheaper atmosphere: one number per region | 14,699 | 14,611 | −88 |
+| 8 | seven rare cues borrow an existing sound | 14,611 | 14,542 | −69 |
+| 9 | remove Focus Vaults, relocate Prism Wells | 14,542 | 14,337 | −205 |
+| — | compressor re-search | 14,337 | 14,305 | −32 |
+| 10 | remove in-run hints and the dead save field | 14,305 | 14,213 | −92 |
+| — | final compressor pass | 14,213 | **14,178** | −35 |
+
+**15,246 → 14,178 B, −1,068.** Gap to 13,312: **866 B**.
+
+## What each one actually cost
+
+**6a — the store split.** Not a deletion: every site that reads a store or
+cosmetic field is behind `WD`, so the full system is still in the Wavedash
+build. Worth 530 B where stubbing the screen measured 283, because the split
+also removes the cosmetic table, both STORE buttons, the banked-coin readouts
+and all four variant renderers. Coins stay exactly as they were as in-run
+feedback. **COSN survived the first attempt**: Terser drops an unreferenced
+const only when it can prove the initialiser is side-effect free, and it will
+not assume that of `.split(' ')`. The build now *asserts* the competition
+bundle contains no store text rather than trusting the eliminator.
+
+**7 — the atmosphere.** Three primitive families driven by three numbers per
+region became one number per region: 0 is the cloud, positive *n* a filled
+*n*-gon, negative *n* an outlined one. Four of the seven regions had been using
+the same family as each other anyway. Cloudbreak keeps its clouds.
+
+**8 — borrowed cues.** Seven rare events reuse a sound instead of owning one.
+Each still fires and still carries its information in *pitch* — a target still
+climbs as its bank fills, pigment still pitches by colour. This made the audio
+contract sharper, not weaker: "no two cues share a synthesis signature" now
+means every cue that *owns* a sound owns a different one, and seven new
+assertions require each borrowing cue to actually make a noise.
+
+**9 — Focus Vaults.** Worth 205 B against a 74 B stub, because the vault flag,
+the chunk scan, the `slow` time-dilation blend, the camera focus, the screen
+tint, the mixer duck and the music's half-tempo branch all go with it. Two
+regressions the suites caught: the Prism Well spawned *only* inside a vault, so
+the game lost its only full pigment refill (wells are now a rare reward in their
+own right), and the shifted RNG stream left one resting state in twenty-five
+unescapable. Re-verified at **250 seeds**.
+
+## The gap is 866 B and everything left is on the protect list
+
+Measured against this build:
+
+| Option | Bytes | What it costs |
+|---|---:|---|
+| all parallax scenery (gradient stays) | 255 | region silhouettes |
+| archetype: crushers | 107 | Sunforge's signature room |
+| world filler | 92 | screen density — the pinball read |
+| archetype: bowl | 84 | a room type |
+| coin arc | 79 | the arc that teaches a trajectory |
+| score pops | 78 | SPECTRUM n/7, pickup names, BANK payouts |
+| the trail | 76 | the speed read |
+| destruction cache | 58 | coins behind breakables |
+| archetype: rotor | 58 | a room type |
+| debris fragments | 57 | destruction shards |
+| archetype: pegField | 54 | the peg field |
+| music: kick / pad / bass | 95 | the arrangement's identity |
+| music: lead / hats / snare | 60 | its intensity layers |
+| region gates | 19 | the rainbow pigment reward between regions |
+| shockwaves | 17 | impact pressure |
+
+Not listed: silencing `sndHit` (71 B) — that is the impact sound.
+
+**No combination reaching 866 B avoids the protect list.** The cheapest package
+that gets there is roughly: all parallax scenery + four of the nine archetypes +
+world filler + coin arcs + destruction caches + region gates + score pops. That
+is most of what "procedural worlds", "pinball movement" and "region identities"
+mean in this game.
