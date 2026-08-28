@@ -16,6 +16,7 @@
     "test:browser": "node tests/browser.mjs",
     "test:wavedash": "node tools/build.mjs --wavedash && node tests/wavedash.mjs",
     "test:feel": "node tools/build.mjs --dev && node tests/feel.mjs",
+    "test:title": "node tools/build.mjs --dev && node tests/title.mjs",
     "test:shots": "node tests/shots.mjs",
     "test:gallery": "node tools/build.mjs --dev && node tests/gallery.mjs",
     "serve": "node tools/serve.mjs"

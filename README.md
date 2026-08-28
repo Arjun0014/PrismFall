@@ -38,7 +38,9 @@ exactly what the effect is worth.
 Strokes that cross **fuse into a Prism Node** and share their effect bits, so
 mixing is composition rather than a table of special cases: Orange+Yellow is a
 spring that aims, Red+Indigo kicks you and flips gravity at once, Violet+Blue
-phases a whole rail.
+phases a whole rail. Because drawings are permanent you can build the crossing
+first and fall into it afterwards, which is what turns mixing from a trick into
+a plan. The title screen says so on a line painted through all seven hues.
 
 Each colour draws from its own finite pigment reservoir. Red cannot be spammed
 forever; you refill from coloured shards, partial spectrum-diversity refunds and

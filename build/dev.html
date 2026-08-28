@@ -2399,8 +2399,18 @@ function screenTitle() {
   [
     'DRAG near the unicorn · your drawings STAY until something uses them',
     'R push · O aim · Y spring · G tether · B rail · I gravity · V warp',
+    0,   // the mixing line, painted below through the whole spectrum
     'longer line = stronger effect · X lets go · 1-7 or SCROLL picks a colour',
-  ].forEach((l, i) => txt(l, W / 2, H - 112 * U + i * 19 * U, 13, i === 1 ? W6 : i ? W3 : W9, !i));
+  ].forEach((l, i) => l && txt(l, W / 2, H - 122 * U + i * 19 * U, 13,
+    i === 1 ? W6 : i > 2 ? W3 : W9, !i));
+  // Mixing is the deepest rule in the game -- two crossing strokes fuse and the
+  // line then does both colours at once -- and it was nowhere on this screen.
+  // It gets its own line, drawn through all seven hues, so the sentence
+  // demonstrates the thing it is describing.
+  const mix = X.createLinearGradient(W / 2 - 300 * U, 0, W / 2 + 300 * U, 0);
+  for (let i = 0; i < 7; i++) mix.addColorStop(i / 6, chsl(i, 68));
+  txt('CROSS TWO STROKES TO MIX THEM — O+Y aims AND springs, R+I kicks AND flips',
+    W / 2, H - 84 * U, 13, mix, 1);
   if (WD) wdIdentity(W / 2, H * .3 - 74 * U), wdBoard(W - 190 * U, H / 2 - 40 * U);
   // Below the buttons, not at a fixed offset from the title: at 16:9 heights
   // the old position landed straight on top of PLAY.
