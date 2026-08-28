@@ -566,5 +566,18 @@
   "note": "anti-inlining Terser block",
   "delta": -45,
   "left": -3239
+ },
+ {
+  "date": "2026-08-28 11:38",
+  "quick": false,
+  "zip": 16558,
+  "min": 45877,
+  "raw": 120456,
+  "rr": 21883,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 7,
+  "left": -3246
  }
 ]
