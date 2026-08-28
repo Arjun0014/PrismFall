@@ -91,7 +91,25 @@ for (const n of Object.keys(firstSig)) {
   else seen[k] = n;
 }
 ok(dupes.length === 0, 'no two cues share a synthesis signature', dupes.join(','));
-ok(Object.keys(firstSig).length >= 18, 'cues are synthesised, not stubs', Object.keys(firstSig).length);
+// Seven cues deliberately borrow a sound rather than owning one (see the
+// "cues that borrow" block in audio.js). They record no signature of their own,
+// because the cue they call records it instead -- so the distinctness check
+// above now says exactly what it should: every cue that OWNS a sound owns a
+// different one.
+const BORROW = 'sndTarget sndPig sndWell sndFuse sndRefund sndEmpty sndGate'.split(' ');
+ok(Object.keys(firstSig).length >= CUES.length - BORROW.length - 1,
+  'every cue that owns a sound is synthesised, not a stub',
+  Object.keys(firstSig).length + '/' + (CUES.length - BORROW.length));
+// What a borrowing cue must still do is make a noise. A borrowed sound is a
+// design choice; a silent event is a bug.
+for (const n of BORROW) {
+  // Clear the per-frame voice budget first: ok() refuses to synthesise once 26
+  // voices are already out, and the soak above leaves it full.
+  E('voices=0');
+  const before = H.audioStats.created;
+  E(n + '(1)');
+  ok(H.audioStats.created > before, n + ' still sounds', H.audioStats.created - before);
+}
 // Impact and boost must scale with the event, not play a fixed sample.
 ok(new Set(sig.sndHit || []).size > 20, 'impact sound varies with impulse', new Set(sig.sndHit || []).size);
 ok(new Set(sig.sndCoin || []).size > 3, 'coin pitch rises through a chain', new Set(sig.sndCoin || []).size);

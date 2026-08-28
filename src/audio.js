@@ -119,11 +119,18 @@ function sndBreak(d) {
 
 // A scoring target: pitch climbs with how much of the bank is already lit, so
 // you can hear how close a bank is without reading the pips.
-function sndTarget(f) {
-  const n = 76 + f * 12 | 0;
-  O('square', NOTE(n), NOTE(n + 7), .07, .12);
-  O('triangle', NOTE(n + 12), 0, .12, .1);
-}
+// --- cues that borrow -------------------------------------------------------
+// Seven rare events reuse a sound that already exists rather than carrying one
+// of their own. Every one still fires, still lands on the right beat, and still
+// carries its information in PITCH -- the part a player actually reads. A
+// target still climbs as its bank fills and pigment still pitches by colour,
+// because the sound they borrow is itself pitch-driven.
+//
+// What they give up is a timbre of their own, and they are the seven nobody
+// could describe from memory. The signature sounds -- impact, destruction, the
+// seven colour verbs, the coin, the crown, the bank, death, Full Spectrum --
+// are untouched.
+function sndTarget(f) { sndCoin(f * 8); }
 function sndBank() {
   ARP(70, [0, 4, 7, 12, 16, 19], .5, .12, 'square', .04, 12);
   N(.7, .22, 'bandpass', 700, 6000, .8);
@@ -183,20 +190,17 @@ function ARP(root, offs, dur, pk, w, gap, up) {
 }
 const MAJ = [0, 4, 7, 12];
 function sndCrown() { ARP(70, MAJ, .5, .12, 'triangle', .05); }
-function sndPig(c) { O('triangle', NOTE(64 + c * 2), NOTE(70 + c * 2), .16, .16); }
-function sndWell() {
-  ARP(60, SCALE[1], .5, .12, 'sine', .06, 12);
-  N(.9, .16, 'bandpass', 720, 6000, .8);
-}
+function sndPig(c) { sndCoin(c); }
+function sndWell() { sndCrown(); }
 function sndSpectrum() {
   ARP(60, SCALE[1], .7, .12, 'sawtooth', .05, 12);
   ARP(90, MAJ, 1.6, .1, 'sine', 0);
   if (AC) N(1.2, .2, 'bandpass', 420, 8000, .7, 0, now() + .3);
 }
-function sndFuse() { O('square', 1400, 2600, .05, .1); O('sine', 900, 1800, .1, .1); }
-function sndRefund() { O('triangle', NOTE(70), NOTE(90), .16, .12); }
+function sndFuse() { sndUI(1); }
+function sndRefund() { sndCoin(0); }
 function sndPower() { ARP(60, [0, 5, 10], .12, .1, 'square', .06, 2); }
-function sndEmpty() { O('sine', 150, 70, .12, .16); N(.06, .07, 'lowpass', 500, 200, 1); }
+function sndEmpty() { sndUI(0); }
 function sndStall(u) { O('sine', 70 + u * 40, 48, .16, .12 + u * .16); }
 function sndDeath() {
   ARP(70, [0, -3, -6, -9, -12, -15, -18], .8, .1, 'sawtooth', .04, -30);
@@ -204,10 +208,7 @@ function sndDeath() {
   O('sine', 120, 30, 1.2, .3);
 }
 function sndUI(up) { O('square', up ? 900 : 620, up ? 1200 : 500, .04, .07); }
-function sndGate() {
-  ARP(48, [0, 7, 12, 16, 19], 1.6, .1, 'triangle', 0);
-  N(1.4, .2, 'bandpass', 300, 5200, .6);
-}
+function sndGate() { sndBank(); }
 
 // --- per-frame continuous layers ------------------------------------------
 // Continuous layers, updated once a frame:

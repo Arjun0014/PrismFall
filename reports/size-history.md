@@ -90,3 +90,6 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 18:46 | EXP6a store+cosmetics -> WD only | 116474 | 70847 | 19497 | **14761** | -485 | -1449 | roadroller |
 | 2026-08-28 18:46 | EXP6a store fully eliminated | 116782 | 70750 | 19438 | **14716** | -45 | -1404 | roadroller |
 | 2026-08-28 19:06 | EXP6b title copy trim | 116910 | 70719 | 19416 | **14699** | -17 | -1387 | roadroller |
+| 2026-08-28 19:10 | EXP7 cheap atmosphere | 116855 | 69969 | 19297 | **14611** | -88 | -1299 | roadroller |
+| 2026-08-28 19:19 | EXP8 rare cues borrow | 116855 | 69969 | 19297 | **14611** | 0 | -1299 | roadroller |
+| 2026-08-28 19:19 | EXP8 rare cues borrow | 117105 | 69478 | 19207 | **14542** | -69 | -1230 | roadroller |

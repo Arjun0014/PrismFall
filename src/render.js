@@ -136,7 +136,7 @@ function background() {
     const x1 = flr((cx + hw) / size), y1 = flr((cy + hh) / size);
     for (let gy = flr((cy - hh) / size); gy <= y1; gy++)
       for (let gx = flr((cx - hw) / size); gx <= x1; gx++) {
-        const v = hsh(gx * 30 + k[0], gy * 17);
+        const v = hsh(gx * 30 + k, gy * 17);
         if (v < .5) continue;
         const wx = (gx + .16 + hsh(gx, gy) * .7) * size, wy = (gy + .16 + hsh(gy, gx + 9) * .7) * size;
         const hue = pal[6] + (v - .5) * 60 | 0;
@@ -147,21 +147,28 @@ function background() {
   }
 }
 
-// Motif families: [prim, a, b].
-// prim 0 blobs - 1 polygon(a sides, b/10 inner radius, b<0 rough)
-// prim 2 rings(a) + spokes(|b|), b<0 = partial arcs instead of full rings.
-const MOT = [[0, 3, 0], [2, 1, 8], [2, 2, -3], [1, 5, 4], [1, 7, -1], [2, 3, 6], [2, 1, 4]];
+// One number per region is the whole motif system: 0 is the cloud, a positive
+// n a filled n-gon, a negative n an outlined one. Seven regions, seven
+// silhouettes, one shape function.
+//
+// This replaced three separate primitive families -- blobs, polygons with an
+// inner radius and a roughness flag, and rings-plus-spokes with partial-arc
+// variants -- driven by a table of three numbers each. That machinery was the
+// single most expensive presentation system in the game at 361 archive bytes,
+// and four of the seven regions were using the same family as each other
+// anyway. Cloudbreak keeps its clouds, because the cloud is the one silhouette
+// nothing else can stand in for.
+//   Cloudbreak clouds - Sunforge hex ring - Verdant triangle ring -
+//   Crystal pentagon - Mine heptagon - Temple octagon ring - Engine square ring
+const MOT = [0, -6, -3, 5, 7, -8, -4];
 
 function motif(k, x, y, r, v) {
-  const a1 = k[1], a2 = k[2];
   BP();
-  if (!k[0]) {
+  if (!k) {
     // A cloud is a union of lobes sitting on a flat base. Every lobe MUST open
     // its own subpath: consecutive arcs in one path are joined by a straight
     // line, and those chords are the hard triangular wedges that were showing
     // up inside every cloud in Cloudbreak.
-    // A cloud spans about 3.4x its lobe radius, where every other motif spans
-    // 2x, so it is scaled down to occupy the same footprint as its neighbours.
     r *= .6;
     const n = 4 + (v * 4 | 0), base = y + r * .3;
     for (let i = 0; i < n; i++) {
@@ -174,27 +181,17 @@ function motif(k, x, y, r, v) {
       AR(lx, ly, lr);
     }
     // A slab along the bottom closes the gaps between lobes into one silhouette.
-    MT(x - r * .95, base);
-    X.roundRect(x - r * .95, base - r * .3, r * 1.9, r * .3, r * .16);
+    X.roundRect(x - r * .9, base - r * .3, r * 1.9, r * .3, r * .16);
     X.fill();
-  } else if (k[0] < 2) {
-    for (let i = 0; i < a1; i++) {
-      const a = i / a1 * TAU + v * 4;
-      const q = r * (a2 < 0 ? .6 + hsh(i, v * 90) * .5 : i & 1 ? a2 / 10 : 1);
-      VTX(i, x + cos(a) * q, y + sin(a) * q);
-    }
-    X.closePath(); X.fill();
-  } else {
-    const span = a2 < 0 ? 2.4 : TAU, n = abs(a2);
-    for (let i = 1; i <= a1; i++) { BP(); AR(x, y, r * (1 - i * .2), v * TAU, v * TAU + span); X.stroke(); }
-    BP();
-    for (let i = 0; i < n; i++) {
-      const a = i / n * TAU + T * .06 * (v > .7 ? -1 : 1);
-      MT(x + cos(a) * r * .5, y + sin(a) * r * .5);
-      LT(x + cos(a) * r, y + sin(a) * r);
-    }
-    X.stroke();
+    return;
   }
+  const n = abs(k);
+  for (let i = 0; i < n; i++) {
+    const a = i / n * TAU + v * 4;
+    VTX(i, x + cos(a) * r, y + sin(a) * r);
+  }
+  X.closePath();
+  if (k > 0) X.fill(); else X.stroke();
 }
 
 // --- world -----------------------------------------------------------------

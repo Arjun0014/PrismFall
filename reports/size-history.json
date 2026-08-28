@@ -1112,5 +1112,44 @@
   "note": "EXP6b title copy trim",
   "delta": -17,
   "left": -1387
+ },
+ {
+  "date": "2026-08-28 19:10",
+  "quick": false,
+  "zip": 14611,
+  "min": 69969,
+  "raw": 116855,
+  "rr": 19297,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP7 cheap atmosphere",
+  "delta": -88,
+  "left": -1299
+ },
+ {
+  "date": "2026-08-28 19:19",
+  "quick": false,
+  "zip": 14611,
+  "min": 69969,
+  "raw": 116855,
+  "rr": 19297,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP8 rare cues borrow",
+  "delta": 0,
+  "left": -1299
+ },
+ {
+  "date": "2026-08-28 19:19",
+  "quick": false,
+  "zip": 14542,
+  "min": 69478,
+  "raw": 117105,
+  "rr": 19207,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP8 rare cues borrow",
+  "delta": -69,
+  "left": -1230
  }
 ]
