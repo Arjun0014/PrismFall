@@ -90,6 +90,13 @@ export function literals(src) {
       // The hue argument of a colour call is identity, whatever it is made of.
       if (a.type === 'CallExpression' && a.callee.type === 'Identifier' &&
         HUEFN.has(a.callee.name) && a.arguments[0] === child) return 0;
+      // Both ends of a generated range, together or not at all. ri(760, 1080)
+      // snapped independently became ri(700, 1400): the low end moved 8% down,
+      // the high end 30% up, and the span more than doubled. That is not a
+      // nudge to a value, it is a different distribution -- rooms of a
+      // different size and a different rhythm.
+      if (a.type === 'CallExpression' && a.callee.type === 'Identifier' &&
+        (a.callee.name === 'ri' || a.callee.name === 'rf')) return 0;
       // A table is a table: REG, MOT, SCALE, KICK, BASSR, pal, HUE, PC.
       if (a.type === 'ArrayExpression' && stack[i - 1] && stack[i - 1].type === 'VariableDeclarator') return 0;
       // ...and anything a hue is stored in.

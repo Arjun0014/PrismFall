@@ -78,3 +78,7 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 16:44 | EXP3a clustering, decay-guarded | 116033 | 73368 | 20242 | **15317** | +5 | -2005 | roadroller |
 | 2026-08-28 16:54 | EXP3a clustering render+audio only | 116035 | 73370 | 20282 | **15348** | +31 | -2036 | roadroller |
 | 2026-08-28 17:05 | EXP3b cluster world | 115999 | 73332 | 20194 | **15283** | -65 | -1971 | roadroller |
+| 2026-08-28 17:19 | EXP3c second clustering pass at 20% | 115950 | 73283 | 20076 | **15192** | -91 | -1880 | roadroller |
+| 2026-08-28 17:20 |  | 116548 | 73332 | 20194 | **15283** | +91 | -1971 | roadroller |
+| 2026-08-28 17:21 | EXP3c 20% pass, range-guarded | 116503 | 73287 | 20090 | **15206** | -77 | -1894 | roadroller |
+| 2026-08-28 17:28 |  | 116548 | 73332 | 20194 | **15283** | +77 | -1971 | roadroller |

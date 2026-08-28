@@ -821,3 +821,56 @@ keeps a cue's character keeps its parameters and therefore saves nothing. This
 closes the audio avenue: the only way to collect that 454 B is to accept
 arbitrary sounds, and that is not a compression change, it is a redesign with a
 worse result.
+
+## EXP 3 — Targeted perceptual constant clustering
+
+Replace a rare constant with a value the program already uses, close enough that
+no player could tell. Unlike the expression rewrites of #14 and #19 this really
+does retire a value: it adds no characters and it shrinks the pool.
+
+The search is **subtractive** — snap everything, then drop what hurts. Greedy-add
+from nothing stalled at −48 B where snapping everything was worth −155, because
+retiring a value only pays once *all* its occurrences are gone, so most
+individual snaps measure at zero and a one-at-a-time walk never starts.
+
+| Pass | Files | Tol | Before | After | Delta | Decision |
+|---|---|---:|---:|---:|---:|---|
+| 3a | render, audio | 12% | 15,430 | **15,348** | **−82** | KEEP |
+| 3b | world | 12% | 15,348 | **15,283** | **−65** | KEEP |
+| 3c | render, audio, world | 20% | 15,283 | 15,206 | −77 | **REVERT** |
+
+### The rails, all of which were written after something broke
+
+**Structural, not numeric.** The first version snapped `540` to `500` inside
+`(((b - a + 540) % 360) - 180)` — the shortest-angular-distance idiom, where 540
+is 360 + 180 and is *arithmetic*. Every hue interpolation then took the wrong way
+round the wheel and the title screen went from purple to teal. Literals inside
+modular or bitwise arithmetic, inside the hue argument of a colour call, inside a
+table, or in anything named after a hue are now refused outright.
+
+**Relative tolerance is the wrong ruler for anything exponentiated.**
+`p.vx *= .985` → `.9` is an 8% relative change and a **sevenfold** change in how
+fast a particle stops, because it is applied sixty times a second. Constants just
+under 1 are refused.
+
+**Both ends of a range move together or not at all.** `ri(760, 1080)` snapped
+independently became `ri(700, 1400)`: low end 8% down, high end 30% up, span more
+than doubled. That is not a nudge to a value, it is a different distribution —
+rooms of a different size and a different rhythm.
+
+**UI layout is relational, not perceptual.** `hud.js` is excluded entirely.
+Moving `modal`'s subtitle offset without the store's grid offset put the subtitle
+straight through the first row of items. Worth 31 B and not worth having.
+
+### Why 20% is over the line
+
+The 12% passes are invisible. The 20% pass passed the archive test and failed the
+game, in two specific ways the suites caught:
+
+- **`no seed is hopeless even for a modest policy [804]`** — one seed became
+  effectively unplayable, reaching 804 depth against a floor of 1,500.
+- **`no two cues share a synthesis signature [sndRail=sndFuse]`** — two sounds
+  collapsed into the same sound.
+
+Twelve percent is the ceiling for this codebase, and it is a measured ceiling
+rather than a guessed one.

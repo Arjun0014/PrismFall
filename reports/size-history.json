@@ -956,5 +956,57 @@
   "note": "EXP3b cluster world",
   "delta": -65,
   "left": -1971
+ },
+ {
+  "date": "2026-08-28 17:19",
+  "quick": false,
+  "zip": 15192,
+  "min": 73283,
+  "raw": 115950,
+  "rr": 20076,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP3c second clustering pass at 20%",
+  "delta": -91,
+  "left": -1880
+ },
+ {
+  "date": "2026-08-28 17:20",
+  "quick": false,
+  "zip": 15283,
+  "min": 73332,
+  "raw": 116548,
+  "rr": 20194,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 91,
+  "left": -1971
+ },
+ {
+  "date": "2026-08-28 17:21",
+  "quick": false,
+  "zip": 15206,
+  "min": 73287,
+  "raw": 116503,
+  "rr": 20090,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP3c 20% pass, range-guarded",
+  "delta": -77,
+  "left": -1894
+ },
+ {
+  "date": "2026-08-28 17:28",
+  "quick": false,
+  "zip": 15283,
+  "min": 73332,
+  "raw": 116548,
+  "rr": 20194,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 77,
+  "left": -1971
  }
 ]
