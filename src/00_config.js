@@ -102,16 +102,11 @@ const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split('
 // Drafted between descents, permanent for the rest of the run. Like BOOST these
 // are pure table rows: each boon is a bit, and exactly one system reads it, so
 // adding one costs a name and an `if`.
-const BOONN = ('PRISM HEART|+30% pigment capacity, refilled now|' +
-  'AFTERGLOW|every stroke costs 30% less pigment|' +
-  'MOMENTUM|far less drag at speed, and a higher ceiling|' +
-  'DEMOLITION|panels shatter at half the impact, twice the chain|' +
-  'LODESTONE|coins are pulled to you at any multiplier|' +
-  'SECOND WIND|the stall clock runs 80% longer|' +
-  'RESONANCE|bumpers pay double and bleed pigment back|' +
-  'WIDE PALETTE|two more strokes may live on the field|' +
-  'HARD LIGHT|your strokes fire twice before they are spent|' +
-  'GOLDEN HOUR|every coin is worth triple').split('|');
+const BOONN = ('PRISM HEART|+30% pigment, refilled|AFTERGLOW|strokes cost 30% less|' +
+  'MOMENTUM|far less drag at speed|DEMOLITION|panels break at half the hit|' +
+  'LODESTONE|coins always pull to you|SECOND WIND|stall clock +80%|' +
+  'RESONANCE|bumpers pay double|WIDE PALETTE|+2 stroke slots|' +
+  'HARD LIGHT|strokes fire twice|GOLDEN HOUR|coins worth triple').split('|');
 const NBOON = BOONN.length >> 1;
 const bn = (i) => (boon >> i) & 1;
 
