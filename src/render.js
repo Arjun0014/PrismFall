@@ -80,10 +80,9 @@ function partStep(h) {
 
 // --- camera ----------------------------------------------------------------
 function camUpdate(h) {
-  const v = vault;
-  C.x = approach(C.x, v ? v.cx : P.x + clamp(P.vx * .12, -180, 180), v ? 3.2 : 7.5, h);
-  C.y = approach(C.y, v ? v.cy : P.y + clamp(P.vy * .22, -.2 * VH, .22 * VH), v ? 3.2 : 7.5, h);
-  C.z = approach(C.z, v ? .8 : 1 / (1 + P.sp / 5200), 4, h);
+  C.x = approach(C.x, P.x + clamp(P.vx * .12, -180, 180), 7.5, h);
+  C.y = approach(C.y, P.y + clamp(P.vy * .22, -.2 * VH, .22 * VH), 7.5, h);
+  C.z = approach(C.z, 1 / (1 + P.sp / 5200), 4, h);
   SC = mn(H / VH, W / (COL * 2 + 48)) * C.z;
   // Keep the play column framed. Without this the velocity lead walks the
   // camera off the side of the world and half the screen becomes dead rock.

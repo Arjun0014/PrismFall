@@ -1151,5 +1151,31 @@
   "note": "EXP8 rare cues borrow",
   "delta": -69,
   "left": -1230
+ },
+ {
+  "date": "2026-08-28 19:28",
+  "quick": false,
+  "zip": 14326,
+  "min": 68192,
+  "raw": 115273,
+  "rr": 18920,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP9 remove focus vaults",
+  "delta": -216,
+  "left": -1014
+ },
+ {
+  "date": "2026-08-28 19:35",
+  "quick": false,
+  "zip": 14337,
+  "min": 68228,
+  "raw": 115554,
+  "rr": 18930,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 11,
+  "left": -1025
  }
 ]

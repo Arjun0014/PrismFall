@@ -96,11 +96,6 @@ function hud() {
       'PIGMENT IS FINITE - GRAB SHARDS'][hint];
     if (t) txt(t, W / 2, H - 118 * U, 15, W6, 1);
   }
-  if (slow > .05) {
-    X.fillStyle = 'hsl(275 60% 60% / ' + slow * .1 + ')';
-    X.fillRect(0, 0, W, H);
-    txt('FOCUS VAULT', W / 2, H - 96 * U, 16, W6, 1);
-  }
 }
 
 // Seven reservoirs: fill = pigment left, ring = selection, dot = chain state.

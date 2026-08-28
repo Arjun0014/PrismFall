@@ -68,7 +68,6 @@ const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]]
 
 const regZone = (r) => REG[r][7];
 let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
-let vault = null;   // chunk currently focusing the camera
 // Shared build context for the archetype builders: the playable span, its
 // centre and width, the region's material bias and the current difficulty.
 // Set once per chunk by genChunk so no builder has to take seven parameters.
@@ -190,7 +189,6 @@ function genChunk() {
   bW = bR - bL; bX = (bL + bR) / 2; bB = b; bD = dif;
 
   if (boundary) buildGate(c);
-  else if (cIdx > 2 && rp(.1)) { c.v = 1; buildVault(c, rg); }
   else {
     const k = +REG[rg][5][ri(0, 9)];
     c.k = k;
@@ -395,23 +393,6 @@ function crushers(c) {
 }
 
 // --- special rooms ---------------------------------------------------------
-// Focus Vault - a slow, enclosed prize room. Some of them hold a Prism Well
-// instead of a Crown Coin, which is the game's only full pigment refill.
-function buildVault(c, rg) {
-  const cx = bX, cy = c.y + c.h * .5, r = mn(bW * .4, 240);
-  c.cx = cx; c.cy = cy;
-  arcSegs(c, cx, cy, r, .8 * PI, 2.4 * PI, M_BUMP);   // bowl with a top-left mouth
-  const well = rp(.4);
-  for (let a = 0; a < 3; a++) c.o.push(sg(cx, cy, r * .5, a * PI / 3, M_BUMP, { w: rs() * .5 }));
-  c.i.push(item(well ? I_WELL : I_CROWN, cx, cy - r * .8));
-  c.i.push(item(I_PIG, cx - r * .6, cy + r * .3, pick(aff(rg))));
-  c.i.push(item(I_PIG, cx + r * .6, cy + r * .3, ri(0, 6)));
-  for (let i = 0; i < 6; i++)
-    c.i.push(item(I_COIN, cx + cos(i / 6 * TAU) * r * .8, cy + sin(i / 6 * TAU) * r * .8));
-}
-
-// Region exit machine: a spinning prism above a closing throat, then a full
-// spectrum of pigment as a reward for getting through it.
 function buildGate(c) {
   const cx = bX, cy = c.y + c.h * .4;
   rotor(c);
@@ -449,6 +430,10 @@ function rewards(c, rg) {
   // Upward temptation, above the entry line.
   if (rp(.3 * rich)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 6), .02, .16);
   if (rp(.16 * rich)) place(I_BOOST, ri(0, 6), .3, .8);
+  // The Prism Well is the game's only full refill. It used to be locked inside
+  // a Focus Vault; with those gone it becomes a rare find in its own right,
+  // still rare enough that hitting one feels like luck rather than supply.
+  if (rp(.07 * rich)) place(I_WELL, 0, .2, .8);
   // Destruction cache: coins sealed behind breakable panels.
   if (rp(.22 * rich)) {
     const x = rp(.5) ? bL + 90 : bR - 90, y = c.y + rf(.22, .7) * c.h;
@@ -463,7 +448,7 @@ function rewards(c, rg) {
 function worldReset(sd) {
   seed = sd || (rnd() * 1e9) | 0;
   srnd(seed);
-  chunks = []; nextY = -900; prevL = -COL; prevR = COL; cIdx = 0; vault = null;
+  chunks = []; nextY = -900; prevL = -COL; prevR = COL; cIdx = 0;
   // Opening room: open, gentle, and it demonstrates bouncing within seconds.
   const c = { y: -900, h: 1400, l: -COL, r: COL, pl: -COL, pr: COL, o: [], i: [], rg: 0, k: 0, v: 0, z: 0, bk: [] };
   c.o.push(sgAB(-COL, -900, -COL, 500, 0), sgAB(COL, -900, COL, 500, 0),

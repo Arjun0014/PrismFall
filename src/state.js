@@ -11,7 +11,6 @@ let W = 0, H = 0, SC = 1;      // canvas pixel size, world->screen scale
 // 0 title  1 playing  2 paused  3 results  4 store
 let st = 0;
 let T = 0;        // wall-clock seconds since load (drives animation)
-let slow = 0;     // 0..1 focus-vault time dilation blend
 let shake = 0;    // camera shake energy
 let flash = 0;    // full-screen flash energy
 let flashH = 0;   // flash hue

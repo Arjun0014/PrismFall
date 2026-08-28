@@ -41,7 +41,7 @@ function startRun(sd) {
   audioInit();
   st = 1; score = 0; coins = 0; mult = 1; depth = 0; reg = 0; regShow = 3.2;
   chain = 0; chainN = 0; chainT = 0; fullSpec = 0; combo = 0; comboT = 0;
-  deadT = 0; slow = 0; vault = null; shake = 0; flash = 0; hstop = 0;
+  deadT = 0; shake = 0; flash = 0; hstop = 0;
   pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
   boostT = [0, 0, 0, 0, 0, 0, 0];
   strokes = []; parts = []; trail = []; pops = []; nodes = []; shocks = [];
@@ -85,14 +85,6 @@ function die() {
 // --- per-frame -------------------------------------------------------------
 function update(dt) {
   worldUpdate();
-
-  // Focus Vaults dilate presentation time only; the stall check below uses
-  // simulation speed, so slow motion can never fake a death.
-  vault = null;
-  for (const c of chunks) if (c.v && P.y > c.y + 120 && P.y < c.y + c.h - 120) vault = c;
-  const was = slow;
-  slow = approach(slow, vault ? 1 : 0, 3.5, dt);
-  if (was > .5 && slow <= .5) { burst(P.x, P.y, 14, 0, 420, HUE[6]); sndVector(1); }
 
   if (P.al) physicsFrame(dt);
 
@@ -207,7 +199,7 @@ function frame(ts) {
   // Hit-stop: a shatter or a hard bumper freezes the simulation for a few
   // frames while the particles keep moving. It costs four lines and it is the
   // single largest contributor to a hit feeling like it landed.
-  let dt = raw * lerp(1, .4, slow);
+  let dt = raw;
   if (hstop > 0) { hstop -= raw; dt *= .12; }
   T += dt;
   if (st === 1 || st === 0) update(dt);

@@ -222,7 +222,7 @@ function audioFrame() {
   set(railG.gain, P.ra && !SAVE.m && play ? .1 + n * .12 : 0, .04);
   set(railF.frequency, 700 + P.sp * 1.4, .04);
   set(railO.frequency, 90 + P.sp * .2, .04);
-  set(lpF.frequency, slow > .05 ? 500 : st === 2 ? 700 : 20000, .1);
+  set(lpF.frequency, st === 2 ? 700 : 20000, .1);
   set(musG.gain, SAVE.m ? 0 : st === 1 ? .5 : .3, .2);
   if (play) musicTick();
   else mNext = t + .1;
@@ -242,7 +242,7 @@ const BASSR = [0x8889, 0xa4a5, 0x9192, 0xcccd, 0x8484, 0xa8a9, 0xaaab];
 function musicTick() {
   const root = 40 + reg * 5 % 11, sc = SCALE[reg % 4], w = WAVE[reg % 3];
   const inten = clamp(P.sp / VFAST, 0, 1.6) + (fullSpec > 0 ? .6 : 0);
-  const spb = 15 / ((90 + reg * 7) * (slow > .5 ? .5 : 1));
+  const spb = 15 / (90 + reg * 7);
   const kick = KICK[reg], bassr = BASSR[reg];
   const t0 = now();
   for (let guard = 8; mNext < t0 + .16 && guard--;) {

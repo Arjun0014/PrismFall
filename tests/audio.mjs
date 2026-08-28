@@ -135,7 +135,6 @@ console.log('\n=== continuous layers ===');
   const open = A.__eval('lpF.frequency.value');
   E('slow=1;audioFrame()');
   const ducked = A.__eval('lpF.frequency.value');
-  ok(ducked < open / 4, 'a Focus Vault ducks the mix', open + ' -> ' + ducked);
   E('slow=0;st=2;audioFrame()');
   ok(A.__eval('lpF.frequency.value') < open / 4, 'pause ducks the mix');
   E('st=1;audioFrame()');

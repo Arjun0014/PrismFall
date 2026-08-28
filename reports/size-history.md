@@ -93,3 +93,5 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 19:10 | EXP7 cheap atmosphere | 116855 | 69969 | 19297 | **14611** | -88 | -1299 | roadroller |
 | 2026-08-28 19:19 | EXP8 rare cues borrow | 116855 | 69969 | 19297 | **14611** | 0 | -1299 | roadroller |
 | 2026-08-28 19:19 | EXP8 rare cues borrow | 117105 | 69478 | 19207 | **14542** | -69 | -1230 | roadroller |
+| 2026-08-28 19:28 | EXP9 remove focus vaults | 115273 | 68192 | 18920 | **14326** | -216 | -1014 | roadroller |
+| 2026-08-28 19:35 |  | 115554 | 68228 | 18930 | **14337** | +11 | -1025 | roadroller |
