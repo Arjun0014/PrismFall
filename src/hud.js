@@ -173,7 +173,9 @@ function screenTitle() {
     'DRAG near the unicorn - drawings STAY until used - longer = stronger',
     'R push - O aim - Y spring - G tether - B rail - I gravity - V warp',
     0,   // the mixing line, painted below through the whole spectrum
-    'X lets go - 1-7 or SCROLL picks a colour',
+    // '1-7 or SCROLL picks a colour' was here too and is now cut: the in-run
+    // hint teaches it. 'X lets go' stays because nothing else in the game does.
+    'X lets go',
   ].forEach((l, i) => l && txt(l, W / 2, H - 122 * U + i * 19 * U, 13,
     i === 1 ? W6 : i > 2 ? W3 : W9, !i));
   // Mixing is the deepest rule in the game -- two crossing strokes fuse and the

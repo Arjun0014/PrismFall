@@ -89,3 +89,4 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 17:58 | deep model re-search | 116548 | 73302 | 20146 | **15246** | -2 | -1934 | roadroller (deep) |
 | 2026-08-28 18:46 | EXP6a store+cosmetics -> WD only | 116474 | 70847 | 19497 | **14761** | -485 | -1449 | roadroller |
 | 2026-08-28 18:46 | EXP6a store fully eliminated | 116782 | 70750 | 19438 | **14716** | -45 | -1404 | roadroller |
+| 2026-08-28 19:06 | EXP6b title copy trim | 116910 | 70719 | 19416 | **14699** | -17 | -1387 | roadroller |

@@ -1099,5 +1099,18 @@
   "note": "EXP6a store fully eliminated",
   "delta": -45,
   "left": -1404
+ },
+ {
+  "date": "2026-08-28 19:06",
+  "quick": false,
+  "zip": 14699,
+  "min": 70719,
+  "raw": 116910,
+  "rr": 19416,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP6b title copy trim",
+  "delta": -17,
+  "left": -1387
  }
 ]
