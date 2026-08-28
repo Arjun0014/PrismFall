@@ -943,5 +943,18 @@
   "note": "EXP3a clustering render+audio only",
   "delta": 31,
   "left": -2036
+ },
+ {
+  "date": "2026-08-28 17:05",
+  "quick": false,
+  "zip": 15283,
+  "min": 73332,
+  "raw": 115999,
+  "rr": 20194,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "EXP3b cluster world",
+  "delta": -65,
+  "left": -1971
  }
 ]

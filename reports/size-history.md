@@ -77,3 +77,4 @@ Hard limit 13312 B. Target <= 13000 B.
 | 2026-08-28 16:33 | EXP3a perceptual clustering render+hud+audio | 116026 | 73361 | 20234 | **15312** | +20 | -2000 | roadroller |
 | 2026-08-28 16:44 | EXP3a clustering, decay-guarded | 116033 | 73368 | 20242 | **15317** | +5 | -2005 | roadroller |
 | 2026-08-28 16:54 | EXP3a clustering render+audio only | 116035 | 73370 | 20282 | **15348** | +31 | -2036 | roadroller |
+| 2026-08-28 17:05 | EXP3b cluster world | 115999 | 73332 | 20194 | **15283** | -65 | -1971 | roadroller |
