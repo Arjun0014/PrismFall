@@ -7,12 +7,15 @@
   "scripts": {
     "build": "node tools/build.mjs",
     "pack": "node tools/build.mjs --deep",
+    "build:wavedash": "node tools/build.mjs --wavedash",
     "size": "node tools/build.mjs --quiet",
     "test": "node tools/build.mjs && node tests/run.mjs",
     "test:sim": "node tests/sim.mjs",
     "test:gen": "node tests/gen.mjs",
     "test:audio": "node tests/audio.mjs",
     "test:browser": "node tests/browser.mjs",
+    "test:wavedash": "node tools/build.mjs --wavedash && node tests/wavedash.mjs",
+    "test:feel": "node tools/build.mjs --dev && node tests/feel.mjs",
     "test:shots": "node tests/shots.mjs",
     "test:gallery": "node tools/build.mjs --dev && node tests/gallery.mjs",
     "serve": "node tools/serve.mjs"

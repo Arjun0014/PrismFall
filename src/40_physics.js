@@ -27,8 +27,9 @@ function detachRail(boost) {
 function railStep(h) {
   const s = P.ra;
   const dx = s.x2 - s.x1, dy = s.y2 - s.y1, L = hyp(dx, dy);
-  if (s.l <= 0 || L < 8) { detachRail(1); return 0; }
-  s.l = mx(s.l, .1);
+  // A rail lasts as long as its line does, and its line is permanent. You come
+  // off it by reaching an end, by hitting something, or by pressing X.
+  if (s.u || L < 8) { detachRail(1); return 0; }
   const ux = dx / L, uy = dy / L;
   let sp = P.vx * ux + P.vy * uy;
   sp = sp * .998 + (Gx * ux + Gy * uy) * h;
@@ -39,7 +40,13 @@ function railStep(h) {
   }
   P.rt += sp * h / L;
   P.vx = ux * sp; P.vy = uy * sp;
-  if (P.rt < 0 || P.rt > 1) { P.rt = clamp(P.rt, 0, 1); detachRail(1); return 0; }
+  if (P.rt < 0 || P.rt > 1) {
+    P.rt = clamp(P.rt, 0, 1);
+    // Superrail reflects at the ends instead of dropping you, turning even a
+    // short line into a shuttle.
+    if (P.rw > 0) { P.rw -= h; P.vx = -P.vx; P.vy = -P.vy; P.rt = clamp(P.rt, .02, .98); sndSpring(400); }
+    else { detachRail(1); return 0; }
+  }
   const nx = -uy * P.rs, ny = ux * P.rs;
   P.x = s.x1 + dx * P.rt + nx * (R + ST);
   P.y = s.y1 + dy * P.rt + ny * (R + ST);
@@ -78,7 +85,7 @@ function tetherConstrain() {
 // reward for keeping a chain alive, never a substitute for aim: the radius
 // only opens up once the multiplier is already high, and it pulls coins only.
 function items(h) {
-  const mag = mult > 4 ? 60 + mult * 24 : 0;
+  const mag = bn(4) ? 180 + mult * 24 : mult > 4 ? 60 + mult * 24 : 0;
   for (const c of NC) for (const it of c.i) {
     if (it.g) continue;
     const dx = P.x - it.x, dy = P.y - it.y, d = hyp(dx, dy);
@@ -109,7 +116,7 @@ function hitOb(o) {
 
   if (o.m & M_BREAK) {
     const imp = -vn;
-    if (imp > (P.rp > 0 ? BRK_R : BRK_E)) { shatter(o, px, py, imp); return; }
+    if (imp > (P.rp > 0 ? BRK_R : BRK_E) * (bn(3) ? .5 : 1)) { shatter(o, px, py, imp, 0); return; }
   }
 
   P.x += nx * pen; P.y += ny * pen;
@@ -117,6 +124,8 @@ function hitOb(o) {
   if (vn >= 0) return;
 
   const bump = o.m & M_BUMP, damp = o.m & M_DAMP;
+  o.f = 1;                                   // contact flash, read by the renderer
+  if (o.m & M_TGT) light(o, px, py);
   // A bumper's restitution falls off with speed: it kicks hard when you are
   // slow (a genuine rescue) and bleeds energy when you are already flying.
   // Without this the world is a closed energy pump and every run saturates at
@@ -138,19 +147,99 @@ function hitOb(o) {
 
   const imp = -vn;
   sndHit(imp, damp ? 1 : bump ? 2 : 0, o.x + o.y);
-  shake = mn(26, shake + imp * (bump ? .006 : .0035));
+  shake = mn(26, shake + imp * (bump ? .008 : .0035));
   const n = clamp(imp * .012, 1, 14) | 0;
   burst(px, py, n, 1, mn(imp * .35, 420), geoHue(o));
+
+  // A bumper is a scoring event, not just a wall. It pays, it feeds the same
+  // combo the coins do, and above a real impact it stops time for a frame and
+  // throws a ring -- which is the whole difference between hitting geometry
+  // and playing a pinball table.
+  if (bump && imp > 150) {
+    combo++; comboT = 1.6;
+    const v = (18 + imp * .05) * mult * (bn(6) ? 2 : 1) | 0;
+    score += v;
+    if (bn(6)) { const c2 = flr(rr() * 7); pig[c2] = mn(pmax(), pig[c2] + 2.4); }
+    if (imp > 620) {
+      pop(px, py, '+' + v, HUE[2]);
+      shock(px, py, 60 + mn(imp * .2, 190), pal[6] + 30);
+      hstop = mx(hstop, .045);
+    }
+  }
 }
 
-function shatter(o, px, py, imp) {
+// A scoring target lights on contact; lighting the last one in its bank pays
+// the whole bank out and re-arms it.
+function light(o, px, py) {
+  if (o.lt) return;
+  const k = o.bk;
+  o.lt = 1;
+  if (!k) return;
+  k.l++;
+  const v = 60 * mult | 0;
+  score += v;
+  sndTarget(k.l / k.n);
+  burst(px, py, 10, 0, 260, 48);
+  if (k.l < k.n) return;
+  // Bank cleared: pay out, refill a little pigment, re-arm.
+  k.l = 0;
+  for (const q of k.m) q.lt = 0;
+  const big = 420 * k.n * mult | 0;
+  score += big;
+  coins += k.n * 2;
+  for (let i = 0; i < 7; i++) pig[i] = mn(pmax(), pig[i] + 5);
+  pop(k.x, k.y, 'BANK +' + big, 48);
+  shock(k.x, k.y, 320, 48);
+  flash = mx(flash, .4); flashH = 48;
+  shake = mn(30, shake + 12);
+  hstop = mx(hstop, .07);
+  sndBank();
+}
+
+// Breaking a panel throws real debris and lights the fuse on its neighbours,
+// so one good hit unzips a whole structure instead of punching a single hole.
+// `d` is the cascade depth, purely so the chain reads as a wave outward.
+function shatter(o, px, py, imp, d) {
   o.k = 1;
-  shake = mn(30, shake + 10);
-  burst(px, py, 22, 2, 460, geoHue(o));
-  sndBreak();
-  score += 45 * mult | 0;
-  pop(px, py, '+' + (45 * mult | 0), 45);
-  P.vx *= .84; P.vy *= .84;
+  const h = geoHue(o);
+  shake = mn(32, shake + 10 - d);
+  burst(px, py, 18, 2, 460, h);
+  shards(px, py, o, h);
+  shock(px, py, 150, h);
+  sndBreak(d);
+  const v = 60 * mult * (1 + d * .5) | 0;
+  score += v;
+  combo++; comboT = 1.6;
+  if (!d) { pop(px, py, '+' + v, 45); hstop = mx(hstop, .05); }
+
+  // Light the fuse on every breakable neighbour. Staggering by distance turns
+  // a cluster into a chain rather than a single silent frame.
+  if (d > 3) return;
+  const rad = BRK_CH * (bn(3) ? 2 : 1);
+  for (const c of NC) for (const q of c.o) {
+    if (q === o || q.k || q.kt || !(q.m & M_BREAK)) continue;
+    const dd = hyp(q.x - px, q.y - py);
+    if (dd < rad + q.r) { q.kt = .04 + dd / rad * .1; q.kd = d + 1; }
+  }
+  P.vx *= .9; P.vy *= .9;
+}
+
+// Fuses lit by a cascade, ticked once per frame from the game loop.
+function fuseStep(h) {
+  for (const c of chunks) for (const o of c.o) {
+    if (!o.kt || o.k) continue;
+    if ((o.kt -= h) > 0) continue;
+    obT(o);
+    shatter(o, _cx, _cy, 0, o.kd);
+  }
+}
+
+// Debris: spinning shards that carry the colour of what they came from.
+function shards(x, y, o, h) {
+  for (let i = 0; i < 7; i++) {
+    const a = rf(0, TAU), v = rf(90, 420);
+    pt(x, y, cos(a) * v, sin(a) * v, rf(.5, 1.1), h, 4, rf(3, 8) * (o.t ? 1 : 1.4));
+  }
 }
 
 const geoHue = (o) => o.m & M_DAMP ? 280 : o.m & M_BREAK ? 20 : o.m & M_PHASE ? 285 : pal[6];
@@ -160,15 +249,26 @@ function physics(h) {
   const sp0 = hyp(P.vx, P.vy);
   NC = nearChunks(P.y - 420 - sp0 * h, P.y + 420 + sp0 * h);
 
+  // The region's force field, sampled at the body's own position.
+  let fx = Gx, fy = Gy;
+  for (const c of NC) if (c.z && P.y >= c.y && P.y < c.y + c.h) {
+    zoneF(c, P.x, P.y);
+    fx += _zx; fy += _zy;
+    break;
+  }
+
   if (P.te) {
     P.te.t -= h;
-    P.te.l = mx(48, P.te.l - 62 * h);
-    P.vx += Gx * h; P.vy += Gy * h;
+    // No reel-in: the radius stays exactly the length you drew, which is the
+    // whole contract of this verb. The orbit is topped up in tetherConstrain
+    // instead, so a swing still never quietly dies.
+
+    P.vx += fx * h; P.vy += fy * h;
     if (P.te.t <= 0) releaseTether();
   } else if (P.ra) {
     // rail supplies its own motion
   } else {
-    P.vx += Gx * h; P.vy += Gy * h;
+    P.vx += fx * h; P.vy += fy * h;
   }
   clampV();
 
@@ -178,8 +278,9 @@ function physics(h) {
   // instead of the player. Below VFAST there is no drag at all, so recovering
   // from a stall is never taxed.
   let sp = hyp(P.vx, P.vy);
-  if (sp > VFAST) {
-    const d = mx(0, 1 - (sp / VFAST - 1) * 1.5 * h);
+  const vf = VFAST * (bn(2) ? 1.5 : 1);
+  if (sp > vf) {
+    const d = mx(0, 1 - (sp / vf - 1) * (bn(2) ? .6 : 1.5) * h);
     P.vx *= d; P.vy *= d;
     sp *= d;
   }

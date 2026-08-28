@@ -24,11 +24,20 @@ const COL = 400;       // standard play-column half width (near-4:3 zone)
 const WMAX = 545;      // absolute wall half width (side rooms)
 
 // -- strokes ----------------------------------------------------------------
-const SMAX = 150;      // max stroke length
+// Strokes are PERMANENT. A drawing stays on the field until something uses it,
+// which is what makes the seven colours a toolkit you can lay out in advance
+// and combine, rather than a twitch input that evaporates before you can mix.
+// Only a *spent* stroke fades, and only so the consumption reads visually.
+const SMAX = 210;      // max stroke length
+const SMIN = 22;       // below this a stroke is too short to fire
 const SREACH = 305;    // max distance from the unicorn a stroke may start
-const SLIFE = 1.8;     // stroke lifetime in seconds
-const SLIM = 3;        // simultaneous live strokes
+const SPENT = .22;     // fade-out of a consumed stroke, in seconds
+const SLIM = 5;        // simultaneous live strokes (FIFO once exceeded)
 const ST = 5;          // stroke half-thickness for collision
+// Every colour scales with how long you drew it: pow(L / SNOM, ...) is the one
+// rule behind all seven verbs, and pigment already costs per unit length, so
+// "bigger effect costs more" needs no extra economy.
+const SNOM = 105;      // the length at which a stroke has its nominal strength
 
 // -- pigment ----------------------------------------------------------------
 const PMAX = 100;                                  // per-reservoir capacity
@@ -41,7 +50,7 @@ const STALLW = 0.9;    // stall seconds before the warning kicks in
 
 // -- colours ----------------------------------------------------------------
 // Red Orange Yellow Green Blue Indigo Violet — order never changes.
-const HUE = [0, 32, 54, 140, 200, 258, 296];
+const HUE = [0, 32, 54, 140, 200, 248, 312];
 const CBIT = [1, 2, 4, 8, 16, 32, 64];
 const ALL7 = 127;
 
@@ -52,12 +61,24 @@ const M_BREAK = 4;   // shatters above an impact-energy threshold
 const M_PHASE = 8;   // solid unless the unicorn is phased (Violet)
 const M_ANCH = 16;   // drawn as a Green tether anchor
 const M_RAIL = 32;   // drawn as a Blue guide rail
+const M_TGT = 64;    // pinball score target: banks light up, a full bank pays out
 
 // -- world ------------------------------------------------------------------
 const CHUNKS = 26;       // retained chunk ring size
 const REGD = 15000;      // depth of one region
-const BRK_E = 1180;      // impact speed needed to break a panel
-const BRK_R = 400;       // ... while Red-charged
+const NREG = 7;          // regions in one descent
+const BRK_E = 900;       // impact speed needed to break a panel
+const BRK_R = 300;       // ... while Red-charged
+const BRK_CH = 150;      // radius a shatter propagates to its neighbours
+
+// -- zones ------------------------------------------------------------------
+// A chunk may carry one force field. This is the cheapest way to give a region
+// a mechanic of its own rather than only a palette: one number per chunk and
+// four lines in the physics step.
+// 0 none  1 updraft  2 gravity well  3 crosswind  4 inversion  5 coil  6 current
+// Six themed regions, six fields, no two alike -- if two regions shared one
+// they would play the same however differently they were painted.
+const Z_UP = 1, Z_WELL = 2, Z_WIND = 3, Z_INV = 4, Z_FLOW = 5, Z_RUSH = 6;
 
 // -- items ------------------------------------------------------------------
 const I_COIN = 0, I_CROWN = 1, I_PIG = 2, I_WELL = 3, I_BOOST = 4;
@@ -76,6 +97,23 @@ const BOOST = [
   [7, .4, 12],      // White Efficiency - every colour costs less
 ];
 const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split(' ');
+
+// -- boons ------------------------------------------------------------------
+// Drafted between descents, permanent for the rest of the run. Like BOOST these
+// are pure table rows: each boon is a bit, and exactly one system reads it, so
+// adding one costs a name and an `if`.
+const BOONN = ('PRISM HEART|+30% pigment capacity, refilled now|' +
+  'AFTERGLOW|every stroke costs 30% less pigment|' +
+  'MOMENTUM|far less drag at speed, and a higher ceiling|' +
+  'DEMOLITION|panels shatter at half the impact, twice the chain|' +
+  'LODESTONE|coins are pulled to you at any multiplier|' +
+  'SECOND WIND|the stall clock runs 80% longer|' +
+  'RESONANCE|bumpers pay double and bleed pigment back|' +
+  'WIDE PALETTE|two more strokes may live on the field|' +
+  'HARD LIGHT|your strokes fire twice before they are spent|' +
+  'GOLDEN HOUR|every coin is worth triple').split('|');
+const NBOON = BOONN.length >> 1;
+const bn = (i) => (boon >> i) & 1;
 
 // -- localStorage namespace -------------------------------------------------
 const LS = 'pf26_save';

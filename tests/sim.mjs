@@ -35,7 +35,7 @@ function clean(vx, vy) {
 
 // Build a live stroke with an arbitrary effect mask directly under the player.
 function stroke(mask, x1, y1, x2, y2, c) {
-  const s = { x1, y1, x2, y2, e: mask, c: c === undefined ? 0 : c, l: A.SLIFE, u: 0, paid: 0 };
+  const s = { x1, y1, x2, y2, e: mask, c: c === undefined ? 0 : c, l: 0, u: 0, paid: 0, n: 1 };
   A.strokes.push(s);
   return s;
 }
@@ -311,15 +311,25 @@ console.log('\n=== physics robustness ===');
   ok(A.hyp(A.P.vx, A.P.vy) <= A.VMAX + 1, 'velocity clamp holds', A.hyp(A.P.vx, A.P.vy) | 0);
 }
 {
-  // Constraint cleanup: a rail whose stroke expires must not strand the player.
+  // Constraint cleanup. A rail lasts as long as its line does, and lines are
+  // permanent, so the way one ends is being consumed or scrolling out of reach
+  // -- either must detach the rail rather than stranding the player on it.
   const P = clean(0, 300);
   const s = stroke(16, -100, SY, 100, SY);
   A.__eval('collideAll(1/120)');
   ok(P.ra === s, 'rail attached');
-  s.l = -1;
   A.__eval('update(1/60)');
-  ok(!P.ra, 'expiring the stroke detaches the rail');
-  ok(A.strokes.indexOf(s) < 0, 'the dead stroke is removed');
+  ok(P.ra === s, 'the rail does NOT expire on a timer');
+  s.u = 1; s.l = -1;
+  A.__eval('update(1/60)');
+  ok(!P.ra, 'consuming the stroke detaches the rail');
+  ok(A.strokes.indexOf(s) < 0, 'the spent stroke is removed once it has faded');
+
+  // Scrolling far above the player is the only other way a drawing leaves.
+  const s2 = stroke(1, -100, SY, 100, SY);
+  A.P.y = s2.y2 + 4000;
+  A.__eval('update(1/60)');
+  ok(A.strokes.indexOf(s2) < 0, 'a drawing far behind the player is culled');
 }
 {
   // Stroke cap.
@@ -447,7 +457,7 @@ console.log('\n=== persistence ===');
 console.log('\n=== boosters ===');
 {
   // Every booster must measurably change the verb it names.
-  const KEY = ['sp', 'sp', 'te', 'rl', 'gt', 'ph', 'cost'];
+  const KEY = ['sp', 'sp', 'te', 'rw', 'gt', 'ph', 'cost'];
   const probe = (bi, on) => {
     A.__eval('startRun(808);st=1');
     A.__eval('for(const c of chunks){c.o.length=0;c.i.length=0}');
@@ -465,7 +475,7 @@ console.log('\n=== boosters ===');
     }
     stroke(A.CBIT[c], -90, SY, 90, SY, c);
     A.__eval('collideAll(1/120)');
-    return { sp: A.hyp(P.vx, P.vy), gt: P.gt, ph: P.ph, te: P.te ? P.te.l : 0, rl: P.ra ? P.ra.l : 0 }[KEY[bi]];
+    return { sp: A.hyp(P.vx, P.vy), gt: P.gt, ph: P.ph, te: P.te ? P.te.l : 0, rw: P.rw }[KEY[bi]];
   };
   for (let i = 0; i < 7; i++) {
     const off = probe(i, 0), on = probe(i, 1);
@@ -589,6 +599,249 @@ console.log('\n=== regions ===');
   ok(new Set(pals).size === 7, 'seven distinct region palettes');
   const grammars = new Set(A.REG.map((r) => r[4]));
   ok(grammars.size === 7, 'seven distinct chunk grammars');
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n=== permanent drawings ===');
+{
+  // The whole point of the rework: a drawing you never use never goes away.
+  const P = clean(0, 0);
+  A.__eval('startRun(41);st=1');
+  A.__eval('for(const c of chunks){c.o.length=0;c.i.length=0}');
+  A.__eval('sel=0;mwx=P.x+40;mwy=P.y-200;startStroke();mwx=P.x+140;mwy=P.y-200;moveStroke();drawing=null');
+  const s = A.strokes[A.strokes.length - 1];
+  ok(!!s, 'a stroke was drawn');
+  // Far more than the old 1.8s lifetime, with the player nowhere near it.
+  A.P.x = 0; A.P.y = s.y1 - 30; A.P.vx = 0; A.P.vy = 0;
+  for (let i = 0; i < 600; i++) { A.P.y = s.y1 - 30; A.P.vy = 0; A.__eval('update(1/60)'); }
+  ok(A.strokes.indexOf(s) >= 0, 'an unused drawing survives ten seconds', A.strokes.length);
+  ok(!s.u, 'and is still live, not spent');
+
+  // Consuming it is the only thing that spends it.
+  const P2 = clean(0, 600);
+  const s2 = stroke(1, -100, SY, 100, SY);
+  A.__eval('collideAll(1/120)');
+  ok(s2.u === 1, 'using a drawing spends it');
+  ok(s2.l > 0 && s2.l <= A.SPENT, 'a spent drawing fades rather than vanishing', s2.l);
+}
+{
+  // The cap is a FIFO, not a timer: drawing past the limit retires the oldest.
+  A.__eval('startRun(42);st=1;strokes.length=0');
+  for (let i = 0; i < 4; i++)
+    A.__eval('sel=1;mwx=P.x+30;mwy=P.y+30;startStroke();mwx=P.x+120;mwy=P.y+120;moveStroke();drawing=null');
+  const first = A.strokes[0];
+  ok(A.strokes.length === 4, 'four drawings coexist', A.strokes.length);
+  for (let i = 0; i < 4; i++)
+    A.__eval('sel=1;mwx=P.x+30;mwy=P.y+30;startStroke();mwx=P.x+120;mwy=P.y+120;moveStroke();drawing=null');
+  ok(A.strokes.length === A.SLIM, 'the cap holds', A.strokes.length);
+  ok(A.strokes.indexOf(first) < 0, 'the oldest drawing is the one retired');
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n=== green tether: pinned to the start, sized by the line ===');
+{
+  // Anchor at the START of the drag, length equal to the line's own length,
+  // and no clamp — a tiny line gives a tiny orbit and a huge one a huge orbit.
+  for (const L of [30, 90, 200]) {
+    const P = clean(0, 0);
+    P.y = 400;
+    const s = stroke(8, -L / 2, SY, L / 2, SY);
+    A.__eval('collideAll(1/120)');
+    const te = P.te;
+    ok(!!te, 'tether attached at length ' + L);
+    if (!te) continue;
+    ok(Math.abs(te.x - s.x1) < 1e-6 && Math.abs(te.y - s.y1) < 1e-6,
+      'anchored at the start of the drawing (L=' + L + ')', te.x + ',' + te.y);
+    ok(Math.abs(te.l - L) < 1e-6, 'rope length equals the line length (L=' + L + ')', te.l);
+  }
+}
+{
+  // The rope is a real constraint at any size: released from beyond its reach,
+  // the body is pulled back onto the circle rather than drifting off.
+  const P = clean(0, 0);
+  P.y = 400;
+  stroke(8, -20, SY, 20, SY);
+  A.__eval('collideAll(1/120)');
+  const te = P.te;
+  P.x = te.x + 900; P.y = te.y;
+  A.__eval('tetherConstrain()');
+  ok(Math.abs(A.hyp(P.x - te.x, P.y - te.y) - te.l) < 1, 'a short rope still holds',
+    A.hyp(P.x - te.x, P.y - te.y).toFixed(1));
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n=== length drives every colour ===');
+{
+  // One rule for all seven verbs: a longer line is a stronger effect.
+  const probe = (mask, L, key) => {
+    const P = clean(0, 300);
+    P.y = 400;
+    stroke(mask, -L / 2, SY, L / 2, SY, 0);
+    A.__eval('Gx=0;Gy=GRAV');
+    A.__eval('collideAll(1/120)');
+    return { sp: A.hyp(P.vx, P.vy), gt: P.gt, ph: P.ph, te: P.te ? P.te.l : 0 }[key];
+  };
+  const CASES = [[1, 'sp', 'Red'], [2, 'sp', 'Orange'], [4, 'sp', 'Yellow'],
+    [8, 'te', 'Green'], [32, 'gt', 'Indigo'], [64, 'ph', 'Violet']];
+  for (const [m, k, name] of CASES) {
+    const shortV = probe(m, 40, k), longV = probe(m, 200, k);
+    ok(longV > shortV * 1.1, name + ' scales with how long you drew it',
+      shortV.toFixed(1) + ' -> ' + longV.toFixed(1));
+  }
+  // Below the minimum a line is inert rather than weakly firing, so a stray
+  // click never burns a colour.
+  const P = clean(0, 300);
+  P.y = 400;
+  const tiny = stroke(1, -8, SY, 8, SY);
+  A.__eval('collideAll(1/120)');
+  ok(!tiny.u, 'a line under the minimum length does not fire');
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n=== pinball: bumpers, targets, cascades ===');
+{
+  // A bumper is a scoring event, not just a wall.
+  const P = clean(0, 900);
+  A.__eval('score=0;mult=1;combo=0');
+  A.__eval('NC=[{o:[ci(0,432,24,M_BUMP)],i:[],bk:[]}]');
+  A.__eval('collideAll(1/120)');
+  ok(A.score > 0, 'hitting a bumper scores', A.score);
+  ok(A.combo > 0, 'and feeds the same combo the coins do', A.combo);
+}
+{
+  // A drop-target bank: light every target, get paid, and the bank re-arms.
+  const P = clean(0, 0);
+  A.__eval('score=0;mult=1;coins=0');
+  A.__eval(`
+    const c={o:[],i:[],bk:[]};
+    const k={n:3,l:0,cap:3,x:0,y:400,m:[]};
+    c.bk.push(k);
+    for(let i=0;i<3;i++){const o=ci(-60+i*60,400,20,M_TGT);o.bk=k;k.m.push(o);c.o.push(o)}
+    NC=[c];window.__bank=k;window.__c=c;
+  `);
+  const k = A.__eval('__bank');
+  for (let i = 0; i < 3; i++) {
+    const o = A.__eval('__c.o[' + i + ']');
+    A.__eval('light(__c.o[' + i + '],0,400)');
+  }
+  ok(A.score > 1000, 'clearing a bank pays out', A.score);
+  ok(k.l === 0, 'and the bank re-arms', k.l);
+  ok(A.__eval('__c.o.every(o=>!o.lt)'), 'every target in it is unlit again');
+  ok(A.coins > 0, 'a cleared bank also pays coins', A.coins);
+}
+{
+  // Breaking one panel must light the fuse on its neighbours.
+  const P = clean(0, 2000);
+  A.__eval('boon=0;hstop=0');
+  A.__eval(`
+    const c={o:[],i:[],bk:[]};
+    for(let i=0;i<5;i++)c.o.push(ci(i*60,400,20,M_BREAK));
+    NC=[c];chunks=[c];window.__c=c;
+  `);
+  A.__eval('shatter(__c.o[0],0,400,2000,0)');
+  const lit = A.__eval('__c.o.filter(o=>o.kt>0).length');
+  ok(lit > 0, 'a shatter lights fuses on its neighbours', lit);
+  ok(A.hstop > 0, 'and stops time for a moment', A.hstop.toFixed(3));
+  for (let i = 0; i < 60; i++) A.__eval('fuseStep(1/60)');
+  const gone = A.__eval('__c.o.filter(o=>o.k).length');
+  ok(gone > 1, 'the chain reaction actually propagates', gone + '/5');
+}
+{
+  // Red is the destruction verb: its blast should break panels it never hits.
+  const P = clean(0, 0);
+  P.y = 400;
+  A.__eval(`
+    const c={o:[],i:[],bk:[]};
+    for(let i=0;i<4;i++)c.o.push(ci(-60+i*40,540,16,M_BREAK));
+    NC=[c];chunks=[c];window.__c=c;
+  `);
+  stroke(1, -100, SY, 100, SY);
+  A.__eval('collideAll(1/120)');
+  const fused = A.__eval('__c.o.filter(o=>o.kt>0||o.k).length');
+  ok(fused > 0, 'a Red stroke detonates nearby panels', fused + '/4');
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n=== region force fields ===');
+{
+  // Every region that claims a mechanic has to actually apply a force.
+  for (let r = 0; r < 7; r++) {
+    const z = A.__eval('regZone(' + r + ')');
+    if (!z) { ok(r === 6, 'the Engine mixes fields instead of owning one'); continue; }
+    const f = A.__eval(`
+      const c={y:0,h:1000,l:-400,r:400,z:${z}};
+      let best=0;
+      for(let i=0;i<40;i++){zoneF(c,-380+i*19,500);best=mx(best,hyp(_zx,_zy))}
+      best;
+    `);
+    ok(f > 100, 'region ' + r + ' (' + A.REG[r][0] + ') field pushes', f.toFixed(0));
+  }
+  ok(new Set(A.REG.slice(0, 6).map((q) => q[7])).size === 6,
+    'the six themed regions each own a different field',
+    A.REG.slice(0, 6).map((q) => q[7]).join(','));
+}
+{
+  // A field must never be able to hold the unicorn still forever: it redirects,
+  // it does not trap.
+  A.__eval('startRun(77);st=1');
+  let zoned = 0;
+  for (let i = 0; i < 400 && !zoned; i++) {
+    A.__eval('update(1/60)');
+    zoned = A.__eval('chunks.filter(c=>c.z).length');
+  }
+  ok(zoned > 0, 'fields are generated during real play', zoned);
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n=== ascension draft ===');
+{
+  A.__eval('startRun(88);st=1');
+  ok(A.boon === 0 && A.descent === 0, 'a run starts with no boons');
+  A.P.y = A.NREG * A.REGD + 400;
+  A.__eval('update(1/60)');
+  ok(A.st === 5, 'finishing the seventh region opens the draft', A.st);
+  ok(A.draft.length === 2, 'two boons are offered', A.draft.length);
+  ok(A.draft[0] !== A.draft[1], 'and they are different');
+  A.__eval('screenAscend()');
+  ok(1, 'the draft screen draws');
+  const pick = A.draft[0];
+  A.__eval('takeBoon(0)');
+  ok(A.st === 1, 'taking one resumes the run', A.st);
+  ok(A.__eval('bn(' + pick + ')') === 1, 'the boon is applied');
+  ok(A.descent === 1, 'the descent counter advances', A.descent);
+  ok(A.pig.every((p) => p >= A.PMAX), 'and the tank is refilled');
+
+  // Boons are permanent within a run and gone at the start of the next.
+  for (let i = 0; i < 120; i++) A.__eval('update(1/60)');
+  ok(A.__eval('bn(' + pick + ')') === 1, 'a boon does not expire');
+  A.__eval('startRun(89)');
+  ok(A.boon === 0, 'a new run starts clean');
+}
+{
+  // Every boon has to measurably change the thing it names.
+  const setB = (i) => A.__eval('startRun(90);st=1;boon=' + (1 << i));
+  A.__eval('startRun(90);st=1;boon=0');
+  const basePmax = A.__eval('pmax()'), baseCost = A.__eval('costMul()');
+  const baseSlots = A.__eval('SLIM + (bn(7)?2:0)');
+  setB(0); ok(A.__eval('pmax()') > basePmax, 'PRISM HEART raises pigment capacity');
+  setB(1); ok(A.__eval('costMul()') < baseCost, 'AFTERGLOW lowers stroke cost');
+  setB(2); ok(A.__eval('(()=>{P.vx=VFAST*1.4;P.vy=0;const b=P.vx;physics(1/120);return P.vx>=b*.999})()'),
+    'MOMENTUM keeps speed that would otherwise bleed off');
+  setB(3); ok(A.__eval('BRK_E*(bn(3)?.5:1)') < A.BRK_E, 'DEMOLITION halves the break threshold');
+  setB(4); ok(A.__eval('bn(4)') === 1, 'LODESTONE is set');
+  setB(5); ok(A.__eval('STALLT*(bn(5)?1.8:1)') > A.STALLT, 'SECOND WIND lengthens the stall clock');
+  setB(6); ok(A.__eval('bn(6)') === 1, 'RESONANCE is set');
+  setB(7); ok(A.__eval('SLIM + (bn(7)?2:0)') > baseSlots, 'WIDE PALETTE adds stroke slots');
+  setB(8);
+  A.__eval('for(const c of chunks){c.o.length=0;c.i.length=0}');
+  A.__eval('sel=0;mwx=P.x+40;mwy=P.y+40;startStroke();mwx=P.x+140;mwy=P.y+140;moveStroke();drawing=null');
+  ok(A.strokes[A.strokes.length - 1].n === 2, 'HARD LIGHT gives a stroke two charges');
+  setB(9);
+  A.__eval('coins=0;grab({t:I_COIN,x:P.x,y:P.y,c:0,g:0})');
+  const gold = A.coins;
+  A.__eval('startRun(90);st=1;boon=0;coins=0;grab({t:I_COIN,x:P.x,y:P.y,c:0,g:0})');
+  ok(gold > A.coins, 'GOLDEN HOUR multiplies coin value', A.coins + ' -> ' + gold);
+  ok(A.NBOON === 10, 'ten boons exist', A.NBOON);
 }
 
 // ---------------------------------------------------------------------------

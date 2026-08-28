@@ -34,13 +34,14 @@ function startRun(sd) {
   audioInit();
   st = 1; score = 0; coins = 0; mult = 1; depth = 0; reg = 0; regShow = 3.2;
   chain = 0; chainN = 0; chainT = 0; fullSpec = 0; combo = 0; comboT = 0;
-  deadT = 0; slow = 0; vault = null; shake = 0; flash = 0;
+  deadT = 0; slow = 0; vault = null; shake = 0; flash = 0; hstop = 0;
+  boon = 0; draft = []; dsel = -1; descent = 0;
   pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
   boostT = [0, 0, 0, 0, 0, 0, 0];
-  strokes = []; parts = []; trail = []; pops = []; nodes = [];
+  strokes = []; parts = []; trail = []; pops = []; nodes = []; shocks = [];
   drawing = null; wheel = null;
   P.x = 0; P.y = -320; P.vy = 300; P.a = PI / 2;
-  P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300;
+  P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300; P.rw = 0;
   Gx = 0; Gy = GRAV;
   C.x = P.x; C.y = P.y; C.z = 1;
   pal = regPal(0);
@@ -61,6 +62,38 @@ function endRun() {
   if (!SAVE.t) { SAVE.t = 1; }
   save();
   sndRail(0);
+  if (WD) wdSubmit(score | 0, depth | 0);
+}
+
+// --- the Ascension draft ---------------------------------------------------
+// Reaching the bottom of the Rainbow Engine is not the end of the game: the
+// shaft loops, harder, and before it does you take one permanent upgrade from
+// two on offer. Boons are what make the second descent a different run rather
+// than the same run with bigger numbers.
+function ascend() {
+  const pool = [];
+  for (let i = 0; i < NBOON; i++) if (!bn(i)) pool.push(i);
+  if (!pool.length) { descent++; return; }
+  draft = [pool.splice(flr(rr() * pool.length), 1)[0]];
+  if (pool.length) draft.push(pool[flr(rr() * pool.length)]);
+  dsel = -1;
+  st = 5;
+  flash = 1; flashH = -1;
+  sndSpectrum();
+}
+
+function takeBoon(i) {
+  if (st !== 5 || i >= draft.length) return;
+  boon |= 1 << draft[i];
+  descent++;
+  st = 1;
+  // The upgrade lands with a full tank, so the new descent starts on the front
+  // foot rather than immediately begging for pigment.
+  for (let j = 0; j < 7; j++) pig[j] = pmax();
+  score += 5000 * mult | 0;
+  pop(P.x, P.y - 40, BOONN[draft[i] * 2], -1);
+  draft = [];
+  sndWell();
 }
 
 function die() {
@@ -88,6 +121,12 @@ function update(dt) {
 
   if (P.al) physicsFrame(dt);
 
+  fuseStep(dt);
+
+  // A descent is over once the Rainbow Engine is behind you. Everything below
+  // is the same seven regions again, harder, with whatever boon you drafted.
+  if (st === 1 && loopAt(P.y) > descent && P.al) { ascend(); return; }
+
   // region progression
   const r = regAt(P.y);
   if (r !== reg) {
@@ -103,11 +142,12 @@ function update(dt) {
 
   // Stall is the only failure state: too slow for too long and the run ends.
   if (P.al) {
+    const stallT = STALLT * (bn(5) ? 1.8 : 1);
     if (P.sp < STALLV) {
       P.st += dt;
-      const u = clamp((P.st - STALLW) / (STALLT - STALLW), 0, 1);
+      const u = clamp((P.st - STALLW) / (stallT - STALLW), 0, 1);
       if ((stallSnd -= dt) <= 0 && u > 0) { stallSnd = mx(.16, .55 - u * .4); sndStall(u); }
-      if (P.st > STALLT) die();
+      if (P.st > stallT) die();
     } else if (P.st > 0) {
       if (P.st > STALLW) burst(P.x, P.y, 8, 0, 260, HUE[0]);
       P.st = mx(0, P.st - dt * 2.6);
@@ -124,11 +164,14 @@ function update(dt) {
   if (chainT > 0 && (chainT -= dt) <= 0) { chain = 0; chainN = 0; }
   flash = mx(0, flash - dt * 2.4);
 
-  // Strokes age out unless they are being drawn or are the active rail.
+  // Strokes are permanent. Only a *spent* one runs a timer, and that timer is
+  // purely the fade that shows it was consumed. The single other way a drawing
+  // leaves the field is scrolling out of reach behind you, which the player
+  // never sees happen.
   for (let i = strokes.length; i--;) {
     const s = strokes[i];
-    if (s !== drawing && s !== P.ra) s.l -= dt;
-    if (s.l <= 0) {
+    if (s.u) s.l -= dt;
+    if ((s.u && s.l <= 0) || s.y2 < P.y - 2600) {
       if (P.ra === s) detachRail(1);
       if (s === drawing) drawing = null;
       strokes.splice(i, 1);
@@ -169,7 +212,7 @@ function draw() {
       : hsl(flashH | 0, 100, 72, flash * .45);
     X.fillRect(0, 0, W, H);
   }
-  if (st > 1) [0, 0, screenPause, screenResults, screenStore][st]();
+  if (st > 1) [0, 0, screenPause, screenResults, screenStore, screenAscend][st]();
   else if (!st) screenTitle();
   if (wheel && st === 1) prismWheel(); else wheel = null;
   cursor();
@@ -184,7 +227,11 @@ function frame(ts) {
   requestAnimationFrame(frame);
   const raw = clamp((ts - last) / 1000, 0, .05);
   last = ts;
-  const dt = raw * lerp(1, .4, slow);
+  // Hit-stop: a shatter or a hard bumper freezes the simulation for a few
+  // frames while the particles keep moving. It costs four lines and it is the
+  // single largest contributor to a hit feeling like it landed.
+  let dt = raw * lerp(1, .4, slow);
+  if (hstop > 0) { hstop -= raw; dt *= .12; }
   T += dt;
   if (st === 1 || st === 0) update(dt);
   else if (st === 3) partStep(dt);

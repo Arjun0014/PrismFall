@@ -107,10 +107,27 @@ function sndHit(imp, kind, tune) {
   } else if (kind) O('sine', 90, 42, .25, v * .5);
 }
 
-function sndBreak() {
-  N(.3, .45, 'bandpass', 2600, 300, 1.4);
-  O('triangle', 160, 38, .34, .5);
-  N(.09, .3, 'highpass', 4000, 9000, 1);
+// Depth is the cascade generation: each ring of a chain reaction rings a
+// little higher and a little thinner, so a collapse sounds like one event
+// spreading outward instead of six identical crashes on the same frame.
+function sndBreak(d) {
+  const k = 1 / (1 + d * .5);
+  N(.3 * k, .45 * k, 'bandpass', 2600 * (1 + d * .3), 300, 1.4);
+  O('triangle', 160 * (1 + d * .22), 38, .34 * k, .5 * k);
+  N(.09, .3 * k, 'highpass', 4000, 9000, 1);
+}
+
+// A scoring target: pitch climbs with how much of the bank is already lit, so
+// you can hear how close a bank is without reading the pips.
+function sndTarget(f) {
+  const n = 76 + f * 12 | 0;
+  O('square', NOTE(n), NOTE(n + 7), .07, .13);
+  O('triangle', NOTE(n + 12), 0, .13, .1);
+}
+function sndBank() {
+  ARP(72, [0, 4, 7, 12, 16, 19], .45, .13, 'square', .04, 12);
+  N(.7, .24, 'bandpass', 700, 6000, .8);
+  O('sine', 90, 300, .4, .3);
 }
 
 // --- the seven colours -----------------------------------------------------

@@ -30,9 +30,13 @@ let shX = 0, shY = 0;
 
 // --- particles -------------------------------------------------------------
 // k: 0 spark (streak), 1 debris, 2 ring. hue undefined = current colour.
+function shock(x, y, R, h) {
+  if (shocks.length > 26) shocks.shift();
+  shocks.push({ x, y, r: 0, R, h, t: 1 });
+}
 function pt(x, y, vx, vy, l, h, k, s) {
-  if (parts.length > 340) parts.shift();
-  parts.push({ x, y, vx, vy, l, L: l, h, k, s });
+  if (parts.length > 420) parts.shift();
+  parts.push({ x, y, vx, vy, l, L: l, h, k, s, a: rf(0, TAU), w: rf(-9, 9) });
 }
 function burst(x, y, n, k, spd, hue, vx, vy) {
   const h = hue === undefined ? HUE[sel] : hue;
@@ -60,6 +64,12 @@ function partStep(h) {
     if ((p.l -= h) <= 0) { parts.splice(i, 1); continue; }
     p.x += p.vx * h; p.y += p.vy * h;
     if (p.k !== 2) { p.vy += 400 * h; p.vx *= .985; p.vy *= .985; }
+    if (p.k === 4) p.a += p.w * h;
+  }
+  for (let i = shocks.length; i--;) {
+    const w = shocks[i];
+    w.r += (w.R - w.r) * mn(1, 9 * h);
+    if ((w.t -= h * 2.2) <= 0) shocks.splice(i, 1);
   }
   for (let i = pops.length; i--;) {
     const p = pops[i]; p.y -= 46 * h;
@@ -117,13 +127,13 @@ function background() {
   const k = MOT[reg];
   X.lineWidth = mx(1, 2.4 * SC);
   for (let L = 0; L < 2; L++) {
-    const par = L ? .4 : .16, size = L ? 300 : 560, al = L ? .13 : .05;
+    const par = L ? .4 : .16, size = L ? 330 : 560, al = L ? .085 : .045;
     const cx = C.x * par, cy = C.y * par, hw = W / 2 / SC, hh = H / 2 / SC;
     const x1 = flr((cx + hw) / size), y1 = flr((cy + hh) / size);
     for (let gy = flr((cy - hh) / size); gy <= y1; gy++)
       for (let gx = flr((cx - hw) / size); gx <= x1; gx++) {
         const v = hsh(gx * 31 + k[0], gy * 17);
-        if (v < .4) continue;
+        if (v < .5) continue;
         const wx = (gx + .15 + hsh(gx, gy) * .7) * size, wy = (gy + .15 + hsh(gy, gx + 9) * .7) * size;
         const hue = pal[6] + (v - .5) * 60 | 0;
         X.fillStyle = hsl(hue, 60, pal[7] | 0, al);
@@ -142,7 +152,26 @@ function motif(k, x, y, r, v) {
   const a1 = k[1], a2 = k[2];
   BP();
   if (!k[0]) {
-    for (let i = 0; i < 3; i++) AR(x + (i - 1) * r * .5, y + (i & 1 ? r * .16 : 0), r * (.5 - i * .06));
+    // A cloud is a union of lobes sitting on a flat base. Every lobe MUST open
+    // its own subpath: consecutive arcs in one path are joined by a straight
+    // line, and those chords are the hard triangular wedges that were showing
+    // up inside every cloud in Cloudbreak.
+    // A cloud spans about 3.4x its lobe radius, where every other motif spans
+    // 2x, so it is scaled down to occupy the same footprint as its neighbours.
+    r *= .58;
+    const n = 4 + (v * 4 | 0), base = y + r * .34;
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1) - .5;
+      // Fattest in the middle, tapering to the ends; the hash keeps every cloud
+      // in the field a different shape for free.
+      const lr = r * (.3 + .34 * cos(t * 2.6) + hsh(i * 7, v * 400) * .16);
+      const lx = x + t * r * 1.7, ly = base - lr * (.72 + hsh(i, v * 90) * .5);
+      MT(lx + lr, ly);
+      AR(lx, ly, lr);
+    }
+    // A slab along the bottom closes the gaps between lobes into one silhouette.
+    MT(x - r * .95, base);
+    X.roundRect(x - r * .95, base - r * .34, r * 1.9, r * .34, r * .17);
     X.fill();
   } else if (k[0] < 2) {
     for (let i = 0; i < a1; i++) {
@@ -172,14 +201,17 @@ const MSTY = [
   [292, 60, 30, 100, 74],    // phase wall
   [200, 80, 40, 100, 76],    // guide rail
   [140, 70, 34, 100, 70],    // tether anchor
+  [46, 38, 22, 90, 60],      // scoring target, unlit
+  [46, 100, 60, 100, 92],    // scoring target, lit
 ];
 function obStyle(o) {
   const m = o.m;
-  const i = m & M_DAMP ? 0 : m & M_BREAK ? 1 : m & M_PHASE ? 2 : m & M_RAIL ? 3 : m & M_ANCH ? 4 : -1;
+  const i = m & M_TGT ? (o.lt ? 6 : 5)
+    : m & M_DAMP ? 0 : m & M_BREAK ? 1 : m & M_PHASE ? 2 : m & M_RAIL ? 3 : m & M_ANCH ? 4 : -1;
   if (i < 0) {
-    const b = m & M_BUMP;
-    return [hsl(pal[6] + (b ? 30 : 0) | 0, b ? 90 : 46, b ? 46 : mx(26, pal[7] * .46) | 0),
-      hsl(pal[6] + (b ? 40 : 0) | 0, b ? 100 : 68, b ? 78 : pal[7] | 0)];
+    return m & M_BUMP
+      ? [hsl(pal[6] + 30 | 0, 92, 48), hsl(pal[6] + 40 | 0, 100, 80)]
+      : [hsl(pal[6] | 0, 52, 19), hsl(pal[6] | 0, 84, mx(58, pal[7]) | 0)];
   }
   const s = MSTY[i];
   return [hsl(s[0], s[1], s[2]), hsl(s[0], s[3], s[4])];
@@ -201,13 +233,26 @@ function drawWorld() {
       LT(w2sx(sd < 0 ? c.l : c.r), by);
       LT(sd, by); X.fill();
     }
+    if (c.z) drawZone(c);
     for (const o of c.o) {
       if (o.k) continue;
       obT(o);
       const s2 = obStyle(o);
+      const ox = w2sx(_cx), oy = w2sy(_cy);
+      // Contact flash. Everything you touch swells and glows for a moment, so a
+      // busy screen still reads as a chain of separate hits rather than a blur.
+      const f = o.f > 0 ? (o.f = mx(0, o.f - .05)) : 0;
+      // A lit fuse: the panel shudders and whitens in the instant before it goes.
+      const fz = o.kt > 0 ? 1 : 0;
+      if (f || fz) {
+        X.save();
+        X.translate(ox, oy); X.scale(1 + f * .3, 1 + f * .3); X.translate(-ox, -oy);
+        if (fz) X.globalAlpha = .5 + rnd() * .5;
+      }
       if (!o.t) {
-        CIR(w2sx(_cx), w2sy(_cy), o.r * SC, s2[0], s2[1], mx(1, 2.5 * SC));
-        if (o.m & M_BUMP) CIR(w2sx(_cx), w2sy(_cy), o.r * SC * .55, 0, s2[1], mx(1, 1.6 * SC));
+        CIR(ox, oy, o.r * SC, s2[0], s2[1], mx(1, (2.5 + f * 4) * SC));
+        if (o.m & M_BUMP) CIR(ox, oy, o.r * SC * .55, 0, s2[1], mx(1, 1.6 * SC));
+        if (f) CIR(ox, oy, (o.r + 6 + f * 22) * SC, 0, hsl(pal[6] + 30 | 0, 100, 80, f), mx(1, 2 * SC));
       } else {
         const cg = cos(_cg) * o.r, sg2 = sin(_cg) * o.r;
         LIN(w2sx(_cx - cg), w2sy(_cy - sg2), w2sx(_cx + cg), w2sy(_cy + sg2), wide, s2[0]);
@@ -217,9 +262,42 @@ function drawWorld() {
           SK(mx(1, 2 * SC), 'hsl(48 100% 80% / .85)');
           X.setLineDash([]);
         }
+        if (f) SK(mx(1, (2 + f * 5) * SC), hsl(pal[6] + 30 | 0, 100, 85, f));
       }
+      if (f || fz) { X.globalAlpha = 1; X.restore(); }
+    }
+    // Bank progress, floating above the middle of each partly-lit bank.
+    for (const k of c.bk) if (k.l) {
+      const bx = w2sx(k.x), by = w2sy(k.y) - 46 * SC;
+      for (let i = 0; i < k.n; i++)
+        CIR(bx + (i - (k.n - 1) / 2) * 13 * SC, by, 4 * SC,
+          i < k.l ? 'hsl(48 100% 68%)' : 'hsl(48 30% 32%)');
     }
     for (const it of c.i) if (!it.g) drawItem(it);
+  }
+}
+
+// A force field that cannot be seen is just the game cheating, so each one
+// draws its own flow: rising streaks for an updraft, converging ones for a
+// well, sideways drift for wind, upward fall for an inversion.
+function drawZone(c) {
+  const y0 = mx(c.y, s2wy(0) - 100), y1 = mn(c.y + c.h, s2wy(H) + 100), sp = y1 - y0;
+  if (sp <= 0) return;
+  const z = c.z;
+  const hue = z === Z_UP ? 190 : z === Z_WELL ? 288 : z === Z_WIND ? 24
+    : z === Z_INV ? 262 : z === Z_FLOW ? 150 : 186;
+  const drift = T * (z === Z_WIND ? 60 : z === Z_RUSH ? 320 : 200) * (z === Z_UP || z === Z_INV ? -1 : 1);
+  X.lineCap = 'round';
+  for (let i = 0; i < 24; i++) {
+    const q = hsh(i * 13, c.y | 0);
+    const x = lerp(c.l + 30, c.r - 30, hsh(i, 7));
+    const yy = y0 + (((q * sp + drift) % sp) + sp) % sp;
+    zoneF(c, x, yy);
+    const m = hyp(_zx, _zy);
+    if (m < 1) continue;
+    const ln = mn(64, m * .05);
+    LIN(w2sx(x), w2sy(yy), w2sx(x + _zx / m * ln), w2sy(yy + _zy / m * ln),
+      mx(1, 2.2 * SC), hsl(hue, 90, 72, .16 + q * .18));
   }
 }
 
@@ -266,9 +344,35 @@ function strokeColor(s, a) {
 function drawStrokes() {
   X.lineCap = 'round';
   for (const s of strokes) {
-    const a = clamp(s.l / SLIFE * 1.6, .12, 1);
-    LIN(w2sx(s.x1), w2sy(s.y1), w2sx(s.x2), w2sy(s.y2), mx(3, 16 * SC), strokeColor(s, a * .22));
+    // A live stroke is permanent, so it is drawn at full strength. Only a spent
+    // one fades, and that fade is the only thing that says it was consumed.
+    const a = s.u ? clamp(s.l / SPENT, 0, 1) : 1;
+    const x1 = w2sx(s.x1), y1 = w2sy(s.y1), x2 = w2sx(s.x2), y2 = w2sy(s.y2);
+    // Four passes, because a drawing must never be mistakable for scenery: a
+    // Green line in Cloudbreak sat at almost exactly the hue of that region's
+    // bumpers. Glow, dark casing, colour, white core -- the casing and the core
+    // are what separate the player's marks from the world at any palette.
+    LIN(x1, y1, x2, y2, mx(4, 22 * SC), strokeColor(s, a * .18));
+    SK(mx(3, (ST * 2 + 5) * SC), 'hsl(266 55% 5% / ' + a * .8 + ')');
     SK(mx(2, ST * 2 * SC), strokeColor(s, a));
+    SK(mx(1, ST * .8 * SC), 'hsl(0 0% 100% / ' + a * .55 + ')');
+    if (!s.u) {
+      // The pin: where the drag began. Green hangs its rope here, so this ring
+      // is not decoration -- it is the fact the tether rule depends on.
+      CIR(x1, y1, (4.5 + sin(T * 4 + s.x1) * .8) * SC, 0, chsl(s.c, 80, .9), mx(1, 2 * SC));
+      // The aim: Orange fires you toward the far end, so the end gets an arrow.
+      const dx = x2 - x1, dy = y2 - y1, L = hyp(dx, dy);
+      if (L > 16) {
+        const ux = dx / L, uy = dy / L, hd = 9 * SC;
+        POLY(3, chsl(s.c, 78, .95), 0, 0, (i) => {
+          const b = [0, 2.6, -2.6][i], cb = cos(b) * hd, sb = sin(b) * hd;
+          VTX(i, x2 + cb * ux - sb * uy, y2 + sb * ux + cb * uy);
+        });
+      }
+      // Charges left, for the Hard Light boon.
+      for (let i = 1; i < s.n; i++)
+        CIR((x1 + x2) / 2 + i * 8 * SC, (y1 + y2) / 2, 2.6 * SC, '#fff');
+    }
     if (s === P.ra) {
       X.setLineDash([4 * SC, 9 * SC]); X.lineDashOffset = -T * 90 * SC;
       SK(mx(1, 3 * SC), 'hsl(190 100% 88% / .9)');
@@ -281,15 +385,34 @@ function drawStrokes() {
   }
   if (P.te) {
     const ax = w2sx(P.te.x), ay = w2sy(P.te.y);
+    // The rope, plus the circle it may sweep. The radius is the length of the
+    // line you drew, and seeing it is what turns the swing into something you
+    // aim rather than something that happens to you.
+    CIR(ax, ay, P.te.l * SC, 0, chsl(3, 60, .17), mx(1, 1.4 * SC));
     LIN(ax, ay, w2sx(P.x), w2sy(P.y), mx(1, 3.4 * SC), chsl(3, 70));
     CIR(ax, ay, 8 * SC, chsl(3, 62));
+    CIR(ax, ay, (12 + sin(T * 9) * 3) * SC, 0, chsl(3, 80, .8), mx(1, 2 * SC));
   }
 }
 
 function drawParts() {
   X.lineCap = 'round';
+  // Shockwaves sit under everything else so they read as pressure, not confetti.
+  for (const w of shocks) {
+    const a = clamp(w.t, 0, 1);
+    CIR(w2sx(w.x), w2sy(w.y), w.r * SC, 0, hsl(w.h | 0, 100, 78, a * .7), mx(1, 5 * a * SC));
+  }
   for (const p of parts) {
     const a = clamp(p.l / p.L, 0, 1), x = w2sx(p.x), y = w2sy(p.y);
+    if (p.k === 4) {
+      // Debris: a real spinning fragment of whatever just came apart.
+      X.save(); X.translate(x, y); X.rotate(p.a);
+      const q = p.s * SC * (.4 + a * .6);
+      POLY(4, hsl(p.h | 0, 70, 38 + a * 26, a), hsl(p.h | 0, 90, 78, a), mx(1, 1.2 * SC),
+        (i) => VTX(i, [-1, .8, 1.2, -.6][i] * q, [-.7, -1.1, .9, 1][i] * q));
+      X.restore();
+      continue;
+    }
     if (p.k === 2) CIR(x, y, (1 - a) * p.s * 9 * SC, 0, hsl(p.h | 0, 100, 75, a), mx(1, 3 * a * SC));
     else LIN(x, y, x - p.vx * (p.k ? .02 : .012) * SC, y - p.vy * (p.k ? .02 : .012) * SC,
       mx(1, p.s * (p.k ? 1 : a) * SC), hsl(p.h | 0, p.k ? 70 : 100, p.k ? 55 : 68, a));

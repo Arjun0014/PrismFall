@@ -8,13 +8,14 @@ const X = CV.getContext('2d');
 let W = 0, H = 0, SC = 1;      // canvas pixel size, world->screen scale
 
 // -- game / scene state -----------------------------------------------------
-// 0 title  1 playing  2 paused  3 results  4 store  5 how-to
+// 0 title  1 playing  2 paused  3 results  4 store  5 ascension draft
 let st = 0;
 let T = 0;        // wall-clock seconds since load (drives animation)
 let slow = 0;     // 0..1 focus-vault time dilation blend
 let shake = 0;    // camera shake energy
 let flash = 0;    // full-screen flash energy
 let flashH = 0;   // flash hue
+let hstop = 0;    // hit-stop: seconds of near-frozen time after a big impact
 
 // -- the unicorn ------------------------------------------------------------
 const P = {
@@ -24,6 +25,7 @@ const P = {
   ra: null,      // attached Blue rail (stroke)
   rt: 0,         // rail param along the stroke
   rs: 1,         // rail side (+1/-1)
+  rw: 0,         // Superrail: seconds the rail still reflects at its ends
   te: null,      // Green tether {x,y,l,t}
   ph: 0,         // Violet phase timer (ignores solids)
   rp: 0,         // Red power timer (cheap destruction)
@@ -60,6 +62,7 @@ let parts = [];    // particles
 let trail = [];    // unicorn trail samples
 let pops = [];     // floating score/text pops
 let nodes = [];    // prism-node sparkles from stroke fusion
+let shocks = [];   // expanding shockwave rings from shatters and big hits
 
 // -- persistent -------------------------------------------------------------
 const SAVE = { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0, t: 0 };

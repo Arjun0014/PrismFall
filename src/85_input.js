@@ -58,14 +58,36 @@ addEventListener('wheel', (e) => {
 addEventListener('keydown', (e) => {
   audioInit();
   const k = e.key, l = k.toLowerCase();
+  // The Ascension draft is modal and owns the number keys while it is up.
+  if (st === 5) { if (k === '1' || k === '2') takeBoon(+k - 1); return; }
   if (k > '0' && k < '8') { setSel(+k - 1); return; }
   if (k === 'Escape' || l === 'p') st = st === 1 ? 2 : st === 2 ? 1 : st === 4 ? (back(), st) : st;
-  if (l === 'r' && st > 1) startRun();
+  if (l === 'r' && st > 1 && st !== 5) startRun();
   if (l === 'm') mute();
+  // Let go of whatever is holding you. With permanent strokes a rail lasts as
+  // long as its line does, so there has to be a way off it that is not a crash.
+  if (l === 'x') { if (P.ra) detachRail(1); else if (P.te) releaseTether(); }
   if (k === ' ' || k === 'Enter') { if (st === 2) st = 1; else if (st < 4) startRun(); }
   if (DEBUG) {
-    if (k === 'g') { P.y += REGD; P.vy = 400; }
+    if (k === 'g') { jumpReg(regAt(P.y) + 1); }
     if (k === 'f') for (let i = 0; i < 7; i++) pig[i] = PMAX;
   }
 });
+// Absolute region jump, exposed for the screenshot gallery so a capture always
+// lands in the region it claims to be capturing. DEBUG-only: Terser drops the
+// whole block from the release build.
+if (DEBUG) window.jumpReg = (r) => {
+  P.y = r * REGD + 600; P.x = 0; P.vx = 0; P.vy = 500;
+  P.ra = null; P.te = null; P.st = 0; P.al = 1;
+  reg = regAt(P.y); pal = regPal(reg);
+  chunks = []; nextY = P.y - 900; prevL = -COL; prevR = COL;
+  while (nextY < P.y + 3200) genChunk();
+};
+// A couple more DEBUG-only probes for the live feel harness, which needs to
+// reach inside the IIFE to light a target or sample speed over time.
+if (DEBUG) {
+  window.__chunks = () => chunks;
+  window.__light = (o) => light(o, o.x, o.y);
+  window.__speeds = () => ({ sp: P.sp | 0, mult: +mult.toFixed(1), combo, score: score | 0, strokes: strokes.length });
+}
 document.addEventListener('visibilitychange', () => { if (document.hidden && st === 1) st = 2; });

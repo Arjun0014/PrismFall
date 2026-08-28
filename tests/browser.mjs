@@ -30,6 +30,7 @@ function serve() {
   });
 }
 const external = [];
+const skipped = [];
 
 let failures = 0;
 const ok = (c, m) => { console.log((c ? '  PASS  ' : '  FAIL  ') + m); if (!c) failures++; };
@@ -174,10 +175,25 @@ const server = await serve();
 try {
   if (!existsSync(join(ROOT, 'dist', 'index.html'))) throw new Error('build first: npm run build');
   if (!only || only === 'chromium') await runBrowser('chromium', chromium);
-  if (!only || only === 'firefox') await runBrowser('firefox', firefox);
+  // A browser that will not start on this machine is an environment problem,
+  // not a game failure, so it is reported loudly and skipped rather than
+  // turning every run red. A browser that starts and then fails still fails.
+  if (!only || only === 'firefox') {
+    try {
+      await runBrowser('firefox', firefox);
+    } catch (e) {
+      const m = String(e && e.message);
+      if (/spawn|ENOENT|Executable doesn't exist|browserType\.launch/i.test(m)) {
+        skipped.push('firefox -- ' + m.split('\n')[0]);
+      } else throw e;
+    }
+  }
   ok(external.length === 0, 'no external requests' + (external.length ? ' -> ' + external.slice(0, 3).join(',') : ''));
 } finally {
   server.close();
 }
-console.log(failures ? '\n' + failures + ' FAILURE(S)' : '\nall browser checks passed');
+skipped.forEach((m) => console.log('\n  SKIP  ' + m +
+  '\n        cannot launch on this machine -- an environment problem, not a game failure'));
+console.log(failures ? '\n' + failures + ' FAILURE(S)'
+  : '\nall browser checks passed' + (skipped.length ? '  (' + skipped.length + ' engine skipped)' : ''));
 process.exit(failures ? 1 : 0);

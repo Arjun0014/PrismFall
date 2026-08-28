@@ -12,7 +12,12 @@ const SUITES = [
   ['procedural generator', 'tests/gen.mjs', [args.includes('--quick') ? '16' : '80']],
   ['audio', 'tests/audio.mjs', []],
 ];
-if (!args.includes('--no-browser')) SUITES.push(['browser', 'tests/browser.mjs', []]);
+if (!args.includes('--no-browser')) {
+  SUITES.push(['browser', 'tests/browser.mjs', []]);
+  // The Wavedash build is a separate product from the same source, so it needs
+  // its own gate: it must run with the SDK and, just as importantly, without it.
+  SUITES.push(['wavedash build', 'tests/wavedash.mjs', []]);
+}
 
 let failed = 0;
 for (const [name, file, extra] of SUITES) {

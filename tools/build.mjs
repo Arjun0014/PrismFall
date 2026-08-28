@@ -3,6 +3,13 @@
 //   node tools/build.mjs            fast size build (Terser -> HTML -> zip)
 //   node tools/build.mjs --deep     deep competition pack (adds Roadroller search + ECT)
 //   node tools/build.mjs --dev      unminified debug build in build/dev.html
+//   node tools/build.mjs --wavedash Wavedash platform build in dist-wavedash/
+//
+// There are two products from one source tree. The competition build in dist/
+// is the 13 KiB archive and contains no platform code at all; the Wavedash
+// build in dist-wavedash/ adds src/95_wavedash.js (leaderboards, identity, SDK
+// init) and has no size limit, so it is packed for legibility rather than
+// bytes. Everything else -- every feature, every tuning constant -- is shared.
 //
 // Every run writes dist/index.html + dist/prismfall.zip and appends a row to
 // reports/size-history.md.
@@ -20,6 +27,7 @@ const LIMIT = 13312;
 const args = process.argv.slice(2);
 const DEEP = args.includes('--deep');
 const DEV = args.includes('--dev');
+const WAVE = args.includes('--wavedash');
 const QUIET = args.includes('--quiet');
 const QUICK = args.includes('--quick');   // roadroller only, light zopfli: fast feedback
 const NOTE = (args.find((a) => a.startsWith('--note=')) || '').slice(7);
@@ -63,6 +71,20 @@ function html(script) {
   return '<!doctype html><meta charset=utf-8><title>PRISMFALL</title><canvas id=a></canvas><script>' +
     script + '</script>';
 }
+
+// The Wavedash page needs a viewport tag and a matching page background, and
+// it must not be gzip-golfed -- the platform serves static files and the only
+// thing that matters here is that it runs.
+function wavedashHtml(script) {
+  return '<!doctype html><html lang=en><meta charset=utf-8>' +
+    '<meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">' +
+    '<title>PRISMFALL</title><style>html,body{margin:0;height:100%;background:#05030c;overflow:hidden}' +
+    'canvas{display:block}</style><canvas id=a></canvas><script>' + script + '</script></html>';
+}
+
+// Emitted next to the build so `wavedash dev` and the CLI upload both work
+// from a clean checkout. game_id is filled in by `wavedash init`.
+const WD_TOML = 'game_id = ""\nupload_dir = "./dist-wavedash"\n';
 
 // ------------------------------------------------------------------ zips ----
 async function zipOf(htmlText, iterations) {
@@ -136,9 +158,21 @@ async function main() {
   mkdirSync(p('reports'), { recursive: true });
 
   if (DEV) {
-    const dev = bundle(true);
+    const dev = bundle(true, WAVE);
     writeFileSync(p('build', 'dev.html'), html('(()=>{\n' + dev + '\n})()'));
     log('dev build -> build/dev.html');
+    return;
+  }
+
+  if (WAVE) {
+    mkdirSync(p('dist-wavedash'), { recursive: true });
+    const src = bundle(false, true);
+    const js = await terse(src);
+    const page = wavedashHtml(js);
+    writeFileSync(p('dist-wavedash', 'index.html'), page);
+    if (!existsSync(p('wavedash.toml'))) writeFileSync(p('wavedash.toml'), WD_TOML);
+    log('  wavedash     ' + Buffer.byteLength(page, 'utf8') + ' B -> dist-wavedash/index.html');
+    log('  next         npx wavedash dev   (sandbox)   ·   npx wavedash push   (upload)');
     return;
   }
 

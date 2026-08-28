@@ -39,15 +39,20 @@ const hot = (x, y, w, h) => pmx > x - w / 2 && pmx < x + w / 2 && pmy > y - h / 
 
 function btn(x, y, w, h, label, fn, accent) {
   const o = hot(x, y, w, h);
-  btns.push({ hot: o, fn });
+  btns.push({ x, y, w, h, fn });
   RR(x - w / 2, y - h / 2, w, h, 8 * U);
   FL(o ? accent || UE : UB);
   SK(2 * U, o ? W9 : UE);
   txt(label, x, y + U, 15, o ? W9 : W6, 1);
 }
 
+// Hit-test at click time, not at draw time. Caching each button's hover state
+// during draw meant a press at a position the pointer had not already been
+// hovering was tested against the *previous* frame's cursor and silently did
+// nothing -- fine for a mouse that drifts to the button first, broken for a
+// tap and for anything that clicks straight to a coordinate.
 function uiClick() {
-  for (const b of btns) if (b.hot) { sndUI(1); b.fn(); return 1; }
+  for (const b of btns) if (hot(b.x, b.y, b.w, b.h)) { sndUI(1); b.fn(); return 1; }
   return 0;
 }
 
@@ -58,6 +63,10 @@ function hud() {
   txt(coins + (SAVE.c ? ' (' + (SAVE.c + coins) + ')' : ''), p + 16 * U, p, 16, UG, 1, 'left');
   txt(score | 0, W - p, p, 19, W9, 1, 'right');
   if (mult > 1.05) txt('x' + mult.toFixed(1), W - p, p + 22 * U, 15, chsl(2, 70), 1, 'right');
+  if (combo > 3) {
+    const k = 1 + mn(combo, 30) * .02, cc = clamp(comboT / 1.6, 0, 1);
+    txt(combo + ' CHAIN', W - p, p + 46 * U, 15 * k, hsl(48, 100, 60 + combo, cc), 1, 'right');
+  }
 
   // region name, progress bar and depth
   X.fillStyle = W3;
@@ -73,6 +82,10 @@ function hud() {
   for (let i = 0; i < 7; i++) if (boostT[i] > 0)
     txt(BNAME[i] + ' ' + boostT[i].toFixed(1), W - p, p + (30 + brow++ * 16) * U, 12,
       BOOST[i][0] > 6 ? W9 : chsl(BOOST[i][0], 70), 1, 'right');
+  // Drafted boons are permanent, so they live down the left edge rather than
+  // competing with the timed boosters on the right.
+  for (let i = 0, row = 0; i < NBOON; i++) if (bn(i))
+    txt(BOONN[i * 2], p - 12 * U, (58 + row++ * 15) * U, 11, chsl(i % 7, 72), 1, 'left');
 
   if (regShow > 0)
     txt(REG[reg][0], W / 2, H * .3, 42,
@@ -85,7 +98,7 @@ function hud() {
   if (slow > .05) {
     X.fillStyle = 'hsl(275 60% 60% / ' + slow * .1 + ')';
     X.fillRect(0, 0, W, H);
-    txt('FOCUS VAULT', W / 2, 70 * U, 16, W6, 1);
+    txt('FOCUS VAULT', W / 2, H - 96 * U, 16, W6, 1);
   }
 }
 
@@ -106,7 +119,7 @@ function prismBar() {
     txt('ROYGBIV'[i], cx, y, on ? 15 : 12, on ? W9 : W6, 1);
     txt(i + 1, cx, y - h / 2 - 9 * U, 10, on ? W9 : W3);
     if (chain & CBIT[i]) CIR(cx, y + h / 2 + 8 * U, 2.6 * U, chsl(i, 75));
-    btns.push({ hot: hot(cx, y, w, h), fn: () => setSel(i) });
+    btns.push({ x: cx, y, w, h, fn: () => setSel(i) });
   }
   if (chainN > 2) txt(chainN + '/7', x0 - 18 * U, y, 13, W9, 1);
 }
@@ -186,9 +199,11 @@ function screenTitle() {
   txt('PRISMFALL', W / 2, cy, 66, W9, 1);
   txt('you never steer the unicorn — you draw the physics', W / 2, cy + 46 * U, 15, W6);
   [
-    'DRAG a short rail near the unicorn · 1-7 or SCROLL picks a colour',
+    'DRAG near the unicorn · your drawings STAY until something uses them',
     'R push · O aim · Y spring · G tether · B rail · I gravity · V warp',
-  ].forEach((l, i) => txt(l, W / 2, H - 100 * U + i * 20 * U, 13, i ? W6 : W9, !i));
+    'longer line = stronger effect · X lets go · 1-7 or SCROLL picks a colour',
+  ].forEach((l, i) => txt(l, W / 2, H - 112 * U + i * 19 * U, 13, i === 1 ? W6 : i ? W3 : W9, !i));
+  if (WD) wdIdentity(W / 2, H * .3 - 74 * U), wdBoard(W - 190 * U, H / 2 - 40 * U);
   // Below the buttons, not at a fixed offset from the title: at 16:9 heights
   // the old position landed straight on top of PLAY.
   if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm   COINS ' + SAVE.c,
@@ -208,6 +223,55 @@ function screenResults() {
     [-105, 114, 130, 'STORE', () => { st = 4; }],
     [105, 114, 130, 'MENU', () => { st = 0; }],
   ], 16);
+}
+
+// --- Ascension draft -------------------------------------------------------
+// Shown once a full seven-region descent is behind you. Two cards, one choice,
+// permanent for the rest of the run — the thing that makes the loop a new run
+// rather than a lap.
+function screenAscend() {
+  X.fillStyle = 'hsl(275 45% 5% / .86)';
+  X.fillRect(0, 0, W, H);
+  const cy = H / 2;
+  for (let i = 0; i < 7; i++) {
+    X.font = 'bold ' + (44 * U | 0) + 'px monospace';
+    X.textAlign = 'center';
+    X.fillStyle = chsl(i, 60, .45);
+    X.fillText('PRISM ASCENSION', W / 2 + sin(T * 1.6 + i * .5) * 4 * U, cy - 168 * U + (i - 3) * 1.8 * U);
+  }
+  txt('PRISM ASCENSION', W / 2, cy - 168 * U, 44, W9, 1);
+  txt('DESCENT ' + (descent + 1) + ' COMPLETE  ·  the shaft begins again, harder',
+    W / 2, cy - 128 * U, 15, W6);
+  txt('TAKE ONE. IT IS YOURS FOR THE REST OF THE RUN.', W / 2, cy - 104 * U, 13, W3);
+
+  dsel = -1;
+  const cw = 300 * U, ch = 190 * U;
+  for (let i = 0; i < draft.length; i++) {
+    const b = draft[i];
+    const x = W / 2 + (i - (draft.length - 1) / 2) * (cw + 26 * U), y = cy + 4 * U;
+    const o = hot(x, y, cw, ch);
+    if (o) dsel = i;
+    RR(x - cw / 2, y - ch / 2, cw, ch, 14 * U);
+    FL(o ? 'hsl(285 45% 17% / .98)' : 'hsl(272 40% 10% / .96)');
+    SK((o ? 3 : 1.6) * U, o ? W9 : chsl(b % 7, 60));
+    // A colour bar keys each boon to a hue so the cards are told apart at a
+    // glance across many runs.
+    RR(x - cw / 2 + 16 * U, y - ch / 2 + 16 * U, cw - 32 * U, 5 * U, 3 * U);
+    FL(chsl(b % 7, 62));
+    txt(BOONN[b * 2], x, y - 34 * U, 21, W9, 1);
+    // Wrap the description by words so a long boon never runs off its card.
+    const words = BOONN[b * 2 + 1].split(' ');
+    let line = '', row = 0;
+    X.font = (13 * U | 0) + 'px monospace';
+    for (let w = 0; w <= words.length; w++) {
+      const nx = line ? line + ' ' + words[w] : words[w];
+      if (w < words.length && X.measureText(nx).width < cw - 44 * U) { line = nx; continue; }
+      txt(line, x, y + (4 + row++ * 19) * U, 13, W6);
+      line = words[w] || '';
+    }
+    txt('PRESS ' + (i + 1), x, y + ch / 2 - 22 * U, 12, o ? W9 : W3, 1);
+    btns.push({ x, y, w: cw, h: ch, fn: () => takeBoon(i) });
+  }
 }
 
 function screenPause() {
@@ -237,7 +301,7 @@ function screenStore() {
     txt(COSN[n], x + 66 * U, y - 5 * U, 11, own ? W9 : W6, 1);
     txt(own ? (eq ? 'EQUIPPED' : 'EQUIP') : COSP[i] + 'c', x + 66 * U, y + 9 * U, 10,
       own ? W3 : SAVE.c < COSP[i] ? 'hsl(0 60% 60%)' : UG);
-    btns.push({ hot: o, fn: () => buyEquip(c, i) });
+    btns.push({ x: x + 66 * U, y, w: 140 * U, h: 38 * U, fn: () => buyEquip(c, i) });
   }
   // Live preview through the real unicorn renderer.
   X.save();

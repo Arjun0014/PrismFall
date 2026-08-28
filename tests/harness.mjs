@@ -121,7 +121,8 @@ export function boot(opts = {}) {
   const src = bundle(true);
   const names = ('P C X CV st T slow shake flash pig sel chain chainN fullSpec coins score mult depth reg ' +
     'chunks strokes parts trail pops nodes SAVE Gx Gy W H SC U drawing pmx pmy mwx mwy hint boostT combo ' +
-    'seed nextY vault NC wheel wsel chainT hitCd AC mg sfxG musG lpF railG railF railO voices mStep mNext').split(' ');
+    'seed nextY vault NC wheel wsel chainT hitCd AC mg sfxG musG lpF railG railF railO voices mStep mNext ' +
+    'boon draft descent hstop shocks').split(' ');
   const fns = ('physics update draw frame startRun endRun die worldReset worldUpdate genChunk nearChunks ' +
     'startStroke moveStroke fuse hitStroke applyStroke chainAdd fullSpectrum grab setSel resize ptr ' +
     'audioInit audioFrame load save camUpdate palUpdate partStep pushTrail solidNear regAt difAt loopAt ' +
@@ -131,10 +132,13 @@ export function boot(opts = {}) {
     'sndHit sndBreak sndBoost sndVector sndSpring sndTether sndRail sndGrav sndWarp sndCoin sndCrown '+
     'sndPig sndWell sndSpectrum sndFuse sndRefund sndPower sndEmpty sndStall sndDeath sndUI sndGate '+
     'musicTick audioFrame O N ARP NOTE KICK BASSR wallsAt unicornBody drawWorld drawItem drawStrokes drawParts drawTrail ' +
-    'drawUnicorn background motif obStyle obT obVel strokeColor railStep').split(' ');
+    'drawUnicorn background motif obStyle obT obVel strokeColor railStep ' +
+    'ascend takeBoon light fuseStep shards zoneF pmax pw bn tag targets crushers screenAscend drawZone ' +
+    'sndTarget sndBank regZone').split(' ');
   const consts = ('R GRAV VMAX VFAST VH COL WMAX SMAX SREACH SLIFE SLIM ST PMAX PC STALLV STALLT STALLW ' +
     'HUE CBIT ALL7 M_BUMP M_DAMP M_BREAK M_PHASE M_ANCH M_RAIL CHUNKS REGD BRK_E BRK_R ' +
-    'I_COIN I_CROWN I_PIG I_WELL I_BOOST BOOST BNAME LS REG BIAS AFF MOT COSN COSP MSTY').split(' ');
+    'I_COIN I_CROWN I_PIG I_WELL I_BOOST BOOST BNAME LS REG BIAS AFF MOT COSN COSP MSTY ' +
+    'SMIN SNOM SPENT M_TGT NBOON BOONN BRK_CH NREG Z_UP Z_WELL Z_WIND Z_INV Z_FLOW').split(' ');
 
   const uniq = [...new Set([...names, ...fns, ...consts])];
   const body = src + '\nreturn {' + uniq.map((n) => 'get ' + n + '(){return typeof ' + n + '=="undefined"?undefined:' + n + '}').join(',') +

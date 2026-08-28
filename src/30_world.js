@@ -7,38 +7,55 @@
 // ---------------------------------------------------------------------------
 
 // Archetype ids used inside the region weight strings. Funnel and Sieve are
-// the same builder with different parameters, so seven situations cost six.
+// the same builder with different parameters, so eight situations cost seven.
 // 0 PEG  1 FUNNEL  2 BOWL  3 SHAFT  4 ROTOR  5 SIEVE  6 CHAMBER
+// 7 TARGET BANK  8 CRUSHER LANE
 
-// Region row — deliberately tiny. Everything a region needs beyond these five
-// numbers is derived, which costs far fewer compressed bytes than a table:
+// Region row. Everything a region needs beyond these nine numbers is derived,
+// which costs far fewer compressed bytes than a table:
 //   0 name
 //   1 base hue        background gradient starts here
 //   2 hue spread      gradient end + geometry hue are offsets from the base
 //   3 geometry light
 //   4 background light
-//   5 archetype weights (one char per draw), straight from the world spec
+//   5 archetype weights (one char per draw)
 //   6 filler density  extra scattered geometry per chunk
+//   7 zone type       the force field that gives the region its mechanic
+//   8 zone frequency  0..9, chunks in ten that carry the field
 // Affinity colours come from AFF, music from formulas in 60_audio.js.
-// 0 PEG  1 FUNNEL  2 BOWL  3 SHAFT  4 ROTOR  5 SIEVE  6 CHAMBER
+//
+// A region is a *mechanic* first and a palette second. Each row below pairs a
+// force field with the archetypes and materials that make that field matter,
+// so the seven descents ask genuinely different things of the player rather
+// than recolouring the same shaft.
 const REG = [
-  // peg fields, wide gaps, bumpers, gentle funnels
-  ['CLOUDBREAK', 206, 74, 88, 26, '0001002105', 5],
-  // breakable panels, crushers, rotors, moving gates
-  ['SUNFORGE', 12, 34, 72, 19, '4414564146', 6],
-  // tether anchors, circular chambers, spring pods
-  ['VERDANT COIL', 152, -74, 74, 17, '2262262622', 7],
-  // long guide rails, narrow shafts, S-curves, precision exits
-  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3335331353', 5],
-  // breakable shortcuts, hidden rooms, phase barriers, high reward density
-  ['PRISM MINE', 276, -28, 62, 10, '6616065166', 8],
-  // gravity inversion chambers, phase walls, looping routes
-  ['INVERSION TEMPLE', 264, 52, 80, 13, '6462646326', 6],
-  // compound rooms built from every prior geometry
-  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456246', 8],
+  // Sky. Updraft columns hold you up, so descending is something you do on
+  // purpose. Round, soft, bumper-heavy: the region that teaches the verbs.
+  ['CLOUDBREAK', 206, 74, 88, 26, '0002100210', 5, Z_UP, 5],
+  // Furnace. Almost everything is breakable and chains into its neighbours;
+  // crusher lanes and rotors do the breaking for you if you build speed.
+  ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4],
+  // Overgrown spiral. Anchors and springy pods everywhere, and a slipstream
+  // that curls you around them — the region the Green tether was built for.
+  ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6],
+  // Glass river. Long rails, narrow throats, flow that carries you along them.
+  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7],
+  // Dark mine. Phase walls hide pockets, gravity wells drag you into them, and
+  // the reward density is the highest in the game.
+  ['PRISM MINE', 276, -28, 62, 10, '6760671666', 9, Z_WELL, 6],
+  // Temple. Inversion fields turn the shaft upside down; the geometry is built
+  // to be read from both directions.
+  ['INVERSION TEMPLE', 264, 52, 80, 13, '6465264636', 7, Z_INV, 7],
+  // The Engine. Every archetype, every field, maximum density.
+  ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456788', 9, 0, 9],
 ];
-// Material bias per region: [break, phase, damp, bump, move] as hex nibbles/16.
-const BIAS = [0x00193, 0x80149, 0x10275, 0x01243, 0xa5324, 0x2a336, 0x63359];
+// Material bias per region, as five hex nibbles read left to right:
+//   BREAK PHASE DAMP BUMP MOVE, each out of 16.
+// This table is most of what a region feels like under the unicorn. Cloudbreak
+// is nearly all bumpers and nothing that eats speed; Sunforge is three quarters
+// breakable; the Mine is the only place that is genuinely sticky. Dampeners
+// stay scarce everywhere because they are the one material that can kill you.
+const BIAS = [0x000b4, 0xc016a, 0x201a6, 0x11153, 0xa9332, 0x4a355, 0x6528b];
 // Two affinity colours per region, one digit each, straight from the world spec:
 // Cloudbreak O+Y, Sunforge R+O, Verdant G+Y, Crystal B+O, Mine R+V, Temple I+V.
 const AFF = '120132410656';
@@ -48,6 +65,7 @@ const bit = (b, i) => (b >> (16 - i * 4) & 15) / 16;
 // The Rainbow Engine's affinity is "all colours", so it rolls fresh each time.
 const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]];
 
+const regZone = (r) => REG[r][7];
 let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
 let vault = null;   // chunk currently focusing the camera
 // Shared build context for the archetype builders: the playable span, its
@@ -162,7 +180,7 @@ function genChunk() {
   const r = clamp(COL + rf(-70, 90) + wide, 300, WMAX);
   const h = boundary ? 1240 : ri(760, 1080);
 
-  const c = { y, h, l, r, pl: prevL, pr: prevR, o: [], i: [], rg, k: 0, v: 0 };
+  const c = { y, h, l, r, pl: prevL, pr: prevR, o: [], i: [], rg, k: 0, v: 0, z: 0, bk: [] };
 
   // Walls, drawn as chunk-to-chunk segments so the column is continuous.
   c.o.push(sgAB(prevL, y, l, y + h, 0), sgAB(prevR, y, r, y + h, 0));
@@ -175,9 +193,13 @@ function genChunk() {
   else {
     const k = +REG[rg][5][ri(0, 9)];
     c.k = k;
+    // The region's force field. It is what makes a descent feel like a place:
+    // Cloudbreak holds you up, the Temple turns you over, the Coil and the
+    // Current sweep you sideways, the Mine drags you into its pockets.
+    if (cIdx > 1 && ri(0, 9) < REG[rg][8]) c.z = regZone(rg) || ri(1, 5);
     if (k === 1 || k === 5)
       barrier(c, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 210), c.y + c.h * rf(.34, .6), 0);
-    else [pegField, 0, bowl, shaft, rotor, 0, chamber][k](c);
+    else [pegField, 0, bowl, shaft, rotor, 0, chamber, targets, crushers][k](c);
     decorate(c, REG[rg][6] + (dif * 1.6 | 0));
     rewards(c, rg);
   }
@@ -212,10 +234,25 @@ function decorate(c, n) {
       if (solidNear(c, x + dx, y + dy, need) || solidNear(c, x - dx, y - dy, need)) continue;
     }
     n--;
+    // Half the scatter is live pinball furniture: bumpers that kick, targets
+    // that light, panels that shatter. A screen should always contain
+    // something worth hitting on purpose.
     c.o.push(cir
-      ? ci(x, y, rad, mat(bB, 0) | (rp(.42) ? M_BUMP : 0), moving(bB, 74))
-      : sg(x, y, hl, a, mat(bB, 1) | (rp(.2) ? M_ANCH : 0), moving(bB, 62)));
+      ? ci(x, y, rad, mat(bB, 0) | (rp(.5) ? M_BUMP : rp(.3) ? M_TGT : 0), moving(bB, 74))
+      : sg(x, y, hl, a, mat(bB, 1) | (rp(.22) ? M_ANCH : 0), moving(bB, 62)));
+    if (c.o[c.o.length - 1].m & M_TGT) tag(c, c.o[c.o.length - 1], 3);
   }
+}
+
+// Register an obstacle as a member of a scoring bank. Every target in a bank
+// lights independently; lighting the last one pays the whole bank out and
+// resets it, so a bank is a repeatable objective rather than a one-off pickup.
+function tag(c, o, cap) {
+  let k = c.bk[c.bk.length - 1];
+  if (!k || k.n >= k.cap) { k = { n: 0, l: 0, cap, x: o.x, y: o.y, m: [] }; c.bk.push(k); }
+  k.n++; k.m.push(o);
+  o.bk = k;
+  o.m |= M_TGT;
 }
 
 // --- archetypes ------------------------------------------------------------
@@ -226,7 +263,8 @@ function pegField(c) {
     for (let i = 0; i < n; i++) {
       const t = (i + (r & 1 ? .5 : 0)) / (n - .35);
       c.o.push(ci(bL + 44 + t * (bW - 88), yy, rf(14, 27),
-        mat(bB, 0) | (rp(.3) ? M_BUMP : 0), moving(bB, 60)));
+        mat(bB, 0) | (rp(.45) ? M_BUMP : rp(.25) ? M_TGT : 0), moving(bB, 60)));
+      if (c.o[c.o.length - 1].m & M_TGT) tag(c, c.o[c.o.length - 1], 3);
     }
   }
 }
@@ -311,6 +349,50 @@ function chamber(c) {
   c.i.push(item(rp(.25) ? I_CROWN : I_PIG, rp(.5) ? bL + 55 : bR - 55, (top + bot) / 2, pick(aff(c.rg))));
 }
 
+// Drop-target banks: rows of lit-on-contact panels flanked by kickers. Clear a
+// whole bank and it pays out and re-arms, which is the loop that makes a
+// pinball table worth staying on rather than falling through.
+function targets(c) {
+  const rows = ri(2, 3);
+  for (let r = 0; r < rows; r++) {
+    const yy = c.y + c.h * (.2 + r * .62 / rows + rf(-.04, .04));
+    const n = ri(3, 5), span = mn(bW * .74, 330), x0 = bX - span / 2 + rf(-40, 40);
+    const k = { n, l: 0, cap: n, x: bX, y: yy, m: [] };
+    c.bk.push(k);
+    for (let i = 0; i < n; i++) {
+      const o = sg(x0 + (i + .5) * span / n, yy, 30, PI / 2 + rf(-.2, .2), M_TGT);
+      o.bk = k; k.m.push(o);
+      c.o.push(o);
+    }
+    // Kickers at both ends of the bank keep the ball in the lane.
+    c.o.push(ci(x0 - 42, yy, 20, M_BUMP), ci(x0 + span + 42, yy, 20, M_BUMP));
+    for (let i = 0; i < n; i++) c.i.push(item(I_COIN, x0 + (i + .5) * span / n, yy - 54));
+  }
+  c.i.push(item(rp(.4) ? I_BOOST : I_PIG, bX + rf(-.3, .3) * bW, c.y + c.h * .92, ri(0, 6)));
+}
+
+// Crusher lane: a corridor of breakable panels with counter-swinging arms that
+// do the demolition for you once you are moving. Sunforge's signature room.
+function crushers(c) {
+  const w = mn(bW * .8, 380), sx = bX + rf(-.1, .1) * bW;
+  const n = ri(3, 4);
+  for (let i = 0; i < n; i++) {
+    const yy = c.y + c.h * (.14 + i * .74 / n);
+    // A full-width breakable curtain with one deliberate gap.
+    const gapX = sx + rf(-.34, .34) * w, gw = mx(86, 150 - bD * 20);
+    for (const sd of [-1, 1]) {
+      const ex = sd < 0 ? sx - w / 2 : sx + w / 2;
+      const gx = gapX + sd * gw / 2;
+      if (abs(ex - gx) > 30) c.o.push(sgAB(gx, yy, ex, yy + rf(-14, 14), M_BREAK));
+    }
+    // The crusher itself: a heavy arm sweeping the lane.
+    c.o.push(sg(gapX, yy + c.h * .37 / n, mn(w * .34, 150), rf(0, PI), M_BUMP,
+      { w: rs() * rf(.8, 1.7 + bD * .4) }));
+    c.i.push(item(I_COIN, gapX, yy + 40), item(I_COIN, gapX + rf(-30, 30), yy + 86));
+  }
+  c.i.push(item(rp(.5) ? I_CROWN : I_BOOST, sx, c.y + c.h * .96, ri(0, 6)));
+}
+
 // --- special rooms ---------------------------------------------------------
 // Focus Vault — a slow, enclosed prize room. Some of them hold a Prism Well
 // instead of a Crown Coin, which is the game's only full pigment refill.
@@ -341,6 +423,9 @@ function buildGate(c) {
 // --- rewards ---------------------------------------------------------------
 function rewards(c, rg) {
   const af = aff(rg);
+  // Reward density tracks the region's own density number, so the Prism Mine
+  // really is worth the risk it asks you to take and Cloudbreak stays airy.
+  const rich = REG[rg][6] / 6;
   // Drop something valuable in the first free spot we find.
   const place = (t, cc, lo, hi) => {
     for (let a = 0; a < 10; a++) {
@@ -359,12 +444,12 @@ function rewards(c, rg) {
     }
   }
   // Pigment biased to the region affinity, but never exclusive to it.
-  if (rp(.62)) place(I_PIG, rp(.7) ? pick(af) : ri(0, 6), .15, .85);
+  if (rp(.62 * rich)) place(I_PIG, rp(.7) ? pick(af) : ri(0, 6), .15, .85);
   // Upward temptation, above the entry line.
-  if (rp(.3)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 6), .02, .16);
-  if (rp(.16)) place(I_BOOST, ri(0, 6), .3, .8);
+  if (rp(.3 * rich)) place(rp(.3) ? I_BOOST : I_CROWN, ri(0, 6), .02, .16);
+  if (rp(.16 * rich)) place(I_BOOST, ri(0, 6), .3, .8);
   // Destruction cache: coins sealed behind breakable panels.
-  if (rp(.24)) {
+  if (rp(.24 * rich)) {
     const x = rp(.5) ? bL + 90 : bR - 90, y = c.y + rf(.25, .7) * c.h;
     for (let i = 0; i < 4; i++)
       c.o.push(sg(x + (i < 2 ? 0 : i > 2 ? 62 : -62), y + (i < 2 ? (i ? 62 : -62) : 0), 62, i < 2 ? PI / 2 : 0, M_BREAK));
@@ -379,7 +464,7 @@ function worldReset(sd) {
   srnd(seed);
   chunks = []; nextY = -900; prevL = -COL; prevR = COL; cIdx = 0; vault = null;
   // Opening room: open, gentle, and it demonstrates bouncing within seconds.
-  const c = { y: -900, h: 1400, l: -COL, r: COL, pl: -COL, pr: COL, o: [], i: [], rg: 0, k: 0, v: 0 };
+  const c = { y: -900, h: 1400, l: -COL, r: COL, pl: -COL, pr: COL, o: [], i: [], rg: 0, k: 0, v: 0, z: 0, bk: [] };
   c.o.push(sgAB(-COL, -900, -COL, 500, 0), sgAB(COL, -900, COL, 500, 0),
     sgAB(-COL, -900, COL, -900, M_BUMP),
     ci(-140, 60, 26, M_BUMP), ci(150, 250, 26, M_BUMP), ci(-60, 420, 22, M_BUMP));
@@ -411,6 +496,47 @@ function wallsAt(y) {
     const t = (y - c.y) / c.h;
     _wl = lerp(c.pl, c.l, t); _wr = lerp(c.pr, c.r, t);
     return;
+  }
+}
+
+// The force a chunk's field applies at (x,y), into the scratch pair _zx/_zy.
+// One switch, five fields, and every region gets a mechanic instead of a
+// repaint. Fields never kill: the worst any of them does is redirect you.
+let _zx = 0, _zy = 0;
+function zoneF(c, x, y) {
+  _zx = _zy = 0;
+  const z = c.z;
+  if (!z) return;
+  const t = (y - c.y) / c.h, ph = sin(t * 7 + T * 1.4);
+  if (z === Z_UP) {
+    // Updraft columns: three lanes of lift you can ride or dodge.
+    const lane = cos((x - c.l) / (c.r - c.l) * TAU * 1.5);
+    if (lane > .1) _zy = -GRAV * 1.15 * lane;
+  } else if (z === Z_WELL) {
+    // A gravity well at the chunk's heart, falling off with distance.
+    const dx = (c.l + c.r) / 2 - x, dy = c.y + c.h * .5 - y, d = hyp(dx, dy) + 60;
+    const k = mn(1, 300 / d) * GRAV * .8;
+    _zx = dx / d * k; _zy = dy / d * k;
+  } else if (z === Z_WIND) {
+    _zx = ph * GRAV * .62;
+  } else if (z === Z_INV) {
+    // Inversion: the shaft is upside down here, and the transition is soft
+    // enough at the edges that you always see it coming.
+    _zy = -GRAV * 2 * clamp(mn(t, 1 - t) * 6, 0, 1);
+  } else if (z === Z_FLOW) {
+    // The Coil: a rotation about the chunk's heart. Everything in Verdant is
+    // built to be swung around, and the field swings you too.
+    const cx = (c.l + c.r) / 2, cy = c.y + c.h * .5;
+    const dx = x - cx, dy = y - cy, d = hyp(dx, dy) + 80;
+    const k = GRAV * .7 * mn(1, 340 / d);
+    _zx = -dy / d * k; _zy = dx / d * k;
+  } else {
+    // The Current: a meandering channel that carries you down it. Unlike the
+    // Coil this one has a direction, which is what makes the Crystal region a
+    // race rather than a playground.
+    const cx = (c.l + c.r) / 2 + sin(y * .0016 + c.y * .01) * (c.r - c.l) * .3;
+    _zx = clamp((cx - x) * 5, -GRAV, GRAV);
+    _zy = GRAV * .55;
   }
 }
 
