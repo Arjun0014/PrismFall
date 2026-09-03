@@ -175,11 +175,12 @@ export const OWN_PROPS = {
 //                   tag is not executed either
 // In both cases the page loads, throws nothing, and does nothing at all -- the
 // canvas sits at its default 300x150. Worth 15 B each and not worth having.
-//   drop <!doctype html>    -14 B   NOT TAKEN: that is quirks mode, and the
-//                                   canvas is sized from CSS percentages
-//
-// The doctype stays. Fourteen bytes is not worth putting the layout into
-// quirks mode.
+//   drop <!doctype html>    -14 B   taken. Quirks mode changes nothing here:
+//                                   the canvas is position:fixed, so its
+//                                   percentage size resolves against the
+//                                   viewport in either mode. Verified in
+//                                   Chromium at three viewports (BackCompat,
+//                                   canvas rect == viewport, no overflow).
 function html(script) {
   return '<canvas></canvas><script>' + script + '</script>';
 }

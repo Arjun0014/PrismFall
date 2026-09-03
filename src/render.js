@@ -285,9 +285,9 @@ function drawZone(c) {
   const y0 = mx(c.y, s2wy(0) - 100), y1 = mn(c.y + c.h, s2wy(H) + 100), sp = y1 - y0;
   if (sp <= 0) return;
   const z = c.z;
-  const hue = z == Z_UP ? 190 : z == Z_WELL ? 288 : z == Z_WIND ? 24
-    : z == Z_INV ? 262 : z == Z_FLOW ? 150 : 186;
-  const drift = T * (z == Z_WIND ? 60 : z == Z_RUSH ? 300 : 200) * (z == Z_UP || z == Z_INV ? -1 : 1);
+  // Per field: streak hue, and drift speed (negative = upward), indexed by zone id.
+  const hue = [0, 190, 288, 24, 262, 150, 186][z];
+  const drift = T * [0, -200, 200, 60, -200, 200, 300][z];
   for (let i = 0; i < 26; i++) {
     const q = hsh(i * 13, c.y | 0);
     const x = lerp(c.l + 30, c.r - 30, hsh(i, 7));
