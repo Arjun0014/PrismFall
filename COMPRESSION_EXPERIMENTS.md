@@ -1277,3 +1277,18 @@ Any one row except the two 12 B ones clears the limit on its own.
 
 Note `oncontextmenu = () => false` is NOT a cheaper form of the suppression:
 `booleans_as_integers` prints `false` as `0`, which does not cancel the event.
+
+## The one cut, chosen from that menu
+
+The tagline ("you never steer the unicorn - you draw the physics") is now
+Wavedash-only: `if (WD) txt(...)`, which Terser folds away in the competition
+build at zero cost. It was flavour, not a control; every colour's verb, the
+drag rule, mixing and release are still on the title screen, and the shot in
+`reports/shots/title-competition-1366x768.png` shows the layout without it.
+
+| | Before | After | Delta |
+|---|---:|---:|---:|
+| tagline behind `WD`, deep pack | 13,332 | **13,303** | -29 |
+
+**13,303 B, 9 B under the 13,312 B limit.** Session total 13,529 -> 13,303
+(-226): 197 B from exact levers, 29 B from one line of flavour text.

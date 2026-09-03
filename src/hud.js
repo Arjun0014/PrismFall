@@ -159,7 +159,10 @@ function screenTitle() {
   for (let i = 0; i < 7; i++)
     txt('PRISMFALL', W / 2 + sin(T * 1.2 + i * .5) * 5 * U, cy + (i - 3) * 2.4 * U, 66, chsl(i, 60, .5), 1);
   txt('PRISMFALL', W / 2, cy, 66, W9, 1);
-  txt('you never steer the unicorn - you draw the physics', W / 2, cy + 46 * U, 15, W6);
+  // The tagline is Wavedash-only: it is flavour, not a control, and it was the
+  // cheapest line on the title screen (29 B) once every exact lever was spent.
+  // The lines below still teach every colour, the drag, the release and mixing.
+  if (WD) txt('you never steer the unicorn - you draw the physics', W / 2, cy + 46 * U, 15, W6);
   [
     'DRAG near the unicorn - drawings STAY until used - longer = stronger',
     'R push - O aim - Y spring - G tether - B rail - I gravity - V warp',
