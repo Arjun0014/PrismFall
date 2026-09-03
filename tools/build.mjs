@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { minify } from 'terser';
 import { makeZip, readZip } from './zip.mjs';
 import { bundle, readSources } from './src.mjs';
+import { canon } from './canon.mjs';
 export { bundle, readSources };
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -139,11 +140,23 @@ async function terse(js, wrap) {
   const opts = wrap ? TERSER_OPTS
     : Object.assign({}, TERSER_OPTS, {
       compress: Object.assign({}, TERSER_OPTS.compress, { toplevel: true }),
+      mangle: Object.assign({}, TERSER_OPTS.mangle, { properties: OWN_PROPS }),
     });
   const r = await minify(src, opts);
   if (r.error) throw r.error;
-  return r.code;
+  // The packed build is then rewritten into one canonical shape per construct
+  // (tools/canon.mjs): -203 B measured, no change in behaviour.
+  return wrap ? r.code : canon(r.code);
 }
+
+// The game's own two-letter object properties (P.vx, o.kt, c.bk ...) mangled
+// to single characters in the packed build only: -46 B measured. The regex is
+// a whitelist, so nothing the DOM or Web Audio owns can be touched. The
+// Wavedash build keeps the real names because its save record and the SDK
+// calls are read by code outside this tree.
+export const OWN_PROPS = {
+  regex: /^(x1|y1|x2|y2|paid|cap|kt|kd|os|op|ox|oy|lt|bk|pl|pr|rg|vx|vy|sp|ra|rt|rs|rw|te|ph|rp|st|gt|al|tz|fn)$/,
+};
 
 // ------------------------------------------------------------------ html ----
 // The page styles itself from JS (see 85_input.js), so the shell is minimal.

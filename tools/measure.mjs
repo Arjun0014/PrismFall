@@ -10,13 +10,14 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { makeZip } from './zip.mjs';
-import { TERSER_OPTS, RR_MEM } from './build.mjs';
+import { TERSER_OPTS, RR_MEM, OWN_PROPS } from './build.mjs';
+import { canon } from './canon.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const p = (...a) => join(ROOT, ...a);
 
 /** The shell the archive actually ships, byte for byte. */
-export const html = (s) => '<!doctype html><canvas id=a></canvas><script>' + s + '</script>';
+export const html = (s) => '<!doctype html><canvas></canvas><script>' + s + '</script>';
 
 /** The cached Roadroller model the fast build uses. */
 export function rrOptions() {
@@ -45,7 +46,7 @@ export function competitionTerser(over = {}) {
   return {
     ...TERSER_OPTS, ...over,
     compress: { ...TERSER_OPTS.compress, toplevel: true, ...(over.compress || {}) },
-    mangle: over.mangle === false ? false : mangleOver(over.mangle),
+    mangle: over.mangle === false ? false : mangleOver({ properties: OWN_PROPS, ...(over.mangle || {}) }),
     format: { ...TERSER_OPTS.format, ...(over.format || {}) },
   };
 }
@@ -84,5 +85,5 @@ export async function score(raw, cfg, rr, tag, iters) {
   const { minify } = await import('terser');
   const r = await minify(raw, cfg);
   if (r.error) throw r.error;
-  return weigh(r.code, rr, tag, iters);
+  return weigh(canon(r.code), rr, tag, iters);
 }
