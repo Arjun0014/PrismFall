@@ -181,7 +181,7 @@ export const OWN_PROPS = {
 // The doctype stays. Fourteen bytes is not worth putting the layout into
 // quirks mode.
 function html(script) {
-  return '<!doctype html><canvas></canvas><script>' + script + '</script>';
+  return '<canvas></canvas><script>' + script + '</script>';
 }
 
 // The Wavedash page needs a viewport tag and a matching page background, and

@@ -17,7 +17,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const p = (...a) => join(ROOT, ...a);
 
 /** The shell the archive actually ships, byte for byte. */
-export const html = (s) => '<!doctype html><canvas></canvas><script>' + s + '</script>';
+export const html = (s) => '<canvas></canvas><script>' + s + '</script>';
 
 /** The cached Roadroller model the fast build uses. */
 export function rrOptions() {
