@@ -24,6 +24,8 @@ const POLY = (n, f, s, w, fn) => {
   if (s) SK(w, s);
 };
 const VTX = (i, x, y) => (i ? LT : MT)(x, y);
+// Line width in screen pixels, never thinner than one.
+const lw = (k) => mx(1, k * SC);
 
 let pal = [232, 62, 12, 322, 52, 27, 288, 80];   // live (interpolated) palette
 let shX = 0, shY = 0;
@@ -128,7 +130,7 @@ function background() {
   g.addColorStop(1, hsl(pal[3] | 0, pal[4] | 0, pal[5] | 0));
   X.fillStyle = g; X.fillRect(0, 0, W, H);
   const k = MOT[reg];
-  X.lineWidth = mx(1, 2.4 * SC);
+  X.lineWidth = lw(2.4);
   for (let L = 0; L < 2; L++) {
     const par = L ? .4 : .16, size = L ? 300 : 500, al = L ? .09 : .05;
     const cx = C.x * par, cy = C.y * par, hw = W / 2 / SC, hh = H / 2 / SC;
@@ -219,7 +221,7 @@ function obStyle(o) {
 
 function drawWorld() {
   const y0 = s2wy(0) - 200, y1 = s2wy(H) + 200;
-  const wide = mx(2, (ST * 2 + 3) * SC), thin = mx(1, ST * SC);
+  const wide = mx(2, (ST * 2 + 3) * SC), thin = lw(ST);
   const mass = hsl(pal[6] | 0, 30, mx(4, pal[2] * .42) | 0);
   for (const c of chunks) {
     if (c.y + c.h < y0 || c.y > y1) continue;
@@ -249,19 +251,19 @@ function drawWorld() {
         if (fz) X.globalAlpha = .5 + rnd() * .5;
       }
       if (!o.t) {
-        CIR(ox, oy, o.r * SC, s2[0], s2[1], mx(1, (2.4 + f * 4) * SC));
-        if (o.m & M_BUMP) CIR(ox, oy, o.r * SC * .5, 0, s2[1], mx(1, 1.6 * SC));
-        if (f) CIR(ox, oy, (o.r + 6 + f * 20) * SC, 0, hsl(pal[6] + 30 | 0, 100, 80, f), mx(1, 2 * SC));
+        CIR(ox, oy, o.r * SC, s2[0], s2[1], lw((2.4 + f * 4)));
+        if (o.m & M_BUMP) CIR(ox, oy, o.r * SC * .5, 0, s2[1], lw(1.6));
+        if (f) CIR(ox, oy, (o.r + 6 + f * 20) * SC, 0, hsl(pal[6] + 30 | 0, 100, 80, f), lw(2));
       } else {
         const cg = cos(_cg) * o.r, sg2 = sin(_cg) * o.r;
         LIN(w2sx(_cx - cg), w2sy(_cy - sg2), w2sx(_cx + cg), w2sy(_cy + sg2), wide, s2[0]);
         SK(thin, s2[1]);
         if (o.m & M_BREAK) {
           X.setLineDash([6 * SC, 7 * SC]);
-          SK(mx(1, 2 * SC), hsl(48, 100, 80, .85));
+          SK(lw(2), hsl(48, 100, 80, .85));
           X.setLineDash([]);
         }
-        if (f) SK(mx(1, (2 + f * 5) * SC), hsl(pal[6] + 30 | 0, 100, 90, f));
+        if (f) SK(lw((2 + f * 5)), hsl(pal[6] + 30 | 0, 100, 90, f));
       }
       if (f || fz) { X.globalAlpha = 1; X.restore(); }
     }
@@ -295,7 +297,7 @@ function drawZone(c) {
     if (m < 1) continue;
     const ln = mn(64, m * .05);
     LIN(w2sx(x), w2sy(yy), w2sx(x + _zx / m * ln), w2sy(yy + _zy / m * ln),
-      mx(1, 2.4 * SC), hsl(hue, 90, 70, .16 + q * .16));
+      lw(2.4), hsl(hue, 90, 70, .16 + q * .16));
   }
 }
 
@@ -303,7 +305,7 @@ function drawZone(c) {
 // vertex count, radius and spin rate.
 function drawItem(it) {
   const x = w2sx(it.x), y = w2sy(it.y), s = SC, b = 1 + sin(T * 3 + it.x * .02) * .12, t = it.t;
-  if (!t) { CIR(x, y, 9 * s * b, UG, hsl(38, 100, 84), mx(1, 2.4 * s)); return; }
+  if (!t) { CIR(x, y, 9 * s * b, UG, hsl(38, 100, 84), lw(2.4)); return; }
   if (t == I_WELL) {
     for (let i = 0; i < 7; i++) {
       const a = i / 7 * TAU + T * .6;
@@ -320,7 +322,7 @@ function drawItem(it) {
   X.save(); X.translate(x, y);
   X.rotate(T * (cr ? .8 : pg ? 1.4 : -1) + it.c);
   POLY(n, cr ? UG : pg ? chsl(bc, 60) : bc > 6 ? '#fff' : chsl(bc, 60),
-    pg ? chsl(bc, 90) : '#fff', mx(1, 2 * s), (i) => {
+    pg ? chsl(bc, 90) : '#fff', lw(2), (i) => {
       const a = i / n * TAU, q = rad * (cr && i & 1 ? .4 : 1);
       VTX(i, cos(a) * q, sin(a) * q);
     });
@@ -352,11 +354,11 @@ function drawStrokes() {
     LIN(x1, y1, x2, y2, mx(4, 20 * SC), strokeColor(s, a * .16));
     SK(mx(3, (ST * 2 + 5) * SC), hsl(266, 55, 5, a * .8));
     SK(mx(2, ST * 2 * SC), strokeColor(s, a));
-    SK(mx(1, ST * .8 * SC), hsl(0, 0, 100, a * .5));
+    SK(lw(ST * .8), hsl(0, 0, 100, a * .5));
     if (!s.u) {
       // The pin: where the drag began. Green hangs its rope here, so this ring
       // is not decoration -- it is the fact the tether rule depends on.
-      CIR(x1, y1, (4.5 + sin(T * 4 + s.x1) * .8) * SC, 0, chsl(s.c, 80, .9), mx(1, 2 * SC));
+      CIR(x1, y1, (4.5 + sin(T * 4 + s.x1) * .8) * SC, 0, chsl(s.c, 80, .9), lw(2));
       // The aim: Orange fires you toward the far end, so the end gets an arrow.
       const dx = x2 - x1, dy = y2 - y1, L = hyp(dx, dy);
       if (L > 16) {
@@ -369,23 +371,23 @@ function drawStrokes() {
     }
     if (s == P.ra) {
       X.setLineDash([4 * SC, 9 * SC]); X.lineDashOffset = -T * 90 * SC;
-      SK(mx(1, 3 * SC), hsl(190, 100, 88, .9));
+      SK(lw(3), hsl(190, 100, 88, .9));
       X.setLineDash([]);
     }
   }
   for (const n of nodes) {
     const a = n.t / .5;
-    CIR(w2sx(n.x), w2sy(n.y), (6 + (1 - a) * 26) * SC, 0, hsl(0, 0, 100, a), mx(1, 3 * SC));
+    CIR(w2sx(n.x), w2sy(n.y), (6 + (1 - a) * 26) * SC, 0, hsl(0, 0, 100, a), lw(3));
   }
   if (P.te) {
     const ax = w2sx(P.te.x), ay = w2sy(P.te.y);
     // The rope, plus the circle it may sweep. The radius is the length of the
     // line you drew, and seeing it is what turns the swing into something you
     // aim rather than something that happens to you.
-    CIR(ax, ay, P.te.l * SC, 0, chsl(3, 60, .16), mx(1, 1.4 * SC));
-    LIN(ax, ay, w2sx(P.x), w2sy(P.y), mx(1, 3.2 * SC), chsl(3, 70));
+    CIR(ax, ay, P.te.l * SC, 0, chsl(3, 60, .16), lw(1.4));
+    LIN(ax, ay, w2sx(P.x), w2sy(P.y), lw(3.2), chsl(3, 70));
     CIR(ax, ay, 8 * SC, chsl(3, 60));
-    CIR(ax, ay, (12 + sin(T * 9) * 3) * SC, 0, chsl(3, 80, .8), mx(1, 2 * SC));
+    CIR(ax, ay, (12 + sin(T * 9) * 3) * SC, 0, chsl(3, 80, .8), lw(2));
   }
 }
 
@@ -393,7 +395,7 @@ function drawParts() {
   // Shockwaves sit under everything else so they read as pressure, not confetti.
   for (const w of shocks) {
     const a = clamp(w.t, 0, 1);
-    CIR(w2sx(w.x), w2sy(w.y), w.r * SC, 0, hsl(w.h | 0, 100, 70, a * .7), mx(1, 5 * a * SC));
+    CIR(w2sx(w.x), w2sy(w.y), w.r * SC, 0, hsl(w.h | 0, 100, 70, a * .7), lw(5 * a));
   }
   for (const p of parts) {
     const a = clamp(p.l / p.L, 0, 1), x = w2sx(p.x), y = w2sy(p.y);
@@ -401,14 +403,14 @@ function drawParts() {
       // Debris: a real spinning fragment of whatever just came apart.
       X.save(); X.translate(x, y); X.rotate(p.a);
       const q = p.s * SC * (.4 + a * .6);
-      POLY(4, hsl(p.h | 0, 70, 40 + a * 26, a), hsl(p.h | 0, 90, 70, a), mx(1, 1.2 * SC),
+      POLY(4, hsl(p.h | 0, 70, 40 + a * 26, a), hsl(p.h | 0, 90, 70, a), lw(1.2),
         (i) => VTX(i, [-1, .8, 1.2, -.6][i] * q, [-.7, -1.2, .9, 1][i] * q));
       X.restore();
       continue;
     }
-    if (p.k == 2) CIR(x, y, (1 - a) * p.s * 9 * SC, 0, hsl(p.h | 0, 100, 70, a), mx(1, 3 * a * SC));
+    if (p.k == 2) CIR(x, y, (1 - a) * p.s * 9 * SC, 0, hsl(p.h | 0, 100, 70, a), lw(3 * a));
     else LIN(x, y, x - p.vx * (p.k ? .02 : .012) * SC, y - p.vy * (p.k ? .02 : .012) * SC,
-      mx(1, p.s * (p.k ? 1 : a) * SC), hsl(p.h | 0, p.k ? 70 : 100, p.k ? 60 : 60, a));
+      lw(p.s * (p.k ? 1 : a)), hsl(p.h | 0, p.k ? 70 : 100, p.k ? 60 : 60, a));
   }
   for (const p of pops) {
     const a = clamp(p.l, 0, 1);
@@ -501,7 +503,7 @@ function drawUnicorn() {
 
   // Selected-colour halo, tinted red while Red-charged: world-space feedback
   // so the player never has to glance at the HUD.
-  CIR(x, y, (R + 7) * s, 0, P.rp > 0 ? hsl(6, 100, 62) : chsl(sel, 70, .5), mx(1, (P.rp > 0 ? 3 : 2) * s));
+  CIR(x, y, (R + 7) * s, 0, P.rp > 0 ? hsl(6, 100, 62) : chsl(sel, 70, .5), lw((P.rp > 0 ? 3 : 2)));
   if (P.st > STALLW) {
     const u = (P.st - STALLW) / (STALLT - STALLW);
     BP(); AR(x, y, (R + 16 + sin(T * 20) * 4) * s, -PI / 2, -PI / 2 + TAU * (1 - u));
