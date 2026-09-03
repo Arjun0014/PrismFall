@@ -1775,5 +1775,44 @@
   "note": "",
   "delta": -14,
   "left": -259
+ },
+ {
+  "date": "2026-09-03 13:04",
+  "quick": false,
+  "zip": 13575,
+  "min": 66215,
+  "raw": 114310,
+  "rr": 17944,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 4,
+  "left": -263
+ },
+ {
+  "date": "2026-09-03 13:06",
+  "quick": false,
+  "zip": 13571,
+  "min": 66215,
+  "raw": 114310,
+  "rr": 17937,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -4,
+  "left": -259
+ },
+ {
+  "date": "2026-09-03 13:11",
+  "quick": false,
+  "zip": 13538,
+  "min": 66215,
+  "raw": 114310,
+  "rr": 17898,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -33,
+  "left": -226
  }
 ]

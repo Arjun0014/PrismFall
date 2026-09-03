@@ -21,6 +21,7 @@
 // a page shared with the platform SDK, so its top-level declarations stay
 // declarations there.
 import * as acorn from 'acorn';
+import { relabel } from './relabel.mjs';
 
 const parse = (js) => acorn.parse(js, { ecmaVersion: 2022 });
 const S = (js, n) => js.slice(n.start, n.end);
@@ -116,7 +117,9 @@ export const nums = (js) => {
   return apply(js, ed);
 };
 
-export const PASSES = [split, toLet, nolet, ifs, noinc, nums];
+// Last: locals renamed from their own alphabet (tools/relabel.mjs), after the
+// top-level lets have become assignments so the globals are the free names.
+export const PASSES = [split, toLet, nolet, ifs, noinc, nums, (js) => relabel(js)];
 export function canon(js) {
   for (const p of PASSES) js = p(js);
   parse(js); // must still be a program
