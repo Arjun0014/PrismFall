@@ -15,8 +15,6 @@ function bst(c) {
   for (let i = 0; i < 7; i++) if (boostT[i] > 0 && BOOST[i][0] == c) return BOOST[i][1];
   return 1;
 }
-const costMul = () => bst(7);
-const pmax = () => PMAX;
 // How strong a stroke of length L is. Every colour reads this one curve, so
 // "draw longer for more of it" is a single rule the player learns once, and
 // pigment already bills per unit length so the cost side needs no new economy.
@@ -48,7 +46,7 @@ function moveStroke() {
   if (d < 1) return;
   let L = mn(d, SMAX);
   if (L > s.paid) {
-    const unit = PC[s.c] * costMul(), want = (L - s.paid) * unit;
+    const unit = PC[s.c] * bst(7), want = (L - s.paid) * unit;
     if (pig[s.c] >= want) { pig[s.c] -= want; s.paid = L; }
     else {
       L = s.paid += pig[s.c] / unit;
@@ -231,7 +229,7 @@ function chainAdd(b) {
   chainN = n;
   if (n == 7) return fullSpectrum();
   if (n == 3 || n == 5) {
-    for (let i = 0; i < 7; i++) pig[i] = mn(pmax(), pig[i] + 6);
+    for (let i = 0; i < 7; i++) pig[i] = mn(PMAX, pig[i] + 6);
     pop(P.x, P.y - 30, 'SPECTRUM ' + n + '/7', HUE[n]);
     sndRefund();
   }
@@ -239,7 +237,7 @@ function chainAdd(b) {
 
 function fullSpectrum() {
   fullSpec = 3.2;
-  for (let i = 0; i < 7; i++) pig[i] = mn(pmax(), pig[i] + 26);
+  for (let i = 0; i < 7; i++) pig[i] = mn(PMAX, pig[i] + 26);
   mult = mn(12, mult + 1.5);
   score += 1200 * mult | 0;
   flash = 1; flashH = -1;
@@ -262,11 +260,11 @@ function grab(it) {
     flash = mx(flash, .45); flashH = 48;
     sndCrown();
   } else if (it.t == I_PIG) {
-    pig[it.c] = mn(pmax(), pig[it.c] + 40);
+    pig[it.c] = mn(PMAX, pig[it.c] + 40);
     sndPig(it.c);
     burst(it.x, it.y, 12, 3, 190, HUE[it.c]);
   } else if (it.t == I_WELL) {
-    for (let i = 0; i < 7; i++) pig[i] = pmax();
+    for (let i = 0; i < 7; i++) pig[i] = PMAX;
     flash = 1; flashH = -1;
     pop(it.x, it.y, 'PRISM WELL', -1);
     sndWell();

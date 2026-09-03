@@ -60,13 +60,10 @@ const BIAS = [0x000b4, 0xc016a, 0x201a6, 0x11153, 0xa9332, 0x4a355, 0x6528b];
 // Two affinity colours per region, one digit each, straight from the world spec:
 // Cloudbreak O+Y, Sunforge R+O, Verdant G+Y, Crystal B+O, Mine R+V, Temple I+V.
 const AFF = '120132410656';
-const regHue = (r) => REG[r][1];
-const bias = (r) => BIAS[r];
 const bit = (b, i) => (b >> (16 - i * 4) & 15) / 16;
 // The Rainbow Engine's affinity is "all colours", so it rolls fresh each time.
 const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]];
 
-const regZone = (r) => REG[r][7];
 let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
 // Shared build context for the archetype builders: the playable span, its
 // centre and width, the region's material bias and the current difficulty.
@@ -171,7 +168,7 @@ function solidNear(c, x, y, rad) {
 // ---------------------------------------------------------------------------
 function genChunk() {
   const y = nextY;
-  const rg = regAt(y), dif = difAt(y), b = bias(rg);
+  const rg = regAt(y), dif = difAt(y), b = BIAS[rg];
   const boundary = flr((y + 1400) / REGD) > flr(y / REGD) && y > 200;
 
   // Wall profile: side pockets widen the column, shafts narrow it.
@@ -195,7 +192,7 @@ function genChunk() {
     // The region's force field. It is what makes a descent feel like a place:
     // Cloudbreak holds you up, the Temple turns you over, the Coil and the
     // Current sweep you sideways, the Mine drags you into its pockets.
-    if (cIdx > 1 && ri(0, 9) < REG[rg][8]) c.z = regZone(rg) || ri(1, 5);
+    if (cIdx > 1 && ri(0, 9) < REG[rg][8]) c.z = REG[rg][7] || ri(1, 5);
     if (k == 1 || k == 5)
       barrier(c, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 200), c.y + c.h * rf(.3, .6), 0);
     else [pegField, 0, bowl, shaft, rotor, 0, chamber, targets, crushers][k](c);

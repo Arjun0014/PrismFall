@@ -96,7 +96,7 @@ function update(dt) {
   const r = regAt(P.y);
   if (r != reg) {
     reg = r; regShow = 3.2;
-    flash = mx(flash, .35); flashH = regHue(reg);
+    flash = mx(flash, .35); flashH = REG[reg][1];
     sndGate();
     score += 500 * mult | 0;
   }

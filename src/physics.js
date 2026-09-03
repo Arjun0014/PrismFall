@@ -186,7 +186,7 @@ function light(o, px, py) {
   const big = 420 * k.n * mult | 0;
   score += big;
   coins += k.n * 2;
-  for (let i = 0; i < 7; i++) pig[i] = mn(pmax(), pig[i] + 5);
+  for (let i = 0; i < 7; i++) pig[i] = mn(PMAX, pig[i] + 5);
   pop(k.x, k.y, 'BANK +' + big, 48);
   shock(k.x, k.y, 320, 48);
   flash = mx(flash, .4); flashH = 48;
