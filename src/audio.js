@@ -16,9 +16,8 @@ const WAVE = ['triangle', 'sawtooth', 'square'];
 
 function audioInit() {
   if (AC) { if (AC.state == 'suspended') AC.resume(); return; }
-  const AX = window.AudioContext || window.webkitAudioContext;
-  if (!AX) return;
-  AC = new AX();
+  if (!window.AudioContext) return;
+  AC = new AudioContext();
 
   lpF = AC.createBiquadFilter(); lpF.type = 'lowpass'; lpF.frequency.value = 20000;
   mg = AC.createGain(); mg.gain.value = SAVE.m ? 0 : .8;

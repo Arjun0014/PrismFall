@@ -12,18 +12,17 @@ function setSel(i) {
   burst(P.x, P.y, 6, 0, 130, HUE[i]);
 }
 
-document.body.style.cssText = 'margin:0;overflow:hidden;background:#05030c';
+document.body.style.cssText = 'margin:0;overflow:hidden';
 CV.style.cssText = 'position:fixed;width:100%;height:100%';
 
 function resize() {
-  const d = mn(devicePixelRatio || 1, 2);
+  const d = mn(devicePixelRatio, 2);
   W = CV.width = innerWidth * d | 0;
   H = CV.height = innerHeight * d | 0;
   // Sizing the canvas resets its context, so the two settings that never
   // change are restored here rather than before every stroke and every string.
   X.lineCap = 'round';
   X.textBaseline = 'middle';
-  U = mn(W / 1280, H / 720);
 }
 
 function ptr(e) {
@@ -49,9 +48,8 @@ addEventListener('blur', () => { drawing = null; if (st == 1) st = 2; });
 
 addEventListener('wheel', (e) => {
   if (st != 1) return;
-  e.preventDefault();
   setSel(sel + (e.deltaY > 0 ? 1 : -1));
-}, { passive: false });
+});
 
 addEventListener('keydown', (e) => {
   audioInit();
