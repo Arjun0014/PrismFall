@@ -1140,3 +1140,17 @@ was re-run through all of them.
 | the `visibilitychange` pause | 26 | pause on tab switch (`blur` still covers most of it) |
 | the `contextmenu` suppression | 22 | right-click menu on the canvas |
 | title-screen copy | ~180 | how anyone learns to play |
+
+## The searched build parameters, re-run on the new payload
+
+| Axis | Tool | Result |
+|---|---|---:|
+| Terser flags | `terflags.mjs --rounds=2` (78 moves, every one through the canonical pass) | `inline:true` -8, `join_vars:false` -2; everything else 0 or worse. **13,535 -> 13,525** |
+| global alphabet | `mangle.mjs --climb=300` | plain `A..Z` within 4 B of `_B..Z`; plateau after 90 probes. 0 |
+| local alphabet | `build/x/climb.mjs` (relabel order) | `z..a` stands; plateau after 76 probes. 0 |
+| file order | `reorder.mjs --files --probes=120` (now scored after the canonical pass; it was not, and reported 13,782 for a 13,535 build) | current order stands; 37 candidates rejected by the smoke gate. 0 |
+| Roadroller model + abbreviations | `build.mjs --deep` | cached model stands (re-run once more on the final payload below) |
+
+The `pf26` save key was undone after the suites: the browser and Wavedash
+suites seed and read `pf26_save`, live Wavedash saves live under it, and it
+was 3 B. **13,525 -> 13,529.**
