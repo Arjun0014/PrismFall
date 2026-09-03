@@ -421,21 +421,21 @@ console.log('\n=== persistence ===');
 {
   A.__eval('startRun(41);st=1');
   A.__eval('SAVE.b=0;SAVE.d=0;coins=7;score=1234;depth=5000;endRun()');
-  ok(H.store.pf26 !== undefined, 'save writes the namespaced key');
-  ok(!Object.keys(H.store).some((k) => !k.startsWith('pf26')), 'no foreign keys written', Object.keys(H.store).join(','));
+  ok(H.store.pf26_save !== undefined, 'save writes the namespaced key');
+  ok(!Object.keys(H.store).some((k) => !k.startsWith('pf26_')), 'no foreign keys written', Object.keys(H.store).join(','));
   // Coins are in-run feedback in the competition build -- there is nothing to
   // spend them on, so nothing banks them. Best score and depth still persist.
   ok(A.SAVE.b === 1234 && A.SAVE.d === 5000, 'best score and depth persist', A.SAVE.b + '/' + A.SAVE.d);
-  ok(H.store.pf26.split(',').length === 3, 'the competition record is three fields', H.store.pf26);
+  ok(H.store.pf26_save.split(',').length === 3, 'the competition record is three fields', H.store.pf26_save);
   // Reload path.
   A.__eval('SAVE.b=0;SAVE.d=0;load()');
   ok(A.SAVE.b === 1234 && A.SAVE.d === 5000, 'values survive a reload', A.SAVE.b + '/' + A.SAVE.d);
   // Malformed storage must not crash or wipe.
-  H.store.pf26 = 'garbage,,,x';
+  H.store.pf26_save = 'garbage,,,x';
   let threw = 0;
   try { A.__eval('load()'); } catch (e) { threw = 1; }
   ok(!threw, 'malformed storage does not throw');
-  H.store.pf26 = '';
+  H.store.pf26_save = '';
   try { A.__eval('load()'); } catch (e) { threw = 1; }
   ok(!threw, 'empty storage does not throw');
 }
