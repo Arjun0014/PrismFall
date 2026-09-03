@@ -54,19 +54,28 @@ const now = () => AC.currentTime;
 
 // Oscillator with an optional pitch sweep and an attack/decay envelope.
 // f1 of 0 (or equal to f0) means "hold the pitch".
-function O(w, f0, f1, dur, pk, dest, t0) {
-  if (!ok()) return;
-  const t = t0 || now();
-  const o = AC.createOscillator(), g = AC.createGain();
-  o.type = w;
-  o.frequency.setValueAtTime(mx(8, f0), t);
-  if (f1 && f1 != f0) o.frequency.exponentialRampToValueAtTime(mx(8, f1), t + dur);
+// Pitch (or cutoff) sweep shared by both voices: hold f0, glide to f1 if given.
+function sweep(p, f0, f1, t, dur, lo) {
+  p.setValueAtTime(mx(lo, f0), t);
+  if (f1 && f1 != f0) p.exponentialRampToValueAtTime(mx(lo, f1), t + dur);
+}
+// Envelope and routing shared by both voices: src (through mid) -> gain -> dest.
+function fire(src, mid, t, dur, pk, dest) {
+  const g = AC.createGain();
   g.gain.setValueAtTime(1e-4, t);
   g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .008);
   g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
-  o.connect(g).connect(dest || sfxG);
-  o.start(t); o.stop(t + dur + .02);
+  (mid ? src.connect(mid) : src).connect(g).connect(dest || sfxG);
+  src.start(t); src.stop(t + dur + .02);
   voices++;
+}
+function O(w, f0, f1, dur, pk, dest, t0) {
+  if (!ok()) return;
+  const t = t0 || now();
+  const o = AC.createOscillator();
+  o.type = w;
+  sweep(o.frequency, f0, f1, t, dur, 8);
+  fire(o, 0, t, dur, pk, dest);
 }
 
 function N(dur, pk, ft, f0, f1, q, dest, t0) {
@@ -76,16 +85,9 @@ function N(dur, pk, ft, f0, f1, q, dest, t0) {
   s.buffer = nzBuf; s.loop = true;
   s.playbackRate.value = .7 + rnd() * .6;
   const f = AC.createBiquadFilter(); f.type = ft;
-  f.frequency.setValueAtTime(mx(20, f0), t);
-  if (f1 != f0) f.frequency.exponentialRampToValueAtTime(mx(20, f1), t + dur);
+  sweep(f.frequency, f0, f1, t, dur, 20);
   f.Q.value = q || 1;
-  const g = AC.createGain();
-  g.gain.setValueAtTime(1e-4, t);
-  g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .005);
-  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
-  s.connect(f).connect(g).connect(dest || sfxG);
-  s.start(t); s.stop(t + dur + .02);
-  voices++;
+  fire(s, f, t, dur, pk, dest);
 }
 
 // --- collision / material --------------------------------------------------
