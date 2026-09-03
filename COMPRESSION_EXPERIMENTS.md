@@ -1030,3 +1030,113 @@ that gets there is roughly: all parallax scenery + four of the nine archetypes +
 world filler + coin arcs + destruction caches + region gates + score pops. That
 is most of what "procedural worlds", "pinball movement" and "region identities"
 mean in this game.
+
+---
+
+# Canonical-shape phase
+
+Starting point **14,033 B** (gap 721). Rule unchanged: no feature, sound,
+effect, world, system, cosmetic or piece of feel removed. Every row below is a
+real archive, and every kept change was re-verified by the suites (167 sim, 21
+gen at 80 seeds, 41 audio, Chromium, Wavedash).
+
+## The finding that paid: one shape per construct
+
+Roadroller strips insignificant whitespace before it models anything (the
+decoder's byte count is 39K against a 66K beautified bundle), so the earlier
+"free text shape" result was measuring nothing. What the model *does* see is
+the token stream, and it is paying for every construct that Terser prints in
+more than one way. A post-Terser pass (`tools/canon.mjs`) rewrites the packed
+build into exactly one shape per construct; each pass was measured alone on
+the real archive:
+
+| Pass | What it does | Delta |
+|---|---|---:|
+| `split` | `let a = 1, b = 2;` -> one declarator per statement | **-121** |
+| `let` | every `const` -> `let` | -24 |
+| `nolet` | top-level `let A = x` -> `A = x` (eval'd script, so these are globals anyway) | -24 |
+| `ifs` | `a && b;` and `a ? b : c;` statements -> `if` statements | -37 |
+| `noinc` | `i++` (statement / for-update) -> `i += 1` | -10 |
+| `nums` | `1e9`, `1e-4` -> plain decimals | -15 |
+| own-property mangling | `P.vx`, `o.kt`, `c.bk` ... -> one character (whitelist regex, packed build only) | -46 |
+| `==` everywhere (source) | every `===`/`!==` compared numbers, same-typed strings, objects, or undefined where no caller passes null | -19 |
+
+Together: **14,033 -> 13,765 (-249 + -19)**. The same family, measured and
+rejected: top-level arrows -> function declarations (-5 alone, **+14** once
+`split` is in), `a || b;` -> if (0), `else if` -> nested else (+5),
+`return a ? b : c` -> if/return (+4), `x = a ? b : c` -> if/else (+21),
+compound assignments expanded (**+64** -- `+=` is good), `while` -> `for`
+(+1), leading zeros on decimals (+31), alphabetical object keys (+5),
+parenthesised single arrow params (-1), `shorthand:false` (0),
+`join_vars:false` (+4). The five Terser flags most likely to interact were
+re-run under the new pipeline: `evaluate:false` +1,048, `reduce_vars:false`
++1,055, `conditionals:false` +475, `collapse_vars:false` +22,
+`if_return:false` +3. The flag set stands.
+
+## Names: the model predicts "previous + 1"
+
+`tools/relabel.mjs` reproduces Terser's per-scope name allocation byte for
+byte with the default alphabet (the check that the scope model is right), then
+varies it:
+
+| Variant | Delta vs Terser |
+|---|---:|
+| locals named in declaration order (Terser) | 0 |
+| locals named by reference count | **+89** |
+| locals named by live span | +166 |
+| locals from a disjoint lowercase alphabet, no skipped letters, `a..z` | -20 |
+| same, `z..a` | **-33** kept; hill-climb of the order plateaued after 76 probes |
+| every local a fresh name (no reuse across sibling blocks) | **+318** |
+
+Consecutive declarations get consecutive names, and Terser breaks that only
+where a local has to skip a letter a referenced global is using -- a disjoint
+alphabet removes every skip. Reuse across sibling blocks is worth 318 B, so
+"register allocation" of local names is not a direction: the model wants a
+small, ordered name set, not a compact one.
+
+Globals: Terser's order (all function declarations first, in definition order,
+then variables) is a steep local optimum -- first-appearance order **+133**,
+frequency order **+225**, variables-first definition order -8. Own-property
+names in first-appearance order -6, frequency order +5. Neither taken. The
+global alphabet re-searched on the new payload: plain `A..Z` and `_B..Z` are
+within 4 B of each other; plateau.
+
+## Source-level, one at a time
+
+| # | Change | Before | After | Delta | Decision |
+|---|---|---:|---:|---:|---|
+| E1 | every literal `'hsl(...)'` string -> a call to the `hsl()` helper the game already has (identical colours) | 13,765 | 13,727 | -38 | KEEP |
+| E2 | `lineCap` / `textBaseline` set once in `resize()` (sizing the canvas resets them) instead of before every stroke and string | 13,727 | 13,718 | -9 | KEEP |
+| E3 | one-line aliases (`pmax`, `costMul`, `regHue`, `bias`, `regZone`) inlined at their 1-4 uses | 13,718 | 13,700 | -18 | KEEP |
+| E9 | the seven borrowing cues call the borrowed sound directly | 13,700 | 13,722 | +22 | REVERT -- the one-line wrappers are cheap repeated shapes |
+| E4 | archetype weight strings sorted (identical distribution) | 13,700 | 13,690 | -10 | UNDONE -- one fixed seed fell to 950 against the 1,500 playability floor |
+| E5 | scenery hash `hsh()` through mulberry32's own output stage instead of three constants of its own (scenery re-rolls; verified in the gallery, no visible pattern) | 13,690 | 13,657 | -33 | KEEP |
+| E7 | `webkitAudioContext`, `devicePixelRatio \|\| 1`, wheel `preventDefault`/`passive:false`, a redundant `U` assignment, `background:#05030c` on a body the canvas always covers | 13,657 | 13,614 | -42 | KEEP |
+| E8 | the unicorn's eye colour through `hsl()` (1.6 px circle) | 13,614 | 13,609 | -5 | KEEP |
+| E13 | particle hues for damp/breakable/phase read from the material style table | 13,609 | 13,625 | +16 | REVERT |
+| E12 | `O()` and `N()` share `sweep()` and `fire()`, each voice keeping its own attack time | 13,609 | 13,605 | -4 | KEEP (the version that unified the attack times was undone: -2 B is not worth a design change) |
+| E11 | `lw(k)` = `mx(1, k * SC)` for the 20 line widths | 13,607 | 13,591 | -16 | KEEP |
+| F6 | pure white through `hsl(0, 0, 100)` so the six `'#fff'` become one name | 13,598 | 13,589 | -9 | KEEP |
+| F22 | one chunk constructor for the generator and the opening room; the dead `v` field goes | 13,589 | 13,585 | -4 | KEEP |
+| shell | `<!doctype html>` dropped -- the canvas is position:fixed, so quirks mode changes nothing; verified in Chromium at 1920x1080, 800x600, 390x844 (BackCompat, canvas rect == viewport, no overflow) | 13,599 | 13,585 | -14 | KEEP |
+| zone | `drawZone`'s hue and drift chains -> arrays indexed by zone id | 13,585 | 13,571 | -14 | KEEP |
+| tables2 | the same for item type, parallax layer, title-line colour | 13,571 | 13,571 | 0 | REVERT |
+| E6 | save key `pf26_save` -> `pf26` (still namespaced: every js13k entry shares one origin's localStorage, so a one-letter key is not safe; measured -19 and not taken) | 13,557 | 13,554 | -3 | KEEP |
+| WD | the competition build no longer carries the Wavedash-only `SAVE` fields or a `coins + ''` coercion | 13,554 | 13,542 | -12 | KEEP |
+| spread | `ci`/`sg` spread the decoration record instead of `Object.assign` | 13,542 | 13,535 | -7 | KEEP |
+| fill | `Array(7).fill(...)` for the reservoirs | 13,535 | 13,543 | +8 | REVERT |
+
+Two things learned on the way. Adding or removing a top-level function shifts
+every later global name, so any single small experiment carries roughly
+**+/-10 B of noise** from the name assignment alone (E12 measured -2 in one
+place and -11 in another). And the same is true of the suites: E4 and E6 both
+passed the smoke test and failed a real suite, which is why every kept change
+was re-run through all of them.
+
+## Measured and NOT taken (the protect list)
+
+| Option | Bytes | What it costs |
+|---|---:|---|
+| the `visibilitychange` pause | 26 | pause on tab switch (`blur` still covers most of it) |
+| the `contextmenu` suppression | 22 | right-click menu on the canvas |
+| title-screen copy | ~180 | how anyone learns to play |
