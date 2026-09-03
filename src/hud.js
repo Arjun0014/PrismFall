@@ -19,7 +19,7 @@ const CATS = 4;
 const owned = (c, i) => !i || (SAVE.o >> (c * 3 + i)) & 1;
 
 // fixed UI palette
-const W9 = '#fff';
+const W9 = hsl(0, 0, 100);
 const W6 = hsl(0, 0, 100, .62);
 const W3 = hsl(0, 0, 100, .34);
 const UB = hsl(282, 40, 15, .88);   // button

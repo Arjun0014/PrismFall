@@ -312,7 +312,7 @@ function drawItem(it) {
       BP(); AR(x, y, 26 * s * b, a, a + .8);
       SK(7 * s, chsl(i, 60));
     }
-    CIR(x, y, 13 * s * b, '#fff');
+    CIR(x, y, 13 * s * b, W9);
     return;
   }
   const cr = t == I_CROWN, pg = t == I_PIG;
@@ -321,8 +321,8 @@ function drawItem(it) {
   const n = cr ? 10 : pg ? 6 : 3, rad = (cr ? 16 : pg ? 12 : 15) * s * b;
   X.save(); X.translate(x, y);
   X.rotate(T * (cr ? .8 : pg ? 1.4 : -1) + it.c);
-  POLY(n, cr ? UG : pg ? chsl(bc, 60) : bc > 6 ? '#fff' : chsl(bc, 60),
-    pg ? chsl(bc, 90) : '#fff', lw(2), (i) => {
+  POLY(n, cr ? UG : pg ? chsl(bc, 60) : bc > 6 ? W9 : chsl(bc, 60),
+    pg ? chsl(bc, 90) : W9, lw(2), (i) => {
       const a = i / n * TAU, q = rad * (cr && i & 1 ? .4 : 1);
       VTX(i, cos(a) * q, sin(a) * q);
     });
@@ -445,7 +445,7 @@ function unicornBody(body, tint, white, horn) {
   // Every alternative body, horn and trail is a store cosmetic, so each one
   // is behind WD and none of them exist in the competition build. What is
   // left is the unicorn everyone starts with, unchanged.
-  const main = white ? '#fff' : WD && body == 1 ? hsl(268, 40, 12) : WD && body == 2 ? hsl(190, 100, 72) : hsl(300, 40, 96);
+  const main = white ? W9 : WD && body == 1 ? hsl(268, 40, 12) : WD && body == 2 ? hsl(190, 100, 72) : hsl(300, 40, 96);
   const line = white ? chsl(flr(T * 6) % 7, 70) : WD && body == 2 ? hsl(300, 100, 70) : hsl(280, 45, 62);
   const gal = sin(T * 13), rb = flr(T * 5);
 
@@ -480,12 +480,12 @@ function unicornBody(body, tint, white, horn) {
   const hl = WD && horn == 1 ? 26 : 15;
   const hg = X.createLinearGradient(0, 0, 0, -hl);
   hg.addColorStop(0, chsl(0, 60)); hg.addColorStop(1, chsl(tint, 90));
-  POLY(3, hg, '#fff', 1.2, (i) => VTX(i, [-3, 3, 0][i], [0, 0, -hl][i]));
+  POLY(3, hg, W9, 1.2, (i) => VTX(i, [-3, 3, 0][i], [0, 0, -hl][i]));
   if (!WD || !horn) for (let i = 0; i < 4; i++) {
     const q = i / 4;
     LIN(-3 + q * 6 * .5, -hl * q, 3 - q * 6 * .5, -hl * q - 2, 1.2, chsl((rb + i) % 7, 90));
   }
-  if (WD && horn == 2) POLY(10, '#fff', chsl(tint, 90), 1, (i) => {
+  if (WD && horn == 2) POLY(10, W9, chsl(tint, 90), 1, (i) => {
     const a = i / 10 * TAU + T * 2, q = (i & 1 ? 2.4 : 6);
     VTX(i, cos(a) * q, -hl + sin(a) * q);
   });
