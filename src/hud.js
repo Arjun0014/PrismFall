@@ -20,11 +20,11 @@ const owned = (c, i) => !i || (SAVE.o >> (c * 3 + i)) & 1;
 
 // fixed UI palette
 const W9 = '#fff';
-const W6 = 'hsl(0 0% 100% / .62)';
-const W3 = 'hsl(0 0% 100% / .34)';
-const UB = 'hsl(282 40% 15% / .88)';   // button
-const UE = 'hsl(290 55% 50%)';         // edge / accent
-const UG = 'hsl(48 100% 66%)';         // gold
+const W6 = hsl(0, 0, 100, .62);
+const W3 = hsl(0, 0, 100, .34);
+const UB = hsl(282, 40, 15, .88);   // button
+const UE = hsl(290, 55, 50);         // edge / accent
+const UG = hsl(48, 100, 66);         // gold
 
 let U = 1;              // UI scale
 let btns = [];          // immediate-mode buttons for this frame
@@ -90,7 +90,7 @@ function hud() {
       BOOST[i][0] > 6 ? W9 : chsl(BOOST[i][0], 70), 1, 'right');
   if (regShow > 0)
     txt(REG[reg][0], W / 2, H * .3, 42,
-      'hsl(0 0% 100% / ' + clamp(regShow, 0, 1) * clamp(3.2 - regShow, 0, 1) + ')', 1);
+      hsl(0, 0, 100, clamp(regShow, 0, 1) * clamp(3.2 - regShow, 0, 1)), 1);
   // The in-run hints are gone from the 13K build. The title screen teaches the
   // same three things -- drag to draw, the colour keys, pigment is finite --
   // and it teaches them before the first frame instead of during it.
@@ -103,7 +103,7 @@ function prismBar() {
   for (let i = 0; i < 7; i++) {
     const x = x0 + i * w * 50 / 44, on = i == sel, f = pig[i] / PMAX, cx = x + w / 2;
     RR(x, y - h / 2, w, h, 5 * U);
-    FL('hsl(270 30% 8% / .8)');
+    FL(hsl(270, 30, 8, .8));
     X.save(); X.clip();
     X.fillStyle = chsl(i, on ? 60 : 42, dryC == i && dryT > 0 ? .4 + sin(T * 40) * .3 : 1);
     X.fillRect(x, y + h / 2 - h * f, w, h * f);
@@ -131,11 +131,11 @@ function cursor() {
 // --- modal framework -------------------------------------------------------
 // bs = [dx, dy, w, label, fn, accent] offsets from the screen centre.
 function modal(w, h, title, lines, bs, sz) {
-  X.fillStyle = 'hsl(275 45% 5% / .8)';
+  X.fillStyle = hsl(275, 45, 5, .8);
   X.fillRect(0, 0, W, H);
   if (w) {
     RR(W / 2 - w * U / 2, H / 2 - h * U / 2, w * U, h * U, 14 * U);
-    FL('hsl(272 40% 9% / .96)');
+    FL(hsl(272, 40, 9, .96));
     SK(2 * U, UE);
     txt(title, W / 2, H / 2 - (h / 2 - 34) * U, 27, W9, 1);
   }
@@ -149,7 +149,7 @@ function mute() { SAVE.m ^= 1; if (mg) mg.gain.value = SAVE.m ? 0 : .8; save(); 
 
 function screenTitle() {
   // With no store to sit beside it, MUTE takes the middle of the second row.
-  const bs = [[0, -30, 190, 'PLAY', startRun, 'hsl(300 80% 55%)'],
+  const bs = [[0, -30, 190, 'PLAY', startRun, hsl(300, 80, 55)],
     [WD ? 105 : 0, 26, 130, SAVE.m ? 'UNMUTE' : 'MUTE', mute]];
   if (WD) bs.push([-105, 26, 130, 'STORE', () => { st = 4; }]);
   modal(0, 0, 0, [], bs);
@@ -193,11 +193,11 @@ function screenResults() {
     'BEST    ' + SAVE.b,
     score >= SAVE.b && score ? 'NEW BEST!' : '',
   ], WD ? [
-    [0, 62, 210, 'RETRY  (R)', startRun, 'hsl(300 80% 55%)'],
+    [0, 62, 210, 'RETRY  (R)', startRun, hsl(300, 80, 55)],
     [-105, 114, 130, 'STORE', () => { st = 4; }],
     [105, 114, 130, 'MENU', () => { st = 0; }],
   ] : [
-    [0, 62, 210, 'RETRY  (R)', startRun, 'hsl(300 80% 55%)'],
+    [0, 62, 210, 'RETRY  (R)', startRun, hsl(300, 80, 55)],
     [0, 114, 130, 'MENU', () => { st = 0; }],
   ], 16);
 }
@@ -224,11 +224,11 @@ function screenStore() {
     const own = owned(c, i), eq = SAVE.e[c] == i, o = hot(x + 66 * U, y, 140 * U, 38 * U);
     if (o) { prevCat = c; prevIt = i; }
     RR(x, y - 19 * U, 140 * U, 38 * U, 7 * U);
-    FL(eq ? UE : own ? UB : 'hsl(275 25% 10%)');
+    FL(eq ? UE : own ? UB : hsl(275, 25, 10));
     SK((eq ? 2.4 : 1) * U, eq || o ? W9 : W3);
     txt(COSN[n], x + 66 * U, y - 5 * U, 11, own ? W9 : W6, 1);
     txt(own ? (eq ? 'EQUIPPED' : 'EQUIP') : COSP[i] + 'c', x + 66 * U, y + 9 * U, 10,
-      own ? W3 : SAVE.c < COSP[i] ? 'hsl(0 60% 60%)' : UG);
+      own ? W3 : SAVE.c < COSP[i] ? hsl(0, 60, 60) : UG);
     btns.push({ x: x + 66 * U, y, w: 140 * U, h: 38 * U, fn: () => buyEquip(c, i) });
   }
   // Live preview through the real unicorn renderer.

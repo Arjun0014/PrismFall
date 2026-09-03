@@ -259,7 +259,7 @@ function drawWorld() {
         SK(thin, s2[1]);
         if (o.m & M_BREAK) {
           X.setLineDash([6 * SC, 7 * SC]);
-          SK(mx(1, 2 * SC), 'hsl(48 100% 80% / .85)');
+          SK(mx(1, 2 * SC), hsl(48, 100, 80, .85));
           X.setLineDash([]);
         }
         if (f) SK(mx(1, (2 + f * 5) * SC), hsl(pal[6] + 30 | 0, 100, 90, f));
@@ -271,7 +271,7 @@ function drawWorld() {
       const bx = w2sx(k.x), by = w2sy(k.y) - 48 * SC;
       for (let i = 0; i < k.n; i++)
         CIR(bx + (i - (k.n - 1) / 2) * 13 * SC, by, 4 * SC,
-          i < k.l ? 'hsl(48 100% 68%)' : 'hsl(48 30% 32%)');
+          i < k.l ? hsl(48, 100, 68) : hsl(48, 30, 32));
     }
     for (const it of c.i) if (!it.g) drawItem(it);
   }
@@ -305,7 +305,7 @@ function drawZone(c) {
 // vertex count, radius and spin rate.
 function drawItem(it) {
   const x = w2sx(it.x), y = w2sy(it.y), s = SC, b = 1 + sin(T * 3 + it.x * .02) * .12, t = it.t;
-  if (!t) { CIR(x, y, 9 * s * b, UG, 'hsl(38 100% 84%)', mx(1, 2.4 * s)); return; }
+  if (!t) { CIR(x, y, 9 * s * b, UG, hsl(38, 100, 84), mx(1, 2.4 * s)); return; }
   if (t == I_WELL) {
     for (let i = 0; i < 7; i++) {
       const a = i / 7 * TAU + T * .6;
@@ -353,9 +353,9 @@ function drawStrokes() {
     // bumpers. Glow, dark casing, colour, white core -- the casing and the core
     // are what separate the player's marks from the world at any palette.
     LIN(x1, y1, x2, y2, mx(4, 20 * SC), strokeColor(s, a * .16));
-    SK(mx(3, (ST * 2 + 5) * SC), 'hsl(266 55% 5% / ' + a * .8 + ')');
+    SK(mx(3, (ST * 2 + 5) * SC), hsl(266, 55, 5, a * .8));
     SK(mx(2, ST * 2 * SC), strokeColor(s, a));
-    SK(mx(1, ST * .8 * SC), 'hsl(0 0% 100% / ' + a * .5 + ')');
+    SK(mx(1, ST * .8 * SC), hsl(0, 0, 100, a * .5));
     if (!s.u) {
       // The pin: where the drag began. Green hangs its rope here, so this ring
       // is not decoration -- it is the fact the tether rule depends on.
@@ -372,13 +372,13 @@ function drawStrokes() {
     }
     if (s == P.ra) {
       X.setLineDash([4 * SC, 9 * SC]); X.lineDashOffset = -T * 90 * SC;
-      SK(mx(1, 3 * SC), 'hsl(190 100% 88% / .9)');
+      SK(mx(1, 3 * SC), hsl(190, 100, 88, .9));
       X.setLineDash([]);
     }
   }
   for (const n of nodes) {
     const a = n.t / .5;
-    CIR(w2sx(n.x), w2sy(n.y), (6 + (1 - a) * 26) * SC, 0, 'hsl(0 0% 100% / ' + a + ')', mx(1, 3 * SC));
+    CIR(w2sx(n.x), w2sy(n.y), (6 + (1 - a) * 26) * SC, 0, hsl(0, 0, 100, a), mx(1, 3 * SC));
   }
   if (P.te) {
     const ax = w2sx(P.te.x), ay = w2sy(P.te.y);
@@ -417,7 +417,7 @@ function drawParts() {
   for (const p of pops) {
     const a = clamp(p.l, 0, 1);
     txt(p.t, w2sx(p.x), w2sy(p.y), 17 * SC / U,
-      p.h < 0 ? 'hsl(0 0% 100% / ' + a + ')' : hsl(p.h | 0, 100, 70, a), 1);
+      p.h < 0 ? hsl(0, 0, 100, a) : hsl(p.h | 0, 100, 70, a), 1);
   }
 }
 
@@ -448,8 +448,8 @@ function unicornBody(body, tint, white, horn) {
   // Every alternative body, horn and trail is a store cosmetic, so each one
   // is behind WD and none of them exist in the competition build. What is
   // left is the unicorn everyone starts with, unchanged.
-  const main = white ? '#fff' : WD && body == 1 ? 'hsl(268 40% 12%)' : WD && body == 2 ? 'hsl(190 100% 72%)' : 'hsl(300 40% 96%)';
-  const line = white ? chsl(flr(T * 6) % 7, 70) : WD && body == 2 ? 'hsl(300 100% 70%)' : 'hsl(280 45% 62%)';
+  const main = white ? '#fff' : WD && body == 1 ? hsl(268, 40, 12) : WD && body == 2 ? hsl(190, 100, 72) : hsl(300, 40, 96);
+  const line = white ? chsl(flr(T * 6) % 7, 70) : WD && body == 2 ? hsl(300, 100, 70) : hsl(280, 45, 62);
   const gal = sin(T * 13), rb = flr(T * 5);
   X.lineCap = 'round';
 
@@ -507,10 +507,10 @@ function drawUnicorn() {
 
   // Selected-colour halo, tinted red while Red-charged: world-space feedback
   // so the player never has to glance at the HUD.
-  CIR(x, y, (R + 7) * s, 0, P.rp > 0 ? 'hsl(6 100% 62%)' : chsl(sel, 70, .5), mx(1, (P.rp > 0 ? 3 : 2) * s));
+  CIR(x, y, (R + 7) * s, 0, P.rp > 0 ? hsl(6, 100, 62) : chsl(sel, 70, .5), mx(1, (P.rp > 0 ? 3 : 2) * s));
   if (P.st > STALLW) {
     const u = (P.st - STALLW) / (STALLT - STALLW);
     BP(); AR(x, y, (R + 16 + sin(T * 20) * 4) * s, -PI / 2, -PI / 2 + TAU * (1 - u));
-    SK(mx(2, 4 * s), 'hsl(' + (30 - u * 30) + ' 100% 60%)');
+    SK(mx(2, 4 * s), hsl(30 - u * 30, 100, 60));
   }
 }

@@ -167,7 +167,7 @@ function draw() {
   if (st == 1 || st == 2) hud();
   if (flash > .01) {
     X.fillStyle = flashH < 0
-      ? 'hsl(' + ((T * 500) % 360 | 0) + ' 100% 75% / ' + flash * .5 + ')'
+      ? hsl((T * 500) % 360 | 0, 100, 75, flash * .5)
       : hsl(flashH | 0, 100, 72, flash * .45);
     X.fillRect(0, 0, W, H);
   }
