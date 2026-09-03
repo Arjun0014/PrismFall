@@ -101,7 +101,12 @@ export const TERSER_OPTS = {
     passes: 3,
     reduce_funcs: false,    // keep single-use functions as functions
     sequences: false,       // do not comma-fold statements together
-    inline: false,          // do not inline function bodies at all
+    // Re-searched after the canonical pass (tools/canon.mjs) went in: with
+    // every declaration already split and every statement in one shape, letting
+    // Terser inline is worth -8 B and join_vars:false another -2. Both found by
+    // tools/terflags.mjs; do not tidy without re-running it.
+    inline: true,
+    join_vars: false,
     loops: false,           // leave for/while shapes as written          -9 B
     // `a = a + b` -> `a += b` shortens the text and destroys a repeated
     // pattern the model was predicting nearly free. The single largest flag

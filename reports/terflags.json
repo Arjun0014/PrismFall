@@ -1,6 +1,20 @@
 {
- "base": 15285,
- "best": 15285,
- "taken": [],
- "patches": []
+ "base": 13535,
+ "best": 13525,
+ "taken": [
+  "join_vars=false",
+  "inline=true"
+ ],
+ "patches": [
+  {
+   "compress": {
+    "join_vars": false
+   }
+  },
+  {
+   "compress": {
+    "inline": true
+   }
+  }
+ ]
 }
