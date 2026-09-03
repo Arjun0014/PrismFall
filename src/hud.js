@@ -34,7 +34,6 @@ let btns = [];          // immediate-mode buttons for this frame
 function txt(s, x, y, sz, col, bold, al) {
   X.font = (bold ? 'bold ' : '') + (sz * U | 0) + 'px monospace';
   X.textAlign = al || 'center';
-  X.textBaseline = 'middle';
   X.fillStyle = col;
   X.fillText(s, x, y);
 }

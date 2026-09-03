@@ -19,6 +19,10 @@ function resize() {
   const d = mn(devicePixelRatio || 1, 2);
   W = CV.width = innerWidth * d | 0;
   H = CV.height = innerHeight * d | 0;
+  // Sizing the canvas resets its context, so the two settings that never
+  // change are restored here rather than before every stroke and every string.
+  X.lineCap = 'round';
+  X.textBaseline = 'middle';
   U = mn(W / 1280, H / 720);
 }
 

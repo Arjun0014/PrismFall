@@ -221,7 +221,6 @@ function drawWorld() {
   const y0 = s2wy(0) - 200, y1 = s2wy(H) + 200;
   const wide = mx(2, (ST * 2 + 3) * SC), thin = mx(1, ST * SC);
   const mass = hsl(pal[6] | 0, 30, mx(4, pal[2] * .42) | 0);
-  X.lineCap = 'round';
   for (const c of chunks) {
     if (c.y + c.h < y0 || c.y > y1) continue;
     // Rock beyond each wall, so the play column reads as a shaft.
@@ -287,7 +286,6 @@ function drawZone(c) {
   const hue = z == Z_UP ? 190 : z == Z_WELL ? 288 : z == Z_WIND ? 24
     : z == Z_INV ? 262 : z == Z_FLOW ? 150 : 186;
   const drift = T * (z == Z_WIND ? 60 : z == Z_RUSH ? 300 : 200) * (z == Z_UP || z == Z_INV ? -1 : 1);
-  X.lineCap = 'round';
   for (let i = 0; i < 26; i++) {
     const q = hsh(i * 13, c.y | 0);
     const x = lerp(c.l + 30, c.r - 30, hsh(i, 7));
@@ -342,7 +340,6 @@ function strokeColor(s, a) {
 }
 
 function drawStrokes() {
-  X.lineCap = 'round';
   for (const s of strokes) {
     // A live stroke is permanent, so it is drawn at full strength. Only a spent
     // one fades, and that fade is the only thing that says it was consumed.
@@ -393,7 +390,6 @@ function drawStrokes() {
 }
 
 function drawParts() {
-  X.lineCap = 'round';
   // Shockwaves sit under everything else so they read as pressure, not confetti.
   for (const w of shocks) {
     const a = clamp(w.t, 0, 1);
@@ -432,7 +428,6 @@ function pushTrail() {
 
 function drawTrail() {
   const n = trail.length, style = WD ? SAVE.e[2] : 0;
-  X.lineCap = 'round';
   for (let i = 1; i < n; i++) {
     if (WD && style == 1 && i % 2) continue;
     const a = i / n, p = trail[i - 1], q = trail[i];
@@ -451,7 +446,6 @@ function unicornBody(body, tint, white, horn) {
   const main = white ? '#fff' : WD && body == 1 ? hsl(268, 40, 12) : WD && body == 2 ? hsl(190, 100, 72) : hsl(300, 40, 96);
   const line = white ? chsl(flr(T * 6) % 7, 70) : WD && body == 2 ? hsl(300, 100, 70) : hsl(280, 45, 62);
   const gal = sin(T * 13), rb = flr(T * 5);
-  X.lineCap = 'round';
 
   BP(); MT(-13, 0);
   for (let i = 1; i < 5; i++) LT(-13 - i * 6, sin(T * 9 - i * .8) * (2 + i * 1.6));
