@@ -216,7 +216,7 @@ function shatter(o, px, py, imp, d) {
   if (d > 3) return;
   const rad = BRK_CH;
   for (const c of NC) for (const q of c.o) {
-    if (q === o || q.k || q.kt || !(q.m & M_BREAK)) continue;
+    if (q == o || q.k || q.kt || !(q.m & M_BREAK)) continue;
     const dd = hyp(q.x - px, q.y - py);
     if (dd < rad + q.r) { q.kt = .04 + dd / rad * .1; q.kd = d + 1; }
   }

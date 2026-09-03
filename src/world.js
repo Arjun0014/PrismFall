@@ -196,7 +196,7 @@ function genChunk() {
     // Cloudbreak holds you up, the Temple turns you over, the Coil and the
     // Current sweep you sideways, the Mine drags you into its pockets.
     if (cIdx > 1 && ri(0, 9) < REG[rg][8]) c.z = regZone(rg) || ri(1, 5);
-    if (k === 1 || k === 5)
+    if (k == 1 || k == 5)
       barrier(c, k > 1 ? ri(2, 3) : 1, k > 1 ? rf(0, 26) : rf(120, 200), c.y + c.h * rf(.3, .6), 0);
     else [pegField, 0, bowl, shaft, rotor, 0, chamber, targets, crushers][k](c);
     decorate(c, REG[rg][6] + (dif * 1.6 | 0));
@@ -273,7 +273,7 @@ function barrier(c, n, drop, yy, quiet, mo) {
   for (let i = 0; i < n; i++) cuts.push(bL + (i + rf(.22, .8)) * bW / n);
   let px = bL - 20, py = yy - drop;
   for (let i = 0; i <= n; i++) {
-    const last = i === n;
+    const last = i == n;
     const gw = mx(100, rf(120, 200) - bD * 16);
     const nx = last ? bR + 20 : cuts[i] - gw / 2, ny = last ? yy - drop : yy + drop;
     if (nx - px > 26) c.o.push(sgAB(px, py, nx, ny, m));
@@ -315,7 +315,7 @@ function shaft(c) {
 function rotor(c) {
   const n = ri(1, 2);
   for (let i = 0; i < n; i++) {
-    const rx = bX + rf(-.22, .22) * bW, ry = c.y + c.h * (n === 1 ? .5 : .3 + i * .4);
+    const rx = bX + rf(-.22, .22) * bW, ry = c.y + c.h * (n == 1 ? .5 : .3 + i * .4);
     const arms = ri(2, 3), len = mn(bW * .3, 200), w = rs() * rf(.9, 1.9 + bD * .3);
     for (let a = 0; a < arms; a++)
       c.o.push(sg(rx, ry, len, a * PI / arms, M_BUMP, { w }));
@@ -483,22 +483,22 @@ function zoneF(c, x, y) {
   const z = c.z;
   if (!z) return;
   const t = (y - c.y) / c.h, ph = sin(t * 7 + T * 1.4);
-  if (z === Z_UP) {
+  if (z == Z_UP) {
     // Updraft columns: three lanes of lift you can ride or dodge.
     const lane = cos((x - c.l) / (c.r - c.l) * TAU * 1.6);
     if (lane > .1) _zy = -GRAV * 1.2 * lane;
-  } else if (z === Z_WELL) {
+  } else if (z == Z_WELL) {
     // A gravity well at the chunk's heart, falling off with distance.
     const dx = (c.l + c.r) / 2 - x, dy = c.y + c.h * .5 - y, d = hyp(dx, dy) + 60;
     const k = mn(1, 300 / d) * GRAV * .8;
     _zx = dx / d * k; _zy = dy / d * k;
-  } else if (z === Z_WIND) {
+  } else if (z == Z_WIND) {
     _zx = ph * GRAV * .6;
-  } else if (z === Z_INV) {
+  } else if (z == Z_INV) {
     // Inversion: the shaft is upside down here, and the transition is soft
     // enough at the edges that you always see it coming.
     _zy = -GRAV * 2 * clamp(mn(t, 1 - t) * 6, 0, 1);
-  } else if (z === Z_FLOW) {
+  } else if (z == Z_FLOW) {
     // The Coil: a rotation about the chunk's heart. Everything in Verdant is
     // built to be swung around, and the field swings you too.
     const cx = (c.l + c.r) / 2, cy = c.y + c.h * .5;

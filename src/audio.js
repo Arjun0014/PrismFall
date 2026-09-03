@@ -15,7 +15,7 @@ const SCALE = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 4, 5, 7, 9, 11], [0, 3, 5, 7, 10, 
 const WAVE = ['triangle', 'sawtooth', 'square'];
 
 function audioInit() {
-  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  if (AC) { if (AC.state == 'suspended') AC.resume(); return; }
   const AX = window.AudioContext || window.webkitAudioContext;
   if (!AX) return;
   AC = new AX();
@@ -61,7 +61,7 @@ function O(w, f0, f1, dur, pk, dest, t0) {
   const o = AC.createOscillator(), g = AC.createGain();
   o.type = w;
   o.frequency.setValueAtTime(mx(8, f0), t);
-  if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(mx(8, f1), t + dur);
+  if (f1 && f1 != f0) o.frequency.exponentialRampToValueAtTime(mx(8, f1), t + dur);
   g.gain.setValueAtTime(1e-4, t);
   g.gain.exponentialRampToValueAtTime(mx(1e-4, pk), t + .008);
   g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
@@ -78,7 +78,7 @@ function N(dur, pk, ft, f0, f1, q, dest, t0) {
   s.playbackRate.value = .7 + rnd() * .6;
   const f = AC.createBiquadFilter(); f.type = ft;
   f.frequency.setValueAtTime(mx(20, f0), t);
-  if (f1 !== f0) f.frequency.exponentialRampToValueAtTime(mx(20, f1), t + dur);
+  if (f1 != f0) f.frequency.exponentialRampToValueAtTime(mx(20, f1), t + dur);
   f.Q.value = q || 1;
   const g = AC.createGain();
   g.gain.setValueAtTime(1e-4, t);
@@ -217,13 +217,13 @@ function sndGate() { sndBank(); }
 function audioFrame() {
   voices = 0;
   if (!AC) return;
-  const t = now(), n = clamp(P.sp / VMAX, 0, 1), play = st === 1 && P.al;
+  const t = now(), n = clamp(P.sp / VMAX, 0, 1), play = st == 1 && P.al;
   const set = (p, v, k) => p.setTargetAtTime(v, t, k);
   set(railG.gain, P.ra && !SAVE.m && play ? .1 + n * .12 : 0, .04);
   set(railF.frequency, 700 + P.sp * 1.4, .04);
   set(railO.frequency, 90 + P.sp * .2, .04);
-  set(lpF.frequency, st === 2 ? 700 : 20000, .1);
-  set(musG.gain, SAVE.m ? 0 : st === 1 ? .5 : .3, .2);
+  set(lpF.frequency, st == 2 ? 700 : 20000, .1);
+  set(musG.gain, SAVE.m ? 0 : st == 1 ? .5 : .3, .2);
   if (play) musicTick();
   else mNext = t + .1;
 }
@@ -257,7 +257,7 @@ function musicTick() {
     if (!b) for (const o of [0, 3 + (sc[2] > 3 ? 1 : 0), 7])
       O('triangle', NOTE(root + sc[deg] + o), 0, spb * 15, .1, musG, t);
     if (inten > .22 && (b & 1)) N(.03, .04 + inten * .03, 'highpass', 7000, 6000, 1, musG, t);
-    if (inten > .5 && b % 4 === 2) N(.1, .12, 'bandpass', 1800, 900, 1.2, musG, t);
+    if (inten > .5 && b % 4 == 2) N(.1, .12, 'bandpass', 1800, 900, 1.2, musG, t);
     if (inten > .8 && !(b & 1)) {
       const n = NOTE(root + 12 + sc[(i * 3 + bar) % sc.length]);
       O(w, n, n, .1, .1, musG, t);

@@ -6,7 +6,7 @@
 // Colour selection is instant and free; only drawing costs pigment.
 function setSel(i) {
   i = (i + 7) % 7;
-  if (i === sel) return;
+  if (i == sel) return;
   sel = i;
   sndUI(1);
   burst(P.x, P.y, 6, 0, 130, HUE[i]);
@@ -37,14 +37,14 @@ addEventListener('pointerdown', (e) => {
   audioInit();
   ptr(e);
   if (e.button) return;
-  if (!uiClick() && st === 1) startStroke();
+  if (!uiClick() && st == 1) startStroke();
 });
 
 addEventListener('pointerup', () => { drawing = null; });
-addEventListener('blur', () => { drawing = null; if (st === 1) st = 2; });
+addEventListener('blur', () => { drawing = null; if (st == 1) st = 2; });
 
 addEventListener('wheel', (e) => {
-  if (st !== 1) return;
+  if (st != 1) return;
   e.preventDefault();
   setSel(sel + (e.deltaY > 0 ? 1 : -1));
 }, { passive: false });
@@ -53,16 +53,16 @@ addEventListener('keydown', (e) => {
   audioInit();
   const k = e.key, l = k.toLowerCase();
   if (k > '0' && k < '8') { setSel(+k - 1); return; }
-  if (k === 'Escape' || l === 'p') st = st === 1 ? 2 : st === 2 ? 1 : WD && st === 4 ? (back(), st) : st;
-  if (l === 'r' && st > 1) startRun();
-  if (l === 'm') mute();
+  if (k == 'Escape' || l == 'p') st = st == 1 ? 2 : st == 2 ? 1 : WD && st == 4 ? (back(), st) : st;
+  if (l == 'r' && st > 1) startRun();
+  if (l == 'm') mute();
   // Let go of whatever is holding you. With permanent strokes a rail lasts as
   // long as its line does, so there has to be a way off it that is not a crash.
-  if (l === 'x') { if (P.ra) detachRail(1); else if (P.te) releaseTether(); }
-  if (k === ' ' || k === 'Enter') { if (st === 2) st = 1; else if (st < 4) startRun(); }
+  if (l == 'x') { if (P.ra) detachRail(1); else if (P.te) releaseTether(); }
+  if (k == ' ' || k == 'Enter') { if (st == 2) st = 1; else if (st < 4) startRun(); }
   if (DEBUG) {
-    if (k === 'g') { jumpReg(regAt(P.y) + 1); }
-    if (k === 'f') for (let i = 0; i < 7; i++) pig[i] = PMAX;
+    if (k == 'g') { jumpReg(regAt(P.y) + 1); }
+    if (k == 'f') for (let i = 0; i < 7; i++) pig[i] = PMAX;
   }
 });
 // Absolute region jump, exposed for the screenshot gallery so a capture always
@@ -84,4 +84,4 @@ if (DEBUG) {
   window.__pos = () => [w2sx(P.x), w2sy(P.y)];
   window.__speeds = () => ({ sp: P.sp | 0, mult: +mult.toFixed(1), combo, score: score | 0, strokes: strokes.length });
 }
-document.addEventListener('visibilitychange', () => { if (document.hidden && st === 1) st = 2; });
+document.addEventListener('visibilitychange', () => { if (document.hidden && st == 1) st = 2; });

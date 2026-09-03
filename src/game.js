@@ -76,7 +76,7 @@ function die() {
   sndDeath();
   if (P.ra) detachRail(0);
   if (P.te) releaseTether();
-  if (st !== 0) endRun();
+  if (st != 0) endRun();
 }
 
 // --- per-frame -------------------------------------------------------------
@@ -94,7 +94,7 @@ function update(dt) {
 
   // region progression
   const r = regAt(P.y);
-  if (r !== reg) {
+  if (r != reg) {
     reg = r; regShow = 3.2;
     flash = mx(flash, .35); flashH = regHue(reg);
     sndGate();
@@ -119,7 +119,7 @@ function update(dt) {
     }
   } else {
     deadT -= dt;
-    if (deadT <= 0) { if (st === 0) { startRun(); st = 0; } else st = 3; }
+    if (deadT <= 0) { if (st == 0) { startRun(); st = 0; } else st = 3; }
   }
 
   // timers
@@ -137,8 +137,8 @@ function update(dt) {
     const s = strokes[i];
     if (s.u) s.l -= dt;
     if ((s.u && s.l <= 0) || s.y2 < P.y - 2600) {
-      if (P.ra === s) detachRail(1);
-      if (s === drawing) drawing = null;
+      if (P.ra == s) detachRail(1);
+      if (s == drawing) drawing = null;
       strokes.splice(i, 1);
     }
   }
@@ -164,7 +164,7 @@ function draw() {
   drawTrail();
   drawParts();
   if (P.al) drawUnicorn();
-  if (st === 1 || st === 2) hud();
+  if (st == 1 || st == 2) hud();
   if (flash > .01) {
     X.fillStyle = flashH < 0
       ? 'hsl(' + ((T * 500) % 360 | 0) + ' 100% 75% / ' + flash * .5 + ')'
@@ -193,8 +193,8 @@ function frame(ts) {
   let dt = raw;
   if (hstop > 0) { hstop -= raw; dt *= .12; }
   T += dt;
-  if (st === 1 || st === 0) update(dt);
-  else if (st === 3) partStep(dt);
+  if (st == 1 || st == 0) update(dt);
+  else if (st == 3) partStep(dt);
   camUpdate(raw);
   palUpdate(raw);
   audioFrame();

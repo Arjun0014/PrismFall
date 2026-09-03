@@ -47,5 +47,5 @@ function segX(ax, ay, bx, by, cx, cy, dx, dy) {
 }
 
 // hsl helpers - every colour in the game comes from these two.
-const hsl = (h, s, l, a) => 'hsl(' + h + ' ' + s + '% ' + l + '%' + (a === undefined ? '' : ' / ' + a) + ')';
+const hsl = (h, s, l, a) => 'hsl(' + h + ' ' + s + '% ' + l + '%' + (a == undefined ? '' : ' / ' + a) + ')';
 const chsl = (c, l, a) => hsl(HUE[c], 100, l, a);

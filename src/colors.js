@@ -12,7 +12,7 @@ let dryC = -1, dryT = 0;   // "out of pigment" HUD flash
 // Booster lookup: the strength multiplier currently applied to colour c, or 1.
 // Colour 7 is the pigment-cost booster.
 function bst(c) {
-  for (let i = 0; i < 7; i++) if (boostT[i] > 0 && BOOST[i][0] === c) return BOOST[i][1];
+  for (let i = 0; i < 7; i++) if (boostT[i] > 0 && BOOST[i][0] == c) return BOOST[i][1];
   return 1;
 }
 const costMul = () => bst(7);
@@ -26,7 +26,7 @@ const pw = (L) => .45 + mn(L, SMAX) / SNOM * .55;
 // A stroke may only begin within SREACH of the unicorn; further clicks clamp
 // back onto that circle so the player is never silently ignored.
 function startStroke() {
-  if (st !== 1 || !P.al) return;
+  if (st != 1 || !P.al) return;
   if (pig[sel] <= .5) { dryC = sel; dryT = .5; sndEmpty(); return; }
   const dx = mwx - P.x, dy = mwy - P.y, k = mn(1, SREACH / (hyp(dx, dy) || 1));
   const sx = P.x + dx * k, sy = P.y + dy * k;
@@ -35,7 +35,7 @@ function startStroke() {
   // stays on the field for the whole run.
   drawing = { x1: sx, y1: sy, x2: sx, y2: sy, e: CBIT[sel], c: sel, l: 0, u: 0, paid: 0 };
   strokes.push(drawing);
-  while (strokes.length > SLIM) if (P.ra === strokes.shift()) detachRail(0);
+  while (strokes.length > SLIM) if (P.ra == strokes.shift()) detachRail(0);
   if (P.te) releaseTether();
 }
 
@@ -63,7 +63,7 @@ function moveStroke() {
 // Overlapping live strokes fuse into a Prism Node and share effect bits.
 function fuse(s) {
   for (const o of strokes) {
-    if (o === s || o.u || o.e === s.e) continue;
+    if (o == s || o.u || o.e == s.e) continue;
     const p = segX(s.x1, s.y1, s.x2, s.y2, o.x1, o.y1, o.x2, o.y2);
     if (p) {
       s.e = o.e = s.e | o.e;
@@ -77,7 +77,7 @@ function fuse(s) {
 // A stroke fires once, on the first contact after it is long enough to matter.
 function hitStroke(s) {
   const ax = s.x2 - s.x1, ay = s.y2 - s.y1, L = hyp(ax, ay);
-  if (s.u || s === drawing || s === P.ra || L < SMIN) return 0;
+  if (s.u || s == drawing || s == P.ra || L < SMIN) return 0;
   const t = segT(s.x1, s.y1, s.x2, s.y2, P.x, P.y);
   const px = s.x1 + ax * t, py = s.y1 + ay * t;
   let nx = P.x - px, ny = P.y - py;
@@ -104,7 +104,7 @@ function applyStroke(s, nx, ny, px, py, t, ux, uy, L) {
     if (b & 16) P.ph = .8 * vb;
     else {
       let o2 = 0;
-      for (const o of strokes) if (o !== s && !o.u && o.e & 64) { o2 = o; break; }
+      for (const o of strokes) if (o != s && !o.u && o.e & 64) { o2 = o; break; }
       warpFX(P.x, P.y);
       if (o2) {
         const da = at2(o2.y2 - o2.y1, o2.x2 - o2.x1) - at2(uy, ux), ca = cos(da), sa = sin(da);
@@ -224,13 +224,13 @@ function chainAdd(b) {
   const before = chain;
   chainT = 7;
   chain |= b & ALL7;
-  if (chain === before) return;
+  if (chain == before) return;
   let n = 0;
   for (let i = 0; i < 7; i++) if (chain & CBIT[i]) n++;
   if (n <= chainN) return;
   chainN = n;
-  if (n === 7) return fullSpectrum();
-  if (n === 3 || n === 5) {
+  if (n == 7) return fullSpectrum();
+  if (n == 3 || n == 5) {
     for (let i = 0; i < 7; i++) pig[i] = mn(pmax(), pig[i] + 6);
     pop(P.x, P.y - 30, 'SPECTRUM ' + n + '/7', HUE[n]);
     sndRefund();
@@ -252,20 +252,20 @@ function fullSpectrum() {
 // --- pickups ---------------------------------------------------------------
 function grab(it) {
   it.g = 1;
-  if (it.t === I_COIN) {
+  if (it.t == I_COIN) {
     combo++; comboT = 1.4; coins += 1;
     score += 10 * mult * (1 + combo * .05) | 0;
     sndCoin(combo);
-  } else if (it.t === I_CROWN) {
+  } else if (it.t == I_CROWN) {
     coins += 15; score += (500 * mult) | 0;
     pop(it.x, it.y, 'CROWN +15', 48);
     flash = mx(flash, .45); flashH = 48;
     sndCrown();
-  } else if (it.t === I_PIG) {
+  } else if (it.t == I_PIG) {
     pig[it.c] = mn(pmax(), pig[it.c] + 40);
     sndPig(it.c);
     burst(it.x, it.y, 12, 3, 190, HUE[it.c]);
-  } else if (it.t === I_WELL) {
+  } else if (it.t == I_WELL) {
     for (let i = 0; i < 7; i++) pig[i] = pmax();
     flash = 1; flashH = -1;
     pop(it.x, it.y, 'PRISM WELL', -1);

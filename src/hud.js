@@ -101,11 +101,11 @@ function hud() {
 function prismBar() {
   const w = 44 * U, x0 = W / 2 - 25 * w / 7, y = H - 40 * U, h = 26 * U;
   for (let i = 0; i < 7; i++) {
-    const x = x0 + i * w * 50 / 44, on = i === sel, f = pig[i] / PMAX, cx = x + w / 2;
+    const x = x0 + i * w * 50 / 44, on = i == sel, f = pig[i] / PMAX, cx = x + w / 2;
     RR(x, y - h / 2, w, h, 5 * U);
     FL('hsl(270 30% 8% / .8)');
     X.save(); X.clip();
-    X.fillStyle = chsl(i, on ? 60 : 42, dryC === i && dryT > 0 ? .4 + sin(T * 40) * .3 : 1);
+    X.fillStyle = chsl(i, on ? 60 : 42, dryC == i && dryT > 0 ? .4 + sin(T * 40) * .3 : 1);
     X.fillRect(x, y + h / 2 - h * f, w, h * f);
     X.restore();
     RR(x, y - h / 2, w, h, 5 * U);
@@ -123,7 +123,7 @@ function prismBar() {
 // one piece of pointer feedback that is about the rules rather than decoration,
 // so it survives while the drawn cursor does not.
 function cursor() {
-  if (st !== 1 || drawing || !P.al) return;
+  if (st != 1 || drawing || !P.al) return;
   const dx = mwx - P.x, dy = mwy - P.y, d = hyp(dx, dy);
   if (d > SREACH) CIR(w2sx(P.x + dx / d * SREACH), w2sy(P.y + dy / d * SREACH), 4 * U, chsl(sel, 60, .8));
 }
@@ -169,7 +169,7 @@ function screenTitle() {
     // only place left that teaches either half of it.
     'X lets go - 1-7 or SCROLL picks a colour',
   ].forEach((l, i) => l && txt(l, W / 2, H - 122 * U + i * 19 * U, 13,
-    i === 1 ? W6 : i > 2 ? W3 : W9, !i));
+    i == 1 ? W6 : i > 2 ? W3 : W9, !i));
   // Mixing is the deepest rule in the game -- two crossing strokes fuse and the
   // line then does both colours at once -- and it was nowhere on this screen.
   // It gets its own line, drawn through all seven hues, so the sentence
@@ -221,7 +221,7 @@ function screenStore() {
   for (let n = 0; n < CATS * 3; n++) {
     const c = n / 3 | 0, i = n % 3;
     const x = x0 + i * 150 * U, y = H / 2 - 118 * U + c * 48 * U;
-    const own = owned(c, i), eq = SAVE.e[c] === i, o = hot(x + 66 * U, y, 140 * U, 38 * U);
+    const own = owned(c, i), eq = SAVE.e[c] == i, o = hot(x + 66 * U, y, 140 * U, 38 * U);
     if (o) { prevCat = c; prevIt = i; }
     RR(x, y - 19 * U, 140 * U, 38 * U, 7 * U);
     FL(eq ? UE : own ? UB : 'hsl(275 25% 10%)');
@@ -236,8 +236,8 @@ function screenStore() {
   X.translate(W / 2, H / 2 + 122 * U);
   X.scale(1.9 * U, 1.9 * U);
   // Preview the hovered variant in place, everything else as equipped.
-  unicornBody(prevCat === 0 ? prevIt : SAVE.e[0], flr(T * 3) % 7, 0,
-    prevCat === 1 ? prevIt : SAVE.e[1]);
+  unicornBody(prevCat == 0 ? prevIt : SAVE.e[0], flr(T * 3) % 7, 0,
+    prevCat == 1 ? prevIt : SAVE.e[1]);
   X.restore();
 }
 
