@@ -30,6 +30,7 @@ import { weigh, competitionTerser, rrOptions } from './measure.mjs';
 import { readSources } from './src.mjs';
 import { topLevel, rebuild } from './ast.mjs';
 import { smoke } from './smoke.mjs';
+import { canon } from './canon.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const p = (...a) => join(ROOT, ...a);
@@ -51,7 +52,8 @@ async function measure(parts, { check } = {}) {
     const s = smoke(r.code, { frames: 150 });
     if (!s.ok) return { zip: Infinity, broken: s.where + ': ' + s.err };
   }
-  return weigh(r.code, rr, 'ro');
+  // Scored the way the build ships: after the canonical pass.
+  return weigh(canon(r.code), rr, 'ro');
 }
 
 const base = await measure(files);
