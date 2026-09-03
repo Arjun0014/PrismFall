@@ -99,4 +99,4 @@ const BOOST = [
 const BNAME = 'OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY'.split(' ');
 
 // -- localStorage namespace -------------------------------------------------
-const LS = 'pf26_save';
+const LS = 'pf26';
