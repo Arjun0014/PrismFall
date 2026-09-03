@@ -1723,5 +1723,18 @@
   "note": "",
   "delta": -9,
   "left": -277
+ },
+ {
+  "date": "2026-09-03 12:57",
+  "quick": false,
+  "zip": 13585,
+  "min": 66280,
+  "raw": 114337,
+  "rr": 17934,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -4,
+  "left": -273
  }
 ]

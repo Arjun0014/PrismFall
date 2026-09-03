@@ -70,6 +70,9 @@ let nextY = 0, prevL = -COL, prevR = COL, cIdx = 0, seed = 1;
 // Set once per chunk by genChunk so no builder has to take seven parameters.
 let bL = 0, bR = 0, bW = 0, bX = 0, bB = 0, bD = 0;
 
+// A chunk record: span, entry walls, obstacles, items, region, archetype, field, banks.
+const mkChunk = (y, h, l, r, pl, pr) => ({ y, h, l, r, pl, pr, o: [], i: [], rg: regAt(y), k: 0, z: 0, bk: [] });
+
 // --- obstacle constructors -------------------------------------------------
 // One shape record covers both primitives: t 0 is a circle of radius r, t 1 is
 // a segment of half-length r at angle g. Sharing the field means the collision
@@ -177,7 +180,7 @@ function genChunk() {
   const r = clamp(COL + rf(-70, 90) + wide, 300, WMAX);
   const h = boundary ? 1200 : ri(700, 1200);
 
-  const c = { y, h, l, r, pl: prevL, pr: prevR, o: [], i: [], rg, k: 0, v: 0, z: 0, bk: [] };
+  const c = mkChunk(y, h, l, r, prevL, prevR);
 
   // Walls, drawn as chunk-to-chunk segments so the column is continuous.
   c.o.push(sgAB(prevL, y, l, y + h, 0), sgAB(prevR, y, r, y + h, 0));
@@ -436,7 +439,7 @@ function worldReset(sd) {
   srnd(seed);
   chunks = []; nextY = -900; prevL = -COL; prevR = COL; cIdx = 0;
   // Opening room: open, gentle, and it demonstrates bouncing within seconds.
-  const c = { y: -900, h: 1400, l: -COL, r: COL, pl: -COL, pr: COL, o: [], i: [], rg: 0, k: 0, v: 0, z: 0, bk: [] };
+  const c = mkChunk(-900, 1400, -COL, COL, -COL, COL);
   c.o.push(sgAB(-COL, -900, -COL, 500, 0), sgAB(COL, -900, COL, 500, 0),
     sgAB(-COL, -900, COL, -900, M_BUMP),
     ci(-150, 60, 26, M_BUMP), ci(150, 240, 26, M_BUMP), ci(-60, 420, 20, M_BUMP));
