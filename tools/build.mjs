@@ -159,8 +159,14 @@ async function terse(js, wrap) {
 // a whitelist, so nothing the DOM or Web Audio owns can be touched. The
 // Wavedash build keeps the real names because its save record and the SDK
 // calls are read by code outside this tree.
+// builtins: true, because Terser reserves every name on its DOM-property list
+// REGARDLESS of the whitelist, and x1/y1/x2/y2 (SVGLineElement), cap and os are
+// on it -- so six of these names were silently never mangled. The regex is
+// still the only thing that decides what CAN be renamed; builtins only stops
+// the reserve list from vetoing a whitelisted name. -6 B measured.
 export const OWN_PROPS = {
   regex: /^(x1|y1|x2|y2|paid|cap|kt|kd|os|op|ox|oy|lt|bk|pl|pr|rg|vx|vy|sp|ra|rt|rs|rw|te|ph|rp|st|gt|al|tz|fn)$/,
+  builtins: true,
 };
 
 // ------------------------------------------------------------------ html ----
@@ -172,14 +178,19 @@ export const OWN_PROPS = {
 //   drop <title>            -22 B   the tab shows the filename instead
 //   drop <meta charset>     -24 B   safe only because the source is now ASCII
 //
-// Two apparently free trims were measured and are NOT taken, because both
-// silently stop the game running while still loading without a console error:
-//   omit </canvas>  a <script> inside <canvas> is fallback content, which a
-//                   browser that supports canvas never executes
-//   omit </script>  a script terminated by end-of-file rather than a closing
-//                   tag is not executed either
-// In both cases the page loads, throws nothing, and does nothing at all -- the
-// canvas sits at its default 300x150. Worth 15 B each and not worth having.
+//   omit </canvas>    -7 B   taken. The <script> becomes the canvas element's
+//                            fallback content, and fallback content is parsed
+//                            into the DOM like anything else: a script there
+//                            runs (the HTML spec only says the content is not
+//                            RENDERED). An earlier session recorded this as
+//                            fatal; re-tested on the real dist page in Chromium
+//                            and WebKit (build/x/shell.mjs): the script's
+//                            parent is CANVAS, the canvas is sized by the
+//                            script, the game plays, no errors. The browser
+//                            suite runs against this shell.
+//   omit </script>    NOT taken: a script terminated by end-of-file rather
+//                     than a closing tag is never executed. The page loads,
+//                     throws nothing, and the canvas sits at 300x150.
 //   drop <!doctype html>    -14 B   taken. Quirks mode changes nothing here:
 //                                   the canvas is position:fixed, so its
 //                                   percentage size resolves against the
@@ -187,7 +198,7 @@ export const OWN_PROPS = {
 //                                   Chromium at three viewports (BackCompat,
 //                                   canvas rect == viewport, no overflow).
 function html(script) {
-  return '<canvas></canvas><script>' + script + '</script>';
+  return '<canvas><script>' + script + '</script>';
 }
 
 // The Wavedash page needs a viewport tag and a matching page background, and

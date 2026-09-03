@@ -6,7 +6,7 @@
 // so long runs never accumulate nodes.
 // ---------------------------------------------------------------------------
 
-let AC = null, mg, sfxG, musG, lpF, nzBuf, railG, railO, railF;
+let AC = 0, mg = 0, sfxG = 0, musG = 0, lpF = 0, nzBuf = 0, railG = 0, railO = 0, railF = 0;
 let voices = 0;                   // per-frame voice budget
 let mNext = 0, mStep = 0;         // music scheduler
 
@@ -15,7 +15,7 @@ const SCALE = [[0, 2, 3, 5, 7, 8, 10], [0, 2, 4, 5, 7, 9, 11], [0, 3, 5, 7, 10, 
 const WAVE = ['triangle', 'sawtooth', 'square'];
 
 function audioInit() {
-  if (AC) { if (AC.state == 'suspended') AC.resume(); return; }
+  if (AC) { AC.resume(); return; }
   if (!window.AudioContext) return;
   AC = new AudioContext();
 
@@ -25,10 +25,12 @@ function audioInit() {
   sfxG = AC.createGain(); sfxG.gain.value = .8; sfxG.connect(lpF);
   musG = AC.createGain(); musG.gain.value = .5; musG.connect(lpF);
 
-  const n = AC.sampleRate * 2;
-  nzBuf = AC.createBuffer(1, n, AC.sampleRate);
+  // Two seconds of white noise at a fixed 48 kHz: the source node resamples
+  // it to whatever rate the context runs at, and white noise resampled is
+  // still white noise. Reading the context's rate twice cost 7 B more.
+  nzBuf = AC.createBuffer(1, 96000, 48000);
   const d = nzBuf.getChannelData(0);
-  for (let i = 0; i < n; i++) d[i] = rnd() * 2 - 1;
+  for (let i = 0; i < d.length; i++) d[i] = rnd() * 2 - 1;
 
   // One always-on voice: the Blue rail grind. Built once, then only its gain
   // and frequency are modulated, so long runs never leak nodes.

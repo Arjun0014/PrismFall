@@ -123,7 +123,7 @@ function mat(b, allowBreak) {
 }
 // Optional motion decoration: a straight oscillation along a random axis.
 function moving(b, amp) {
-  if (!rp(bit(b, 4))) return null;
+  if (!rp(bit(b, 4))) return 0;
   const a = rf(0, TAU);
   return { ox: cos(a) * amp, oy: sin(a) * amp * .6, os: rf(.7, 1.9), op: rf(0, TAU) };
 }

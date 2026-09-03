@@ -129,6 +129,8 @@ and every tuning constant:
 | `npm run build:wavedash` | Wavedash platform build into `dist-wavedash/` |
 | `npm run build -- --dev` | Unminified debug build with `DEBUG=1` in `build/dev.html` |
 | `npm run serve` | Static server over `dist/` |
+| `npm run heat` | Per-byte cost of the packed build from Roadroller's own model: by class, line, string, number, identifier |
+| `npm run equiv` | Proves the post-Terser rewrites (canon, relabel, globals) are call-for-call equivalent to plain Terser output |
 
 The competition build emits `dist/index.html` + `dist/prismfall.zip` and appends
 a row to [reports/size-history.md](reports/size-history.md). It fails with a
@@ -192,6 +194,13 @@ npm run test:gallery   # one screenshot per region (needs the --dev build)
 DOM, Canvas2D and Web Audio, then hands the suites its internals. Nothing is
 re-implemented for testing, so a passing assertion is a statement about the
 shipped code.
+
+The suites boot the *source*. The packed bundle is a different program --
+Terser's output rewritten by `tools/canon.mjs` into one shape per construct,
+then renamed by `tools/relabel.mjs` and `tools/globals.mjs` -- so
+`npm run equiv` runs plain Terser output and the shipped bundle through the
+same stubbed DOM with a seeded `Math.random` and a 900-frame input script and
+requires every canvas call, property set and audio parameter write to match.
 
 What the suites actually check:
 

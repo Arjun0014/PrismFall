@@ -491,7 +491,7 @@ function unicornBody(body, tint, white, horn) {
   });
   X.restore();
 
-  CIR(26, -8, 1.6, st == 1 && P.st > STALLW ? '#f44' : hsl(276, 38, 15));
+  CIR(26, -8, 1.6, st == 1 && P.st > STALLW ? hsl(0, 100, 63) : hsl(276, 38, 15));
 }
 
 function drawUnicorn() {

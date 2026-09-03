@@ -19,7 +19,7 @@ function clampV() {
 function detachRail(boost) {
   const s = P.ra;
   if (s) { s.u = 1; s.l = mn(s.l, .12); }
-  P.ra = null;
+  P.ra = 0;
   if (boost) { P.vx *= 1.06; P.vy *= 1.06; }
   sndRail(0);
 }
@@ -57,7 +57,7 @@ function railStep(h) {
 // Releasing a tether converts the orbit into a launch.
 function releaseTether() {
   if (!P.te) return;
-  P.te = null;
+  P.te = 0;
   const s = hyp(P.vx, P.vy) || 1, k = 1.34 + 150 / s;
   P.vx *= k; P.vy *= k;
   clampV();

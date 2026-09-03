@@ -12,8 +12,9 @@ function setSel(i) {
   burst(P.x, P.y, 6, 0, 130, HUE[i]);
 }
 
-document.body.style.cssText = 'margin:0;overflow:hidden';
-CV.style.cssText = 'position:fixed;width:100%;height:100%';
+// One style line, not two: inset:0 pins the fixed canvas to the viewport, so
+// the body's default margin never shows and it needs no rule of its own.
+CV.style.cssText = 'position:fixed;inset:0;width:100%;height:100%';
 
 function resize() {
   const d = mn(devicePixelRatio, 2);
@@ -43,8 +44,8 @@ addEventListener('pointerdown', (e) => {
   if (!uiClick() && st == 1) startStroke();
 });
 
-addEventListener('pointerup', () => { drawing = null; });
-addEventListener('blur', () => { drawing = null; if (st == 1) st = 2; });
+addEventListener('pointerup', () => { drawing = 0; });
+addEventListener('blur', () => { drawing = 0; if (st == 1) st = 2; });
 
 addEventListener('wheel', (e) => {
   if (st != 1) return;
@@ -86,4 +87,8 @@ if (DEBUG) {
   window.__pos = () => [w2sx(P.x), w2sy(P.y)];
   window.__speeds = () => ({ sp: P.sp | 0, mult: +mult.toFixed(1), combo, score: score | 0, strokes: strokes.length });
 }
-document.addEventListener('visibilitychange', () => { if (document.hidden && st == 1) st = 2; });
+// On window, not document: the HTML spec fires visibilitychange with bubbles
+// initialised to true, so the same addEventListener shape as every other
+// handler here reaches it. It fires on hide and on show; on show the run is
+// already paused (or was never running), so the hidden check is redundant.
+addEventListener('visibilitychange', () => { if (st == 1) st = 2; });

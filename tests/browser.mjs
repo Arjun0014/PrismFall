@@ -100,9 +100,17 @@ async function runBrowser(name, launcher) {
   for (const [vw, vh] of SIZES) {
     await page.setViewportSize({ width: vw, height: vh });
     await page.waitForTimeout(250);
+    // The invariant, not the implementation: the canvas fills the viewport from
+    // the origin and nothing can scroll. The shell used to set overflow:hidden
+    // on the body and this asserted that rule; the canvas is now position:fixed
+    // with inset:0 and the body has no rule at all (-19 B), so the test checks
+    // what the rule was for.
     const good = await page.evaluate(() => {
-      const c = document.querySelector('canvas');
-      return c.width > 100 && c.height > 100 && getComputedStyle(document.body).overflow === 'hidden';
+      const c = document.querySelector('canvas'), r = c.getBoundingClientRect();
+      const d = document.scrollingElement || document.documentElement;
+      return c.width > 100 && c.height > 100 && r.left === 0 && r.top === 0 &&
+        Math.abs(r.width - innerWidth) < 1 && Math.abs(r.height - innerHeight) < 1 &&
+        d.scrollWidth <= innerWidth && d.scrollHeight <= innerHeight;
     });
     ok(good, 'viewport ' + vw + 'x' + vh);
     if (SHOTS && vw === 1366) await page.screenshot({ path: join(ROOT, 'reports', 'shots', name + '-1366.png') });

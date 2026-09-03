@@ -1,6 +1,8 @@
 // ---------------------------------------------------------------------------
 // Global mutable state. Short property names are deliberate: they survive
 // minification (Terser will not rename properties) and compress well.
+// "Nothing attached" is 0, not null: every reader is a truthiness test, and
+// the packer prices `null` at over a byte per use against a third for `0`.
 // ---------------------------------------------------------------------------
 
 const CV = document.querySelector('canvas');
@@ -21,11 +23,11 @@ const P = {
   x: 0, y: 0, vx: 0, vy: 0,
   a: 0,          // render heading
   sp: 0,         // cached speed
-  ra: null,      // attached Blue rail (stroke)
+  ra: 0,         // attached Blue rail (stroke)
   rt: 0,         // rail param along the stroke
   rs: 1,         // rail side (+1/-1)
   rw: 0,         // Superrail: seconds the rail still reflects at its ends
-  te: null,      // Green tether {x,y,l,t}
+  te: 0,         // Green tether {x,y,l,t}
   ph: 0,         // Violet phase timer (ignores solids)
   rp: 0,         // Red power timer (cheap destruction)
   st: 0,         // stall timer
@@ -76,4 +78,4 @@ const SAVE = WD ? { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0 } : { b: 0, d:
 // -- input ------------------------------------------------------------------
 let pmx = 0, pmy = 0;           // pointer in screen px
 let mwx = 0, mwy = 0;         // pointer in world units
-let drawing = null;           // stroke being drawn
+let drawing = 0;              // stroke being drawn

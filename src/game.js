@@ -44,9 +44,9 @@ function startRun(sd) {
   pig = [PMAX, PMAX, PMAX, PMAX, PMAX, PMAX, PMAX];
   boostT = [0, 0, 0, 0, 0, 0, 0];
   strokes = []; parts = []; trail = []; pops = []; nodes = []; shocks = [];
-  drawing = null;
+  drawing = 0;
   P.x = 0; P.y = -320; P.vy = 300; P.a = PI / 2;
-  P.ra = null; P.te = null; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300; P.rw = 0;
+  P.ra = 0; P.te = 0; P.ph = 0; P.rp = 0; P.st = 0; P.gt = 0; P.al = 1; P.sp = 300; P.rw = 0;
   Gx = 0; Gy = GRAV;
   C.x = P.x; C.y = P.y; C.z = 1;
   pal = regPal(0);
@@ -138,7 +138,7 @@ function update(dt) {
     if (s.u) s.l -= dt;
     if ((s.u && s.l <= 0) || s.y2 < P.y - 2600) {
       if (P.ra == s) detachRail(1);
-      if (s == drawing) drawing = null;
+      if (s == drawing) drawing = 0;
       strokes.splice(i, 1);
     }
   }

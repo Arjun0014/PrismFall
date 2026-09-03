@@ -37,12 +37,12 @@ function segT(ax, ay, bx, by, px, py) {
 function segX(ax, ay, bx, by, cx, cy, dx, dy) {
   const r1 = bx - ax, r2 = by - ay, s1 = dx - cx, s2 = dy - cy;
   const d = r1 * s2 - r2 * s1;
-  if (!d) return null;
+  if (!d) return 0;
   const t = ((cx - ax) * s2 - (cy - ay) * s1) / d;
   const u = ((cx - ax) * r2 - (cy - ay) * r1) / d;
-  return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [ax + r1 * t, ay + r2 * t] : null;
+  return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [ax + r1 * t, ay + r2 * t] : 0;
 }
 
 // hsl helpers - every colour in the game comes from these two.
-const hsl = (h, s, l, a) => 'hsl(' + h + ' ' + s + '% ' + l + '%' + (a == undefined ? '' : ' / ' + a) + ')';
+const hsl = (h, s, l, a = 1) => 'hsl(' + h + ' ' + s + '% ' + l + '% / ' + a + ')';
 const chsl = (c, l, a) => hsl(HUE[c], 100, l, a);

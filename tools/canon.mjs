@@ -16,12 +16,19 @@
 //   ifs     `a && b;` / `a ? b : c;` statements -> if statements      ( -37 B)
 //   noinc   `i++` statement / for-update -> `i += 1`                  ( -10 B)
 //   nums    `1e9`, `1e-4`         ->  plain decimals                   ( -15 B)
+//   litright `300 * w` -> `w * 300` (commutative ops, pure operands)   ( -24 B)
+//
+// Then two renaming passes: locals from their own alphabet (tools/relabel.mjs,
+// -33 B) and globals with the ten hottest single-charactered (tools/globals.mjs,
+// -32 B, -19 B more from the tail alphabet). `npm run equiv` proves the whole
+// chain call-for-call equivalent to Terser's own output.
 //
 // Applied to the packed build only. The Wavedash page is plain minified JS on
 // a page shared with the platform SDK, so its top-level declarations stay
 // declarations there.
 import * as acorn from 'acorn';
 import { relabel } from './relabel.mjs';
+import { renameGlobals } from './globals.mjs';
 
 const parse = (js) => acorn.parse(js, { ecmaVersion: 2022 });
 const S = (js, n) => js.slice(n.start, n.end);
@@ -105,6 +112,31 @@ export const noinc = (js) => {
   return apply(js, ed);
 };
 
+// A literal on the left of a commutative operator moves to the right:
+// `300 * w * p` -> `w * 300 * p`. Only *, ==, !=, &, | and ^ (never +, which
+// concatenates), only when the other operand is side-effect free, and the
+// tree shape is untouched, so the value is bit-identical. Terser's own
+// lhs_constants does the OPPOSITE and was worth 46 B to switch off; this is
+// the same lever pointed the same way as the source: -24 B.
+const pure = (n) => n.type === 'Identifier' || n.type === 'Literal' ||
+  (n.type === 'MemberExpression' && pure(n.object) && (!n.computed || pure(n.property))) ||
+  (n.type === 'UnaryExpression' && n.operator === '-' && n.argument.type === 'Literal') ||
+  (n.type === 'BinaryExpression' && pure(n.left) && pure(n.right));
+export const litright = (js) => {
+  const ed = [];
+  walk(parse(js), (n) => {
+    if (n.type !== 'BinaryExpression' || !['*', '==', '!=', '&', '|', '^'].includes(n.operator)) return;
+    if (n.left.type !== 'Literal' || n.right.type === 'Literal' || !pure(n.right)) return;
+    // The right operand's span excludes any parentheses around it, so anything
+    // that is not atomic is re-wrapped: `12 * (y >> 9 & 1)` must become
+    // `(y >> 9 & 1) * 12`, not `y >> 9 & 1 * 12`.
+    const atomic = ['Identifier', 'Literal', 'MemberExpression', 'UnaryExpression'].includes(n.right.type);
+    const r = atomic ? S(js, n.right) : '(' + S(js, n.right) + ')';
+    ed.push([n.start, n.end, r + ' ' + n.operator + ' ' + S(js, n.left)]);
+  });
+  return apply(js, ed);
+};
+
 export const nums = (js) => {
   const ed = [];
   walk(parse(js), (n) => {
@@ -119,7 +151,9 @@ export const nums = (js) => {
 
 // Last: locals renamed from their own alphabet (tools/relabel.mjs), after the
 // top-level lets have become assignments so the globals are the free names.
-export const PASSES = [split, toLet, nolet, ifs, noinc, nums, (js) => relabel(js)];
+// Then the globals: definition order, except that the ten most referenced
+// take the ten single-character names (tools/globals.mjs).
+export const PASSES = [split, toLet, nolet, ifs, noinc, nums, litright, (js) => relabel(js), (js) => renameGlobals(js)];
 export function canon(js) {
   for (const p of PASSES) js = p(js);
   parse(js); // must still be a program

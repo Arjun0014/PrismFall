@@ -22,7 +22,9 @@
     "test:title": "node tools/build.mjs --dev && node tests/title.mjs",
     "test:shots": "node tests/shots.mjs",
     "test:gallery": "node tools/build.mjs --dev && node tests/gallery.mjs",
-    "serve": "node tools/serve.mjs"
+    "serve": "node tools/serve.mjs",
+    "heat": "node tools/heat.mjs",
+    "equiv": "node tools/build.mjs --quiet && node tools/equiv.mjs"
   },
   "devDependencies": {
     "@gfx/zopfli": "^1.0.15",

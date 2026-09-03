@@ -1154,3 +1154,126 @@ was re-run through all of them.
 The `pf26` save key was undone after the suites: the browser and Wavedash
 suites seed and read `pf26_save`, live Wavedash saves live under it, and it
 was 3 B. **13,525 -> 13,529.**
+
+---
+
+# Instrumented phase
+
+Starting point **13,529 B** (gap 217). Rule unchanged: no feature, sound,
+effect, world, system, cosmetic or piece of feel removed. Every row is a real
+archive; every kept change was re-run through the suites, and every
+post-Terser rewrite is now also proven call-for-call equivalent to Terser's
+own output (see "the instrument that should have existed", below).
+
+## Two instruments that did not exist
+
+**`tools/heat.mjs`: per-byte cost from the packer's own model.** Roadroller's
+`compressWithModel` can return the entropy of every input byte; nothing in
+this directory had ever asked it to. The tool runs the shipped model (cached
+selectors, precision, counts, abbreviations, 150 MB table) over the exact
+bytes it models and prints where the bits go: by character class, by line, by
+string literal, by numeric value, and by identifier with the first occurrence
+priced separately from the rest. It is the only instrument here that can say
+what one string or one statement costs *in the context of everything before
+it*, and every source change in this phase was found with it rather than
+guessed. Two of its census results matter for what to try next:
+
+| Class | Chars | Archive | Bits/char |
+|---|---:|---:|---:|
+| identifiers | 11,614 | 5,307 | 3.66 |
+| punctuation | 15,191 | 3,840 | 2.02 |
+| numbers | 5,236 | 2,281 | 3.49 |
+| strings | 1,670 | 780 | 3.74 |
+| abbreviation bytes | 1,589 | 577 | 2.90 |
+| newlines | 2,778 | 68 | 0.20 |
+
+Repeated API names are cheap after their first use (`createBiquadFilter`
+13 B the first time, 0.7 B each after), so the "helper for a repeated API
+call" family is closed by measurement: there is nothing for a helper to save.
+Whereas `null` cost **1.25 B per use** across fifteen uses, against a third of
+a byte for `0`.
+
+**`tools/equiv.mjs`: behavioural equivalence of two compiled bundles.** The
+sim, gen and audio suites boot the source; the browser suite asserts the
+shipped page runs; nothing checked that a post-Terser rewrite produces the
+same program. The tool runs two bundles through the stubbed DOM with a seeded
+`Math.random`, a frozen clock and a 900-frame input script (strokes in all
+seven colours, wheel, pause, release, blur, mute, restart, Escape), records
+every Canvas2D call, every context property set and every Web Audio node,
+connection and parameter write at full precision, and reports the first frame
+and first call where the traces differ. **It caught a real bug the same
+hour:** the first literal-right pass (below) took the span of a compound
+right operand without its parentheses and turned `12 * (y >> 9 & 1)` into
+`y >> 9 & 1 * 12`, which is `y >> 9 & 12`. The melody's octave shift played
+an 8 Hz note instead of 1,058 Hz. Every suite stayed green. `npm run equiv`
+now compares plain Terser output with the shipped bundle: 900 frames, 46.8
+million trace characters, identical.
+
+## What moved the number, in order
+
+| | Change | Delta | Running |
+|---|---|---:|---:|
+| 1 | `mangle.properties.builtins: true` -- Terser reserves every name on its DOM-property list regardless of the whitelist, and `x1 y1 x2 y2` (SVGLineElement), `cap` and `os` are on it, so six whitelisted names had silently never been mangled | -6 | |
+| 2 | the last hex colour (`#f44`, the stall warning) through `hsl(0, 100, 63)` like every other colour | -3 | |
+| 3 | `audioInit`: `AC.resume()` unconditionally instead of after `AC.state == 'suspended'` (a no-op on a running context) | -15 | |
+| 4 | the eight audio node globals initialised to `0` instead of declared bare (`if (mg)` / `if (railG)` are the only early reads) | -18 | |
+| 5 | `hsl()` takes `a = 1` and always emits the alpha instead of testing for `undefined` | -8 | |
+| 6 | one style line: the canvas is `position:fixed;inset:0;width:100%;height:100%` and the body has no rule (`margin:0;overflow:hidden` did nothing a fixed, pinned canvas needs); verified in the browser suite by the invariant itself -- canvas rect == viewport at the origin, nothing scrollable | -19 | |
+| 7 | **`litright`** (tools/canon.mjs): a literal on the left of `* == != & \| ^` moves to the right when the other operand is pure, tree shape untouched. Terser's `lhs_constants` does the opposite and was worth 46 B to switch off; this finishes the job in the direction the source already leans | -24 | 13,443 |
+| 8 | `visibilitychange` registered on **window** with the same `addEventListener` shape as every other handler, no `document.hidden` test (on show the run is already paused). The HTML spec fires it with `bubbles` initialised to true; verified in real Chromium over raw CDP, where the window listener fires with `bubbles: true` on hide and on show (Playwright cannot show this: it emulates focus and visibility on every page it drives) | -14 | 13,429 |
+| 9 | **`tools/globals.mjs`**: globals renamed after relabel, definition order (functions first, as Terser) except that the ten most referenced take the ten single-character names. Naming ALL globals by frequency was +225; naming the ten hottest that way and nothing else is -32 (K scanned 4..40: 8 -12, 10 -32, 12 -18, 13 -23, 14 -19, 16 0, 26 +22, 40 +50) | -32 | 13,397 |
+| 10 | the second character of a two-character global runs backwards (`Z..B_`); a family survey of nine lead/tail pairs, then a 70-probe swap climb that found nothing further | -19 | 13,378 |
+| 11 | `null` -> `0` at every "nothing attached" site (`P.ra`, `P.te`, `drawing`, `AC`, the two "no intersection" returns): every reader is a truthiness test, and the model priced `null` at 1.25 B a use | -21 | 13,357 |
+| 12 | the noise buffer is two seconds at a fixed 48 kHz (`createBuffer(1, 96000, 48000)`) instead of reading `AC.sampleRate` twice; the source node resamples and white noise resampled is white noise | -7 | 13,350 |
+| 13 | the `litright` parenthesisation fix (the -24 above had been measured on the wrong program) | +6 | 13,356 |
+| 14 | deep Roadroller re-search on the final payload: a searched model with 8 abbreviations beat the cached one | -17 | 13,339 |
+| 15 | shell: `</canvas>` dropped. An earlier session recorded this as fatal ("fallback content is never executed"); it is not -- fallback content is parsed into the DOM and a script there runs, only the *rendering* is suppressed. Re-tested on the real dist page in Chromium and WebKit (`build/x/shell.mjs`): the script's parent is CANVAS, the canvas is sized by the script, the game plays, no errors; the browser suite now runs against this shell. `</script>` really is required | -7 | **13,332** |
+
+**13,529 -> 13,332 B, -197, with no feature, sound, effect, world, system, cosmetic or tuning value removed. Gap 20 B.**
+
+## Measured and not taken
+
+| Experiment | Delta | Why |
+|---|---:|---|
+| comparison direction canonicalised, `>` -> `<` (101 edits) / `<` -> `>` (121) | +47 / +36 | as written beats either canon |
+| literal on the LEFT of commutative ops (320 edits) | +47 | the mirror of `litright` |
+| `;` dropped before `}` (386) / all statement `;` dropped / all newlines dropped | +44 / crash / +56 | the current statement shape is the optimum |
+| arrow expression bodies -> block bodies (44) | +17 | |
+| `if (!a) {b} else {c}` flipped | 0 edits | Terser already does it |
+| property-name alphabet `a..z` / `z..a` / the global one | +5 / +27 / +10 | Terser's frequency order wins for properties |
+| hybrid globals K = 26 (all single-char names by frequency) | +22 | the sequence matters more than the short names |
+| `oncontextmenu = () => false` | (-11) | **invalid**: `booleans_as_integers` prints `false` as `0`, which does not cancel the event; `() => st < 0` folds the same way in a snippet. `oncontextmenu = e => e.preventDefault()` is -1 |
+| shared `halt()` for blur + visibilitychange / window handler keeping the `hidden` test | -8 / -2 | the plain window handler (-14) is cheaper than either |
+| `BIAS` nibble table unpacked to `[[0,0,0,11,4],...]` / to fractions / flattened | -2 / +17 / -4 | the packed hex form is already at the optimum; the phase-1 lesson holds |
+| `AFF` as nested pairs / split once | -5 / +2 | noise |
+| `hsl()` as a template literal / template + default | +10 / +2 | concatenation beats `${}` |
+| `document.body.style.margin = 0` only / `cssText = 'margin:0'` only / canvas `left:0;top:0` | -9 / -9 / -16 | `inset:0` with no body rule is -19 |
+| Terser flag descent on the new payload (two rounds) | `unsafe_math` -6, `if_return:false` -1 | **rejected**: `unsafe_math` reorders floating-point arithmetic, an exactness change for a noise-level gain; -1 is noise. The flag set stands |
+| local alphabet climb (120 probes) | -2 | noise, not taken |
+| globals alphabet climb (70 probes) | 0 | plateau |
+| file order (60 probes, 32 rejected by the smoke gate) | 0 | current order stands |
+| hybrid K re-scanned under the new packer model (8..13) | 10 stands | |
+| the two save-loader clamps `clamp(x | 0, 0, 1e12)` -> `mx(x | 0, 0)` (provably identical: the int32 can never reach the bound) | +7 | the repeated call shape is cheaper than the 13-digit literal it carries |
+| `2 ** x` for `M.pow(2, x)` | 0 | |
+| `lpF.type = 'lowpass'` dropped (the spec default) / rail voice initial frequencies dropped (re-targeted every tick under zero gain) | +1 / -1..-5 | noise, not taken |
+
+## The protect list, priced on the final build
+
+Baseline 13,332 B, gap 20. Every row is a real archive (deep zopfli ladder).
+Any one row except the two 12 B ones clears the limit on its own.
+
+| Option | Bytes | Lands at | What it costs |
+|---|---:|---:|---|
+| the `contextmenu` suppression | 22 | 13,310 | right-click menu on the canvas |
+| the `visibilitychange` pause | 12 | 13,320 | pause on tab switch (`blur` covers most of it) |
+| the `window.AudioContext` guard | 12 | 13,320 | a silent game instead of an unplayable one in a browser with no unprefixed AudioContext (Safari < 14.1) |
+| `visibilitychange` + the guard together | 22 | 13,310 | both of the above |
+| title: the tagline "you never steer the unicorn - you draw the physics" | 29 | 13,303 | flavour, not a control |
+| title: "X lets go - 1-7 or SCROLL picks a colour" | 26 | 13,306 | how anyone learns to release and to pick a colour by key |
+| title: "DRAG near the unicorn - drawings STAY until used - longer = stronger" | 30 | 13,302 | the core verb |
+| title: "R push - O aim - Y spring - G tether - B rail - I gravity - V warp" | 35 | 13,297 | what each colour does |
+| title: the mixing line and its rainbow gradient | 53 | 13,279 | the deepest rule in the game |
+| title: the whole copy block | 192 | 13,140 | how anyone learns to play |
+
+Note `oncontextmenu = () => false` is NOT a cheaper form of the suppression:
+`booleans_as_integers` prints `false` as `0`, which does not cancel the event.
