@@ -1528,5 +1528,31 @@
   "note": "",
   "delta": -18,
   "left": -388
+ },
+ {
+  "date": "2026-09-03 12:50",
+  "quick": false,
+  "zip": 13722,
+  "min": 66878,
+  "raw": 114113,
+  "rr": 18116,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": 22,
+  "left": -410
+ },
+ {
+  "date": "2026-09-03 12:51",
+  "quick": false,
+  "zip": 13690,
+  "min": 67084,
+  "raw": 114367,
+  "rr": 18074,
+  "tag": "roadroller",
+  "deep": false,
+  "note": "",
+  "delta": -32,
+  "left": -378
  }
 ]

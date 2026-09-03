@@ -32,21 +32,21 @@
 const REG = [
   // Sky. Updraft columns hold you up, so descending is something you do on
   // purpose. Round, soft, bumper-heavy: the region that teaches the verbs.
-  ['CLOUDBREAK', 206, 74, 88, 26, '0002100210', 5, Z_UP, 5, 40],
+  ['CLOUDBREAK', 206, 74, 88, 26, '0000001122', 5, Z_UP, 5, 40],
   // Furnace. Almost everything is breakable and chains into its neighbours;
   // crusher lanes and rotors do the breaking for you if you build speed.
-  ['SUNFORGE', 12, 34, 72, 19, '8574185741', 7, Z_WIND, 4, 196],
+  ['SUNFORGE', 12, 34, 72, 19, '1144557788', 7, Z_WIND, 4, 196],
   // Overgrown spiral. Anchors and springy pods everywhere, and a slipstream
   // that curls you around them - the region the Green tether was built for.
-  ['VERDANT COIL', 152, -74, 74, 17, '2622762262', 8, Z_FLOW, 6, 320],
+  ['VERDANT COIL', 152, -74, 74, 17, '2222226667', 8, Z_FLOW, 6, 320],
   // Glass river. Long rails, narrow throats, flow that carries you along them.
-  ['CRYSTAL CURRENT', 190, 44, 84, 15, '3303531333', 5, Z_RUSH, 7, 25],
+  ['CRYSTAL CURRENT', 190, 44, 84, 15, '0333333335', 5, Z_RUSH, 7, 25],
   // Dark mine. Phase walls hide pockets, gravity wells drag you into them, and
   // the reward density is the highest in the game.
-  ['PRISM MINE', 276, -28, 62, 10, '6760671666', 9, Z_WELL, 6, 120],
+  ['PRISM MINE', 276, -28, 62, 10, '0666666677', 9, Z_WELL, 6, 120],
   // Temple. Inversion fields turn the shaft upside down; the geometry is built
   // to be read from both directions.
-  ['INVERSION TEMPLE', 264, 52, 80, 13, '6465264636', 7, Z_INV, 7, 75],
+  ['INVERSION TEMPLE', 264, 52, 80, 13, '2344566666', 7, Z_INV, 7, 75],
   // The Engine. Every archetype, every field, maximum density.
   ['RAINBOW ENGINE', 300, -136, 90, 9, '0123456788', 9, 0, 9, -1],
 ];
@@ -59,7 +59,7 @@ const REG = [
 const BIAS = [0x000b4, 0xc016a, 0x201a6, 0x11153, 0xa9332, 0x4a355, 0x6528b];
 // Two affinity colours per region, one digit each, straight from the world spec:
 // Cloudbreak O+Y, Sunforge R+O, Verdant G+Y, Crystal B+O, Mine R+V, Temple I+V.
-const AFF = '120132410656';
+const AFF = '120123140656';
 const bit = (b, i) => (b >> (16 - i * 4) & 15) / 16;
 // The Rainbow Engine's affinity is "all colours", so it rolls fresh each time.
 const aff = (r) => r > 5 ? [ri(0, 6), ri(0, 6)] : [+AFF[r * 2], +AFF[r * 2 + 1]];
