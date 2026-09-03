@@ -1865,11 +1865,13 @@
         [ "DRAW with the mouse near the unicorn - longer = stronger", "R push - O aim - Y spring - G tether - B rail - I gravity - V warp", 0, "X lets go - 1-7 or SCROLL picks a colour" ].forEach((_, C) => _ && WC(_, ZE / 2, _F - 122 * MK + C * 19 * MK, 13, C == 1 ? B : C > 2 ? IK : GK, !C));
         WC("CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs", ZE / 2, _F - 84 * MK, 13, B, 1);
         HG.b && WC("BEST " + HG.b + "   DEPTH " + (HG.d / 10 | 0) + "m", ZE / 2, _F / 2 + 82 * MK, 14, IK);
+        WC(_L, ZE / 2, _F / 2 + 104 * MK, 11, IK);
     }
     function FD() {
         CD(470, 330, "RUN OVER", [ "SCORE   " + (SF | 0), "DEPTH   " + (UF / 10 | 0) + "m", "REGION  " + UG[VF][0], "COINS   +" + RF, "BEST    " + HG.b, SF >= HG.b && SF ? "NEW BEST!" : "" ], [ [ 0, 62, 210, "RETRY  (R)", ID, JJ(300, 80, 55) ], [ 0, 114, 130, "MENU", () => {
             CF = 0;
         } ] ], 16);
+        WC(_L, ZE / 2, _F / 2 + 150 * MK, 11, IK);
     }
     function GD() {
         CD(340, 296, "PAUSED", [], [ [ 0, -40, 200, "RESUME", () => {
@@ -2100,9 +2102,14 @@
         E && (YK = E.id);
         XK || (_L = _L || "no leaderboard id");
     }
-    function TD(_, B) {
+    async function TD(_, B) {
         const C = VK();
-        if (!C || !XK || !_) {
+        if (!C || !_) {
+            return;
+        }
+        XK || await SD();
+        if (!XK) {
+            _L = "no score board: " + _L;
             return;
         }
         const D = {
@@ -2436,31 +2443,34 @@
     let BL = 0;
     !function _() {
         const B = VK();
-        if (B) {
-            try {
-                B.init({
-                    deferEvents: 1
-                });
-                B.readyForEvents();
-                B.updateLoadProgressZeroToOne && B.updateLoadProgressZeroToOne(1);
-                B.loadComplete && B.loadComplete();
-            } catch (_) {
-                _L = "init failed: " + String(_ && _.message).slice(0, 60);
-                return;
-            }
-            try {
-                WK = B.getUser && B.getUser();
-            } catch (_) {}
-            _L = "connected" + (WK ? " as " + (WK.username || "?") : ", no user");
-            SD();
-            UD("In the shaft");
-        } else {
+        if (!B) {
             if (++BL < 40) {
                 _L = "waiting for the Wavedash SDK...";
                 setTimeout(_, 250);
                 return;
             }
             _L = "no SDK on this page - scores stay local";
+            return;
         }
+        try {
+            B.init({
+                deferEvents: 1
+            });
+            B.readyForEvents();
+            B.updateLoadProgressZeroToOne && B.updateLoadProgressZeroToOne(1);
+            B.loadComplete && B.loadComplete();
+        } catch (_) {
+            _L = "init failed: " + String(_ && _.message).slice(0, 60);
+            return;
+        }
+        try {
+            WK = B.getUser && B.getUser();
+        } catch (_) {}
+        _L = "connected" + (WK ? " as " + (WK.username || "?") : ", no user");
+        const C = _ => SD().then(() => {
+            !XK && _ < 6 && setTimeout(() => C(_ + 1), 2e3);
+        });
+        C(0);
+        UD("In the shaft");
     }();
 })();</script></html>

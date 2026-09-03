@@ -191,6 +191,9 @@ function screenTitle() {
   // the old position landed straight on top of PLAY.
   if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm' + (WDX ? '   COINS ' + SAVE.c : ''),
     W / 2, H / 2 + 82 * U, 14, W3);
+  // Wavedash only: what the SDK last said -- connected as whom, which board
+  // call failed and why, the rank the last upload came back with.
+  if (WD) txt(wdMsg, W / 2, H / 2 + 104 * U, 11, W3);
 }
 
 function screenResults() {
@@ -209,6 +212,7 @@ function screenResults() {
     [0, 62, 210, 'RETRY  (R)', startRun, hsl(300, 80, 55)],
     [0, 114, 130, 'MENU', () => { st = 0; }],
   ], 16);
+  if (WD) txt(wdMsg, W / 2, H / 2 + 150 * U, 11, W3);
 }
 
 function screenPause() {

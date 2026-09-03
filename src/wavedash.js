@@ -69,7 +69,10 @@ function wdInit() {
   } catch (e) { /* identity is optional */ }
 
   wdMsg = 'connected' + (wdUser ? ' as ' + (wdUser.username || '?') : ', no user');
-  wdBoards();
+  // The board ids are what every upload needs. If the lookup fails at boot
+  // (the SDK reports why in wdMsg), try again a few times rather than never.
+  const boards = (n) => wdBoards().then(() => { if (!wdLB && n < 6) setTimeout(() => boards(n + 1), 2000); });
+  boards(0);
   wdPresence('In the shaft');
 }
 
@@ -124,9 +127,11 @@ async function wdFetch() {
 // Called from endRun. Score and depth go to their own boards, and the run's
 // shape rides along as metadata so a board entry can be read back as a story:
 // which region ended it, how deep, how many laps of the shaft it took.
-function wdSubmit(sc, dp) {
+async function wdSubmit(sc, dp) {
   const S = WDS();
-  if (!S || !wdLB || !sc) return;
+  if (!S || !sc) return;
+  if (!wdLB) await wdBoards();
+  if (!wdLB) { wdMsg = 'no score board: ' + wdMsg; return; }
   const meta = {
     region: REG[reg][0],
     depth: (dp / 10) | 0,
