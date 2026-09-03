@@ -779,7 +779,7 @@ console.log('\n=== region force fields ===');
 {
   // Every region that claims a mechanic has to actually apply a force.
   for (let r = 0; r < 7; r++) {
-    const z = A.__eval('regZone(' + r + ')');
+    const z = A.REG[r][7];
     if (!z) { ok(r === 6, 'the Engine mixes fields instead of owning one'); continue; }
     const f = A.__eval(`
       const c={y:0,h:1000,l:-400,r:400,z:${z}};
