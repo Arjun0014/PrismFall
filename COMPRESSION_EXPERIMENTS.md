@@ -1292,3 +1292,24 @@ drag rule, mixing and release are still on the title screen, and the shot in
 
 **13,303 B, 9 B under the 13,312 B limit.** Session total 13,529 -> 13,303
 (-226): 197 B from exact levers, 29 B from one line of flavour text.
+
+## Title copy, rewritten for clarity (and it got cheaper)
+
+The first line said "DRAG near the unicorn - drawings STAY until used -
+longer = stronger": three facts, two of which a player discovers in the first
+drag (a far-away stroke is clamped toward the unicorn, not refused; unused
+strokes stay). It now names the tool and keeps the one tip:
+"DRAW with the mouse near the unicorn - longer = stronger". And the colour
+verbs line ("R push - O aim - ... - V warp") is drawn through the same rainbow
+gradient the mixing line already builds, so each initial sits roughly in its
+own hue and reads as a colour rather than a key next to X, R and 1-7.
+
+| | Before | After | Delta |
+|---|---:|---:|---:|
+| first line shortened (-4), verbs line in the gradient (0), deep pack | 13,303 | **13,297** | -6 |
+
+Priced and not chosen: "MOUSE: draw lines near the unicorn - longer = stronger"
+(-4), "DRAW with the MOUSE near the unicorn - longer lines are stronger" (-5),
+"DRAW with the mouse near the unicorn" alone (-17, drops the tip).
+
+**13,297 B, 15 B under the limit.**

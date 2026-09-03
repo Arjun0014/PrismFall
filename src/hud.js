@@ -163,21 +163,28 @@ function screenTitle() {
   // cheapest line on the title screen (29 B) once every exact lever was spent.
   // The lines below still teach every colour, the drag, the release and mixing.
   if (WDX) txt('you never steer the unicorn - you draw the physics', W / 2, cy + 46 * U, 15, W6);
+  // One rainbow gradient serves two lines: the mixing sentence below, and the
+  // colour verbs, whose initials then sit roughly in their own hue -- R red
+  // through V violet -- instead of reading as keys next to X, R and 1-7.
+  const mix = X.createLinearGradient(W / 2 - 300 * U, 0, W / 2 + 300 * U, 0);
+  for (let i = 0; i < 7; i++) mix.addColorStop(i / 6, chsl(i, 68));
+  // The first line names the tool and the one tip worth knowing before the
+  // first run. Everything else it used to say (strokes stay until used, the
+  // reach limit) is discovered in the first ten seconds, and a far-away stroke
+  // is clamped toward the unicorn rather than refused.
   [
-    'DRAG near the unicorn - drawings STAY until used - longer = stronger',
+    'DRAW with the mouse near the unicorn - longer = stronger',
     'R push - O aim - Y spring - G tether - B rail - I gravity - V warp',
     0,   // the mixing line, painted below through the whole spectrum
     // Back to the full line now that the in-run hints are gone: this is the
     // only place left that teaches either half of it.
     'X lets go - 1-7 or SCROLL picks a colour',
   ].forEach((l, i) => l && txt(l, W / 2, H - 122 * U + i * 19 * U, 13,
-    i == 1 ? W6 : i > 2 ? W3 : W9, !i));
+    i == 1 ? mix : i > 2 ? W3 : W9, !i));
   // Mixing is the deepest rule in the game -- two crossing strokes fuse and the
   // line then does both colours at once -- and it was nowhere on this screen.
   // It gets its own line, drawn through all seven hues, so the sentence
   // demonstrates the thing it is describing.
-  const mix = X.createLinearGradient(W / 2 - 300 * U, 0, W / 2 + 300 * U, 0);
-  for (let i = 0; i < 7; i++) mix.addColorStop(i / 6, chsl(i, 68));
   txt('CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs', W / 2, H - 84 * U, 13, mix, 1);
   if (WDX) wdIdentity(W / 2, H * .3 - 74 * U), wdBoard(W - 190 * U, H / 2 - 40 * U);
   // Below the buttons, not at a fixed offset from the title: at 16:9 heights

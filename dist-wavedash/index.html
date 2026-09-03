@@ -1858,11 +1858,11 @@
             WC("PRISMFALL", ZE / 2 + BE(DF * 1.2 + B * .5) * 5 * MK, _ + 2.4 * (B - 3) * MK, 66, KJ(B, 60, .5), 1);
         }
         WC("PRISMFALL", ZE / 2, _, 66, GK, 1);
-        [ "DRAG near the unicorn - drawings STAY until used - longer = stronger", "R push - O aim - Y spring - G tether - B rail - I gravity - V warp", 0, "X lets go - 1-7 or SCROLL picks a colour" ].forEach((_, B) => _ && WC(_, ZE / 2, _F - 122 * MK + B * 19 * MK, 13, B == 1 ? HK : B > 2 ? IK : GK, !B));
         const B = YE.createLinearGradient(ZE / 2 - 300 * MK, 0, ZE / 2 + 300 * MK, 0);
         for (let _ = 0; _ < 7; _++) {
             B.addColorStop(_ / 6, KJ(_, 68));
         }
+        [ "DRAW with the mouse near the unicorn - longer = stronger", "R push - O aim - Y spring - G tether - B rail - I gravity - V warp", 0, "X lets go - 1-7 or SCROLL picks a colour" ].forEach((_, C) => _ && WC(_, ZE / 2, _F - 122 * MK + C * 19 * MK, 13, C == 1 ? B : C > 2 ? IK : GK, !C));
         WC("CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs", ZE / 2, _F - 84 * MK, 13, B, 1);
         HG.b && WC("BEST " + HG.b + "   DEPTH " + (HG.d / 10 | 0) + "m", ZE / 2, _F / 2 + 82 * MK, 14, IK);
     }
