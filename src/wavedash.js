@@ -1,9 +1,14 @@
 // ---------------------------------------------------------------------------
-// Wavedash platform integration - SDK init, player identity, leaderboards.
+// Wavedash platform integration - SDK init, presence, leaderboard submission.
 //
-// This file is compiled into the WAVEDASH BUILD ONLY. The competition zip is
+// This file is compiled into the WAVEDASH BUILDS ONLY. The competition zip is
 // built without it and every call site is behind `if (WD)`, so the 13 KiB
 // archive carries none of these bytes. See tools/src.mjs.
+//
+// The published Wavedash build is the competition game plus init and score
+// submission: boards are read on the platform's own Leaderboards tab, not in
+// the game. The on-screen identity card, top-8 panel and avatar below are
+// WDX (the --full variant) and Terser drops them from the published page.
 //
 // Nothing here is allowed to break the game. The platform injects the SDK at
 // runtime, so opening dist-wavedash/index.html directly (no sandbox, no SDK)
@@ -60,7 +65,7 @@ function wdInit() {
 
   try {
     wdUser = S.getUser && S.getUser();
-    if (wdUser && wdUser.avatarUrl) wdAvatar(wdUser.userId);
+    if (WDX && wdUser && wdUser.avatarUrl) wdAvatar(wdUser.userId);
   } catch (e) { /* identity is optional */ }
 
   wdMsg = 'connected' + (wdUser ? ' as ' + (wdUser.username || '?') : ', no user');
@@ -84,7 +89,7 @@ async function wdBoards() {
   // team is playing defaults to Visible. So whether this call makes the board
   // appear depends on who ran it first, which is worth saying out loud.
   if (!wdLB) wdMsg = wdMsg || 'no leaderboard id';
-  wdFetch();
+  if (WDX) wdFetch();
 }
 
 // Avatars arrive as a URL; decode once and keep the Image for the title card.
@@ -129,7 +134,7 @@ function wdSubmit(sc, dp) {
   };
   wdOk(S.uploadLeaderboardScore(wdLB, sc, true, undefined, meta), 'upload').then((d) => {
     if (d) { wdMe = d.globalRank | 0; wdMsg = 'rank #' + wdMe; }
-    wdFetch();
+    if (WDX) wdFetch();
   });
   if (wdDL) wdOk(S.uploadLeaderboardScore(wdDL, dp | 0, true));
   wdPresence('Run over', 'Scored ' + sc);

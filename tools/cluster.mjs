@@ -152,7 +152,7 @@ if (!isMainThread) {
   const { rr, id, names } = workerData;
   parentPort.on('message', async (msg) => {
     try {
-      const src = 'const DEBUG=0,WD=0;\n' +
+      const src = 'const DEBUG=0,WD=0,WDX=0;\n' +
         names.map((n, i) => '// ==== ' + n + ' ====\n' + msg.code[i]).join('\n') + '\n';
       parentPort.postMessage({ seq: msg.seq, ...(await score(src, competitionTerser(), rr, id)) });
     } catch (e) {

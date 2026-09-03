@@ -42,7 +42,17 @@ export function readSources(wd) {
   }));
 }
 
-export function bundle(debug, wd) {
+// Three compile-time constants, all folded by Terser:
+//   DEBUG  the --dev build: stats line, region jump, window.* probes
+//   WD     the Wavedash build: SDK init and leaderboard submission (src/wavedash.js)
+//   WDX    Wavedash EXTRAS: the store, cosmetics, banked coins, the on-screen
+//          identity card and top-8 panel, the title tagline. No published build
+//          sets it: the rules say the Wavedash deployment is the js13k entry with
+//          no extra features, so dist-wavedash/ is the competition game plus the
+//          SDK glue and nothing else. `--wavedash --full` still builds the
+//          variant with everything, to build/wavedash-full.html, for the suite
+//          that covers the store.
+export function bundle(debug, wd, wdx) {
   const body = readSources(wd).map((f) => '// ==== ' + f.name + ' ====\n' + f.code).join('\n');
-  return 'const DEBUG=' + (debug ? 1 : 0) + ',WD=' + (wd ? 1 : 0) + ';\n' + body + '\n';
+  return 'const DEBUG=' + (debug ? 1 : 0) + ',WD=' + (wd ? 1 : 0) + ',WDX=' + (wd && wdx ? 1 : 0) + ';\n' + body + '\n';
 }

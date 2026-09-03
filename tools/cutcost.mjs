@@ -35,7 +35,7 @@ const base = Object.fromEntries(files.map((f) => [f, readFileSync(join(SRC, f), 
 async function measure(mutate) {
   const now = Object.fromEntries(Object.entries(base).map(([k, v]) => [k, v]));
   if (mutate) mutate(now);
-  const src = 'const DEBUG=0,WD=0;\n' +
+  const src = 'const DEBUG=0,WD=0,WDX=0;\n' +
     files.map((f) => '// ==== ' + f + ' ====\n' + now[f]).join('\n') + '\n';
   return (await score(src, competitionTerser(), rr, 'cut', [15, 200, 1000])).zip;
 }

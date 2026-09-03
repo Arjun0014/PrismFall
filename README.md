@@ -138,39 +138,50 @@ non-zero exit code if the archive exceeds 13,312 bytes.
 
 ### The Wavedash build
 
-`src/95_wavedash.js` holds all platform glue — SDK init, player identity and
-leaderboards — and is compiled into the Wavedash build **only**. Every call site
-in the shared code is behind `if (WD)`, which is a compile-time constant, so
-Terser removes those too: the competition archive carries not one byte of it.
+The rules for the Wavedash category say the deployment is the js13k entry
+itself: "no adding extra features". So `dist-wavedash/index.html` is **the
+competition game plus the SDK glue and nothing else** -- same worlds, same
+title screen, same three-field save. `src/wavedash.js` holds that glue (SDK
+init, presence, leaderboard submission) and is compiled into the Wavedash
+builds only; every call site in the shared code is behind `if (WD)`, a
+compile-time constant, so the competition archive carries not one byte of it.
 
 ```bash
-npm run build:wavedash     # -> dist-wavedash/index.html + wavedash.toml
-npx wavedash dev           # local sandbox with test leaderboards
-npx wavedash push          # upload the build
+npm run build:wavedash        # -> dist-wavedash/index.html + wavedash.toml   (upload this)
+npm run build:wavedash:full   # -> build/wavedash-full.html  (store + cosmetics variant, never uploaded)
+npx wavedash dev              # local sandbox with test leaderboards
+npx wavedash push             # upload the build
 ```
 
 `wavedash.toml` is written on first build with `upload_dir = "./dist-wavedash"`;
 fill in `game_id` from the developer portal (or run `wavedash init`).
 
-What the platform build adds:
+What the published Wavedash build adds to the game:
 
 - `Wavedash.init()`, `readyForEvents()` and `loadComplete()` on boot. The game
-  is procedural, so load progress goes straight to 1 — it is interactive on the
+  is procedural, so load progress goes straight to 1 -- it is interactive on the
   first frame.
-- **Player identity** on the title screen: username, avatar (falling back to an
-  initial disc), and your global rank.
 - **Two leaderboards**, `prismfall-score` and `prismfall-depth`, resolved once at
   startup and cached by id. A finished run uploads to both with `keepBest`, and
   attaches metadata that lets a board entry be read back as a story: which
-  region ended it, how deep, how many descents, which boons you drafted.
-- A live **global top 8** panel beside the title, with your own row picked out.
+  region ended it, how deep, how many descents. The boards are read on the
+  platform's own Leaderboards tab, not in the game.
 - Presence updates.
 
+A second compile-time constant, `WDX`, gates the **extras** an earlier version
+of the platform build carried: the Prism Store and its twelve cosmetics, banked
+coins, the on-screen identity card and global top-8 panel, and the title
+tagline. No published build sets it. `npm run build:wavedash:full` still
+compiles that variant to `build/` so the code keeps working, and the build
+asserts that none of its text reaches `dist-wavedash/`.
+
 None of it may break the game. The SDK is injected by the platform at runtime,
-so `dist-wavedash/index.html` opened directly — no sandbox, no SDK — has to play
+so `dist-wavedash/index.html` opened directly -- no sandbox, no SDK -- has to play
 perfectly; every entry point checks for the global first and every promise has a
-catch that shrugs. `npm run test:wavedash` asserts exactly that, twice: once
-against a stubbed SDK and once with no SDK at all.
+catch that shrugs. `npm run test:wavedash` asserts exactly that: the published
+page with no SDK and with a stubbed one (init, both boards, presence, the run's
+score and depth uploaded, the three-field save), and the store round trip
+against the full variant.
 
 The debug build adds a stats line, `g` to jump a region, `f` to refill pigment
 and a few `window.*` probes the screenshot and feel harnesses reach through.

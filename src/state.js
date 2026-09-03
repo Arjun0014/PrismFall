@@ -66,14 +66,14 @@ let nodes = [];    // prism-node sparkles from stroke fusion
 let shocks = [];   // expanding shockwave rings from shatters and big hits
 
 // -- persistent -------------------------------------------------------------
-const SAVE = WD ? { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0 } : { b: 0, d: 0, m: 0 };
+const SAVE = WDX ? { c: 0, b: 0, d: 0, o: 0, e: [0, 0, 0, 0], m: 0 } : { b: 0, d: 0, m: 0 };
 // b best score, d best depth, m muted -- both builds.
 // c banked coins, o owned cosmetics bitmask, e equipped [body, horn, trail,
-// impact] -- the Wavedash build only. The 13K competition build has no store,
-// so every one of those is left at 0 and every site that reads one is behind
-// `WD`, which is a compile-time 0 there: Terser folds the branch away and then
-// drops the store screen, the cosmetic tables and the four variant renderers
-// as unreferenced. One source tree, two products.
+// impact] -- the store variant only (WDX). Neither published build sets it:
+// the competition zip and the Wavedash deployment are the same game, and
+// every site that reads one of these is behind `WDX`, a compile-time 0 there,
+// so Terser folds the branch away and then drops the store screen, the
+// cosmetic tables and the four variant renderers as unreferenced.
 
 // -- input ------------------------------------------------------------------
 let pmx = 0, pmy = 0;           // pointer in screen px

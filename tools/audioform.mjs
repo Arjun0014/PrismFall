@@ -33,7 +33,7 @@ const rr = rrOptions();
 // order the build does -- alphabetical order is a different program.
 const files = readSources(false).map((f) => f.name);
 const base = Object.fromEntries(files.map((f) => [f, readFileSync(join(SRC, f), 'utf8')]));
-const asBundle = (o) => 'const DEBUG=0,WD=0;\n' +
+const asBundle = (o) => 'const DEBUG=0,WD=0,WDX=0;\n' +
   files.map((f) => '// ==== ' + f + ' ====\n' + o[f]).join('\n') + '\n';
 
 // The 24 cues, with the signature each call site already uses.

@@ -43,7 +43,7 @@ function pt(x, y, vx, vy, l, h, k, s) {
 function burst(x, y, n, k, spd, hue, vx, vy) {
   const h = hue == undefined ? HUE[sel] : hue;
   // k==1 is a generic world impact - the equipped Impact cosmetic restyles it.
-  const kk = WD && k == 1 ? SAVE.e[3] : k;
+  const kk = WDX && k == 1 ? SAVE.e[3] : k;
   for (let i = 0; i < n; i++) {
     const a = rf(0, TAU), v = rf(.3, 1) * spd;
     pt(x, y, (vx || 0) + cos(a) * v, (vy || 0) + sin(a) * v,
@@ -429,12 +429,12 @@ function pushTrail() {
 }
 
 function drawTrail() {
-  const n = trail.length, style = WD ? SAVE.e[2] : 0;
+  const n = trail.length, style = WDX ? SAVE.e[2] : 0;
   for (let i = 1; i < n; i++) {
-    if (WD && style == 1 && i % 2) continue;
+    if (WDX && style == 1 && i % 2) continue;
     const a = i / n, p = trail[i - 1], q = trail[i];
     LIN(w2sx(p.x), w2sy(p.y), w2sx(q.x), w2sy(q.y),
-      mx(1, 15 * a * SC * (WD && style == 2 ? .6 + rnd() * .8 : 1)),
+      mx(1, 15 * a * SC * (WDX && style == 2 ? .6 + rnd() * .8 : 1)),
       hsl((q.h < 0 ? (T * 400 + i * 26) % 360 : q.h) | 0, 100, 60 + a * 18, a * .8));
   }
 }
@@ -443,10 +443,10 @@ function drawTrail() {
 // gameplay and the store preview so there is exactly one unicorn in the game.
 function unicornBody(body, tint, white, horn) {
   // Every alternative body, horn and trail is a store cosmetic, so each one
-  // is behind WD and none of them exist in the competition build. What is
+  // is behind WDX and none of them exist in the competition build. What is
   // left is the unicorn everyone starts with, unchanged.
-  const main = white ? W9 : WD && body == 1 ? hsl(268, 40, 12) : WD && body == 2 ? hsl(190, 100, 72) : hsl(300, 40, 96);
-  const line = white ? chsl(flr(T * 6) % 7, 70) : WD && body == 2 ? hsl(300, 100, 70) : hsl(280, 45, 62);
+  const main = white ? W9 : WDX && body == 1 ? hsl(268, 40, 12) : WDX && body == 2 ? hsl(190, 100, 72) : hsl(300, 40, 96);
+  const line = white ? chsl(flr(T * 6) % 7, 70) : WDX && body == 2 ? hsl(300, 100, 70) : hsl(280, 45, 62);
   const gal = sin(T * 13), rb = flr(T * 5);
 
   BP(); MT(-13, 0);
@@ -477,15 +477,15 @@ function unicornBody(body, tint, white, horn) {
   // Horn: 0 spiral, 1 long lance, 2 star tip. Purely decorative - the body is
   // a circle of radius R whatever is equipped.
   X.save(); X.translate(26, -12); X.rotate(-.6);
-  const hl = WD && horn == 1 ? 26 : 15;
+  const hl = WDX && horn == 1 ? 26 : 15;
   const hg = X.createLinearGradient(0, 0, 0, -hl);
   hg.addColorStop(0, chsl(0, 60)); hg.addColorStop(1, chsl(tint, 90));
   POLY(3, hg, W9, 1.2, (i) => VTX(i, [-3, 3, 0][i], [0, 0, -hl][i]));
-  if (!WD || !horn) for (let i = 0; i < 4; i++) {
+  if (!WDX || !horn) for (let i = 0; i < 4; i++) {
     const q = i / 4;
     LIN(-3 + q * 6 * .5, -hl * q, 3 - q * 6 * .5, -hl * q - 2, 1.2, chsl((rb + i) % 7, 90));
   }
-  if (WD && horn == 2) POLY(10, W9, chsl(tint, 90), 1, (i) => {
+  if (WDX && horn == 2) POLY(10, W9, chsl(tint, 90), 1, (i) => {
     const a = i / 10 * TAU + T * 2, q = (i & 1 ? 2.4 : 6);
     VTX(i, cos(a) * q, -hl + sin(a) * q);
   });
@@ -498,7 +498,7 @@ function drawUnicorn() {
   const s = SC, x = w2sx(P.x), y = w2sy(P.y);
   X.save();
   X.translate(x, y); X.rotate(P.a); X.scale(s, s);
-  unicornBody(WD ? SAVE.e[0] : 0, sel, fullSpec > 0 || P.ph > 0, WD ? SAVE.e[1] : 0);
+  unicornBody(WDX ? SAVE.e[0] : 0, sel, fullSpec > 0 || P.ph > 0, WDX ? SAVE.e[1] : 0);
   X.restore();
 
   // Selected-colour halo, tinted red while Red-charged: world-space feedback

@@ -12,7 +12,7 @@
 // const only when it can prove the initialiser is side-effect free, and it will
 // not assume that of `.split(' ')` -- so this table survived into the
 // competition build after everything that reads it had already gone.
-const COSN = WD && ('CLOUD SHADOW NEON SPIRAL LANCE STARTIP ' +
+const COSN = WDX && ('CLOUD SHADOW NEON SPIRAL LANCE STARTIP ' +
   'RAINBOW DASHED COMET SPARKS SHARDS RINGS').split(' ');
 const COSP = [0, 180, 420];
 const CATS = 4;
@@ -65,7 +65,7 @@ function hud() {
   CIR(p, p, 9 * U, UG);
   // Coins stay as in-run reward feedback in both builds; only the banked
   // total beside them is a store thing.
-  txt(WD && SAVE.c ? coins + ' (' + (SAVE.c + coins) + ')' : coins, p + 16 * U, p, 16, UG, 1, 'left');
+  txt(WDX && SAVE.c ? coins + ' (' + (SAVE.c + coins) + ')' : coins, p + 16 * U, p, 16, UG, 1, 'left');
   txt(score | 0, W - p, p, 19, W9, 1, 'right');
   if (mult > 1.05) txt('x' + mult.toFixed(1), W - p, p + 22 * U, 15, chsl(2, 70), 1, 'right');
   if (combo > 3) {
@@ -149,8 +149,8 @@ function mute() { SAVE.m ^= 1; if (mg) mg.gain.value = SAVE.m ? 0 : .8; save(); 
 function screenTitle() {
   // With no store to sit beside it, MUTE takes the middle of the second row.
   const bs = [[0, -30, 190, 'PLAY', startRun, hsl(300, 80, 55)],
-    [WD ? 105 : 0, 26, 130, SAVE.m ? 'UNMUTE' : 'MUTE', mute]];
-  if (WD) bs.push([-105, 26, 130, 'STORE', () => { st = 4; }]);
+    [WDX ? 105 : 0, 26, 130, SAVE.m ? 'UNMUTE' : 'MUTE', mute]];
+  if (WDX) bs.push([-105, 26, 130, 'STORE', () => { st = 4; }]);
   modal(0, 0, 0, [], bs);
   const cy = H * .3;
   // Seven drifting colour ghosts behind one white title. This used to set the
@@ -162,7 +162,7 @@ function screenTitle() {
   // The tagline is Wavedash-only: it is flavour, not a control, and it was the
   // cheapest line on the title screen (29 B) once every exact lever was spent.
   // The lines below still teach every colour, the drag, the release and mixing.
-  if (WD) txt('you never steer the unicorn - you draw the physics', W / 2, cy + 46 * U, 15, W6);
+  if (WDX) txt('you never steer the unicorn - you draw the physics', W / 2, cy + 46 * U, 15, W6);
   [
     'DRAG near the unicorn - drawings STAY until used - longer = stronger',
     'R push - O aim - Y spring - G tether - B rail - I gravity - V warp',
@@ -179,10 +179,10 @@ function screenTitle() {
   const mix = X.createLinearGradient(W / 2 - 300 * U, 0, W / 2 + 300 * U, 0);
   for (let i = 0; i < 7; i++) mix.addColorStop(i / 6, chsl(i, 68));
   txt('CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs', W / 2, H - 84 * U, 13, mix, 1);
-  if (WD) wdIdentity(W / 2, H * .3 - 74 * U), wdBoard(W - 190 * U, H / 2 - 40 * U);
+  if (WDX) wdIdentity(W / 2, H * .3 - 74 * U), wdBoard(W - 190 * U, H / 2 - 40 * U);
   // Below the buttons, not at a fixed offset from the title: at 16:9 heights
   // the old position landed straight on top of PLAY.
-  if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm' + (WD ? '   COINS ' + SAVE.c : ''),
+  if (SAVE.b) txt('BEST ' + SAVE.b + '   DEPTH ' + (SAVE.d / 10 | 0) + 'm' + (WDX ? '   COINS ' + SAVE.c : ''),
     W / 2, H / 2 + 82 * U, 14, W3);
 }
 
@@ -194,7 +194,7 @@ function screenResults() {
     'COINS   +' + coins,
     'BEST    ' + SAVE.b,
     score >= SAVE.b && score ? 'NEW BEST!' : '',
-  ], WD ? [
+  ], WDX ? [
     [0, 62, 210, 'RETRY  (R)', startRun, hsl(300, 80, 55)],
     [-105, 114, 130, 'STORE', () => { st = 4; }],
     [105, 114, 130, 'MENU', () => { st = 0; }],

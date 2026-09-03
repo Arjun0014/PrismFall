@@ -56,7 +56,7 @@ addEventListener('keydown', (e) => {
   audioInit();
   const k = e.key, l = k.toLowerCase();
   if (k > '0' && k < '8') { setSel(+k - 1); return; }
-  if (k == 'Escape' || l == 'p') st = st == 1 ? 2 : st == 2 ? 1 : WD && st == 4 ? (back(), st) : st;
+  if (k == 'Escape' || l == 'p') st = st == 1 ? 2 : st == 2 ? 1 : WDX && st == 4 ? (back(), st) : st;
   if (l == 'r' && st > 1) startRun();
   if (l == 'm') mute();
   // Let go of whatever is holding you. With permanent strokes a rail lasts as

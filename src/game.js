@@ -17,7 +17,7 @@ function load() {
     SAVE.b = clamp(a[0] | 0, 0, 1e12);
     SAVE.d = clamp(a[1] | 0, 0, 1e12);
     SAVE.m = a[2] ? 1 : 0;
-    if (WD && a.length > 8) {
+    if (WDX && a.length > 8) {
       SAVE.c = clamp(a[3] | 0, 0, 1e9);
       SAVE.o = a[4] | 0;
       for (let i = 0; i < CATS; i++) {
@@ -30,7 +30,7 @@ function load() {
 function save() {
   try {
     const a = [SAVE.b, SAVE.d, SAVE.m];
-    if (WD) a.push(SAVE.c, SAVE.o, ...SAVE.e);
+    if (WDX) a.push(SAVE.c, SAVE.o, ...SAVE.e);
     localStorage[LS] = a.join();
   } catch (err) { /* ignore */ }
 }
@@ -60,7 +60,7 @@ function startRun(sd) {
 }
 
 function endRun() {
-  if (WD) SAVE.c += coins;
+  if (WDX) SAVE.c += coins;
   SAVE.b = mx(SAVE.b, score | 0);
   SAVE.d = mx(SAVE.d, depth | 0);
   save();
@@ -171,9 +171,9 @@ function draw() {
       : hsl(flashH | 0, 100, 72, flash * .45);
     X.fillRect(0, 0, W, H);
   }
-  // WD && screenStore folds to 0 in the competition build, which is what
+  // WDX && screenStore folds to 0 in the competition build, which is what
   // drops the store screen, buyEquip and the cosmetic tables entirely.
-  if (st > 1) [0, 0, screenPause, screenResults, WD && screenStore][st]();
+  if (st > 1) [0, 0, screenPause, screenResults, WDX && screenStore][st]();
   else if (!st) screenTitle();
   cursor();
   if (DEBUG) {

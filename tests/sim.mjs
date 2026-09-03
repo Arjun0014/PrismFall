@@ -443,7 +443,7 @@ console.log('\n=== persistence ===');
   // Store: buy, equip, and never gain power. The store is a Wavedash-build
   // feature now, so this asks for that build -- in the competition build it is
   // compiled out and there is nothing here to assert about.
-  const W = boot({ wd: 1 }).api;
+  const W = boot({ wd: 1, wdx: 1 }).api;
   W.__eval('SAVE.c=1000;SAVE.o=0;SAVE.e=[0,0,0]');
   W.__eval('buyEquip(0,1)');
   ok(W.SAVE.e[0] === 1 && W.SAVE.c === 1000 - W.COSP[1], 'purchase deducts and equips', W.SAVE.c);
@@ -500,7 +500,7 @@ console.log('\n=== boosters ===');
 // ---------------------------------------------------------------------------
 console.log('\n=== cosmetics (Wavedash build) ===');
 {
-  const W = boot({ wd: 1 }).api;
+  const W = boot({ wd: 1, wdx: 1 }).api;
   ok(W.COSN.length === 12, 'four categories of three cosmetics', W.COSN.length);
   // Equipping anything must leave the simulation bit-identical.
   const runTo = (equip) => {

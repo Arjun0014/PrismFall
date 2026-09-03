@@ -3,7 +3,8 @@
 //   node tools/build.mjs            fast size build (Terser -> HTML -> zip)
 //   node tools/build.mjs --deep     deep competition pack (adds Roadroller search + ECT)
 //   node tools/build.mjs --dev      unminified debug build in build/dev.html
-//   node tools/build.mjs --wavedash Wavedash platform build in dist-wavedash/
+//   node tools/build.mjs --wavedash Wavedash platform build in dist-wavedash/ (the competition game + SDK)
+//   node tools/build.mjs --wavedash --full   ...with the store and cosmetics, to build/wavedash-full.html
 //
 // There are two products from one source tree. The competition build in dist/
 // is the 13 KiB archive and contains no platform code at all; the Wavedash
@@ -29,6 +30,7 @@ const args = process.argv.slice(2);
 const DEEP = args.includes('--deep');
 const DEV = args.includes('--dev');
 const WAVE = args.includes('--wavedash');
+const FULL = args.includes('--full');      // with --wavedash: the store/cosmetics variant, to build/
 const QUIET = args.includes('--quiet');
 const QUICK = args.includes('--quick');   // roadroller only, light zopfli: fast feedback
 const NOTE = (args.find((a) => a.startsWith('--note=')) || '').slice(7);
@@ -338,7 +340,7 @@ async function main() {
   mkdirSync(p('reports'), { recursive: true });
 
   if (DEV) {
-    const dev = bundle(true, WAVE);
+    const dev = bundle(true, WAVE, FULL);
     writeFileSync(p('build', 'dev.html'), html('(()=>{\n' + dev + '\n})()'));
     log('dev build -> build/dev.html');
     return;
@@ -346,9 +348,20 @@ async function main() {
 
   if (WAVE) {
     mkdirSync(p('dist-wavedash'), { recursive: true });
-    const src = bundle(false, true);
+    // The published Wavedash game is the competition game plus the SDK glue
+    // (WD=1, WDX=0). --full adds the store, cosmetics, coin bank and the
+    // on-screen board, and goes to build/ so it can never be what gets pushed.
+    const src = bundle(false, true, FULL);
     const js = await terse(src, 1);
     const page = wavedashHtml(js);
+    if (FULL) {
+      writeFileSync(p('build', 'wavedash-full.html'), page);
+      log('  wavedash     ' + Buffer.byteLength(page, 'utf8') + ' B -> build/wavedash-full.html  (store + cosmetics variant, not for upload)');
+      return;
+    }
+    for (const mark of ['PRISM STORE', 'EQUIPPED', 'STARTIP', 'cosmetics only', 'GLOBAL TOP 8', 'never steer']) {
+      if (js.includes(mark)) throw new Error('extras text reached the published Wavedash build: ' + mark);
+    }
     writeFileSync(p('dist-wavedash', 'index.html'), page);
     if (!existsSync(p('wavedash.toml'))) writeFileSync(p('wavedash.toml'), WD_TOML);
     log('  wavedash     ' + Buffer.byteLength(page, 'utf8') + ' B -> dist-wavedash/index.html');

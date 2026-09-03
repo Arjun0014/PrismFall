@@ -1,63 +1,63 @@
 <!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no"><title>PRISMFALL</title><style>html,body{margin:0;height:100%;background:#05030c;overflow:hidden}canvas{display:block}</style><canvas></canvas><script>(() => {
     function _(_) {
         for (let B = 0; B < 7; B++) {
-            if (EG[B] > 0 && BF[B][0] == _) {
-                return BF[B][1];
+            if (XF[B] > 0 && UE[B][0] == _) {
+                return UE[B][1];
             }
         }
         return 1;
     }
     function B() {
-        if (JF != 1 || !PF.al) {
+        if (CF != 1 || !IF.al) {
             return;
         }
-        if (TF[UF] <= .5) {
-            VG = UF;
-            WG = .5;
-            QB();
+        if (MF[NF] <= .5) {
+            OG = NF;
+            PG = .5;
+            PB();
             return;
         }
-        const _ = RG - PF.x, B = SG - PF.y, C = GE(1, TE / (LE(_, B) || 1));
-        const D = PF.x + _ * C, E = PF.y + B * C;
-        TG = {
+        const _ = KG - IF.x, B = LG - IF.y, C = ZD(1, ME / (EE(_, B) || 1));
+        const D = IF.x + _ * C, E = IF.y + B * C;
+        MG = {
             x1: D,
             y1: E,
             x2: D,
             y2: E,
-            e: YE[UF],
-            c: UF,
+            e: RE[NF],
+            c: NF,
             l: 0,
             u: 0,
             paid: 0
         };
-        IG.push(TG);
-        while (IG.length > 5) {
-            PF.ra == IG.shift() && K(0);
+        BG.push(MG);
+        while (BG.length > 5) {
+            IF.ra == BG.shift() && K(0);
         }
-        PF.te && M();
+        IF.te && M();
     }
     function C() {
-        const B = TG;
+        const B = MG;
         if (!B) {
             return;
         }
-        const C = RG - B.x1, E = SG - B.y1, F = LE(C, E);
+        const C = KG - B.x1, E = LG - B.y1, F = EE(C, E);
         if (F < 1) {
             return;
         }
-        let G = GE(F, 210);
+        let G = ZD(F, 210);
         if (G > B.paid) {
-            const C = VE[B.c] * _(7), D = (G - B.paid) * C;
-            if (TF[B.c] >= D) {
-                TF[B.c] -= D;
+            const C = OE[B.c] * _(7), D = (G - B.paid) * C;
+            if (MF[B.c] >= D) {
+                MF[B.c] -= D;
                 B.paid = G;
             } else {
-                G = B.paid += TF[B.c] / C;
-                TF[B.c] = 0;
-                if (WG <= 0) {
-                    VG = B.c;
-                    WG = .6;
-                    QB();
+                G = B.paid += MF[B.c] / C;
+                MF[B.c] = 0;
+                if (PG <= 0) {
+                    OG = B.c;
+                    PG = .6;
+                    PB();
                 }
             }
         }
@@ -66,14 +66,14 @@
         D(B);
     }
     function D(_) {
-        for (const B of IG) {
+        for (const B of BG) {
             if (B == _ || B.u || B.e == _.e) {
                 continue;
             }
-            const C = _C(_.x1, _.y1, _.x2, _.y2, B.x1, B.y1, B.x2, B.y2);
+            const C = ZB(_.x1, _.y1, _.x2, _.y2, B.x1, B.y1, B.x2, B.y2);
             if (C) {
                 _.e = B.e = _.e | B.e;
-                MG.push({
+                FG.push({
                     x: C[0],
                     y: C[1],
                     t: .55
@@ -83,14 +83,14 @@
         }
     }
     function E(_) {
-        const B = _.x2 - _.x1, C = _.y2 - _.y1, D = LE(B, C);
-        if (_.u || _ == TG || _ == PF.ra || D < 22) {
+        const B = _.x2 - _.x1, C = _.y2 - _.y1, D = EE(B, C);
+        if (_.u || _ == MG || _ == IF.ra || D < 22) {
             return 0;
         }
-        const E = ZB(_.x1, _.y1, _.x2, _.y2, PF.x, PF.y);
+        const E = YB(_.x1, _.y1, _.x2, _.y2, IF.x, IF.y);
         const G = _.x1 + B * E, H = _.y1 + C * E;
-        let I = PF.x - G, J = PF.y - H;
-        const K = LE(I, J);
+        let I = IF.x - G, J = IF.y - H;
+        const K = EE(I, J);
         if (K > 22) {
             return 0;
         }
@@ -103,123 +103,123 @@
             J /= K;
         }
         F(_, I, J, G, H, E, L, M, D);
-        ZG = .05;
+        SG = .05;
         return 1;
     }
     function F(B, C, D, E, F, H, I, L, N) {
         const O = B.e;
-        const P = XG(N);
+        const P = QG(N);
         let Q = 1;
         if (O & 64) {
             const E = _(6);
             if (O & 16) {
-                PF.ph = .8 * E;
+                IF.ph = .8 * E;
             } else {
                 let _ = 0;
-                for (const C of IG) {
+                for (const C of BG) {
                     if (C != B && !C.u && C.e & 64) {
                         _ = C;
                         break;
                     }
                 }
-                EC(PF.x, PF.y);
+                DC(IF.x, IF.y);
                 if (_) {
-                    const B = KE(_.y2 - _.y1, _.x2 - _.x1) - KE(L, I), C = JE(B), D = IE(B);
-                    const E = PF.vx * C - PF.vy * D, F = PF.vx * D + PF.vy * C;
-                    const G = 30 / (LE(E, F) || 1);
-                    PF.vx = E;
-                    PF.vy = F;
-                    PF.x = (_.x1 + _.x2) / 2 + E * G;
-                    PF.y = (_.y1 + _.y2) / 2 + F * G;
+                    const B = DE(_.y2 - _.y1, _.x2 - _.x1) - DE(L, I), C = CE(B), D = BE(B);
+                    const E = IF.vx * C - IF.vy * D, F = IF.vx * D + IF.vy * C;
+                    const G = 30 / (EE(E, F) || 1);
+                    IF.vx = E;
+                    IF.vy = F;
+                    IF.x = (_.x1 + _.x2) / 2 + E * G;
+                    IF.y = (_.y1 + _.y2) / 2 + F * G;
                     _.u = 1;
                     _.l = .12;
                 } else {
-                    const _ = LE(PF.vx, PF.vy);
+                    const _ = EE(IF.vx, IF.vy);
                     const B = 300 * E * P;
                     if (_ < 60) {
-                        PF.x += C * B;
-                        PF.y += D * B;
-                        PF.vx = C * 460;
-                        PF.vy = D * 460;
+                        IF.x += C * B;
+                        IF.y += D * B;
+                        IF.vx = C * 460;
+                        IF.vy = D * 460;
                     } else {
                         const C = B / _;
-                        PF.x += PF.vx * C;
-                        PF.y += PF.vy * C;
+                        IF.x += IF.vx * C;
+                        IF.y += IF.vy * C;
                     }
                 }
-                S_(PF.y);
-                PF.x = HJ(PF.x, JI + OE, KI - OE);
-                PF.ph = .34 * E * P;
-                PF.vx *= 1.07;
-                PF.vy *= 1.07;
-                EC(PF.x, PF.y);
+                S_(IF.y);
+                IF.x = _J(IF.x, CI + HE, DI - HE);
+                IF.ph = .34 * E * P;
+                IF.vx *= 1.07;
+                IF.vy *= 1.07;
+                DC(IF.x, IF.y);
             }
             JB();
         }
         if (O & 16) {
-            PF.te && M();
-            PF.ra = B;
-            PF.rt = H;
-            PF.rw = _(4) > 1 ? 4 : 0;
-            PF.rs = C * -L + D * I >= 0 ? 1 : -1;
-            const E = HE(LE(PF.vx, PF.vy), 340 + 180 * P);
-            const F = PF.vx * I + PF.vy * L >= 0 ? 1 : -1;
-            PF.vx = I * E * F;
-            PF.vy = L * E * F;
+            IF.te && M();
+            IF.ra = B;
+            IF.rt = H;
+            IF.rw = _(4) > 1 ? 4 : 0;
+            IF.rs = C * -L + D * I >= 0 ? 1 : -1;
+            const E = _E(EE(IF.vx, IF.vy), 340 + 180 * P);
+            const F = IF.vx * I + IF.vy * L >= 0 ? 1 : -1;
+            IF.vx = I * E * F;
+            IF.vy = L * E * F;
             Q = 0;
             HB(1);
         } else if (O & 8) {
-            PF.ra && K(0);
+            IF.ra && K(0);
             const C = _(3);
-            PF.te = {
+            IF.te = {
                 x: B.x1,
                 y: B.y1,
-                l: HE(N * C, 30),
+                l: _E(N * C, 30),
                 t: (1.4 + P) * C
             };
             GB(1);
         }
         if (O & 32) {
-            QF = C * PE;
-            RF = D * PE;
-            PF.gt = 2.9 * _(5) * P;
+            JF = C * IE;
+            KF = D * IE;
+            IF.gt = 2.9 * _(5) * P;
             IB(D);
-            DC(E, F, 10, 3, 150, XE[5]);
+            CC(E, F, 10, 3, 150, QE[5]);
         }
         const R = O & 4;
         if (O & 2) {
-            const _ = LE(PF.vx, PF.vy);
-            const B = R ? HE(_ * 1.34, 560 + 320 * P) : HE(_ * .99, 250 + 250 * P);
-            PF.vx = I * B;
-            PF.vy = L * B;
+            const _ = EE(IF.vx, IF.vy);
+            const B = R ? _E(_ * 1.34, 560 + 320 * P) : _E(_ * .99, 250 + 250 * P);
+            IF.vx = I * B;
+            IF.vy = L * B;
             EB(R);
         } else if (R) {
-            const B = PF.vx * C + PF.vy * D, E = (1.25 + .6 * P) * _(2);
-            PF.vx -= (1 + E) * B * C;
-            PF.vy -= (1 + E) * B * D;
-            const F = PF.vx * C + PF.vy * D, G = GE(300 + 300 * P, FE(B) * 1.6);
+            const B = IF.vx * C + IF.vy * D, E = (1.25 + .6 * P) * _(2);
+            IF.vx -= (1 + E) * B * C;
+            IF.vy -= (1 + E) * B * D;
+            const F = IF.vx * C + IF.vy * D, G = ZD(300 + 300 * P, YD(B) * 1.6);
             if (F < G) {
-                PF.vx += (G - F) * C;
-                PF.vy += (G - F) * D;
+                IF.vx += (G - F) * C;
+                IF.vy += (G - F) * D;
             }
-            FB(FE(B));
+            FB(YD(B));
         } else if (!(O & 89)) {
-            const _ = PF.vx * C + PF.vy * D;
+            const _ = IF.vx * C + IF.vy * D;
             if (_ < 0) {
-                PF.vx -= 1.55 * _ * C;
-                PF.vy -= 1.55 * _ * D;
+                IF.vx -= 1.55 * _ * C;
+                IF.vy -= 1.55 * _ * D;
             }
         }
         if (O & 1) {
             const B = _(0);
-            let G, H, I = LE(PF.vx, PF.vy);
+            let G, H, I = EE(IF.vx, IF.vy);
             if (I < 50) {
                 G = C;
                 H = D;
                 I = 0;
             } else {
-                G = PF.vx / I;
-                H = PF.vy / I;
+                G = IF.vx / I;
+                H = IF.vy / I;
                 const _ = G * C + H * D;
                 if (_ < 0) {
                     G -= 2 * _ * C;
@@ -227,16 +227,16 @@
                 }
             }
             const J = I * 1.5 + 440 * B * P;
-            PF.vx = G * J;
-            PF.vy = H * J;
-            PF.rp = .85;
-            LF = GE(26, LF + 7);
-            BC(E, F, 120 + 160 * P, XE[0]);
-            DC(E, F, 26, 0, 220, XE[0], 420 * -G, 420 * -H);
+            IF.vx = G * J;
+            IF.vy = H * J;
+            IF.rp = .85;
+            EF = ZD(26, EF + 7);
+            _C(E, F, 120 + 160 * P, QE[0]);
+            CC(E, F, 26, 0, 220, QE[0], 420 * -G, 420 * -H);
             const K = (90 + 110 * P) * B;
-            for (const _ of YG) {
+            for (const _ of RG) {
                 for (const B of _.o) {
-                    if (!B.k && !B.kt && B.m & 4 && LE(B.x - E, B.y - F) < K + B.r) {
+                    if (!B.k && !B.kt && B.m & 4 && EE(B.x - E, B.y - F) < K + B.r) {
                         B.kt = .02;
                         B.kd = 0;
                     }
@@ -249,192 +249,192 @@
             B.u = 1;
             B.l = .22;
         }
-        FC(B, E, F);
+        EC(B, E, F);
         G(O);
     }
     function G(_) {
-        const B = VF;
-        UG = 7;
-        VF |= _ & 127;
-        if (VF == B) {
+        const B = OF;
+        NG = 7;
+        OF |= _ & 127;
+        if (OF == B) {
             return;
         }
         let C = 0;
         for (let _ = 0; _ < 7; _++) {
-            VF & YE[_] && C++;
+            OF & RE[_] && C++;
         }
-        if (!(C <= WF)) {
-            WF = C;
+        if (!(C <= PF)) {
+            PF = C;
             if (C == 7) {
                 return H();
             }
             if (C == 3 || C == 5) {
                 for (let _ = 0; _ < 7; _++) {
-                    TF[_] = GE(UE, TF[_] + 6);
+                    MF[_] = ZD(NE, MF[_] + 6);
                 }
-                GC(PF.x, PF.y - 30, "SPECTRUM " + C + "/7", XE[C]);
+                FC(IF.x, IF.y - 30, "SPECTRUM " + C + "/7", QE[C]);
                 KB(0);
             }
         }
     }
     function H() {
-        XF = 3.2;
+        QF = 3.2;
         for (let _ = 0; _ < 7; _++) {
-            TF[_] = GE(UE, TF[_] + 26);
+            MF[_] = ZD(NE, MF[_] + 26);
         }
-        _G = GE(12, _G + 1.5);
-        ZF += 1200 * _G | 0;
-        MF = 1;
-        NF = -1;
-        LF = GE(32, LF + 14);
-        GC(PF.x, PF.y - 46, "FULL SPECTRUM", -1);
+        TF = ZD(12, TF + 1.5);
+        SF += 1200 * TF | 0;
+        FF = 1;
+        GF = -1;
+        EF = ZD(32, EF + 14);
+        FC(IF.x, IF.y - 46, "FULL SPECTRUM", -1);
         NB();
-        VF = 0;
-        WF = 0;
+        OF = 0;
+        PF = 0;
     }
     function I(_) {
         _.g = 1;
         if (_.t == 0) {
-            FG++;
-            GG = 1.4;
-            YF += 1;
-            ZF += 10 * _G * (1 + FG * .05) | 0;
-            KB(FG);
+            YF++;
+            ZF = 1.4;
+            RF += 1;
+            SF += 10 * TF * (1 + YF * .05) | 0;
+            KB(YF);
         } else if (_.t == 1) {
-            YF += 15;
-            ZF += 500 * _G | 0;
-            GC(_.x, _.y, "CROWN +15", 48);
-            MF = HE(MF, .45);
-            NF = 48;
+            RF += 15;
+            SF += 500 * TF | 0;
+            FC(_.x, _.y, "CROWN +15", 48);
+            FF = _E(FF, .45);
+            GF = 48;
             MB();
         } else if (_.t == 2) {
-            TF[_.c] = GE(UE, TF[_.c] + 40);
+            MF[_.c] = ZD(NE, MF[_.c] + 40);
             KB(_.c);
-            DC(_.x, _.y, 12, 3, 190, XE[_.c]);
+            CC(_.x, _.y, 12, 3, 190, QE[_.c]);
         } else if (_.t == 3) {
             for (let _ = 0; _ < 7; _++) {
-                TF[_] = UE;
+                MF[_] = NE;
             }
-            MF = 1;
-            NF = -1;
-            GC(_.x, _.y, "PRISM WELL", -1);
+            FF = 1;
+            GF = -1;
+            FC(_.x, _.y, "PRISM WELL", -1);
             MB();
         } else {
-            EG[_.c] = BF[_.c][2];
-            GC(_.x, _.y, CF[_.c], BF[_.c][0] > 6 ? -1 : XE[BF[_.c][0]]);
-            PB();
+            XF[_.c] = UE[_.c][2];
+            FC(_.x, _.y, VE[_.c], UE[_.c][0] > 6 ? -1 : QE[UE[_.c][0]]);
+            LB(60, [ 0, 5, 10 ], .12, .1, "square", .06, 2);
         }
     }
     function J() {
-        const _ = LE(PF.vx, PF.vy);
-        if (_ > QE) {
-            PF.vx = PF.vx / _ * QE;
-            PF.vy = PF.vy / _ * QE;
+        const _ = EE(IF.vx, IF.vy);
+        if (_ > JE) {
+            IF.vx = IF.vx / _ * JE;
+            IF.vy = IF.vy / _ * JE;
         }
         if (!isFinite(_)) {
-            PF.vx = 0;
-            PF.vy = 200;
+            IF.vx = 0;
+            IF.vy = 200;
         }
-        if (!isFinite(PF.x + PF.y)) {
-            PF.x = 0;
-            PF.y = BG;
+        if (!isFinite(IF.x + IF.y)) {
+            IF.x = 0;
+            IF.y = UF;
         }
     }
     function K(_) {
-        const B = PF.ra;
+        const B = IF.ra;
         if (B) {
             B.u = 1;
-            B.l = GE(B.l, .12);
+            B.l = ZD(B.l, .12);
         }
-        PF.ra = 0;
+        IF.ra = 0;
         if (_) {
-            PF.vx *= 1.06;
-            PF.vy *= 1.06;
+            IF.vx *= 1.06;
+            IF.vy *= 1.06;
         }
         HB(0);
     }
     function L(_) {
-        const B = PF.ra;
-        const C = B.x2 - B.x1, D = B.y2 - B.y1, E = LE(C, D);
+        const B = IF.ra;
+        const C = B.x2 - B.x1, D = B.y2 - B.y1, E = EE(C, D);
         if (B.u || E < 8) {
             K(1);
             return 0;
         }
         const F = C / E, G = D / E;
-        let H = PF.vx * F + PF.vy * G;
-        H = H * .998 + (QF * F + RF * G) * _;
-        if (FE(H) < 370) {
-            const _ = QF * F + RF * G;
+        let H = IF.vx * F + IF.vy * G;
+        H = H * .998 + (JF * F + KF * G) * _;
+        if (YD(H) < 370) {
+            const _ = JF * F + KF * G;
             H = 370 * (_ ? _ > 0 ? 1 : -1 : H >= 0 ? 1 : -1);
         }
-        PF.rt += H * _ / E;
-        PF.vx = F * H;
-        PF.vy = G * H;
-        if (PF.rt < 0 || PF.rt > 1) {
-            PF.rt = HJ(PF.rt, 0, 1);
-            if (!(PF.rw > 0)) {
+        IF.rt += H * _ / E;
+        IF.vx = F * H;
+        IF.vy = G * H;
+        if (IF.rt < 0 || IF.rt > 1) {
+            IF.rt = _J(IF.rt, 0, 1);
+            if (!(IF.rw > 0)) {
                 K(1);
                 return 0;
             }
-            PF.rw -= _;
-            PF.vx = -PF.vx;
-            PF.vy = -PF.vy;
-            PF.rt = HJ(PF.rt, .02, .98);
+            IF.rw -= _;
+            IF.vx = -IF.vx;
+            IF.vy = -IF.vy;
+            IF.rt = _J(IF.rt, .02, .98);
             FB(400);
         }
-        const I = F * PF.rs;
-        PF.x = B.x1 + C * PF.rt + -G * PF.rs * 22;
-        PF.y = B.y1 + D * PF.rt + I * 22;
-        NE() < .5 && DC(PF.x, PF.y, 3, 0, 60, XE[4], .1 * -PF.vx, .1 * -PF.vy);
+        const I = F * IF.rs;
+        IF.x = B.x1 + C * IF.rt + -G * IF.rs * 22;
+        IF.y = B.y1 + D * IF.rt + I * 22;
+        GE() < .5 && CC(IF.x, IF.y, 3, 0, 60, QE[4], .1 * -IF.vx, .1 * -IF.vy);
         return 1;
     }
     function M() {
-        if (!PF.te) {
+        if (!IF.te) {
             return;
         }
-        PF.te = 0;
-        const _ = 1.34 + 150 / (LE(PF.vx, PF.vy) || 1);
-        PF.vx *= _;
-        PF.vy *= _;
+        IF.te = 0;
+        const _ = 1.34 + 150 / (EE(IF.vx, IF.vy) || 1);
+        IF.vx *= _;
+        IF.vy *= _;
         J();
-        DC(PF.x, PF.y, 10, 0, 260);
+        CC(IF.x, IF.y, 10, 0, 260);
         GB(0);
     }
     function N() {
-        const _ = PF.te;
-        let B = PF.x - _.x, C = PF.y - _.y;
-        const D = LE(B, C);
+        const _ = IF.te;
+        let B = IF.x - _.x, C = IF.y - _.y;
+        const D = EE(B, C);
         if (D < 1 || D <= _.l) {
             return;
         }
         B /= D;
         C /= D;
-        PF.x = _.x + B * _.l;
-        PF.y = _.y + C * _.l;
-        const E = PF.vx * B + PF.vy * C;
+        IF.x = _.x + B * _.l;
+        IF.y = _.y + C * _.l;
+        const E = IF.vx * B + IF.vy * C;
         if (E > 0) {
-            PF.vx -= E * B;
-            PF.vy -= E * C;
+            IF.vx -= E * B;
+            IF.vy -= E * C;
         }
-        const F = LE(PF.vx, PF.vy);
+        const F = EE(IF.vx, IF.vy);
         if (F > 1 && F < 1500) {
-            const _ = HE(1.004, 320 / F);
-            PF.vx *= _;
-            PF.vy *= _;
+            const _ = _E(1.004, 320 / F);
+            IF.vx *= _;
+            IF.vy *= _;
         }
     }
     function O(_) {
-        const B = _G > 4 ? 60 + _G * 24 : 0;
-        for (const C of YG) {
+        const B = TF > 4 ? 60 + TF * 24 : 0;
+        for (const C of RG) {
             for (const D of C.i) {
                 if (D.g) {
                     continue;
                 }
-                const C = PF.x - D.x, E = PF.y - D.y, F = LE(C, E);
+                const C = IF.x - D.x, E = IF.y - D.y, F = EE(C, E);
                 if (F < 43) {
                     I(D);
                 } else if (B && !D.t && F < B) {
-                    const B = GE(1, 700 * _ / F);
+                    const B = ZD(1, 700 * _ / F);
                     D.x += C * B;
                     D.y += E * B;
                 }
@@ -442,16 +442,16 @@
         }
     }
     function P(_) {
-        for (const _ of YG) {
+        for (const _ of RG) {
             for (const B of _.o) {
                 B.k || Q(B);
             }
         }
-        if (ZG > 0) {
-            ZG -= _;
+        if (SG > 0) {
+            SG -= _;
         } else {
-            for (let _ = 0; _ < IG.length; _++) {
-                if (E(IG[_])) {
+            for (let _ = 0; _ < BG.length; _++) {
+                if (E(BG[_])) {
                     break;
                 }
             }
@@ -459,55 +459,55 @@
     }
     function Q(_) {
         X(_);
-        const B = B_(_, PF.x, PF.y) + OE;
-        if (FI > B) {
+        const B = B_(_, IF.x, IF.y) + HE;
+        if (YH > B) {
             return;
         }
-        const C = DI, D = EI, E = BI, F = CI, G = B - FI;
-        if (_.m & 8 && PF.ph > 0) {
+        const C = WH, D = XH, E = UH, F = VH, G = B - YH;
+        if (_.m & 8 && IF.ph > 0) {
             return;
         }
         Y(_, E, F);
-        let H = PF.vx - YH, I = PF.vy - ZH;
+        let H = IF.vx - RH, I = IF.vy - SH;
         const L = H * C + I * D;
         if (_.m & 4) {
-            if (-L > (PF.rp > 0 ? 300 : 900)) {
+            if (-L > (IF.rp > 0 ? 300 : 900)) {
                 S(_, E, F, 0, 0);
                 return;
             }
         }
-        PF.x += C * G;
-        PF.y += D * G;
-        PF.ra && K(0);
+        IF.x += C * G;
+        IF.y += D * G;
+        IF.ra && K(0);
         if (L >= 0) {
             return;
         }
         const M = _.m & 1, N = _.m & 2;
         _.f = 1;
-        _.m & ZE && R(_, E, F);
-        const O = (1 + (M ? 1.32 - HJ(PF.sp / QE, 0, 1) * .72 : N ? .12 : .44)) * -L;
+        _.m & SE && R(_, E, F);
+        const O = (1 + (M ? 1.32 - _J(IF.sp / JE, 0, 1) * .72 : N ? .12 : .44)) * -L;
         H += O * C;
         I += O * D;
         const P = -D, Q = C, T = H * P + I * Q;
-        const U = GE(FE(T), (N ? 1.15 : .3) * O) * (T < 0 ? -1 : 1);
+        const U = ZD(YD(T), (N ? 1.15 : .3) * O) * (T < 0 ? -1 : 1);
         H -= U * P;
         I -= U * Q;
-        PF.vx = H + YH;
-        PF.vy = I + ZH;
+        IF.vx = H + RH;
+        IF.vy = I + SH;
         J();
         const V = -L;
         _B(V, N ? 1 : M ? 2 : 0, _.x + _.y);
-        LF = GE(26, LF + V * (M ? .008 : .0035));
-        DC(E, F, HJ(V * .012, 1, 14) | 0, 1, GE(V * .35, 420), _H(_));
+        EF = ZD(26, EF + V * (M ? .008 : .0035));
+        CC(E, F, _J(V * .012, 1, 14) | 0, 1, ZD(V * .35, 420), TG(_));
         if (M && V > 150) {
-            FG++;
-            GG = 1.6;
-            const _ = (18 + V * .05) * _G | 0;
-            ZF += _;
+            YF++;
+            ZF = 1.6;
+            const _ = (18 + V * .05) * TF | 0;
+            SF += _;
             if (V > 620) {
-                GC(E, F, "+" + _, XE[2]);
-                BC(E, F, 60 + GE(V * .2, 190), DK[6] + 30);
-                OF = HE(OF, .045);
+                FC(E, F, "+" + _, QE[2]);
+                _C(E, F, 60 + ZD(V * .2, 190), WJ[6] + 30);
+                HF = _E(HF, .045);
             }
         }
     }
@@ -521,9 +521,9 @@
             return;
         }
         D.l++;
-        ZF += 60 * _G | 0;
+        SF += 60 * TF | 0;
         KB(D.l / D.n * 8);
-        DC(B, C, 10, 0, 260, 48);
+        CC(B, C, 10, 0, 260, 48);
         if (D.l < D.n) {
             return;
         }
@@ -531,267 +531,267 @@
         for (const _ of D.m) {
             _.lt = 0;
         }
-        const E = 420 * D.n * _G | 0;
-        ZF += E;
-        YF += D.n * 2;
+        const E = 420 * D.n * TF | 0;
+        SF += E;
+        RF += D.n * 2;
         for (let _ = 0; _ < 7; _++) {
-            TF[_] = GE(UE, TF[_] + 5);
+            MF[_] = ZD(NE, MF[_] + 5);
         }
-        GC(D.x, D.y, "BANK +" + E, 48);
-        BC(D.x, D.y, 320, 48);
-        MF = HE(MF, .4);
-        NF = 48;
-        LF = GE(30, LF + 12);
-        OF = HE(OF, .07);
+        FC(D.x, D.y, "BANK +" + E, 48);
+        _C(D.x, D.y, 320, 48);
+        FF = _E(FF, .4);
+        GF = 48;
+        EF = ZD(30, EF + 12);
+        HF = _E(HF, .07);
         CB();
     }
     function S(_, B, C, D, E) {
         _.k = 1;
-        const F = _H(_);
-        LF = GE(32, LF + 10 - E);
-        DC(B, C, 18, 2, 460, F);
+        const F = TG(_);
+        EF = ZD(32, EF + 10 - E);
+        CC(B, C, 18, 2, 460, F);
         U(B, C, _, F);
-        BC(B, C, 150, F);
+        _C(B, C, 150, F);
         BB(E);
-        const G = 60 * _G * (1 + E * .5) | 0;
-        ZF += G;
-        FG++;
-        GG = 1.6;
+        const G = 60 * TF * (1 + E * .5) | 0;
+        SF += G;
+        YF++;
+        ZF = 1.6;
         if (!E) {
-            GC(B, C, "+" + G, 45);
-            OF = HE(OF, .05);
+            FC(B, C, "+" + G, 45);
+            HF = _E(HF, .05);
         }
         if (!(E > 3)) {
-            for (const D of YG) {
+            for (const D of RG) {
                 for (const F of D.o) {
                     if (F == _ || F.k || F.kt || !(F.m & 4)) {
                         continue;
                     }
-                    const D = LE(F.x - B, F.y - C);
+                    const D = EE(F.x - B, F.y - C);
                     if (D < 150 + F.r) {
                         F.kt = .04 + D / 150 * .1;
                         F.kd = E + 1;
                     }
                 }
             }
-            PF.vx *= .9;
-            PF.vy *= .9;
+            IF.vx *= .9;
+            IF.vy *= .9;
         }
     }
     function T(_) {
-        for (const B of HG) {
+        for (const B of _G) {
             for (const C of B.o) {
                 if (C.kt && !C.k && !((C.kt -= _) > 0)) {
                     X(C);
-                    S(C, WH, XH, 0, C.kd);
+                    S(C, PH, QH, 0, C.kd);
                 }
             }
         }
     }
     function U(_, B, C, D) {
         for (let E = 0; E < 7; E++) {
-            const E = LJ(0, DE), F = LJ(90, 420);
-            CC(_, B, JE(E) * F, IE(E) * F, LJ(.5, 1.1), D, 4, LJ(3, 8) * (C.t ? 1 : 1.4));
+            const E = EJ(0, WD), F = EJ(90, 420);
+            BC(_, B, CE(E) * F, BE(E) * F, EJ(.5, 1.1), D, 4, EJ(3, 8) * (C.t ? 1 : 1.4));
         }
     }
     function V(_) {
-        const B = LE(PF.vx, PF.vy);
-        YG = U_(PF.y - 420 - B * _, PF.y + 420 + B * _);
-        let C = QF, D = RF;
-        for (const _ of YG) {
-            if (_.z && PF.y >= _.y && PF.y < _.y + _.h) {
-                T_(_, PF.x, PF.y);
-                C += LI;
-                D += MI;
+        const B = EE(IF.vx, IF.vy);
+        RG = U_(IF.y - 420 - B * _, IF.y + 420 + B * _);
+        let C = JF, D = KF;
+        for (const _ of RG) {
+            if (_.z && IF.y >= _.y && IF.y < _.y + _.h) {
+                T_(_, IF.x, IF.y);
+                C += EI;
+                D += FI;
                 break;
             }
         }
-        if (PF.te) {
-            PF.te.t -= _;
-            PF.vx += C * _;
-            PF.vy += D * _;
-            PF.te.t <= 0 && M();
-        } else if (PF.ra) {} else {
-            PF.vx += C * _;
-            PF.vy += D * _;
+        if (IF.te) {
+            IF.te.t -= _;
+            IF.vx += C * _;
+            IF.vy += D * _;
+            IF.te.t <= 0 && M();
+        } else if (IF.ra) {} else {
+            IF.vx += C * _;
+            IF.vy += D * _;
         }
         J();
-        let E = LE(PF.vx, PF.vy);
+        let E = EE(IF.vx, IF.vy);
         if (E > 1400) {
-            const B = HE(0, 1 - 1.5 * (E / 1400 - 1) * _);
-            PF.vx *= B;
-            PF.vy *= B;
+            const B = _E(0, 1 - 1.5 * (E / 1400 - 1) * _);
+            IF.vx *= B;
+            IF.vy *= B;
             E *= B;
         }
-        const F = HJ(EE.ceil(E * _ / (OE * .55)), 1, 8);
+        const F = _J(XD.ceil(E * _ / (HE * .55)), 1, 8);
         const G = _ / F;
         for (let _ = 0; _ < F; _++) {
-            if (PF.ra) {
+            if (IF.ra) {
                 if (!L(G)) {
-                    PF.x += PF.vx * G;
-                    PF.y += PF.vy * G;
+                    IF.x += IF.vx * G;
+                    IF.y += IF.vy * G;
                 }
             } else {
-                PF.x += PF.vx * G;
-                PF.y += PF.vy * G;
+                IF.x += IF.vx * G;
+                IF.y += IF.vy * G;
             }
-            PF.te && N();
+            IF.te && N();
             P(G);
             O(G);
         }
-        S_(PF.y);
-        if (PF.x < JI + OE) {
-            PF.x = JI + OE;
-            PF.vx < 0 && (PF.vx = .55 * -PF.vx + 60);
+        S_(IF.y);
+        if (IF.x < CI + HE) {
+            IF.x = CI + HE;
+            IF.vx < 0 && (IF.vx = .55 * -IF.vx + 60);
         }
-        if (PF.x > KI - OE) {
-            PF.x = KI - OE;
-            PF.vx > 0 && (PF.vx = .55 * -PF.vx - 60);
+        if (IF.x > DI - HE) {
+            IF.x = DI - HE;
+            IF.vx > 0 && (IF.vx = .55 * -IF.vx - 60);
         }
-        PF.ph > 0 && (PF.ph -= _);
-        PF.rp > 0 && (PF.rp -= _);
-        if (PF.gt > 0) {
-            PF.gt -= _;
-            if (PF.gt <= 0) {
-                QF = 0;
-                RF = PE;
+        IF.ph > 0 && (IF.ph -= _);
+        IF.rp > 0 && (IF.rp -= _);
+        if (IF.gt > 0) {
+            IF.gt -= _;
+            if (IF.gt <= 0) {
+                JF = 0;
+                KF = IE;
             }
         }
-        PF.sp = LE(PF.vx, PF.vy);
-        PF.sp > 30 && (PF.a = KE(PF.vy, PF.vx));
+        IF.sp = EE(IF.vx, IF.vy);
+        IF.sp > 30 && (IF.a = DE(IF.vy, IF.vx));
     }
     function W(_, B, C, D, E, F, G) {
-        const H = HE(3, (F - E) * D / 80 | 0);
+        const H = _E(3, (F - E) * D / 80 | 0);
         for (let I = 0; I < H; I++) {
-            const J = IJ(E, F, I / H), K = IJ(E, F, (I + 1) / H);
-            _.o.push(UH(B + JE(J) * D, C + IE(J) * D, B + JE(K) * D, C + IE(K) * D, G));
+            const J = BJ(E, F, I / H), K = BJ(E, F, (I + 1) / H);
+            _.o.push(NH(B + CE(J) * D, C + BE(J) * D, B + CE(K) * D, C + BE(K) * D, G));
         }
     }
     function X(_) {
-        WH = _.x;
-        XH = _.y;
-        YH = 0;
-        ZH = 0;
-        _I = _.g;
+        PH = _.x;
+        QH = _.y;
+        RH = 0;
+        SH = 0;
+        TH = _.g;
         if (_.os) {
-            const B = _.os * KF + _.op, C = IE(B), D = JE(B) * _.os;
-            WH += _.ox * C;
-            XH += _.oy * C;
-            YH = _.ox * D;
-            ZH = _.oy * D;
+            const B = _.os * DF + _.op, C = BE(B), D = CE(B) * _.os;
+            PH += _.ox * C;
+            QH += _.oy * C;
+            RH = _.ox * D;
+            SH = _.oy * D;
         }
-        _.w && (_I += _.w * KF);
+        _.w && (TH += _.w * DF);
     }
     function Y(_, B, C) {
         if (_.w) {
-            YH += -_.w * (C - XH);
-            ZH += _.w * (B - WH);
+            RH += -_.w * (C - QH);
+            SH += _.w * (B - PH);
         }
     }
     function Z(_, B) {
-        return NJ(EH(_, 2)) ? 2 : B && NJ(EH(_, 0)) ? 4 : NJ(EH(_, 1)) ? 8 : NJ(EH(_, 3)) ? 1 : 0;
+        return GJ(XG(_, 2)) ? 2 : B && GJ(XG(_, 0)) ? 4 : GJ(XG(_, 1)) ? 8 : GJ(XG(_, 3)) ? 1 : 0;
     }
     function __(_, B) {
-        if (!NJ(EH(_, 4))) {
+        if (!GJ(XG(_, 4))) {
             return 0;
         }
-        const C = LJ(0, DE);
+        const C = EJ(0, WD);
         return {
-            ox: JE(C) * B,
-            oy: IE(C) * B * .6,
-            os: LJ(.7, 1.9),
-            op: LJ(0, DE)
+            ox: CE(C) * B,
+            oy: BE(C) * B * .6,
+            os: EJ(.7, 1.9),
+            op: EJ(0, WD)
         };
     }
     function B_(_, B, C) {
         if (!_.t) {
-            DI = B - WH;
-            EI = C - XH;
-            FI = LE(DI, EI);
-            if (FI < 1e-4) {
-                DI = 0;
-                EI = -1;
-                FI = 1e-4;
+            WH = B - PH;
+            XH = C - QH;
+            YH = EE(WH, XH);
+            if (YH < 1e-4) {
+                WH = 0;
+                XH = -1;
+                YH = 1e-4;
             } else {
-                DI /= FI;
-                EI /= FI;
+                WH /= YH;
+                XH /= YH;
             }
-            BI = WH + DI * _.r;
-            CI = XH + EI * _.r;
+            UH = PH + WH * _.r;
+            VH = QH + XH * _.r;
             return _.r;
         }
-        const D = JE(_I) * _.r, E = IE(_I) * _.r;
-        const F = WH - D, G = XH - E, H = WH + D, I = XH + E;
-        const J = ZB(F, G, H, I, B, C);
-        BI = F + (H - F) * J;
-        CI = G + (I - G) * J;
-        DI = B - BI;
-        EI = C - CI;
-        FI = LE(DI, EI);
-        if (FI < 1e-4) {
-            DI = -IE(_I);
-            EI = JE(_I);
-            FI = 1e-4;
+        const D = CE(TH) * _.r, E = BE(TH) * _.r;
+        const F = PH - D, G = QH - E, H = PH + D, I = QH + E;
+        const J = YB(F, G, H, I, B, C);
+        UH = F + (H - F) * J;
+        VH = G + (I - G) * J;
+        WH = B - UH;
+        XH = C - VH;
+        YH = EE(WH, XH);
+        if (YH < 1e-4) {
+            WH = -BE(TH);
+            XH = CE(TH);
+            YH = 1e-4;
         } else {
-            DI /= FI;
-            EI /= FI;
+            WH /= YH;
+            XH /= YH;
         }
         return 5;
     }
     function C_(_, B, C, D) {
         for (const E of _.o) {
-            WH = E.x;
-            XH = E.y;
-            _I = E.g;
-            if (B_(E, B, C) + D > FI) {
+            PH = E.x;
+            QH = E.y;
+            TH = E.g;
+            if (B_(E, B, C) + D > YH) {
                 return 1;
             }
         }
         return 0;
     }
     function D_() {
-        const _ = GH;
-        const B = GI(_), C = II(_), D = CH[B];
-        const E = ME((_ + 1400) / _F) > ME(_ / _F) && _ > 200;
-        const F = NJ(.25) ? 120 : 0;
-        const G = HJ(-400 + LJ(-90, 70) - F, -545, -300);
-        const H = HJ(RE + LJ(-70, 90) + F, 300, SE);
-        const I = E ? 1200 : MJ(700, 1200);
-        const J = RH(_, I, G, H, HH, IH);
-        J.o.push(UH(HH, _, G, _ + I, 0), UH(IH, _, H, _ + I, 0));
-        LH = HE(HH, G) + 30;
-        MH = GE(IH, H) - 30;
-        NH = MH - LH;
-        OH = (LH + MH) / 2;
-        PH = D;
-        QH = C;
+        const _ = ZG;
+        const B = ZH(_), C = BI(_), D = VG[B];
+        const E = FE((_ + 1400) / TE) > FE(_ / TE) && _ > 200;
+        const F = GJ(.25) ? 120 : 0;
+        const G = _J(-400 + EJ(-90, 70) - F, -545, -300);
+        const H = _J(KE + EJ(-70, 90) + F, 300, LE);
+        const I = E ? 1200 : FJ(700, 1200);
+        const J = KH(_, I, G, H, _H, BH);
+        J.o.push(NH(_H, _, G, _ + I, 0), NH(BH, _, H, _ + I, 0));
+        EH = _E(_H, G) + 30;
+        FH = ZD(BH, H) - 30;
+        GH = FH - EH;
+        HH = (EH + FH) / 2;
+        IH = D;
+        JH = C;
         if (E) {
             O_(J);
         } else {
-            const _ = +BH[B][5][MJ(0, 9)];
+            const _ = +UG[B][5][FJ(0, 9)];
             J.k = _;
-            JH > 1 && MJ(0, 9) < BH[B][8] && (J.z = BH[B][7] || MJ(1, 5));
-            _ == 1 || _ == 5 ? H_(J, _ > 1 ? MJ(2, 3) : 1, _ > 1 ? LJ(0, 26) : LJ(120, 200), J.y + J.h * LJ(.3, .6), 0) : [ G_, 0, I_, J_, K_, 0, L_, M_, N_ ][_](J);
-            E_(J, BH[B][6] + (C * 1.6 | 0));
+            CH > 1 && FJ(0, 9) < UG[B][8] && (J.z = UG[B][7] || FJ(1, 5));
+            _ == 1 || _ == 5 ? H_(J, _ > 1 ? FJ(2, 3) : 1, _ > 1 ? EJ(0, 26) : EJ(120, 200), J.y + J.h * EJ(.3, .6), 0) : [ G_, 0, I_, J_, K_, 0, L_, M_, N_ ][_](J);
+            E_(J, UG[B][6] + (C * 1.6 | 0));
             P_(J, B);
         }
         J.i = J.i.filter(_ => !C_(J, _.x, _.y, 10.2));
-        HH = G;
-        IH = H;
-        GH = _ + I;
-        JH++;
-        HG.push(J);
-        HG.length > 26 && HG.shift();
+        _H = G;
+        BH = H;
+        ZG = _ + I;
+        CH++;
+        _G.push(J);
+        _G.length > 26 && _G.shift();
         return J;
     }
     function E_(_, B) {
         for (let C = B * 6; B > 0 && C--; ) {
-            const C = LJ(LH + 40, MH - 40), D = _.y + LJ(.07, .93) * _.h;
-            const E = NJ(.6), F = LJ(13, 26), G = LJ(30, 70), H = LJ(0, CE);
+            const C = EJ(EH + 40, FH - 40), D = _.y + EJ(.07, .93) * _.h;
+            const E = GJ(.6), F = EJ(13, 26), G = EJ(30, 70), H = EJ(0, VD);
             if (!C_(_, C, D, 48 + (E ? F : G))) {
                 B--;
-                _.o.push(E ? SH(C, D, F, Z(PH, 0) | (NJ(.5) ? 1 : NJ(.3) ? ZE : 0), __(PH, 70)) : TH(C, D, G, H, Z(PH, 1) | (NJ(.22) ? 16 : 0), __(PH, 60)));
-                _.o[_.o.length - 1].m & ZE && F_(_, _.o[_.o.length - 1], 3);
+                _.o.push(E ? LH(C, D, F, Z(IH, 0) | (GJ(.5) ? 1 : GJ(.3) ? SE : 0), __(IH, 70)) : MH(C, D, G, H, Z(IH, 1) | (GJ(.22) ? 16 : 0), __(IH, 60)));
+                _.o[_.o.length - 1].m & SE && F_(_, _.o[_.o.length - 1], 3);
             }
         }
     }
@@ -811,30 +811,30 @@
         D.n++;
         D.m.push(B);
         B.bk = D;
-        B.m |= ZE;
+        B.m |= SE;
     }
     function G_(_) {
-        const B = MJ(4, 6), C = _.h / (B + 1);
+        const B = FJ(4, 6), C = _.h / (B + 1);
         for (let D = 0; D < B; D++) {
-            const B = _.y + C * (D + 1), E = MJ(4, 7);
+            const B = _.y + C * (D + 1), E = FJ(4, 7);
             for (let C = 0; C < E; C++) {
-                _.o.push(SH(LH + 40 + (C + (D & 1 ? .5 : 0)) / (E - .34) * (NH - 90), B, LJ(14, 30), Z(PH, 0) | (NJ(.45) ? 1 : NJ(.25) ? ZE : 0), __(PH, 60)));
-                _.o[_.o.length - 1].m & ZE && F_(_, _.o[_.o.length - 1], 3);
+                _.o.push(LH(EH + 40 + (C + (D & 1 ? .5 : 0)) / (E - .34) * (GH - 90), B, EJ(14, 30), Z(IH, 0) | (GJ(.45) ? 1 : GJ(.25) ? SE : 0), __(IH, 60)));
+                _.o[_.o.length - 1].m & SE && F_(_, _.o[_.o.length - 1], 3);
             }
         }
     }
     function H_(_, B, C, D, E, F) {
-        const G = F || Z(PH, 1), H = [];
+        const G = F || Z(IH, 1), H = [];
         for (let _ = 0; _ < B; _++) {
-            H.push(LH + (_ + LJ(.22, .8)) * NH / B);
+            H.push(EH + (_ + EJ(.22, .8)) * GH / B);
         }
-        let I = LH - 20, J = D - C;
+        let I = EH - 20, J = D - C;
         for (let E = 0; E <= B; E++) {
             const F = E == B;
-            const K = HE(100, LJ(120, 200) - QH * 16);
-            const L = F ? MH + 20 : H[E] - K / 2, M = F ? D - C : D + C;
-            L - I > 26 && _.o.push(UH(I, J, L, M, G));
-            !F && C > 40 && NJ(.6) && _.o.push(SH(L, M, 15, 1));
+            const K = _E(100, EJ(120, 200) - JH * 16);
+            const L = F ? FH + 20 : H[E] - K / 2, M = F ? D - C : D + C;
+            L - I > 26 && _.o.push(NH(I, J, L, M, G));
+            !F && C > 40 && GJ(.6) && _.o.push(LH(L, M, 15, 1));
             I = F ? L : H[E] + K / 2;
             J = D + C;
         }
@@ -842,290 +842,290 @@
             return H;
         }
         for (let B = 0; B < 4; B++) {
-            _.i.push(VH(0, H[0] + LJ(-26, 26), D + C + 70 + B * 48));
+            _.i.push(OH(0, H[0] + EJ(-26, 26), D + C + 70 + B * 48));
         }
-        _.i.push(VH(NJ(.34) ? 2 : 1, H[B - 1], D - C - 70, OJ(FH(_.rg))));
+        _.i.push(OH(GJ(.34) ? 2 : 1, H[B - 1], D - C - 70, HJ(YG(_.rg))));
         return H;
     }
     function I_(_) {
-        const B = GE(NH * .4, 300), C = OH + LJ(-.2, .2) * NH, D = _.y + _.h * .6;
-        const E = B * JE(.12 * CE);
-        W(_, C, D, B, .12 * CE, .8 * CE, NJ(.34) ? 2 : 0);
-        _.o.push(SH(C - E, D, 15, 1), SH(C + E, D, 15, 1));
-        _.i.push(VH(NJ(.3) ? 1 : 2, C, D + B * .5, OJ(FH(_.rg))));
-        NJ(.6) && _.o.push(TH(C, _.y + _.h * .18, LJ(60, 120), LJ(-.4, .4), 1, __(PH, 90)));
+        const B = ZD(GH * .4, 300), C = HH + EJ(-.2, .2) * GH, D = _.y + _.h * .6;
+        const E = B * CE(.12 * VD);
+        W(_, C, D, B, .12 * VD, .8 * VD, GJ(.34) ? 2 : 0);
+        _.o.push(LH(C - E, D, 15, 1), LH(C + E, D, 15, 1));
+        _.i.push(OH(GJ(.3) ? 1 : 2, C, D + B * .5, HJ(YG(_.rg))));
+        GJ(.6) && _.o.push(MH(C, _.y + _.h * .18, EJ(60, 120), EJ(-.4, .4), 1, __(IH, 90)));
     }
     function J_(_) {
-        const B = HE(150, 240 - QH * 30), C = OH + LJ(-.2, .2) * NH;
-        const D = LJ(-90, 90);
-        _.o.push(UH(C - B / 2, _.y, C - B / 2 + D, _.y + _.h, 32));
-        _.o.push(UH(C + B / 2, _.y, C + B / 2 + D, _.y + _.h, 32));
+        const B = _E(150, 240 - JH * 30), C = HH + EJ(-.2, .2) * GH;
+        const D = EJ(-90, 90);
+        _.o.push(NH(C - B / 2, _.y, C - B / 2 + D, _.y + _.h, 32));
+        _.o.push(NH(C + B / 2, _.y, C + B / 2 + D, _.y + _.h, 32));
         for (let B = 0; B < 7; B++) {
-            _.i.push(VH(0, C + D * (B / 7) + LJ(-30, 30), _.y + 80 + B * (_.h - 150) / 6));
+            _.i.push(OH(0, C + D * (B / 7) + EJ(-30, 30), _.y + 80 + B * (_.h - 150) / 6));
         }
-        if (NJ(.6)) {
-            const B = C < OH ? MH - 70 : LH + 70;
-            const D = NJ(.5);
-            _.i.push(VH(D ? 2 : 4, B, _.y + _.h * .5, D ? OJ(FH(_.rg)) : MJ(0, 6)));
+        if (GJ(.6)) {
+            const B = C < HH ? FH - 70 : EH + 70;
+            const D = GJ(.5);
+            _.i.push(OH(D ? 2 : 4, B, _.y + _.h * .5, D ? HJ(YG(_.rg)) : FJ(0, 6)));
         }
     }
     function K_(_) {
-        const B = MJ(1, 2);
+        const B = FJ(1, 2);
         for (let C = 0; C < B; C++) {
-            const D = OH + LJ(-.22, .22) * NH, E = _.y + _.h * (B == 1 ? .5 : .3 + C * .4);
-            const F = MJ(2, 3), G = GE(NH * .3, 200), H = PJ() * LJ(.9, 1.9 + QH * .3);
+            const D = HH + EJ(-.22, .22) * GH, E = _.y + _.h * (B == 1 ? .5 : .3 + C * .4);
+            const F = FJ(2, 3), G = ZD(GH * .3, 200), H = IJ() * EJ(.9, 1.9 + JH * .3);
             for (let B = 0; B < F; B++) {
-                _.o.push(TH(D, E, G, B * CE / F, 1, {
+                _.o.push(MH(D, E, G, B * VD / F, 1, {
                     w: H
                 }));
             }
-            _.o.push(SH(D, E, 18, 0));
-            _.i.push(VH(0, D, E - G - 40), VH(0, D, E + G + 40));
+            _.o.push(LH(D, E, 18, 0));
+            _.i.push(OH(0, D, E - G - 40), OH(0, D, E + G + 40));
         }
     }
     function L_(_) {
         const B = _.y + _.h * .16, C = _.y + _.h * .8;
         H_(_, 1, 0, B, 1);
         H_(_, 1, 0, C, 1);
-        const D = MJ(4, 7);
+        const D = FJ(4, 7);
         for (let E = 0; E < D; E++) {
-            const D = LH + LJ(.12, .8) * NH, E = IJ(B + 60, C - 60, XB());
-            C_(_, D, E, 60) || (NJ(.5) ? _.o.push(SH(D, E, LJ(16, 30), NJ(.5) ? 1 : 16, __(PH, 80))) : _.o.push(TH(D, E, LJ(48, 90), LJ(0, CE), Z(PH, 1) | (NJ(.3) ? 32 : 0), __(PH, 70))));
+            const D = EH + EJ(.12, .8) * GH, E = BJ(B + 60, C - 60, WB());
+            C_(_, D, E, 60) || (GJ(.5) ? _.o.push(LH(D, E, EJ(16, 30), GJ(.5) ? 1 : 16, __(IH, 80))) : _.o.push(MH(D, E, EJ(48, 90), EJ(0, VD), Z(IH, 1) | (GJ(.3) ? 32 : 0), __(IH, 70))));
         }
-        const E = OH, F = (B + C) / 2, G = GE(NH * .3, 200);
+        const E = HH, F = (B + C) / 2, G = ZD(GH * .3, 200);
         for (let B = 0; B < 4; B++) {
-            const C = B / 4 * DE + LJ(0, 1), D = E + JE(C) * G, H = F + IE(C) * G * .7;
-            C_(_, D, H, 60) || _.o.push(SH(D, H, LJ(13, 20), 1, __(PH, 60)));
+            const C = B / 4 * WD + EJ(0, 1), D = E + CE(C) * G, H = F + BE(C) * G * .7;
+            C_(_, D, H, 60) || _.o.push(LH(D, H, EJ(13, 20), 1, __(IH, 60)));
         }
-        _.i.push(VH(NJ(.22) ? 1 : 2, NJ(.5) ? LH + 60 : MH - 60, (B + C) / 2, OJ(FH(_.rg))));
+        _.i.push(OH(GJ(.22) ? 1 : 2, GJ(.5) ? EH + 60 : FH - 60, (B + C) / 2, HJ(YG(_.rg))));
     }
     function M_(_) {
-        const B = MJ(2, 3);
+        const B = FJ(2, 3);
         for (let C = 0; C < B; C++) {
-            const D = _.y + _.h * (.2 + C * .6 / B + LJ(-.04, .04));
-            const E = MJ(3, 5), F = GE(NH * .8, 300), G = OH - F / 2 + LJ(-40, 40);
+            const D = _.y + _.h * (.2 + C * .6 / B + EJ(-.04, .04));
+            const E = FJ(3, 5), F = ZD(GH * .8, 300), G = HH - F / 2 + EJ(-40, 40);
             const H = {
                 n: E,
                 l: 0,
                 cap: E,
-                x: OH,
+                x: HH,
                 y: D,
                 m: []
             };
             _.bk.push(H);
             for (let B = 0; B < E; B++) {
-                const C = TH(G + (B + .5) * F / E, D, 30, CE / 2 + LJ(-.2, .2), ZE);
+                const C = MH(G + (B + .5) * F / E, D, 30, VD / 2 + EJ(-.2, .2), SE);
                 C.bk = H;
                 H.m.push(C);
                 _.o.push(C);
             }
-            _.o.push(SH(G - 40, D, 20, 1), SH(G + F + 40, D, 20, 1));
+            _.o.push(LH(G - 40, D, 20, 1), LH(G + F + 40, D, 20, 1));
             for (let B = 0; B < E; B++) {
-                _.i.push(VH(0, G + (B + .5) * F / E, D - 60));
+                _.i.push(OH(0, G + (B + .5) * F / E, D - 60));
             }
         }
-        _.i.push(VH(NJ(.4) ? 4 : 2, OH + LJ(-.3, .3) * NH, _.y + _.h * .92, MJ(0, 6)));
+        _.i.push(OH(GJ(.4) ? 4 : 2, HH + EJ(-.3, .3) * GH, _.y + _.h * .92, FJ(0, 6)));
     }
     function N_(_) {
-        const B = MJ(3, 4);
+        const B = FJ(3, 4);
         for (let C = 0; C < B; C++) {
             const D = _.y + _.h * (.15 + C * .8 / B);
             const E = H_(_, 1, 0, D, 1, 4)[0];
-            _.o.push(TH(E, D + _.h * .4 / B, GE(NH * .3, 150), LJ(0, CE), 1, {
-                w: PJ() * LJ(.8, 1.6 + QH * .4)
+            _.o.push(MH(E, D + _.h * .4 / B, ZD(GH * .3, 150), EJ(0, VD), 1, {
+                w: IJ() * EJ(.8, 1.6 + JH * .4)
             }));
-            _.i.push(VH(0, E, D + 40), VH(0, E + LJ(-30, 30), D + 90));
+            _.i.push(OH(0, E, D + 40), OH(0, E + EJ(-30, 30), D + 90));
         }
-        _.i.push(VH(NJ(.5) ? 1 : 4, OH, _.y + _.h * .96, MJ(0, 6)));
+        _.i.push(OH(GJ(.5) ? 1 : 4, HH, _.y + _.h * .96, FJ(0, 6)));
     }
     function O_(_) {
-        const B = OH, C = _.y + _.h * .4;
+        const B = HH, C = _.y + _.h * .4;
         K_(_);
         H_(_, 1, 0, C + 300, 1);
-        _.o.push(SH(B, C, 26, 1));
+        _.o.push(LH(B, C, 26, 1));
         for (let D = 0; D < 7; D++) {
-            _.i.push(VH(2, B + 70 * (D - 3), C + 420, D));
+            _.i.push(OH(2, B + 70 * (D - 3), C + 420, D));
         }
-        _.i.push(VH(1, B, _.y + 150));
+        _.i.push(OH(1, B, _.y + 150));
     }
     function P_(_, B) {
-        const C = FH(B);
-        const D = BH[B][6] / 6;
+        const C = YG(B);
+        const D = UG[B][6] / 6;
         const E = (B, C, D, E) => {
             for (let F = 0; F < 10; F++) {
-                const F = LJ(LH + 40, MH - 40), G = _.y + LJ(D, E) * _.h;
+                const F = EJ(EH + 40, FH - 40), G = _.y + EJ(D, E) * _.h;
                 if (!C_(_, F, G, 30)) {
-                    _.i.push(VH(B, F, G, C));
+                    _.i.push(OH(B, F, G, C));
                     return;
                 }
             }
         };
-        if (NJ(.8)) {
-            const B = MJ(5, 9), C = LH + LJ(.1, .5) * NH, D = _.y + LJ(.16, .5) * _.h;
-            const E = PJ() * LJ(150, 300), F = LJ(-200, 240);
+        if (GJ(.8)) {
+            const B = FJ(5, 9), C = EH + EJ(.1, .5) * GH, D = _.y + EJ(.16, .5) * _.h;
+            const E = IJ() * EJ(150, 300), F = EJ(-200, 240);
             for (let G = 0; G < B; G++) {
                 const H = G / B;
-                const I = C + E * H, J = D + F * IE(H * CE) + H * 150;
-                I > LH + 26 && I < MH - 26 && !C_(_, I, J, 26) && _.i.push(VH(0, I, J));
+                const I = C + E * H, J = D + F * BE(H * VD) + H * 150;
+                I > EH + 26 && I < FH - 26 && !C_(_, I, J, 26) && _.i.push(OH(0, I, J));
             }
         }
-        NJ(.6 * D) && E(2, NJ(.7) ? OJ(C) : MJ(0, 6), .16, .8);
-        NJ(.3 * D) && E(NJ(.3) ? 4 : 1, MJ(0, 6), .02, .16);
-        NJ(.16 * D) && E(4, MJ(0, 6), .3, .8);
-        NJ(.07 * D) && E(3, 0, .2, .8);
+        GJ(.6 * D) && E(2, GJ(.7) ? HJ(C) : FJ(0, 6), .16, .8);
+        GJ(.3 * D) && E(GJ(.3) ? 4 : 1, FJ(0, 6), .02, .16);
+        GJ(.16 * D) && E(4, FJ(0, 6), .3, .8);
+        GJ(.07 * D) && E(3, 0, .2, .8);
     }
     function Q_(_) {
-        KH = _ || NE() * 1e9 | 0;
-        KJ = KH >>> 0;
-        HG = [];
-        GH = -900;
-        HH = -400;
-        IH = RE;
-        JH = 0;
-        const B = RH(-900, 1400, -400, RE, -400, RE);
-        B.o.push(UH(-400, -900, -400, 500, 0), UH(RE, -900, RE, 500, 0), UH(-400, -900, RE, -900, 1), SH(-150, 60, 26, 1), SH(150, 240, 26, 1), SH(-60, 420, 20, 1));
+        DH = _ || GE() * 1e9 | 0;
+        DJ = DH >>> 0;
+        _G = [];
+        ZG = -900;
+        _H = -400;
+        BH = KE;
+        CH = 0;
+        const B = KH(-900, 1400, -400, KE, -400, KE);
+        B.o.push(NH(-400, -900, -400, 500, 0), NH(KE, -900, KE, 500, 0), NH(-400, -900, KE, -900, 1), LH(-150, 60, 26, 1), LH(150, 240, 26, 1), LH(-60, 420, 20, 1));
         for (let _ = 0; _ < 7; _++) {
-            B.i.push(VH(0, _ * 70 - 200, 150 + IE(_ * .9) * 90));
+            B.i.push(OH(0, _ * 70 - 200, 150 + BE(_ * .9) * 90));
         }
-        B.i.push(VH(2, 240, -60, 1), VH(2, -240, 420, 2));
-        HG.push(B);
-        GH = 500;
-        while (GH < 3e3) {
+        B.i.push(OH(2, 240, -60, 1), OH(2, -240, 420, 2));
+        _G.push(B);
+        ZG = 500;
+        while (ZG < 3e3) {
             D_();
         }
     }
     function R_() {
-        while (GH < PF.y + 3200) {
+        while (ZG < IF.y + 3200) {
             D_();
         }
-        const _ = HG[0];
-        if (PF.y < _.y + 40) {
-            PF.y = _.y + 40;
-            PF.vy < 0 && (PF.vy = FE(PF.vy) * .6);
+        const _ = _G[0];
+        if (IF.y < _.y + 40) {
+            IF.y = _.y + 40;
+            IF.vy < 0 && (IF.vy = YD(IF.vy) * .6);
         }
     }
     function S_(_) {
-        JI = -545;
-        KI = SE;
-        for (const B of HG) {
+        CI = -545;
+        DI = LE;
+        for (const B of _G) {
             if (_ >= B.y && _ < B.y + B.h) {
                 const C = (_ - B.y) / B.h;
-                JI = IJ(B.pl, B.l, C);
-                KI = IJ(B.pr, B.r, C);
+                CI = BJ(B.pl, B.l, C);
+                DI = BJ(B.pr, B.r, C);
                 return;
             }
         }
     }
     function T_(_, B, C) {
-        LI = MI = 0;
+        EI = FI = 0;
         const D = _.z;
         if (!D) {
             return;
         }
-        const E = (C - _.y) / _.h, F = IE(E * 7 + KF * 1.4);
+        const E = (C - _.y) / _.h, F = BE(E * 7 + DF * 1.4);
         if (D == 1) {
-            const C = JE((B - _.l) / (_.r - _.l) * DE * 1.6);
-            C > .1 && (MI = -1500 * C);
+            const C = CE((B - _.l) / (_.r - _.l) * WD * 1.6);
+            C > .1 && (FI = -1500 * C);
         } else if (D == 2) {
-            const D = (_.l + _.r) / 2 - B, E = _.y + _.h * .5 - C, F = LE(D, E) + 60;
-            const G = GE(1, 300 / F) * PE * .8;
-            LI = D / F * G;
-            MI = E / F * G;
+            const D = (_.l + _.r) / 2 - B, E = _.y + _.h * .5 - C, F = EE(D, E) + 60;
+            const G = ZD(1, 300 / F) * IE * .8;
+            EI = D / F * G;
+            FI = E / F * G;
         } else if (D == 3) {
-            LI = F * PE * .6;
+            EI = F * IE * .6;
         } else if (D == 4) {
-            MI = -2500 * HJ(GE(E, 1 - E) * 6, 0, 1);
+            FI = -2500 * _J(ZD(E, 1 - E) * 6, 0, 1);
         } else if (D == 5) {
-            const D = B - (_.l + _.r) / 2, E = C - (_.y + _.h * .5), F = LE(D, E) + 80;
-            const G = 875 * GE(1, 300 / F);
-            LI = -E / F * G;
-            MI = D / F * G;
+            const D = B - (_.l + _.r) / 2, E = C - (_.y + _.h * .5), F = EE(D, E) + 80;
+            const G = 875 * ZD(1, 300 / F);
+            EI = -E / F * G;
+            FI = D / F * G;
         } else {
-            const D = (_.l + _.r) / 2 + IE(C * .0016 + _.y * .01) * (_.r - _.l) * .3;
-            LI = HJ(5 * (D - B), -1250, PE);
-            MI = 625;
+            const D = (_.l + _.r) / 2 + BE(C * .0016 + _.y * .01) * (_.r - _.l) * .3;
+            EI = _J(5 * (D - B), -1250, IE);
+            FI = 625;
         }
     }
     function U_(_, B) {
         const C = [];
-        for (const D of HG) {
+        for (const D of _G) {
             D.y + D.h > _ && D.y < B && C.push(D);
         }
         return C;
     }
     function V_() {
-        if (NI) {
-            NI.resume();
+        if (GI) {
+            GI.resume();
             return;
         }
         if (!window.AudioContext) {
             return;
         }
-        NI = new AudioContext;
-        RI = NI.createBiquadFilter();
-        RI.type = "lowpass";
-        RI.frequency.value = 2e4;
-        OI = NI.createGain();
-        OI.gain.value = OG.m ? 0 : .8;
-        RI.connect(OI).connect(NI.destination);
-        PI = NI.createGain();
-        PI.gain.value = .8;
-        PI.connect(RI);
-        QI = NI.createGain();
-        QI.gain.value = .5;
-        QI.connect(RI);
-        SI = NI.createBuffer(1, 96e3, 48e3);
-        const _ = SI.getChannelData(0);
+        GI = new AudioContext;
+        KI = GI.createBiquadFilter();
+        KI.type = "lowpass";
+        KI.frequency.value = 2e4;
+        HI = GI.createGain();
+        HI.gain.value = HG.m ? 0 : .8;
+        KI.connect(HI).connect(GI.destination);
+        II = GI.createGain();
+        II.gain.value = .8;
+        II.connect(KI);
+        JI = GI.createGain();
+        JI.gain.value = .5;
+        JI.connect(KI);
+        LI = GI.createBuffer(1, 96e3, 48e3);
+        const _ = LI.getChannelData(0);
         for (let B = 0; B < _.length; B++) {
-            _[B] = NE() * 2 - 1;
+            _[B] = GE() * 2 - 1;
         }
-        UI = NI.createOscillator();
-        UI.type = "sawtooth";
-        UI.frequency.value = 200;
-        VI = NI.createBiquadFilter();
-        VI.type = "bandpass";
-        VI.frequency.value = 1400;
-        VI.Q.value = 6;
-        TI = NI.createGain();
-        TI.gain.value = 0;
-        UI.connect(VI).connect(TI).connect(PI);
-        UI.start();
-        XI = NI.currentTime + .1;
+        NI = GI.createOscillator();
+        NI.type = "sawtooth";
+        NI.frequency.value = 200;
+        OI = GI.createBiquadFilter();
+        OI.type = "bandpass";
+        OI.frequency.value = 1400;
+        OI.Q.value = 6;
+        MI = GI.createGain();
+        MI.gain.value = 0;
+        NI.connect(OI).connect(MI).connect(II);
+        NI.start();
+        QI = GI.currentTime + .1;
     }
     function W_(_, B, C, D, E, F) {
-        _.setValueAtTime(HE(F, B), D);
-        C && C != B && _.exponentialRampToValueAtTime(HE(F, C), D + E);
+        _.setValueAtTime(_E(F, B), D);
+        C && C != B && _.exponentialRampToValueAtTime(_E(F, C), D + E);
     }
     function X_(_, B, C, D, E, F, G) {
-        const H = NI.createGain();
+        const H = GI.createGain();
         H.gain.setValueAtTime(1e-4, C);
-        H.gain.exponentialRampToValueAtTime(HE(1e-4, E), C + G);
+        H.gain.exponentialRampToValueAtTime(_E(1e-4, E), C + G);
         H.gain.exponentialRampToValueAtTime(1e-4, C + D);
-        (B ? _.connect(B) : _).connect(H).connect(F || PI);
+        (B ? _.connect(B) : _).connect(H).connect(F || II);
         _.start(C);
         _.stop(C + D + .02);
-        WI++;
+        PI++;
     }
     function Y_(_, B, C, D, E, F, G) {
-        if (!CJ()) {
+        if (!VI()) {
             return;
         }
-        const H = G || DJ();
-        const I = NI.createOscillator();
+        const H = G || WI();
+        const I = GI.createOscillator();
         I.type = _;
         W_(I.frequency, B, C, H, D, 8);
         X_(I, 0, H, D, E, F, .008);
     }
     function Z_(_, B, C, D, E, F, G, H) {
-        if (!CJ()) {
+        if (!VI()) {
             return;
         }
-        const I = H || DJ();
-        const J = NI.createBufferSource();
-        J.buffer = SI;
+        const I = H || WI();
+        const J = GI.createBufferSource();
+        J.buffer = LI;
         J.loop = 1;
-        J.playbackRate.value = .7 + NE() * .6;
-        const K = NI.createBiquadFilter();
+        J.playbackRate.value = .7 + GE() * .6;
+        const K = GI.createBiquadFilter();
         K.type = C;
         W_(K.frequency, D, E, I, _, 20);
         K.Q.value = F || 1;
@@ -1135,14 +1135,14 @@
         if (_ < 60) {
             return;
         }
-        const D = HJ(_ / 2400, .04, .5);
+        const D = _J(_ / 2400, .04, .5);
         Z_(.03 + D * .12, D * .7, "lowpass", 300 + _ * 1.6, 150, 1);
         _ > 420 && Y_("triangle", 120 + _ * .05, 40, .1 + D * .12, D * .8);
         if (B > 1) {
-            const _ = _J[CG % 4], B = FE(C | 0);
+            const _ = TI[VF % 4], B = YD(C | 0);
             const E = 64 + _[(B >> 5) % _.length] + 12 * (B >> 9 & 1);
-            Y_("sine", ZI(E), ZI(E) * 1.6, .16, D * .5);
-            Y_("triangle", ZI(E + 12), 0, .1, D * .3);
+            Y_("sine", SI(E), SI(E) * 1.6, .16, D * .5);
+            Y_("triangle", SI(E + 12), 0, .1, D * .3);
         } else {
             B && Y_("sine", 90, 40, .22, D * .5);
         }
@@ -1159,7 +1159,7 @@
         Y_("sine", 90, 300, .4, .3);
     }
     function DB(_) {
-        const B = HJ(_ / 2600, .16, .5);
+        const B = _J(_ / 2600, .16, .5);
         Y_("sawtooth", 150, 700 + _ * .2, .2, B * .5);
         Z_(.3, B * .7, "bandpass", 700, 4369, 1.2);
         Y_("sine", 70, 30, .3, B * .8);
@@ -1170,7 +1170,7 @@
         _ && Y_("sine", 300, 900, .16, .2);
     }
     function FB(_) {
-        const B = HJ(_ / 1400, .12, .4);
+        const B = _J(_ / 1400, .12, .4);
         Y_("sine", 180 + _ * .1, 700 + _ * .3, .1, B);
         Y_("sine", 700 + _ * .3, 200, .2, B * .8);
     }
@@ -1184,8 +1184,8 @@
         }
     }
     function HB(_) {
-        if (NI) {
-            TI && TI.gain.setTargetAtTime(_ && !OG.m ? .12 : 0, DJ(), .03);
+        if (GI) {
+            MI && MI.gain.setTargetAtTime(_ && !HG.m ? .12 : 0, WI(), .03);
             _ && Y_("square", 1200, 2600, .05, .1);
         }
     }
@@ -1201,105 +1201,102 @@
         Y_("sine", 90, 240, .2, .25);
     }
     function KB(_) {
-        const B = 70 + GE(_, 14) * 2;
-        Y_("square", ZI(B), 0, .06, .1);
-        Y_("sine", ZI(B + 12), 0, .1, .12);
+        const B = 70 + ZD(_, 14) * 2;
+        Y_("square", SI(B), 0, .06, .1);
+        Y_("sine", SI(B + 12), 0, .1, .12);
     }
     function LB(_, B, C, D, E, F, G) {
-        if (!NI) {
+        if (!GI) {
             return;
         }
-        const H = DJ();
-        B.forEach((B, I) => Y_(E, ZI(_ + B), G ? ZI(_ + B + G) : 0, C, D, 0, H + I * F));
+        const H = WI();
+        B.forEach((B, I) => Y_(E, SI(_ + B), G ? SI(_ + B + G) : 0, C, D, 0, H + I * F));
     }
     function MB() {
-        LB(70, EJ, .5, .12, "triangle", .05);
+        LB(70, XI, .5, .12, "triangle", .05);
     }
     function NB() {
-        LB(60, _J[1], .7, .12, "sawtooth", .05, 12);
-        LB(90, EJ, 1.6, .1, "sine", 0);
-        NI && Z_(1.2, .2, "bandpass", 420, 8e3, .7, 0, DJ() + .3);
+        LB(60, TI[1], .7, .12, "sawtooth", .05, 12);
+        LB(90, XI, 1.6, .1, "sine", 0);
+        GI && Z_(1.2, .2, "bandpass", 420, 8e3, .7, 0, WI() + .3);
     }
     function OB() {
-        TB(1);
+        SB(1);
     }
     function PB() {
-        LB(60, [ 0, 5, 10 ], .12, .1, "square", .06, 2);
+        SB(0);
     }
-    function QB() {
-        TB(0);
-    }
-    function RB(_) {
+    function QB(_) {
         Y_("sine", 70 + _ * 40, 48, .16, .12 + _ * .16);
     }
-    function SB() {
+    function RB() {
         LB(70, [ 0, -3, -6, -9, -12, -15, -18 ], .8, .1, "sawtooth", .04, -30);
         Z_(1, .3, "lowpass", 3e3, 90, 1);
         Y_("sine", 120, 30, 1.2, .3);
     }
-    function TB(_) {
+    function SB(_) {
         Y_("square", _ ? 900 : 620, _ ? 1200 : 500, .04, .07);
     }
-    function UB() {
-        WI = 0;
-        if (!NI) {
+    function TB() {
+        PI = 0;
+        if (!GI) {
             return;
         }
-        const _ = DJ(), B = HJ(PF.sp / QE, 0, 1), C = JF == 1 && PF.al;
+        const _ = WI(), B = _J(IF.sp / JE, 0, 1), C = CF == 1 && IF.al;
         const D = (B, C, D) => B.setTargetAtTime(C, _, D);
-        D(TI.gain, PF.ra && !OG.m && C ? .1 + B * .12 : 0, .04);
-        D(VI.frequency, 700 + PF.sp * 1.4, .04);
-        D(UI.frequency, 90 + PF.sp * .2, .04);
-        D(RI.frequency, JF == 2 ? 700 : 2e4, .1);
-        D(QI.gain, OG.m ? 0 : JF == 1 ? .5 : .3, .2);
-        C ? VB() : XI = _ + .1;
+        D(MI.gain, IF.ra && !HG.m && C ? .1 + B * .12 : 0, .04);
+        D(OI.frequency, 700 + IF.sp * 1.4, .04);
+        D(NI.frequency, 90 + IF.sp * .2, .04);
+        D(KI.frequency, CF == 2 ? 700 : 2e4, .1);
+        D(JI.gain, HG.m ? 0 : CF == 1 ? .5 : .3, .2);
+        C ? UB() : QI = _ + .1;
     }
-    function VB() {
-        const _ = 40 + CG * 5 % 11, B = _J[CG % 4], C = BJ[CG % 3];
-        const D = HJ(PF.sp / 1400, 0, 1.6) + (XF > 0 ? .6 : 0);
-        const E = 15 / (90 + CG * 7);
-        const F = FJ[CG], G = GJ[CG];
-        const H = DJ();
-        for (let I = 8; XI < H + .16 && I--; ) {
-            const I = HE(XI, H), J = YI, K = J & 15, L = J >> 4;
+    function UB() {
+        const _ = 40 + VF * 5 % 11, B = TI[VF % 4], C = UI[VF % 3];
+        const D = _J(IF.sp / 1400, 0, 1.6) + (QF > 0 ? .6 : 0);
+        const E = 15 / (90 + VF * 7);
+        const F = YI[VF], G = ZI[VF];
+        const H = WI();
+        for (let I = 8; QI < H + .16 && I--; ) {
+            const I = _E(QI, H), J = RI, K = J & 15, L = J >> 4;
             const M = (L * 2 + (K > 7 ? 1 : 0)) % B.length;
             const N = _ - 12 + B[M];
             if (F >> K & 1) {
-                Y_("sine", 120, 40, .16, .5, QI, I);
-                Z_(.03, .12, "lowpass", 900, 200, 1, QI, I);
+                Y_("sine", 120, 40, .16, .5, JI, I);
+                Z_(.03, .12, "lowpass", 900, 200, 1, JI, I);
             }
-            G >> K & 1 && Y_(C, ZI(N), 0, .2, .3, QI, I);
+            G >> K & 1 && Y_(C, SI(N), 0, .2, .3, JI, I);
             if (!K) {
                 for (const C of [ 0, 3 + (B[2] > 3 ? 1 : 0), 7 ]) {
-                    Y_("triangle", ZI(_ + B[M] + C), 0, E * 15, .1, QI, I);
+                    Y_("triangle", SI(_ + B[M] + C), 0, E * 15, .1, JI, I);
                 }
             }
-            D > .22 && K & 1 && Z_(.03, .04 + D * .03, "highpass", 7e3, 6e3, 1, QI, I);
-            D > .5 && K % 4 == 2 && Z_(.1, .12, "bandpass", 1800, 900, 1.2, QI, I);
+            D > .22 && K & 1 && Z_(.03, .04 + D * .03, "highpass", 7e3, 6e3, 1, JI, I);
+            D > .5 && K % 4 == 2 && Z_(.1, .12, "bandpass", 1800, 900, 1.2, JI, I);
             if (D > .8 && !(K & 1)) {
-                const D = ZI(_ + 12 + B[(J * 3 + L) % B.length]);
-                Y_(C, D, D, .1, .1, QI, I);
+                const D = SI(_ + 12 + B[(J * 3 + L) % B.length]);
+                Y_(C, D, D, .1, .1, JI, I);
             }
-            YI++;
-            XI = I + E;
+            RI++;
+            QI = I + E;
         }
     }
-    function WB(_) {
-        let B = EE.imul(_ ^ _ >>> 15, 1 | _);
-        B = B + EE.imul(B ^ B >>> 7, 61 | B) ^ B;
+    function VB(_) {
+        let B = XD.imul(_ ^ _ >>> 15, 1 | _);
+        B = B + XD.imul(B ^ B >>> 7, 61 | B) ^ B;
         return ((B ^ B >>> 14) >>> 0) / 4294967296;
     }
-    function XB() {
-        return WB(KJ = KJ + 1831565813 | 0);
+    function WB() {
+        return VB(DJ = DJ + 1831565813 | 0);
     }
-    function YB(_, B) {
-        return WB(_ * 1000003 + B | 0);
+    function XB(_, B) {
+        return VB(_ * 1000003 + B | 0);
     }
-    function ZB(_, B, C, D, E, F) {
+    function YB(_, B, C, D, E, F) {
         const G = C - _, H = D - B, I = G * G + H * H;
-        return I ? HJ(((E - _) * G + (F - B) * H) / I, 0, 1) : 0;
+        return I ? _J(((E - _) * G + (F - B) * H) / I, 0, 1) : 0;
     }
-    function _C(_, B, C, D, E, F, G, H) {
+    function ZB(_, B, C, D, E, F, G, H) {
         const I = C - _, J = D - B, K = G - E, L = H - F;
         const M = I * L - J * K;
         if (!M) {
@@ -1309,9 +1306,9 @@
         const O = ((E - _) * J - (F - B) * I) / M;
         return N >= 0 && N <= 1 && O >= 0 && O <= 1 ? [ _ + I * N, B + J * N ] : 0;
     }
-    function BC(_, B, C, D) {
-        NG.length > 26 && NG.shift();
-        NG.push({
+    function _C(_, B, C, D) {
+        GG.length > 26 && GG.shift();
+        GG.push({
             x: _,
             y: B,
             r: 0,
@@ -1320,9 +1317,9 @@
             t: 1
         });
     }
-    function CC(_, B, C, D, E, F, G, H) {
-        JG.length > 420 && JG.shift();
-        JG.push({
+    function BC(_, B, C, D, E, F, G, H) {
+        CG.length > 420 && CG.shift();
+        CG.push({
             x: _,
             y: B,
             vx: C,
@@ -1332,30 +1329,30 @@
             h: F,
             k: G,
             s: H,
-            a: LJ(0, DE),
-            w: LJ(-9, 9)
+            a: EJ(0, WD),
+            w: EJ(-9, 9)
         });
     }
-    function DC(_, B, C, D, E, F, G, H) {
-        const I = F ?? XE[UF];
-        const J = D == 1 ? OG.e[3] : D;
+    function CC(_, B, C, D, E, F, G, H) {
+        const I = F ?? QE[NF];
+        const J = D;
         for (let D = 0; D < C; D++) {
-            const C = LJ(0, DE), D = LJ(.3, 1) * E;
-            CC(_, B, (G || 0) + JE(C) * D, (H || 0) + IE(C) * D, LJ(.16, .5), I + LJ(-18, 18), J, LJ(1.4, 3.6));
+            const C = EJ(0, WD), D = EJ(.3, 1) * E;
+            BC(_, B, (G || 0) + CE(C) * D, (H || 0) + BE(C) * D, EJ(.16, .5), I + EJ(-18, 18), J, EJ(1.4, 3.6));
         }
     }
-    function EC(_, B) {
-        CC(_, B, 0, 0, .4, XE[6], 2, 8);
-        DC(_, B, 12, 0, 300, XE[6]);
+    function DC(_, B) {
+        BC(_, B, 0, 0, .4, QE[6], 2, 8);
+        CC(_, B, 12, 0, 300, QE[6]);
     }
-    function FC(_, B, C) {
+    function EC(_, B, C) {
         for (let D = 0; D < 7; D++) {
-            _.e & YE[D] && DC(B, C, 5, 0, 240, XE[D]);
+            _.e & RE[D] && CC(B, C, 5, 0, 240, QE[D]);
         }
-        CC(B, C, 0, 0, .3, XE[_.c], 2, 6);
+        BC(B, C, 0, 0, .3, QE[_.c], 2, 6);
     }
-    function GC(_, B, C, D) {
-        LG.push({
+    function FC(_, B, C, D) {
+        EG.push({
             x: _,
             y: B,
             t: C,
@@ -1363,11 +1360,11 @@
             l: 1.15
         });
     }
-    function HC(_) {
-        for (let B = JG.length; B--; ) {
-            const C = JG[B];
+    function GC(_) {
+        for (let B = CG.length; B--; ) {
+            const C = CG[B];
             if ((C.l -= _) <= 0) {
-                JG.splice(B, 1);
+                CG.splice(B, 1);
             } else {
                 C.x += C.vx * _;
                 C.y += C.vy * _;
@@ -1379,849 +1376,751 @@
                 C.k == 4 && (C.a += C.w * _);
             }
         }
-        for (let B = NG.length; B--; ) {
-            const C = NG[B];
-            C.r += (C.R - C.r) * GE(1, 9 * _);
-            (C.t -= _ * 2.4) <= 0 && NG.splice(B, 1);
+        for (let B = GG.length; B--; ) {
+            const C = GG[B];
+            C.r += (C.R - C.r) * ZD(1, 9 * _);
+            (C.t -= _ * 2.4) <= 0 && GG.splice(B, 1);
         }
-        for (let B = LG.length; B--; ) {
-            const C = LG[B];
+        for (let B = EG.length; B--; ) {
+            const C = EG[B];
             C.y -= 48 * _;
-            (C.l -= _) <= 0 && LG.splice(B, 1);
+            (C.l -= _) <= 0 && EG.splice(B, 1);
         }
-        for (let B = MG.length; B--; ) {
-            (MG[B].t -= _) <= 0 && MG.splice(B, 1);
+        for (let B = FG.length; B--; ) {
+            (FG[B].t -= _) <= 0 && FG.splice(B, 1);
         }
+    }
+    function HC(_) {
+        LF.x = CJ(LF.x, IF.x + _J(IF.vx * .12, -180, 180), 7.5, _);
+        LF.y = CJ(LF.y, IF.y + _J(IF.vy * .22, -124, 136.4), 7.5, _);
+        LF.z = CJ(LF.z, 1 / (1 + IF.sp / 5200), 4, _);
+        BF = ZD(_F / 620, ZE / 848) * LF.z;
+        const B = _E(0, 605 - ZE / 2 / BF);
+        LF.x = _J(LF.x, -B, B);
+        EF = _E(0, EF - EF * 7 * _ - 4 * _);
+        const C = ZD(EF, 26);
+        XJ = EJ(-C, C);
+        YJ = EJ(-C, C);
     }
     function IC(_) {
-        SF.x = JJ(SF.x, PF.x + HJ(PF.vx * .12, -180, 180), 7.5, _);
-        SF.y = JJ(SF.y, PF.y + HJ(PF.vy * .22, -124, 136.4), 7.5, _);
-        SF.z = JJ(SF.z, 1 / (1 + PF.sp / 5200), 4, _);
-        IF = GE(HF / 620, GF / 848) * SF.z;
-        const B = HE(0, 605 - GF / 2 / IF);
-        SF.x = HJ(SF.x, -B, B);
-        LF = HE(0, LF - LF * 7 * _ - 4 * _);
-        const C = GE(LF, 26);
-        EK = LJ(-C, C);
-        FK = LJ(-C, C);
-    }
-    function JC(_) {
-        const B = KK(CG);
+        const B = DK(VF);
         for (let C = 0; C < 8; C++) {
-            DK[C] = C % 3 || C > 6 ? JJ(DK[C], B[C], 1.6, _) : JK(DK[C], B[C], 1.6, _);
+            WJ[C] = C % 3 || C > 6 ? CJ(WJ[C], B[C], 1.6, _) : CK(WJ[C], B[C], 1.6, _);
         }
     }
-    function KC() {
-        const _ = FF.createLinearGradient(0, 0, 0, HF);
-        _.addColorStop(0, QJ(DK[0] | 0, DK[1] | 0, DK[2] | 0));
-        _.addColorStop(1, QJ(DK[3] | 0, DK[4] | 0, DK[5] | 0));
-        FF.fillStyle = _;
-        FF.fillRect(0, 0, GF, HF);
-        const B = LK[CG];
-        FF.lineWidth = CK(2.4);
+    function JC() {
+        const _ = YE.createLinearGradient(0, 0, 0, _F);
+        _.addColorStop(0, JJ(WJ[0] | 0, WJ[1] | 0, WJ[2] | 0));
+        _.addColorStop(1, JJ(WJ[3] | 0, WJ[4] | 0, WJ[5] | 0));
+        YE.fillStyle = _;
+        YE.fillRect(0, 0, ZE, _F);
+        const B = EK[VF];
+        YE.lineWidth = VJ(2.4);
         for (let _ = 0; _ < 2; _++) {
             const C = _ ? .4 : .16, D = _ ? 300 : 500, E = _ ? .09 : .05;
-            const F = SF.x * C, G = SF.y * C, H = GF / 2 / IF, I = HF / 2 / IF;
-            const J = ME((F + H) / D), K = ME((G + I) / D);
-            for (let _ = ME((G - I) / D); _ <= K; _++) {
-                for (let C = ME((F - H) / D); C <= J; C++) {
-                    const H = YB(C * 30 + B, _ * 17);
+            const F = LF.x * C, G = LF.y * C, H = ZE / 2 / BF, I = _F / 2 / BF;
+            const J = FE((F + H) / D), K = FE((G + I) / D);
+            for (let _ = FE((G - I) / D); _ <= K; _++) {
+                for (let C = FE((F - H) / D); C <= J; C++) {
+                    const H = XB(C * 30 + B, _ * 17);
                     if (H < .5) {
                         continue;
                     }
-                    const I = (C + .16 + YB(C, _) * .7) * D, J = (_ + .16 + YB(_, C + 9) * .7) * D;
-                    const K = DK[6] + 60 * (H - .5) | 0;
-                    FF.fillStyle = QJ(K, 60, DK[7] | 0, E);
-                    FF.strokeStyle = QJ(K, 70, DK[7] | 0, E * 2);
-                    LC(B, GF / 2 + (I - F) * IF, HF / 2 + (J - G) * IF, D * (.16 + H * .3) * IF, H);
+                    const I = (C + .16 + XB(C, _) * .7) * D, J = (_ + .16 + XB(_, C + 9) * .7) * D;
+                    const K = WJ[6] + 60 * (H - .5) | 0;
+                    YE.fillStyle = JJ(K, 60, WJ[7] | 0, E);
+                    YE.strokeStyle = JJ(K, 70, WJ[7] | 0, E * 2);
+                    KC(B, ZE / 2 + (I - F) * BF, _F / 2 + (J - G) * BF, D * (.16 + H * .3) * BF, H);
                 }
             }
         }
     }
-    function LC(_, B, C, D, E) {
-        SJ();
+    function KC(_, B, C, D, E) {
+        LJ();
         if (!_) {
             const _ = 4 + (E * 4 | 0), F = C + .3 * (D *= .6);
             for (let C = 0; C < _; C++) {
                 const G = C / (_ - 1) - .5;
-                const H = D * (.3 + .3 * JE(G * 2.4) + YB(C * 7, E * 420) * .16);
-                const I = B + G * D * 1.6, J = F - H * (.8 + YB(C, E * 90) * .5);
-                WJ(I + H, J);
-                VJ(I, J, H);
+                const H = D * (.3 + .3 * CE(G * 2.4) + XB(C * 7, E * 420) * .16);
+                const I = B + G * D * 1.6, J = F - H * (.8 + XB(C, E * 90) * .5);
+                PJ(I + H, J);
+                OJ(I, J, H);
             }
-            FF.roundRect(B - D * .9, F - D * .3, D * 1.9, D * .3, D * .16);
-            FF.fill();
+            YE.roundRect(B - D * .9, F - D * .3, D * 1.9, D * .3, D * .16);
+            YE.fill();
             return;
         }
-        const F = FE(_);
+        const F = YD(_);
         for (let _ = 0; _ < F; _++) {
-            const G = _ / F * DE + E * 4;
-            BK(_, B + JE(G) * D, C + IE(G) * D);
+            const G = _ / F * WD + E * 4;
+            UJ(_, B + CE(G) * D, C + BE(G) * D);
         }
-        FF.closePath();
-        _ > 0 ? FF.fill() : FF.stroke();
+        YE.closePath();
+        _ > 0 ? YE.fill() : YE.stroke();
     }
-    function MC(_) {
+    function LC(_) {
         const B = _.m;
-        const C = B & ZE ? _.lt ? 6 : 5 : B & 2 ? 0 : B & 4 ? 1 : B & 8 ? 2 : B & 32 ? 3 : B & 16 ? 4 : -1;
+        const C = B & SE ? _.lt ? 6 : 5 : B & 2 ? 0 : B & 4 ? 1 : B & 8 ? 2 : B & 32 ? 3 : B & 16 ? 4 : -1;
         if (C < 0) {
-            return B & 1 ? [ QJ(DK[6] + 30 | 0, 90, 48), QJ(DK[6] + 40 | 0, 100, 80) ] : [ QJ(DK[6] | 0, 48, 19), QJ(DK[6] | 0, 90, HE(58, DK[7]) | 0) ];
+            return B & 1 ? [ JJ(WJ[6] + 30 | 0, 90, 48), JJ(WJ[6] + 40 | 0, 100, 80) ] : [ JJ(WJ[6] | 0, 48, 19), JJ(WJ[6] | 0, 90, _E(58, WJ[7]) | 0) ];
         }
-        const D = MK[C];
-        return [ QJ(D[0], D[1], D[2]), QJ(D[0], D[3], D[4]) ];
+        const D = FK[C];
+        return [ JJ(D[0], D[1], D[2]), JJ(D[0], D[3], D[4]) ];
     }
-    function NC() {
-        const _ = IK(0) - 200, B = IK(HF) + 200;
-        const C = HE(2, 13 * IF), D = CK(5);
-        const E = QJ(DK[6] | 0, 30, HE(4, DK[2] * .42) | 0);
-        for (const F of HG) {
+    function MC() {
+        const _ = BK(0) - 200, B = BK(_F) + 200;
+        const C = _E(2, 13 * BF), D = VJ(5);
+        const E = JJ(WJ[6] | 0, 30, _E(4, WJ[2] * .42) | 0);
+        for (const F of _G) {
             if (F.y + F.h < _ || F.y > B) {
                 continue;
             }
-            const G = HK(F.y), H = HK(F.y + F.h);
-            FF.fillStyle = E;
+            const G = _K(F.y), H = _K(F.y + F.h);
+            YE.fillStyle = E;
             for (const _ of [ -9e3, 9e3 ]) {
-                SJ();
-                WJ(_, G);
-                XJ(GK(_ < 0 ? F.pl : F.pr), G);
-                XJ(GK(_ < 0 ? F.l : F.r), H);
-                XJ(_, H);
-                FF.fill();
+                LJ();
+                PJ(_, G);
+                QJ(ZJ(_ < 0 ? F.pl : F.pr), G);
+                QJ(ZJ(_ < 0 ? F.l : F.r), H);
+                QJ(_, H);
+                YE.fill();
             }
-            F.z && OC(F);
+            F.z && NC(F);
             for (const _ of F.o) {
                 if (_.k) {
                     continue;
                 }
                 X(_);
-                const B = MC(_);
-                const E = GK(WH), F = HK(XH);
-                const G = _.f > 0 ? _.f = HE(0, _.f - .05) : 0;
+                const B = LC(_);
+                const E = ZJ(PH), F = _K(QH);
+                const G = _.f > 0 ? _.f = _E(0, _.f - .05) : 0;
                 const H = _.kt > 0 ? 1 : 0;
                 if (G || H) {
-                    FF.save();
-                    FF.translate(E, F);
-                    FF.scale(1 + G * .3, 1 + G * .3);
-                    FF.translate(-E, -F);
-                    H && (FF.globalAlpha = .5 + NE() * .5);
+                    YE.save();
+                    YE.translate(E, F);
+                    YE.scale(1 + G * .3, 1 + G * .3);
+                    YE.translate(-E, -F);
+                    H && (YE.globalAlpha = .5 + GE() * .5);
                 }
                 if (_.t) {
-                    const E = JE(_I) * _.r, F = IE(_I) * _.r;
-                    YJ(GK(WH - E), HK(XH - F), GK(WH + E), HK(XH + F), C, B[0]);
-                    TJ(D, B[1]);
+                    const E = CE(TH) * _.r, F = BE(TH) * _.r;
+                    RJ(ZJ(PH - E), _K(QH - F), ZJ(PH + E), _K(QH + F), C, B[0]);
+                    MJ(D, B[1]);
                     if (_.m & 4) {
-                        FF.setLineDash([ 6 * IF, 7 * IF ]);
-                        TJ(CK(2), QJ(48, 100, 80, .85));
-                        FF.setLineDash([]);
+                        YE.setLineDash([ 6 * BF, 7 * BF ]);
+                        MJ(VJ(2), JJ(48, 100, 80, .85));
+                        YE.setLineDash([]);
                     }
-                    G && TJ(CK(2 + G * 5), QJ(DK[6] + 30 | 0, 100, 90, G));
+                    G && MJ(VJ(2 + G * 5), JJ(WJ[6] + 30 | 0, 100, 90, G));
                 } else {
-                    ZJ(E, F, _.r * IF, B[0], B[1], CK(2.4 + G * 4));
-                    _.m & 1 && ZJ(E, F, _.r * IF * .5, 0, B[1], CK(1.6));
-                    G && ZJ(E, F, (_.r + 6 + G * 20) * IF, 0, QJ(DK[6] + 30 | 0, 100, 80, G), CK(2));
+                    SJ(E, F, _.r * BF, B[0], B[1], VJ(2.4 + G * 4));
+                    _.m & 1 && SJ(E, F, _.r * BF * .5, 0, B[1], VJ(1.6));
+                    G && SJ(E, F, (_.r + 6 + G * 20) * BF, 0, JJ(WJ[6] + 30 | 0, 100, 80, G), VJ(2));
                 }
                 if (G || H) {
-                    FF.globalAlpha = 1;
-                    FF.restore();
+                    YE.globalAlpha = 1;
+                    YE.restore();
                 }
             }
             for (const _ of F.bk) {
                 if (_.l) {
-                    const B = GK(_.x), C = HK(_.y) - 48 * IF;
+                    const B = ZJ(_.x), C = _K(_.y) - 48 * BF;
                     for (let D = 0; D < _.n; D++) {
-                        ZJ(B + 13 * (D - (_.n - 1) / 2) * IF, C, 4 * IF, D < _.l ? QJ(48, 100, 68) : QJ(48, 30, 32));
+                        SJ(B + 13 * (D - (_.n - 1) / 2) * BF, C, 4 * BF, D < _.l ? JJ(48, 100, 68) : JJ(48, 30, 32));
                     }
                 }
             }
             for (const _ of F.i) {
-                _.g || PC(_);
+                _.g || OC(_);
             }
         }
     }
-    function OC(_) {
-        const B = HE(_.y, IK(0) - 100), C = GE(_.y + _.h, IK(HF) + 100) - B;
+    function NC(_) {
+        const B = _E(_.y, BK(0) - 100), C = ZD(_.y + _.h, BK(_F) + 100) - B;
         if (C <= 0) {
             return;
         }
         const D = _.z;
         const E = [ 0, 190, 288, 24, 262, 150, 186 ][D];
-        const F = KF * [ 0, -200, 200, 60, -200, 200, 300 ][D];
+        const F = DF * [ 0, -200, 200, 60, -200, 200, 300 ][D];
         for (let D = 0; D < 26; D++) {
-            const G = YB(D * 13, _.y | 0);
-            const H = IJ(_.l + 30, _.r - 30, YB(D, 7));
+            const G = XB(D * 13, _.y | 0);
+            const H = BJ(_.l + 30, _.r - 30, XB(D, 7));
             const I = B + ((G * C + F) % C + C) % C;
             T_(_, H, I);
-            const J = LE(LI, MI);
+            const J = EE(EI, FI);
             if (J < 1) {
                 continue;
             }
-            const K = GE(64, J * .05);
-            YJ(GK(H), HK(I), GK(H + LI / J * K), HK(I + MI / J * K), CK(2.4), QJ(E, 90, 70, .16 + G * .16));
+            const K = ZD(64, J * .05);
+            RJ(ZJ(H), _K(I), ZJ(H + EI / J * K), _K(I + FI / J * K), VJ(2.4), JJ(E, 90, 70, .16 + G * .16));
         }
     }
-    function PC(_) {
-        const B = GK(_.x), C = HK(_.y), D = IF, E = 1 + IE(KF * 3 + _.x * .02) * .12, F = _.t;
+    function OC(_) {
+        const B = ZJ(_.x), C = _K(_.y), D = BF, E = 1 + BE(DF * 3 + _.x * .02) * .12, F = _.t;
         if (!F) {
-            ZJ(B, C, 9 * D * E, VK, QJ(38, 100, 84), CK(2.4));
+            SJ(B, C, 9 * D * E, LK, JJ(38, 100, 84), VJ(2.4));
             return;
         }
         if (F == 3) {
             for (let _ = 0; _ < 7; _++) {
-                const F = _ / 7 * DE + KF * .6;
-                SJ();
-                VJ(B, C, 26 * D * E, F, F + .8);
-                TJ(7 * D, RJ(_, 60));
+                const F = _ / 7 * WD + DF * .6;
+                LJ();
+                OJ(B, C, 26 * D * E, F, F + .8);
+                MJ(7 * D, KJ(_, 60));
             }
-            ZJ(B, C, 13 * D * E, QK);
+            SJ(B, C, 13 * D * E, GK);
             return;
         }
         const G = F == 1, H = F == 2;
-        const I = H ? _.c : BF[_.c][0];
+        const I = H ? _.c : UE[_.c][0];
         const J = G ? 10 : H ? 6 : 3, K = (G ? 16 : H ? 12 : 15) * D * E;
-        FF.save();
-        FF.translate(B, C);
-        FF.rotate(KF * (G ? .8 : H ? 1.4 : -1) + _.c);
-        _K(J, G ? VK : H ? RJ(I, 60) : I > 6 ? QK : RJ(I, 60), H ? RJ(I, 90) : QK, CK(2), _ => {
-            const B = _ / J * DE, C = K * (G && _ & 1 ? .4 : 1);
-            BK(_, JE(B) * C, IE(B) * C);
+        YE.save();
+        YE.translate(B, C);
+        YE.rotate(DF * (G ? .8 : H ? 1.4 : -1) + _.c);
+        TJ(J, G ? LK : H ? KJ(I, 60) : I > 6 ? GK : KJ(I, 60), H ? KJ(I, 90) : GK, VJ(2), _ => {
+            const B = _ / J * WD, C = K * (G && _ & 1 ? .4 : 1);
+            UJ(_, CE(B) * C, BE(B) * C);
         });
-        FF.restore();
+        YE.restore();
     }
-    function QC(_, B) {
+    function PC(_, B) {
         const C = [];
         for (let B = 0; B < 7; B++) {
-            _.e & YE[B] && C.push(B);
+            _.e & RE[B] && C.push(B);
         }
         if (C.length < 2) {
-            return RJ(C[0] | 0, 60, B);
+            return KJ(C[0] | 0, 60, B);
         }
-        const D = FF.createLinearGradient(GK(_.x1), HK(_.y1), GK(_.x2), HK(_.y2));
-        C.forEach((_, E) => D.addColorStop(E / (C.length - 1), RJ(_, 64, B)));
+        const D = YE.createLinearGradient(ZJ(_.x1), _K(_.y1), ZJ(_.x2), _K(_.y2));
+        C.forEach((_, E) => D.addColorStop(E / (C.length - 1), KJ(_, 64, B)));
         return D;
     }
-    function RC() {
-        for (const _ of IG) {
-            const B = _.u ? HJ(_.l / .22, 0, 1) : 1;
-            const C = GK(_.x1), D = HK(_.y1), E = GK(_.x2), F = HK(_.y2);
-            YJ(C, D, E, F, HE(4, 20 * IF), QC(_, B * .16));
-            TJ(HE(3, 15 * IF), QJ(266, 55, 5, B * .8));
-            TJ(HE(2, 10 * IF), QC(_, B));
-            TJ(CK(4), QJ(0, 0, 100, B * .5));
+    function QC() {
+        for (const _ of BG) {
+            const B = _.u ? _J(_.l / .22, 0, 1) : 1;
+            const C = ZJ(_.x1), D = _K(_.y1), E = ZJ(_.x2), F = _K(_.y2);
+            RJ(C, D, E, F, _E(4, 20 * BF), PC(_, B * .16));
+            MJ(_E(3, 15 * BF), JJ(266, 55, 5, B * .8));
+            MJ(_E(2, 10 * BF), PC(_, B));
+            MJ(VJ(4), JJ(0, 0, 100, B * .5));
             if (!_.u) {
-                ZJ(C, D, (4.5 + IE(KF * 4 + _.x1) * .8) * IF, 0, RJ(_.c, 80, .9), CK(2));
-                const B = E - C, G = F - D, H = LE(B, G);
+                SJ(C, D, (4.5 + BE(DF * 4 + _.x1) * .8) * BF, 0, KJ(_.c, 80, .9), VJ(2));
+                const B = E - C, G = F - D, H = EE(B, G);
                 if (H > 16) {
-                    const C = B / H, D = G / H, I = 9 * IF;
-                    _K(3, RJ(_.c, 70, .95), 0, 0, _ => {
-                        const B = [ 0, 2.4, -2.4 ][_], G = JE(B) * I, H = IE(B) * I;
-                        BK(_, E + G * C - H * D, F + H * C + G * D);
+                    const C = B / H, D = G / H, I = 9 * BF;
+                    TJ(3, KJ(_.c, 70, .95), 0, 0, _ => {
+                        const B = [ 0, 2.4, -2.4 ][_], G = CE(B) * I, H = BE(B) * I;
+                        UJ(_, E + G * C - H * D, F + H * C + G * D);
                     });
                 }
             }
-            if (_ == PF.ra) {
-                FF.setLineDash([ 4 * IF, 9 * IF ]);
-                FF.lineDashOffset = 90 * -KF * IF;
-                TJ(CK(3), QJ(190, 100, 88, .9));
-                FF.setLineDash([]);
+            if (_ == IF.ra) {
+                YE.setLineDash([ 4 * BF, 9 * BF ]);
+                YE.lineDashOffset = 90 * -DF * BF;
+                MJ(VJ(3), JJ(190, 100, 88, .9));
+                YE.setLineDash([]);
             }
         }
-        for (const _ of MG) {
+        for (const _ of FG) {
             const B = _.t / .5;
-            ZJ(GK(_.x), HK(_.y), (6 + 26 * (1 - B)) * IF, 0, QJ(0, 0, 100, B), CK(3));
+            SJ(ZJ(_.x), _K(_.y), (6 + 26 * (1 - B)) * BF, 0, JJ(0, 0, 100, B), VJ(3));
         }
-        if (PF.te) {
-            const _ = GK(PF.te.x), B = HK(PF.te.y);
-            ZJ(_, B, PF.te.l * IF, 0, RJ(3, 60, .16), CK(1.4));
-            YJ(_, B, GK(PF.x), HK(PF.y), CK(3.2), RJ(3, 70));
-            ZJ(_, B, 8 * IF, RJ(3, 60));
-            ZJ(_, B, (12 + IE(KF * 9) * 3) * IF, 0, RJ(3, 80, .8), CK(2));
+        if (IF.te) {
+            const _ = ZJ(IF.te.x), B = _K(IF.te.y);
+            SJ(_, B, IF.te.l * BF, 0, KJ(3, 60, .16), VJ(1.4));
+            RJ(_, B, ZJ(IF.x), _K(IF.y), VJ(3.2), KJ(3, 70));
+            SJ(_, B, 8 * BF, KJ(3, 60));
+            SJ(_, B, (12 + BE(DF * 9) * 3) * BF, 0, KJ(3, 80, .8), VJ(2));
+        }
+    }
+    function RC() {
+        for (const _ of GG) {
+            const B = _J(_.t, 0, 1);
+            SJ(ZJ(_.x), _K(_.y), _.r * BF, 0, JJ(_.h | 0, 100, 70, B * .7), VJ(5 * B));
+        }
+        for (const _ of CG) {
+            const B = _J(_.l / _.L, 0, 1), C = ZJ(_.x), D = _K(_.y);
+            if (_.k == 4) {
+                YE.save();
+                YE.translate(C, D);
+                YE.rotate(_.a);
+                const E = _.s * BF * (.4 + B * .6);
+                TJ(4, JJ(_.h | 0, 70, 40 + B * 26, B), JJ(_.h | 0, 90, 70, B), VJ(1.2), _ => UJ(_, [ -1, .8, 1.2, -.6 ][_] * E, [ -.7, -1.2, .9, 1 ][_] * E));
+                YE.restore();
+                continue;
+            }
+            _.k == 2 ? SJ(C, D, (1 - B) * _.s * 9 * BF, 0, JJ(_.h | 0, 100, 70, B), VJ(3 * B)) : RJ(C, D, C - _.vx * (_.k ? .02 : .012) * BF, D - _.vy * (_.k ? .02 : .012) * BF, VJ(_.s * (_.k ? 1 : B)), JJ(_.h | 0, _.k ? 70 : 100, 60, B));
+        }
+        for (const _ of EG) {
+            const B = _J(_.l, 0, 1);
+            WC(_.t, ZJ(_.x), _K(_.y), 17 * BF / MK, _.h < 0 ? JJ(0, 0, 100, B) : JJ(_.h | 0, 100, 70, B), 1);
         }
     }
     function SC() {
-        for (const _ of NG) {
-            const B = HJ(_.t, 0, 1);
-            ZJ(GK(_.x), HK(_.y), _.r * IF, 0, QJ(_.h | 0, 100, 70, B * .7), CK(5 * B));
-        }
-        for (const _ of JG) {
-            const B = HJ(_.l / _.L, 0, 1), C = GK(_.x), D = HK(_.y);
-            if (_.k == 4) {
-                FF.save();
-                FF.translate(C, D);
-                FF.rotate(_.a);
-                const E = _.s * IF * (.4 + B * .6);
-                _K(4, QJ(_.h | 0, 70, 40 + B * 26, B), QJ(_.h | 0, 90, 70, B), CK(1.2), _ => BK(_, [ -1, .8, 1.2, -.6 ][_] * E, [ -.7, -1.2, .9, 1 ][_] * E));
-                FF.restore();
-                continue;
+        const _ = DG.length ? DG[DG.length - 1] : 0;
+        if (!_ || EE(IF.x - _.x, IF.y - _.y) > 7) {
+            DG.push({
+                x: IF.x,
+                y: IF.y,
+                h: QF > 0 ? -1 : QE[NF]
+            });
+            while (DG.length > 26 + _J(IF.sp / 30, 0, 30)) {
+                DG.shift();
             }
-            _.k == 2 ? ZJ(C, D, (1 - B) * _.s * 9 * IF, 0, QJ(_.h | 0, 100, 70, B), CK(3 * B)) : YJ(C, D, C - _.vx * (_.k ? .02 : .012) * IF, D - _.vy * (_.k ? .02 : .012) * IF, CK(_.s * (_.k ? 1 : B)), QJ(_.h | 0, _.k ? 70 : 100, 60, B));
-        }
-        for (const _ of LG) {
-            const B = HJ(_.l, 0, 1);
-            XC(_.t, GK(_.x), HK(_.y), 17 * IF / WK, _.h < 0 ? QJ(0, 0, 100, B) : QJ(_.h | 0, 100, 70, B), 1);
         }
     }
     function TC() {
-        const _ = KG.length ? KG[KG.length - 1] : 0;
-        if (!_ || LE(PF.x - _.x, PF.y - _.y) > 7) {
-            KG.push({
-                x: PF.x,
-                y: PF.y,
-                h: XF > 0 ? -1 : XE[UF]
-            });
-            while (KG.length > 26 + HJ(PF.sp / 30, 0, 30)) {
-                KG.shift();
-            }
+        const _ = DG.length;
+        for (let B = 1; B < _; B++) {
+            const C = B / _, D = DG[B - 1], E = DG[B];
+            RJ(ZJ(D.x), _K(D.y), ZJ(E.x), _K(E.y), _E(1, 15 * C * BF * 1), JJ((E.h < 0 ? (DF * 400 + B * 26) % 360 : E.h) | 0, 100, 60 + C * 18, C * .8));
         }
     }
-    function UC() {
-        const _ = KG.length, B = OG.e[2];
-        for (let C = 1; C < _; C++) {
-            if (B == 1 && C % 2) {
-                continue;
-            }
-            const D = C / _, E = KG[C - 1], F = KG[C];
-            YJ(GK(E.x), HK(E.y), GK(F.x), HK(F.y), HE(1, 15 * D * IF * (B == 2 ? .6 + NE() * .8 : 1)), QJ((F.h < 0 ? (KF * 400 + C * 26) % 360 : F.h) | 0, 100, 60 + D * 18, D * .8));
-        }
-    }
-    function VC(_, B, C, D) {
-        const E = C ? QK : _ == 1 ? QJ(268, 40, 12) : _ == 2 ? QJ(190, 100, 72) : QJ(300, 40, 96);
-        const F = C ? RJ(ME(KF * 6) % 7, 70) : _ == 2 ? QJ(300, 100, 70) : QJ(280, 45, 62);
-        const G = IE(KF * 13), H = ME(KF * 5);
-        SJ();
-        WJ(-13, 0);
+    function UC(_, B, C, D) {
+        const E = C ? GK : JJ(300, 40, 96);
+        const F = C ? KJ(FE(DF * 6) % 7, 70) : JJ(280, 45, 62);
+        const G = BE(DF * 13), H = FE(DF * 5);
+        LJ();
+        PJ(-13, 0);
         for (let _ = 1; _ < 5; _++) {
-            XJ(-13 - _ * 6, IE(KF * 9 - _ * .8) * (2 + _ * 1.6));
+            QJ(-13 - _ * 6, BE(DF * 9 - _ * .8) * (2 + _ * 1.6));
         }
-        TJ(5, RJ((H + 2) % 7, 60));
-        TJ(2.4, RJ((H + 5) % 7, 80));
+        MJ(5, KJ((H + 2) % 7, 60));
+        MJ(2.4, KJ((H + 5) % 7, 80));
         for (let _ = 0; _ < 4; _++) {
             const B = 15 * (_ >> 1) - 8, C = G * (_ & 1 ? 1 : -1) * (_ > 1 ? -1 : 1);
-            SJ();
-            WJ(B, 6);
-            XJ(B + C * 5, 15);
-            XJ(B + C * 8 + 2, 20);
-            TJ(3, E);
+            LJ();
+            PJ(B, 6);
+            QJ(B + C * 5, 15);
+            QJ(B + C * 8 + 2, 20);
+            MJ(3, E);
         }
-        SJ();
-        FF.ellipse(0, 0, 17, 11, 0, 0, DE);
-        UJ(E);
-        TJ(2, F);
-        SJ();
-        WJ(8, -6);
-        FF.quadraticCurveTo(20, -14, 26, -12);
-        FF.quadraticCurveTo(30, -11, 30, -5);
-        XJ(20, -1);
-        FF.closePath();
-        UJ(E);
-        TJ(2, F);
+        LJ();
+        YE.ellipse(0, 0, 17, 11, 0, 0, WD);
+        NJ(E);
+        MJ(2, F);
+        LJ();
+        PJ(8, -6);
+        YE.quadraticCurveTo(20, -14, 26, -12);
+        YE.quadraticCurveTo(30, -11, 30, -5);
+        QJ(20, -1);
+        YE.closePath();
+        NJ(E);
+        MJ(2, F);
         for (let _ = 0; _ < 4; _++) {
-            SJ();
-            WJ(6 + _ * 4, -7 - _);
-            FF.quadraticCurveTo(2 + _ * 4, -16 - _ * 1.6, 9 + _ * 4, -18 - _);
-            TJ(3.2, RJ((H + _) % 7, 60));
+            LJ();
+            PJ(6 + _ * 4, -7 - _);
+            YE.quadraticCurveTo(2 + _ * 4, -16 - _ * 1.6, 9 + _ * 4, -18 - _);
+            MJ(3.2, KJ((H + _) % 7, 60));
         }
-        FF.save();
-        FF.translate(26, -12);
-        FF.rotate(-.6);
-        const I = D == 1 ? 26 : 15;
-        const J = FF.createLinearGradient(0, 0, 0, -I);
-        J.addColorStop(0, RJ(0, 60));
-        J.addColorStop(1, RJ(B, 90));
-        _K(3, J, QK, 1.2, _ => BK(_, [ -3, 3, 0 ][_], [ 0, 0, -I ][_]));
-        if (!D) {
-            for (let _ = 0; _ < 4; _++) {
-                const B = _ / 4;
-                YJ(B * 6 * .5 - 3, -I * B, 3 - B * 6 * .5, -I * B - 2, 1.2, RJ((H + _) % 7, 90));
-            }
+        YE.save();
+        YE.translate(26, -12);
+        YE.rotate(-.6);
+        const I = YE.createLinearGradient(0, 0, 0, -15);
+        I.addColorStop(0, KJ(0, 60));
+        I.addColorStop(1, KJ(B, 90));
+        TJ(3, I, GK, 1.2, _ => UJ(_, [ -3, 3, 0 ][_], [ 0, 0, -15 ][_]));
+        for (let _ = 0; _ < 4; _++) {
+            const B = _ / 4;
+            RJ(B * 6 * .5 - 3, -15 * B, 3 - B * 6 * .5, -15 * B - 2, 1.2, KJ((H + _) % 7, 90));
         }
-        D == 2 && _K(10, QK, RJ(B, 90), 1, _ => {
-            const B = _ / 10 * DE + KF * 2, C = _ & 1 ? 2.4 : 6;
-            BK(_, JE(B) * C, -I + IE(B) * C);
-        });
-        FF.restore();
-        ZJ(26, -8, 1.6, JF == 1 && PF.st > WE ? QJ(0, 100, 63) : QJ(276, 38, 15));
+        YE.restore();
+        SJ(26, -8, 1.6, CF == 1 && IF.st > PE ? JJ(0, 100, 63) : JJ(276, 38, 15));
     }
-    function WC() {
-        const _ = IF, B = GK(PF.x), C = HK(PF.y);
-        FF.save();
-        FF.translate(B, C);
-        FF.rotate(PF.a);
-        FF.scale(_, _);
-        VC(OG.e[0], UF, XF > 0 || PF.ph > 0, OG.e[1]);
-        FF.restore();
-        ZJ(B, C, 24 * _, 0, PF.rp > 0 ? QJ(6, 100, 62) : RJ(UF, 70, .5), CK(PF.rp > 0 ? 3 : 2));
-        if (PF.st > WE) {
-            const D = (PF.st - WE) / 1.5;
-            SJ();
-            VJ(B, C, (33 + IE(KF * 20) * 4) * _, -CE / 2, -CE / 2 + DE * (1 - D));
-            TJ(HE(2, 4 * _), QJ(30 - D * 30, 100, 60));
+    function VC() {
+        const _ = BF, B = ZJ(IF.x), C = _K(IF.y);
+        YE.save();
+        YE.translate(B, C);
+        YE.rotate(IF.a);
+        YE.scale(_, _);
+        UC(0, NF, QF > 0 || IF.ph > 0);
+        YE.restore();
+        SJ(B, C, 24 * _, 0, IF.rp > 0 ? JJ(6, 100, 62) : KJ(NF, 70, .5), VJ(IF.rp > 0 ? 3 : 2));
+        if (IF.st > PE) {
+            const D = (IF.st - PE) / 1.5;
+            LJ();
+            OJ(B, C, (33 + BE(DF * 20) * 4) * _, -VD / 2, -VD / 2 + WD * (1 - D));
+            MJ(_E(2, 4 * _), JJ(30 - D * 30, 100, 60));
         }
+    }
+    function WC(_, B, C, D, E, F, G) {
+        YE.font = (F ? "bold " : "") + (D * MK | 0) + "px monospace";
+        YE.textAlign = G || "center";
+        YE.fillStyle = E;
+        YE.fillText(_, B, C);
     }
     function XC(_, B, C, D, E, F, G) {
-        FF.font = (F ? "bold " : "") + (D * WK | 0) + "px monospace";
-        FF.textAlign = G || "center";
-        FF.fillStyle = E;
-        FF.fillText(_, B, C);
-    }
-    function YC(_, B, C, D, E, F, G) {
-        const H = ZK(_, B, C, D);
-        XK.push({
+        const H = PK(_, B, C, D);
+        NK.push({
             x: _,
             y: B,
             w: C,
             h: D,
             fn: F
         });
-        YK(_ - C / 2, B - D / 2, C, D, 8 * WK);
-        UJ(H ? G || UK : TK);
-        TJ(2 * WK, H ? QK : UK);
-        XC(E, _, B + WK, 15, H ? QK : RK, 1);
+        OK(_ - C / 2, B - D / 2, C, D, 8 * MK);
+        NJ(H ? G || KK : JK);
+        MJ(2 * MK, H ? GK : KK);
+        WC(E, _, B + MK, 15, H ? GK : HK, 1);
     }
-    function ZC() {
-        for (const _ of XK) {
-            if (ZK(_.x, _.y, _.w, _.h)) {
-                TB(1);
+    function YC() {
+        for (const _ of NK) {
+            if (PK(_.x, _.y, _.w, _.h)) {
+                SB(1);
                 _.fn();
                 return 1;
             }
         }
         return 0;
     }
-    function _D() {
-        const _ = 30 * WK, B = 240 * WK, C = HE(PF.y, 0);
-        ZJ(_, _, 9 * WK, VK);
-        XC(OG.c ? YF + " (" + (OG.c + YF) + ")" : YF, _ + 16 * WK, _, 16, VK, 1, "left");
-        XC(ZF | 0, GF - _, _, 19, QK, 1, "right");
-        _G > 1.05 && XC("x" + _G.toFixed(1), GF - _, _ + 22 * WK, 15, RJ(2, 70), 1, "right");
-        if (FG > 3) {
-            const B = 1 + GE(FG, 30) * .02, C = HJ(GG / 1.6, 0, 1);
-            XC(FG + " CHAIN", GF - _, _ + 46 * WK, 15 * B, QJ(48, 100, 60 + FG, C), 1, "right");
+    function ZC() {
+        const _ = 30 * MK, B = 240 * MK, C = _E(IF.y, 0);
+        SJ(_, _, 9 * MK, LK);
+        WC(RF, _ + 16 * MK, _, 16, LK, 1, "left");
+        WC(SF | 0, ZE - _, _, 19, GK, 1, "right");
+        TF > 1.05 && WC("x" + TF.toFixed(1), ZE - _, _ + 22 * MK, 15, KJ(2, 70), 1, "right");
+        if (YF > 3) {
+            const B = 1 + ZD(YF, 30) * .02, C = _J(ZF / 1.6, 0, 1);
+            WC(YF + " CHAIN", ZE - _, _ + 46 * MK, 15 * B, JJ(48, 100, 60 + YF, C), 1, "right");
         }
-        FF.fillStyle = SK;
-        FF.fillRect(GF / 2 - B / 2, _ + 12 * WK, B, 4 * WK);
-        FF.fillStyle = QJ(DK[6] | 0, 90, 70);
-        FF.fillRect(GF / 2 - B / 2, _ + 12 * WK, B * HJ(C % _F / _F, 0, 1), 4 * WK);
-        XC(BH[CG][0] + (HI(PF.y) ? " +" + HI(PF.y) : ""), GF / 2, 18 * WK, 14, RK, 1);
-        XC((C / 10 | 0) + "m", GF / 2 + B / 2 + 24 * WK, _ + 14 * WK, 13, SK, 0, "left");
-        BD();
+        YE.fillStyle = IK;
+        YE.fillRect(ZE / 2 - B / 2, _ + 12 * MK, B, 4 * MK);
+        YE.fillStyle = JJ(WJ[6] | 0, 90, 70);
+        YE.fillRect(ZE / 2 - B / 2, _ + 12 * MK, B * _J(C % TE / TE, 0, 1), 4 * MK);
+        WC(UG[VF][0] + (_I(IF.y) ? " +" + _I(IF.y) : ""), ZE / 2, 18 * MK, 14, HK, 1);
+        WC((C / 10 | 0) + "m", ZE / 2 + B / 2 + 24 * MK, _ + 14 * MK, 13, IK, 0, "left");
+        _D();
         let D = 0;
         for (let B = 0; B < 7; B++) {
-            EG[B] > 0 && XC(CF[B] + " " + EG[B].toFixed(1), GF - _, _ + (30 + 16 * D++) * WK, 12, BF[B][0] > 6 ? QK : RJ(BF[B][0], 70), 1, "right");
+            XF[B] > 0 && WC(VE[B] + " " + XF[B].toFixed(1), ZE - _, _ + (30 + 16 * D++) * MK, 12, UE[B][0] > 6 ? GK : KJ(UE[B][0], 70), 1, "right");
         }
-        DG > 0 && XC(BH[CG][0], GF / 2, HF * .3, 42, QJ(0, 0, 100, HJ(DG, 0, 1) * HJ(3.2 - DG, 0, 1)), 1);
+        WF > 0 && WC(UG[VF][0], ZE / 2, _F * .3, 42, JJ(0, 0, 100, _J(WF, 0, 1) * _J(3.2 - WF, 0, 1)), 1);
     }
-    function BD() {
-        const _ = 44 * WK, B = GF / 2 - 25 * _ / 7, C = HF - 40 * WK, D = 26 * WK;
+    function _D() {
+        const _ = 44 * MK, B = ZE / 2 - 25 * _ / 7, C = _F - 40 * MK, D = 26 * MK;
         for (let E = 0; E < 7; E++) {
-            const F = B + E * _ * 50 / 44, G = E == UF, H = TF[E] / UE, I = F + _ / 2;
-            YK(F, C - D / 2, _, D, 5 * WK);
-            UJ(QJ(270, 30, 8, .8));
-            FF.save();
-            FF.clip();
-            FF.fillStyle = RJ(E, G ? 60 : 42, VG == E && WG > 0 ? .4 + IE(KF * 40) * .3 : 1);
-            FF.fillRect(F, C + D / 2 - D * H, _, D * H);
-            FF.restore();
-            YK(F, C - D / 2, _, D, 5 * WK);
-            TJ((G ? 2.6 : 1.2) * WK, G ? QK : RJ(E, 55, .8));
-            XC("ROYGBIV"[E], I, C, G ? 15 : 12, G ? QK : RK, 1);
-            XC(E + 1, I, C - D / 2 - 9 * WK, 10, G ? QK : SK);
-            VF & YE[E] && ZJ(I, C + D / 2 + 8 * WK, 2.6 * WK, RJ(E, 75));
-            XK.push({
+            const F = B + E * _ * 50 / 44, G = E == NF, H = MF[E] / NE, I = F + _ / 2;
+            OK(F, C - D / 2, _, D, 5 * MK);
+            NJ(JJ(270, 30, 8, .8));
+            YE.save();
+            YE.clip();
+            YE.fillStyle = KJ(E, G ? 60 : 42, OG == E && PG > 0 ? .4 + BE(DF * 40) * .3 : 1);
+            YE.fillRect(F, C + D / 2 - D * H, _, D * H);
+            YE.restore();
+            OK(F, C - D / 2, _, D, 5 * MK);
+            MJ((G ? 2.6 : 1.2) * MK, G ? GK : KJ(E, 55, .8));
+            WC("ROYGBIV"[E], I, C, G ? 15 : 12, G ? GK : HK, 1);
+            WC(E + 1, I, C - D / 2 - 9 * MK, 10, G ? GK : IK);
+            OF & RE[E] && SJ(I, C + D / 2 + 8 * MK, 2.6 * MK, KJ(E, 75));
+            NK.push({
                 x: I,
                 y: C,
                 w: _,
                 h: D,
-                fn: () => RD(E)
+                fn: () => OD(E)
             });
         }
-        WF > 2 && XC(WF + "/7", B - 18 * WK, C, 13, QK, 1);
+        PF > 2 && WC(PF + "/7", B - 18 * MK, C, 13, GK, 1);
     }
-    function CD() {
-        if (JF != 1 || TG || !PF.al) {
+    function BD() {
+        if (CF != 1 || MG || !IF.al) {
             return;
         }
-        const _ = RG - PF.x, B = SG - PF.y, C = LE(_, B);
-        C > TE && ZJ(GK(PF.x + _ / C * TE), HK(PF.y + B / C * TE), 4 * WK, RJ(UF, 60, .8));
+        const _ = KG - IF.x, B = LG - IF.y, C = EE(_, B);
+        C > ME && SJ(ZJ(IF.x + _ / C * ME), _K(IF.y + B / C * ME), 4 * MK, KJ(NF, 60, .8));
     }
-    function DD(_, B, C, D, E, F) {
-        FF.fillStyle = QJ(275, 45, 5, .8);
-        FF.fillRect(0, 0, GF, HF);
+    function CD(_, B, C, D, E, F) {
+        YE.fillStyle = JJ(275, 45, 5, .8);
+        YE.fillRect(0, 0, ZE, _F);
         if (_) {
-            YK(GF / 2 - _ * WK / 2, HF / 2 - B * WK / 2, _ * WK, B * WK, 14 * WK);
-            UJ(QJ(272, 40, 9, .96));
-            TJ(2 * WK, UK);
-            XC(C, GF / 2, HF / 2 - (B / 2 - 34) * WK, 27, QK, 1);
+            OK(ZE / 2 - _ * MK / 2, _F / 2 - B * MK / 2, _ * MK, B * MK, 14 * MK);
+            NJ(JJ(272, 40, 9, .96));
+            MJ(2 * MK, KK);
+            WC(C, ZE / 2, _F / 2 - (B / 2 - 34) * MK, 27, GK, 1);
         }
         for (let _ = 0; _ < D.length; _++) {
-            XC(D[_], GF / 2, HF / 2 - (B / 2 - 78) * WK + _ * 22 * WK, F || 13.5, RK, F ? 1 : 0);
+            WC(D[_], ZE / 2, _F / 2 - (B / 2 - 78) * MK + _ * 22 * MK, F || 13.5, HK, F ? 1 : 0);
         }
         for (const _ of E) {
-            YC(GF / 2 + _[0] * WK, HF / 2 + _[1] * WK, _[2] * WK, 40 * WK, _[3], _[4], _[5]);
+            XC(ZE / 2 + _[0] * MK, _F / 2 + _[1] * MK, _[2] * MK, 40 * MK, _[3], _[4], _[5]);
         }
+    }
+    function DD() {
+        HG.m ^= 1;
+        HI && (HI.gain.value = HG.m ? 0 : .8);
+        HD();
     }
     function ED() {
-        OG.m ^= 1;
-        OI && (OI.gain.value = OG.m ? 0 : .8);
-        KD();
+        CD(0, 0, 0, [], [ [ 0, -30, 190, "PLAY", ID, JJ(300, 80, 55) ], [ 0, 26, 130, HG.m ? "UNMUTE" : "MUTE", DD ] ]);
+        const _ = _F * .3;
+        for (let B = 0; B < 7; B++) {
+            WC("PRISMFALL", ZE / 2 + BE(DF * 1.2 + B * .5) * 5 * MK, _ + 2.4 * (B - 3) * MK, 66, KJ(B, 60, .5), 1);
+        }
+        WC("PRISMFALL", ZE / 2, _, 66, GK, 1);
+        [ "DRAG near the unicorn - drawings STAY until used - longer = stronger", "R push - O aim - Y spring - G tether - B rail - I gravity - V warp", 0, "X lets go - 1-7 or SCROLL picks a colour" ].forEach((_, B) => _ && WC(_, ZE / 2, _F - 122 * MK + B * 19 * MK, 13, B == 1 ? HK : B > 2 ? IK : GK, !B));
+        const B = YE.createLinearGradient(ZE / 2 - 300 * MK, 0, ZE / 2 + 300 * MK, 0);
+        for (let _ = 0; _ < 7; _++) {
+            B.addColorStop(_ / 6, KJ(_, 68));
+        }
+        WC("CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs", ZE / 2, _F - 84 * MK, 13, B, 1);
+        HG.b && WC("BEST " + HG.b + "   DEPTH " + (HG.d / 10 | 0) + "m", ZE / 2, _F / 2 + 82 * MK, 14, IK);
     }
     function FD() {
-        const _ = [ [ 0, -30, 190, "PLAY", LD, QJ(300, 80, 55) ], [ 105, 26, 130, OG.m ? "UNMUTE" : "MUTE", ED ] ];
-        _.push([ -105, 26, 130, "STORE", () => {
-            JF = 4;
-        } ]);
-        DD(0, 0, 0, [], _);
-        const B = HF * .3;
-        for (let _ = 0; _ < 7; _++) {
-            XC("PRISMFALL", GF / 2 + IE(KF * 1.2 + _ * .5) * 5 * WK, B + 2.4 * (_ - 3) * WK, 66, RJ(_, 60, .5), 1);
-        }
-        XC("PRISMFALL", GF / 2, B, 66, QK, 1);
-        XC("you never steer the unicorn - you draw the physics", GF / 2, B + 46 * WK, 15, RK);
-        [ "DRAG near the unicorn - drawings STAY until used - longer = stronger", "R push - O aim - Y spring - G tether - B rail - I gravity - V warp", 0, "X lets go - 1-7 or SCROLL picks a colour" ].forEach((_, B) => _ && XC(_, GF / 2, HF - 122 * WK + B * 19 * WK, 13, B == 1 ? RK : B > 2 ? SK : QK, !B));
-        const C = FF.createLinearGradient(GF / 2 - 300 * WK, 0, GF / 2 + 300 * WK, 0);
-        for (let _ = 0; _ < 7; _++) {
-            C.addColorStop(_ / 6, RJ(_, 68));
-        }
-        XC("CROSS TWO STROKES TO MIX THEM - O+Y aims AND springs", GF / 2, HF - 84 * WK, 13, C, 1);
-        _E(GF / 2, HF * .3 - 74 * WK), BE(GF - 190 * WK, HF / 2 - 40 * WK);
-        OG.b && XC("BEST " + OG.b + "   DEPTH " + (OG.d / 10 | 0) + "m   COINS " + OG.c, GF / 2, HF / 2 + 82 * WK, 14, SK);
-    }
-    function GD() {
-        DD(470, 330, "RUN OVER", [ "SCORE   " + (ZF | 0), "DEPTH   " + (BG / 10 | 0) + "m", "REGION  " + BH[CG][0], "COINS   +" + YF, "BEST    " + OG.b, ZF >= OG.b && ZF ? "NEW BEST!" : "" ], [ [ 0, 62, 210, "RETRY  (R)", LD, QJ(300, 80, 55) ], [ -105, 114, 130, "STORE", () => {
-            JF = 4;
-        } ], [ 105, 114, 130, "MENU", () => {
-            JF = 0;
+        CD(470, 330, "RUN OVER", [ "SCORE   " + (SF | 0), "DEPTH   " + (UF / 10 | 0) + "m", "REGION  " + UG[VF][0], "COINS   +" + RF, "BEST    " + HG.b, SF >= HG.b && SF ? "NEW BEST!" : "" ], [ [ 0, 62, 210, "RETRY  (R)", ID, JJ(300, 80, 55) ], [ 0, 114, 130, "MENU", () => {
+            CF = 0;
         } ] ], 16);
     }
-    function HD() {
-        DD(340, 296, "PAUSED", [], [ [ 0, -40, 200, "RESUME", () => {
-            JF = 1;
-        } ], [ 0, 8, 200, "RESTART  (R)", LD ], [ 0, 56, 200, OG.m ? "UNMUTE" : "MUTE", ED ], [ 0, 104, 200, "QUIT RUN", () => {
-            MD();
-            JF = 3;
+    function GD() {
+        CD(340, 296, "PAUSED", [], [ [ 0, -40, 200, "RESUME", () => {
+            CF = 1;
+        } ], [ 0, 8, 200, "RESTART  (R)", ID ], [ 0, 56, 200, HG.m ? "UNMUTE" : "MUTE", DD ], [ 0, 104, 200, "QUIT RUN", () => {
+            JD();
+            CF = 3;
         } ] ]);
     }
-    function ID() {
-        DD(560, 470, "PRISM STORE", [ OG.c + " COINS - cosmetics only, never power" ], [ [ 0, 200, 150, "BACK", _L ] ], 14);
-        BL = -1;
-        const _ = GF / 2 - 240 * WK;
-        for (let B = 0; B < 12; B++) {
-            const C = B / 3 | 0, D = B % 3;
-            const E = _ + D * 150 * WK, F = HF / 2 - 118 * WK + C * 48 * WK;
-            const G = PK(C, D), H = OG.e[C] == D, I = ZK(E + 66 * WK, F, 140 * WK, 38 * WK);
-            if (I) {
-                BL = C;
-                CL = D;
-            }
-            YK(E, F - 19 * WK, 140 * WK, 38 * WK, 7 * WK);
-            UJ(H ? UK : G ? TK : QJ(275, 25, 10));
-            TJ((H ? 2.4 : 1) * WK, H || I ? QK : SK);
-            XC(NK[B], E + 66 * WK, F - 5 * WK, 11, G ? QK : RK, 1);
-            XC(G ? H ? "EQUIPPED" : "EQUIP" : OK[D] + "c", E + 66 * WK, F + 9 * WK, 10, G ? SK : OG.c < OK[D] ? QJ(0, 60, 60) : VK);
-            XK.push({
-                x: E + 66 * WK,
-                y: F,
-                w: 140 * WK,
-                h: 38 * WK,
-                fn: () => JD(C, D)
-            });
-        }
-        FF.save();
-        FF.translate(GF / 2, HF / 2 + 122 * WK);
-        FF.scale(1.9 * WK, 1.9 * WK);
-        VC(BL == 0 ? CL : OG.e[0], ME(KF * 3) % 7, 0, BL == 1 ? CL : OG.e[1]);
-        FF.restore();
-    }
-    function JD(_, B) {
-        if (PK(_, B)) {
-            OG.e[_] = B;
-            KD();
-        } else if (OG.c >= OK[B]) {
-            OG.c -= OK[B];
-            OG.o |= 1 << _ * 3 + B;
-            OG.e[_] = B;
-            KD();
-            PB();
-        } else {
-            QB();
-        }
-    }
-    function KD() {
+    function HD() {
         try {
-            const _ = [ OG.b, OG.d, OG.m ];
-            _.push(OG.c, OG.o, ...OG.e);
-            localStorage[DF] = _.join();
+            localStorage[WE] = [ HG.b, HG.d, HG.m ].join();
         } catch (_) {}
     }
-    function LD(_) {
+    function ID(_) {
         V_();
-        JF = 1;
-        ZF = 0;
-        YF = 0;
-        _G = 1;
-        BG = 0;
-        CG = 0;
-        DG = 3.2;
+        CF = 1;
+        SF = 0;
+        RF = 0;
+        TF = 1;
+        UF = 0;
         VF = 0;
-        WF = 0;
-        UG = 0;
-        XF = 0;
-        FG = 0;
-        GG = 0;
-        FL = 0;
-        LF = 0;
-        MF = 0;
+        WF = 3.2;
         OF = 0;
-        TF = [ UE, UE, UE, UE, UE, UE, UE ];
-        EG = [ 0, 0, 0, 0, 0, 0, 0 ];
-        IG = [];
-        JG = [];
-        KG = [];
-        LG = [];
-        MG = [];
-        NG = [];
-        TG = 0;
-        PF.x = 0;
-        PF.y = -320;
-        PF.vy = 300;
-        PF.a = CE / 2;
-        PF.ra = 0;
-        PF.te = 0;
-        PF.ph = 0;
-        PF.rp = 0;
-        PF.st = 0;
-        PF.gt = 0;
-        PF.al = 1;
-        PF.sp = 300;
-        PF.rw = 0;
+        PF = 0;
+        NG = 0;
         QF = 0;
-        RF = PE;
-        SF.x = PF.x;
-        SF.y = PF.y;
-        SF.z = 1;
-        DK = KK(0);
+        YF = 0;
+        ZF = 0;
+        SK = 0;
+        EF = 0;
+        FF = 0;
+        HF = 0;
+        MF = [ NE, NE, NE, NE, NE, NE, NE ];
+        XF = [ 0, 0, 0, 0, 0, 0, 0 ];
+        BG = [];
+        CG = [];
+        DG = [];
+        EG = [];
+        FG = [];
+        GG = [];
+        MG = 0;
+        IF.x = 0;
+        IF.y = -320;
+        IF.vy = 300;
+        IF.a = VD / 2;
+        IF.ra = 0;
+        IF.te = 0;
+        IF.ph = 0;
+        IF.rp = 0;
+        IF.st = 0;
+        IF.gt = 0;
+        IF.al = 1;
+        IF.sp = 300;
+        IF.rw = 0;
+        JF = 0;
+        KF = IE;
+        LF.x = IF.x;
+        LF.y = IF.y;
+        LF.z = 1;
+        WJ = DK(0);
         Q_(_);
-        PF.vx = LJ(-70, 70);
-        YI = 0;
-        NI && (XI = NI.currentTime + .05);
+        IF.vx = EJ(-70, 70);
+        RI = 0;
+        GI && (QI = GI.currentTime + .05);
         HB(0);
     }
-    function MD() {
-        OG.c += YF;
-        OG.b = HE(OG.b, ZF | 0);
-        OG.d = HE(OG.d, BG | 0);
-        KD();
+    function JD() {
+        HG.b = _E(HG.b, SF | 0);
+        HG.d = _E(HG.d, UF | 0);
+        HD();
         HB(0);
-        YD(ZF | 0, BG | 0);
+        TD(SF | 0, UF | 0);
     }
-    function ND() {
-        PF.al = 0;
-        FL = 1.3;
+    function KD() {
+        IF.al = 0;
+        SK = 1.3;
         for (let _ = 0; _ < 7; _++) {
-            DC(PF.x, PF.y, 16, 0, 520, XE[_]);
+            CC(IF.x, IF.y, 16, 0, 520, QE[_]);
         }
-        CC(PF.x, PF.y, 0, 0, .7, -1, 2, 22);
-        LF = 30;
-        MF = .7;
-        NF = -1;
-        SB();
-        PF.ra && K(0);
-        PF.te && M();
-        JF != 0 && MD();
+        BC(IF.x, IF.y, 0, 0, .7, -1, 2, 22);
+        EF = 30;
+        FF = .7;
+        GF = -1;
+        RB();
+        IF.ra && K(0);
+        IF.te && M();
+        CF != 0 && JD();
     }
-    function OD(_) {
+    function LD(_) {
         R_();
-        PF.al && PD(_);
+        IF.al && MD(_);
         T(_);
-        const B = GI(PF.y);
-        if (B != CG) {
-            CG = B;
-            DG = 3.2;
-            MF = HE(MF, .35);
-            NF = BH[CG][1];
+        const B = ZH(IF.y);
+        if (B != VF) {
+            VF = B;
+            WF = 3.2;
+            FF = _E(FF, .35);
+            GF = UG[VF][1];
             CB();
-            ZF += 500 * _G | 0;
+            SF += 500 * TF | 0;
         }
-        if (PF.y > BG) {
-            ZF += .05 * (PF.y - BG) * _G;
-            BG = PF.y;
+        if (IF.y > UF) {
+            SF += .05 * (IF.y - UF) * TF;
+            UF = IF.y;
         }
-        _G = HJ(1 + PF.sp / 950 + WF * .2 + (XF > 0 ? 2 : 0), 1, 12);
-        if (PF.al) {
+        TF = _J(1 + IF.sp / 950 + PF * .2 + (QF > 0 ? 2 : 0), 1, 12);
+        if (IF.al) {
             const B = 2.4;
-            if (PF.sp < 118) {
-                PF.st += _;
-                const C = HJ((PF.st - WE) / (B - WE), 0, 1);
-                if ((GL -= _) <= 0 && C > 0) {
-                    GL = HE(.16, .55 - C * .4);
-                    RB(C);
+            if (IF.sp < 118) {
+                IF.st += _;
+                const C = _J((IF.st - PE) / (B - PE), 0, 1);
+                if ((TK -= _) <= 0 && C > 0) {
+                    TK = _E(.16, .55 - C * .4);
+                    QB(C);
                 }
-                PF.st > B && ND();
-            } else if (PF.st > 0) {
-                PF.st > WE && DC(PF.x, PF.y, 8, 0, 260, XE[0]);
-                PF.st = HE(0, PF.st - _ * 2.6);
+                IF.st > B && KD();
+            } else if (IF.st > 0) {
+                IF.st > PE && CC(IF.x, IF.y, 8, 0, 260, QE[0]);
+                IF.st = _E(0, IF.st - _ * 2.6);
             }
         } else {
-            FL -= _;
-            if (FL <= 0) {
-                if (JF == 0) {
-                    LD();
-                    JF = 0;
+            SK -= _;
+            if (SK <= 0) {
+                if (CF == 0) {
+                    ID();
+                    CF = 0;
                 } else {
-                    JF = 3;
+                    CF = 3;
                 }
             }
         }
-        DG -= _;
-        WG -= _;
-        XF -= _;
+        WF -= _;
+        PG -= _;
+        QF -= _;
         for (let B = 0; B < 7; B++) {
-            EG[B] -= _;
+            XF[B] -= _;
         }
-        GG > 0 && (GG -= _) <= 0 && (FG = 0);
-        if (UG > 0 && (UG -= _) <= 0) {
-            VF = 0;
-            WF = 0;
+        ZF > 0 && (ZF -= _) <= 0 && (YF = 0);
+        if (NG > 0 && (NG -= _) <= 0) {
+            OF = 0;
+            PF = 0;
         }
-        MF = HE(0, MF - _ * 2.4);
-        for (let B = IG.length; B--; ) {
-            const C = IG[B];
+        FF = _E(0, FF - _ * 2.4);
+        for (let B = BG.length; B--; ) {
+            const C = BG[B];
             C.u && (C.l -= _);
-            if (C.u && C.l <= 0 || C.y2 < PF.y - 2600) {
-                PF.ra == C && K(1);
-                C == TG && (TG = 0);
-                IG.splice(B, 1);
+            if (C.u && C.l <= 0 || C.y2 < IF.y - 2600) {
+                IF.ra == C && K(1);
+                C == MG && (MG = 0);
+                BG.splice(B, 1);
             }
         }
-        HC(_);
-        PF.al && TC();
+        GC(_);
+        IF.al && SC();
     }
-    function PD(_) {
-        DL += _;
+    function MD(_) {
+        QK += _;
         let B = 0;
-        while (DL >= HL && B < 8) {
-            V(HL);
-            DL -= HL;
+        while (QK >= UK && B < 8) {
+            V(UK);
+            QK -= UK;
             B++;
         }
-        B >= 8 && (DL = 0);
+        B >= 8 && (QK = 0);
     }
-    function QD() {
-        XK = [];
-        WK = GE(GF / 1280, HF / 720);
-        KC();
-        NC();
+    function ND() {
+        NK = [];
+        MK = ZD(ZE / 1280, _F / 720);
+        JC();
+        MC();
+        QC();
+        TC();
         RC();
-        UC();
-        SC();
-        PF.al && WC();
-        JF != 1 && JF != 2 || _D();
-        if (MF > .01) {
-            FF.fillStyle = NF < 0 ? QJ(KF * 500 % 360 | 0, 100, 75, MF * .5) : QJ(NF | 0, 100, 72, MF * .45);
-            FF.fillRect(0, 0, GF, HF);
+        IF.al && VC();
+        CF != 1 && CF != 2 || ZC();
+        if (FF > .01) {
+            YE.fillStyle = GF < 0 ? JJ(DF * 500 % 360 | 0, 100, 75, FF * .5) : JJ(GF | 0, 100, 72, FF * .45);
+            YE.fillRect(0, 0, ZE, _F);
         }
-        JF > 1 ? [ 0, 0, HD, GD, ID ][JF]() : JF || FD();
-        CD();
+        CF > 1 ? [ 0, 0, GD, FD, 0 ][CF]() : CF || ED();
+        BD();
     }
-    function RD(_) {
-        if ((_ = (_ + 7) % 7) != UF) {
-            UF = _;
-            TB(1);
-            DC(PF.x, PF.y, 6, 0, 130, XE[_]);
+    function OD(_) {
+        if ((_ = (_ + 7) % 7) != NF) {
+            NF = _;
+            SB(1);
+            CC(IF.x, IF.y, 6, 0, 130, QE[_]);
         }
     }
-    function SD() {
-        const _ = GE(devicePixelRatio, 2);
-        GF = EF.width = innerWidth * _ | 0;
-        HF = EF.height = innerHeight * _ | 0;
-        FF.lineCap = "round";
-        FF.textBaseline = "middle";
+    function PD() {
+        const _ = ZD(devicePixelRatio, 2);
+        ZE = XE.width = innerWidth * _ | 0;
+        _F = XE.height = innerHeight * _ | 0;
+        YE.lineCap = "round";
+        YE.textBaseline = "middle";
     }
-    function TD(_) {
-        const B = GF / innerWidth;
-        PG = _.clientX * B;
-        QG = _.clientY * B;
-        RG = SF.x + (PG - GF / 2 - EK) / IF;
-        SG = IK(QG);
+    function QD(_) {
+        const B = ZE / innerWidth;
+        IG = _.clientX * B;
+        JG = _.clientY * B;
+        KG = LF.x + (IG - ZE / 2 - XJ) / BF;
+        LG = BK(JG);
     }
-    async function UD(_, B) {
+    async function RD(_, B) {
         try {
             const C = await _;
             if (C && C.success) {
                 return C.data;
             }
-            PL = (B || "call") + " failed: " + (C && C.message || "no reason given");
+            _L = (B || "call") + " failed: " + (C && C.message || "no reason given");
             return null;
         } catch (_) {
-            PL = (B || "call") + " threw: " + String(_ && _.message).slice(0, 60);
+            _L = (B || "call") + " threw: " + String(_ && _.message).slice(0, 60);
             return null;
         }
     }
-    async function VD() {
-        const _ = IL();
+    async function SD() {
+        const _ = VK();
         if (!_ || !_.getOrCreateLeaderboard) {
             return;
         }
         const B = _.LeaderboardSortOrder ? _.LeaderboardSortOrder.DESC : 1;
         const C = _.LeaderboardDisplayType ? _.LeaderboardDisplayType.NUMERIC : 0;
-        const D = await UD(_.getOrCreateLeaderboard("prismfall-score", B, C), "score board");
-        const E = await UD(_.getOrCreateLeaderboard("prismfall-depth", B, C), "depth board");
-        D && (LL = D.id);
-        E && (ML = E.id);
-        LL || (PL = PL || "no leaderboard id");
-        XD();
+        const D = await RD(_.getOrCreateLeaderboard("prismfall-score", B, C), "score board");
+        const E = await RD(_.getOrCreateLeaderboard("prismfall-depth", B, C), "depth board");
+        D && (XK = D.id);
+        E && (YK = E.id);
+        XK || (_L = _L || "no leaderboard id");
     }
-    function WD(_) {
-        const B = IL();
-        try {
-            const C = B.getUserAvatarUrl ? B.getUserAvatarUrl(_, B.AvatarSize ? B.AvatarSize.MEDIUM : 1) : JL.avatarUrl;
-            if (!C) {
-                return;
-            }
-            const D = new Image;
-            D.crossOrigin = "anonymous";
-            D.onload = () => {
-                KL = D;
-            };
-            D.src = C;
-        } catch (_) {}
-    }
-    async function XD() {
-        const _ = IL();
-        if (!_ || !LL || QL) {
-            return;
-        }
-        QL = 1;
-        const B = await UD(_.listLeaderboardEntries(LL, 0, 8, 0), "list");
-        if (B) {
-            NL = B.map(_ => [ _.globalRank, _.username || "player", _.score ]);
-            PL = NL.length ? "" : "be the first to post a score";
-        }
-        const C = await UD(_.getMyLeaderboardEntries(LL), "my entries");
-        C && C.length && (OL = C[0].globalRank | 0);
-        QL = 0;
-    }
-    function YD(_, B) {
-        const C = IL();
-        if (!C || !LL || !_) {
+    function TD(_, B) {
+        const C = VK();
+        if (!C || !XK || !_) {
             return;
         }
         const D = {
-            region: BH[CG][0],
+            region: UG[VF][0],
             depth: B / 10 | 0,
-            laps: HI(B)
+            laps: _I(B)
         };
-        UD(C.uploadLeaderboardScore(LL, _, 1, void 0, D), "upload").then(_ => {
+        RD(C.uploadLeaderboardScore(XK, _, 1, void 0, D), "upload").then(_ => {
             if (_) {
-                OL = _.globalRank | 0;
-                PL = "rank #" + OL;
+                ZK = _.globalRank | 0;
+                _L = "rank #" + ZK;
             }
-            XD();
         });
-        ML && UD(C.uploadLeaderboardScore(ML, B | 0, 1));
-        ZD("Run over", "Scored " + _);
+        YK && RD(C.uploadLeaderboardScore(YK, B | 0, 1));
+        UD("Run over", "Scored " + _);
     }
-    function ZD(_, B) {
-        const C = IL();
+    function UD(_, B) {
+        const C = VK();
         try {
             C && C.updateUserPresence && C.updateUserPresence({
                 status: _,
@@ -2229,86 +2128,36 @@
             });
         } catch (_) {}
     }
-    function _E(_, B) {
-        if (!JL) {
-            return;
-        }
-        const C = 17 * WK, D = JL.username || "player";
-        if (KL) {
-            FF.save();
-            SJ();
-            VJ(_ - 62 * WK, B, C);
-            FF.clip();
-            FF.drawImage(KL, _ - 62 * WK - C, B - C, C * 2, C * 2);
-            FF.restore();
-        } else {
-            ZJ(_ - 62 * WK, B, C, RJ(D.charCodeAt(0) % 7, 46));
-            XC(D[0].toUpperCase(), _ - 62 * WK, B, 17, QK, 1);
-        }
-        ZJ(_ - 62 * WK, B, C, 0, UK, 2 * WK);
-        XC(D, _ - 34 * WK, B - 7 * WK, 15, QK, 1, "left");
-        XC(OL ? "GLOBAL RANK #" + OL : "UNRANKED", _ - 34 * WK, B + 10 * WK, 11, SK, 0, "left");
-    }
-    function BE(_, B) {
-        const C = 250 * WK;
-        YK(_ - C / 2, B - 130 * WK, C, 260 * WK, 12 * WK);
-        UJ("hsl(272 40% 9% / .8)");
-        TJ(1.4 * WK, SK);
-        XC("GLOBAL TOP 8", _, B - 108 * WK, 13, QK, 1);
-        NL.length && PL && XC(PL, _, B + 110 * WK, 10, SK);
-        if (!NL.length) {
-            const D = (PL || "loading...").split(" ");
-            let E = "", F = 0;
-            FF.font = (11 * WK | 0) + "px monospace";
-            for (let G = 0; G <= D.length; G++) {
-                const H = E ? E + " " + D[G] : D[G];
-                if (G < D.length && FF.measureText(H).width < C - 28 * WK) {
-                    E = H;
-                } else {
-                    XC(E, _, B - 30 * WK + 15 * F++ * WK, 11, RK);
-                    E = D[G] || "";
-                }
-            }
-            return;
-        }
-        NL.forEach((D, E) => {
-            const F = B - 78 * WK + E * 24 * WK;
-            const G = JL && D[1] === JL.username;
-            XC("#" + D[0], _ - C / 2 + 16 * WK, F, 12, G ? VK : SK, G, "left");
-            XC(D[1].slice(0, 12), _ - C / 2 + 54 * WK, F, 12, G ? QK : RK, G, "left");
-            XC(D[2], _ + C / 2 - 16 * WK, F, 12, G ? VK : RK, G, "right");
-        });
-    }
-    const CE = Math.PI;
-    const DE = CE * 2;
-    const EE = Math;
-    const FE = EE.abs, GE = EE.min, HE = EE.max, IE = EE.sin, JE = EE.cos, KE = EE.atan2, LE = EE.hypot, ME = EE.floor, NE = EE.random;
-    const OE = 17;
-    const PE = 1250;
-    const QE = 2900;
-    const RE = 400;
-    const SE = 545;
-    const TE = 305;
-    const UE = 100;
-    const VE = [ .088, .055, .062, .07, .05, .076, .095 ];
-    const WE = .9;
-    const XE = [ 0, 32, 54, 140, 200, 248, 312 ];
-    const YE = [ 1, 2, 4, 8, 16, 32, 64 ];
-    const ZE = 64;
-    const _F = 15e3;
-    const BF = [ [ 0, 1.5, 10 ], [ 2, 1.5, 11 ], [ 3, 1.7, 12 ], [ 4, 2, 12 ], [ 5, 1.9, 11 ], [ 6, 1.9, 11 ], [ 7, .4, 12 ] ];
-    const CF = "OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY".split(" ");
-    const DF = "pf26_save";
-    const EF = document.querySelector("canvas");
-    const FF = EF.getContext("2d");
-    let GF = 0, HF = 0, IF = 1;
-    let JF = 0;
-    let KF = 0;
-    let LF = 0;
-    let MF = 0;
-    let NF = 0;
-    let OF = 0;
-    const PF = {
+    const VD = Math.PI;
+    const WD = VD * 2;
+    const XD = Math;
+    const YD = XD.abs, ZD = XD.min, _E = XD.max, BE = XD.sin, CE = XD.cos, DE = XD.atan2, EE = XD.hypot, FE = XD.floor, GE = XD.random;
+    const HE = 17;
+    const IE = 1250;
+    const JE = 2900;
+    const KE = 400;
+    const LE = 545;
+    const ME = 305;
+    const NE = 100;
+    const OE = [ .088, .055, .062, .07, .05, .076, .095 ];
+    const PE = .9;
+    const QE = [ 0, 32, 54, 140, 200, 248, 312 ];
+    const RE = [ 1, 2, 4, 8, 16, 32, 64 ];
+    const SE = 64;
+    const TE = 15e3;
+    const UE = [ [ 0, 1.5, 10 ], [ 2, 1.5, 11 ], [ 3, 1.7, 12 ], [ 4, 2, 12 ], [ 5, 1.9, 11 ], [ 6, 1.9, 11 ], [ 7, .4, 12 ] ];
+    const VE = "OVERDRIVE SUPERCOIL REACH SUPERRAIL FLUX ECHO EFFICIENCY".split(" ");
+    const WE = "pf26_save";
+    const XE = document.querySelector("canvas");
+    const YE = XE.getContext("2d");
+    let ZE = 0, _F = 0, BF = 1;
+    let CF = 0;
+    let DF = 0;
+    let EF = 0;
+    let FF = 0;
+    let GF = 0;
+    let HF = 0;
+    const IF = {
         x: 0,
         y: 0,
         vx: 0,
@@ -2326,58 +2175,55 @@
         gt: 0,
         al: 1
     };
-    let QF = 0, RF = PE;
-    const SF = {
+    let JF = 0, KF = IE;
+    const LF = {
         x: 0,
         y: 0,
         z: 1,
         tz: 1
     };
-    let TF = [];
-    let UF = 1;
+    let MF = [];
+    let NF = 1;
+    let OF = 0;
+    let PF = 0;
+    let QF = 0;
+    let RF = 0;
+    let SF = 0;
+    let TF = 1;
+    let UF = 0;
     let VF = 0;
     let WF = 0;
-    let XF = 0;
-    let YF = 0;
-    let ZF = 0;
-    let _G = 1;
-    let BG = 0;
-    let CG = 0;
-    let DG = 0;
+    let XF = [];
+    let YF = 0, ZF = 0;
+    let _G = [];
+    let BG = [];
+    let CG = [];
+    let DG = [];
     let EG = [];
-    let FG = 0, GG = 0;
-    let HG = [];
-    let IG = [];
-    let JG = [];
-    let KG = [];
-    let LG = [];
-    let MG = [];
-    let NG = [];
-    const OG = {
-        c: 0,
+    let FG = [];
+    let GG = [];
+    const HG = {
         b: 0,
         d: 0,
-        o: 0,
-        e: [ 0, 0, 0, 0 ],
         m: 0
     };
-    let PG = 0, QG = 0;
-    let RG = 0, SG = 0;
-    let TG = 0;
-    let UG = 0;
-    let VG = -1, WG = 0;
-    const XG = _ => .45 + GE(_, 210) / 105 * .55;
-    let YG = [];
-    let ZG = 0;
-    const _H = _ => _.m & 2 ? 280 : _.m & 4 ? 20 : _.m & 8 ? 285 : DK[6];
-    const BH = [ [ "CLOUDBREAK", 206, 74, 88, 26, "0002100210", 5, 1, 5, 40 ], [ "SUNFORGE", 12, 34, 72, 19, "8574185741", 7, 3, 4, 196 ], [ "VERDANT COIL", 152, -74, 74, 17, "2622762262", 8, 5, 6, 320 ], [ "CRYSTAL CURRENT", 190, 44, 84, 15, "3303531333", 5, 6, 7, 25 ], [ "PRISM MINE", 276, -28, 62, 10, "6760671666", 9, 2, 6, 120 ], [ "INVERSION TEMPLE", 264, 52, 80, 13, "6465264636", 7, 4, 7, 75 ], [ "RAINBOW ENGINE", 300, -136, 90, 9, "0123456788", 9, 0, 9, -1 ] ];
-    const CH = [ 180, 786794, 131494, 69971, 693042, 303957, 414347 ];
-    const DH = "120132410656";
-    const EH = (_, B) => (_ >> 16 - B * 4 & 15) / 16;
-    const FH = _ => _ > 5 ? [ MJ(0, 6), MJ(0, 6) ] : [ +DH[_ * 2], +DH[_ * 2 + 1] ];
-    let GH = 0, HH = -400, IH = RE, JH = 0, KH = 1;
-    let LH = 0, MH = 0, NH = 0, OH = 0, PH = 0, QH = 0;
-    const RH = (_, B, C, D, E, F) => ({
+    let IG = 0, JG = 0;
+    let KG = 0, LG = 0;
+    let MG = 0;
+    let NG = 0;
+    let OG = -1, PG = 0;
+    const QG = _ => .45 + ZD(_, 210) / 105 * .55;
+    let RG = [];
+    let SG = 0;
+    const TG = _ => _.m & 2 ? 280 : _.m & 4 ? 20 : _.m & 8 ? 285 : WJ[6];
+    const UG = [ [ "CLOUDBREAK", 206, 74, 88, 26, "0002100210", 5, 1, 5, 40 ], [ "SUNFORGE", 12, 34, 72, 19, "8574185741", 7, 3, 4, 196 ], [ "VERDANT COIL", 152, -74, 74, 17, "2622762262", 8, 5, 6, 320 ], [ "CRYSTAL CURRENT", 190, 44, 84, 15, "3303531333", 5, 6, 7, 25 ], [ "PRISM MINE", 276, -28, 62, 10, "6760671666", 9, 2, 6, 120 ], [ "INVERSION TEMPLE", 264, 52, 80, 13, "6465264636", 7, 4, 7, 75 ], [ "RAINBOW ENGINE", 300, -136, 90, 9, "0123456788", 9, 0, 9, -1 ] ];
+    const VG = [ 180, 786794, 131494, 69971, 693042, 303957, 414347 ];
+    const WG = "120132410656";
+    const XG = (_, B) => (_ >> 16 - B * 4 & 15) / 16;
+    const YG = _ => _ > 5 ? [ FJ(0, 6), FJ(0, 6) ] : [ +WG[_ * 2], +WG[_ * 2 + 1] ];
+    let ZG = 0, _H = -400, BH = KE, CH = 0, DH = 1;
+    let EH = 0, FH = 0, GH = 0, HH = 0, IH = 0, JH = 0;
+    const KH = (_, B, C, D, E, F) => ({
         y: _,
         h: B,
         l: C,
@@ -2386,12 +2232,12 @@
         pr: F,
         o: [],
         i: [],
-        rg: GI(_),
+        rg: ZH(_),
         k: 0,
         z: 0,
         bk: []
     });
-    const SH = (_, B, C, D, E) => ({
+    const LH = (_, B, C, D, E) => ({
         t: 0,
         x: _,
         y: B,
@@ -2400,7 +2246,7 @@
         m: D | 0,
         ...E
     });
-    const TH = (_, B, C, D, E, F) => ({
+    const MH = (_, B, C, D, E, F) => ({
         t: 1,
         x: _,
         y: B,
@@ -2409,206 +2255,187 @@
         m: E | 0,
         ...F
     });
-    const UH = (_, B, C, D, E, F) => TH((_ + C) / 2, (B + D) / 2, LE(C - _, D - B) / 2, KE(D - B, C - _), E, F);
-    const VH = (_, B, C, D) => ({
+    const NH = (_, B, C, D, E, F) => MH((_ + C) / 2, (B + D) / 2, EE(C - _, D - B) / 2, DE(D - B, C - _), E, F);
+    const OH = (_, B, C, D) => ({
         t: _,
         x: B,
         y: C,
         c: D | 0,
         g: 0
     });
-    let WH = 0, XH = 0, YH = 0, ZH = 0, _I = 0;
-    let BI = 0, CI = 0, DI = 0, EI = 0, FI = 0;
-    const GI = _ => {
-        const B = ME(HE(_, 0) / _F);
+    let PH = 0, QH = 0, RH = 0, SH = 0, TH = 0;
+    let UH = 0, VH = 0, WH = 0, XH = 0, YH = 0;
+    const ZH = _ => {
+        const B = FE(_E(_, 0) / TE);
         return B < 7 ? B : B % 7;
     };
-    const HI = _ => ME(ME(HE(_, 0) / _F) / 7);
-    const II = _ => HJ(ME(HE(_, 0) / _F) * .085 + HI(_) * .3, 0, 2.4);
-    let JI = -545, KI = SE;
-    let LI = 0, MI = 0;
-    let NI = 0, OI = 0, PI = 0, QI = 0, RI = 0, SI = 0, TI = 0, UI = 0, VI = 0;
-    let WI = 0;
-    let XI = 0, YI = 0;
-    const ZI = _ => 420 * EE.pow(2, (_ - 70) / 12);
-    const _J = [ [ 0, 2, 3, 5, 7, 8, 10 ], [ 0, 2, 4, 5, 7, 9, 11 ], [ 0, 3, 5, 7, 10, 12 ], [ 0, 1, 5, 6, 8, 11 ] ];
-    const BJ = [ "triangle", "sawtooth", "square" ];
-    const CJ = () => NI && !OG.m && WI < 26;
-    const DJ = () => NI.currentTime;
-    const EJ = [ 0, 4, 7, 12 ];
-    const FJ = [ 4369, 4437, 4115, 4369, 4097, 1298, 21845 ];
-    const GJ = [ 34953, 42149, 37266, 52429, 33924, 43177, 43691 ];
-    const HJ = (_, B, C) => _ < B ? B : _ > C ? C : _;
-    const IJ = (_, B, C) => _ + (B - _) * C;
-    const JJ = (_, B, C, D) => IJ(_, B, 1 - EE.exp(-C * D));
-    let KJ = 1;
-    const LJ = (_, B) => _ + XB() * (B - _);
-    const MJ = (_, B) => ME(_ + XB() * (B - _ + 1));
-    const NJ = _ => XB() < _;
-    const OJ = _ => _[ME(XB() * _.length)];
-    const PJ = () => XB() < .5 ? -1 : 1;
-    const QJ = (_, B, C, D = 1) => "hsl(" + _ + " " + B + "% " + C + "% / " + D + ")";
-    const RJ = (_, B, C) => QJ(XE[_], 100, B, C);
-    const SJ = () => FF.beginPath();
-    const TJ = (_, B) => {
-        FF.lineWidth = _;
-        FF.strokeStyle = B;
-        FF.stroke();
+    const _I = _ => FE(FE(_E(_, 0) / TE) / 7);
+    const BI = _ => _J(FE(_E(_, 0) / TE) * .085 + _I(_) * .3, 0, 2.4);
+    let CI = -545, DI = LE;
+    let EI = 0, FI = 0;
+    let GI = 0, HI = 0, II = 0, JI = 0, KI = 0, LI = 0, MI = 0, NI = 0, OI = 0;
+    let PI = 0;
+    let QI = 0, RI = 0;
+    const SI = _ => 420 * XD.pow(2, (_ - 70) / 12);
+    const TI = [ [ 0, 2, 3, 5, 7, 8, 10 ], [ 0, 2, 4, 5, 7, 9, 11 ], [ 0, 3, 5, 7, 10, 12 ], [ 0, 1, 5, 6, 8, 11 ] ];
+    const UI = [ "triangle", "sawtooth", "square" ];
+    const VI = () => GI && !HG.m && PI < 26;
+    const WI = () => GI.currentTime;
+    const XI = [ 0, 4, 7, 12 ];
+    const YI = [ 4369, 4437, 4115, 4369, 4097, 1298, 21845 ];
+    const ZI = [ 34953, 42149, 37266, 52429, 33924, 43177, 43691 ];
+    const _J = (_, B, C) => _ < B ? B : _ > C ? C : _;
+    const BJ = (_, B, C) => _ + (B - _) * C;
+    const CJ = (_, B, C, D) => BJ(_, B, 1 - XD.exp(-C * D));
+    let DJ = 1;
+    const EJ = (_, B) => _ + WB() * (B - _);
+    const FJ = (_, B) => FE(_ + WB() * (B - _ + 1));
+    const GJ = _ => WB() < _;
+    const HJ = _ => _[FE(WB() * _.length)];
+    const IJ = () => WB() < .5 ? -1 : 1;
+    const JJ = (_, B, C, D = 1) => "hsl(" + _ + " " + B + "% " + C + "% / " + D + ")";
+    const KJ = (_, B, C) => JJ(QE[_], 100, B, C);
+    const LJ = () => YE.beginPath();
+    const MJ = (_, B) => {
+        YE.lineWidth = _;
+        YE.strokeStyle = B;
+        YE.stroke();
     };
-    const UJ = _ => {
-        FF.fillStyle = _;
-        FF.fill();
+    const NJ = _ => {
+        YE.fillStyle = _;
+        YE.fill();
     };
-    const VJ = (_, B, C, D, E) => FF.arc(_, B, C, D || 0, E ?? DE);
-    const WJ = (_, B) => FF.moveTo(_, B);
-    const XJ = (_, B) => FF.lineTo(_, B);
-    const YJ = (_, B, C, D, E, F) => {
-        SJ();
-        WJ(_, B);
-        XJ(C, D);
-        TJ(E, F);
+    const OJ = (_, B, C, D, E) => YE.arc(_, B, C, D || 0, E ?? WD);
+    const PJ = (_, B) => YE.moveTo(_, B);
+    const QJ = (_, B) => YE.lineTo(_, B);
+    const RJ = (_, B, C, D, E, F) => {
+        LJ();
+        PJ(_, B);
+        QJ(C, D);
+        MJ(E, F);
     };
-    const ZJ = (_, B, C, D, E, F) => {
-        SJ();
-        VJ(_, B, C);
-        D && UJ(D);
-        E && TJ(F, E);
+    const SJ = (_, B, C, D, E, F) => {
+        LJ();
+        OJ(_, B, C);
+        D && NJ(D);
+        E && MJ(F, E);
     };
-    const _K = (_, B, C, D, E) => {
-        SJ();
+    const TJ = (_, B, C, D, E) => {
+        LJ();
         for (let B = 0; B < _; B++) {
             E(B);
         }
-        FF.closePath();
-        B && UJ(B);
-        C && TJ(D, C);
+        YE.closePath();
+        B && NJ(B);
+        C && MJ(D, C);
     };
-    const BK = (_, B, C) => (_ ? XJ : WJ)(B, C);
-    const CK = _ => HE(1, _ * IF);
-    let DK = [ 232, 62, 12, 322, 52, 27, 288, 80 ];
-    let EK = 0, FK = 0;
-    const GK = _ => GF / 2 + (_ - SF.x) * IF + EK;
-    const HK = _ => HF / 2 + (_ - SF.y) * IF + FK;
-    const IK = _ => SF.y + (_ - HF / 2 - FK) / IF;
-    const JK = (_, B, C, D) => (_ + ((B - _ + 540) % 360 - 180) * (1 - EE.exp(-C * D)) + 360) % 360;
-    const KK = _ => {
-        const B = BH[_], C = B[1], D = B[4], E = B[9];
-        return [ C, 56, D, C + B[2], 64, D + 23, E < 0 ? KF * 16 % 360 : E, B[3] ];
+    const UJ = (_, B, C) => (_ ? QJ : PJ)(B, C);
+    const VJ = _ => _E(1, _ * BF);
+    let WJ = [ 232, 62, 12, 322, 52, 27, 288, 80 ];
+    let XJ = 0, YJ = 0;
+    const ZJ = _ => ZE / 2 + (_ - LF.x) * BF + XJ;
+    const _K = _ => _F / 2 + (_ - LF.y) * BF + YJ;
+    const BK = _ => LF.y + (_ - _F / 2 - YJ) / BF;
+    const CK = (_, B, C, D) => (_ + ((B - _ + 540) % 360 - 180) * (1 - XD.exp(-C * D)) + 360) % 360;
+    const DK = _ => {
+        const B = UG[_], C = B[1], D = B[4], E = B[9];
+        return [ C, 56, D, C + B[2], 64, D + 23, E < 0 ? DF * 16 % 360 : E, B[3] ];
     };
-    const LK = [ 0, -6, -3, 5, 7, -8, -4 ];
-    const MK = [ [ 276, 40, 7, 60, 26 ], [ 18, 74, 42, 100, 66 ], [ 292, 60, 30, 100, 74 ], [ 200, 80, 40, 100, 76 ], [ 140, 70, 34, 100, 70 ], [ 46, 38, 22, 90, 60 ], [ 46, 100, 60, 100, 92 ] ];
-    const NK = "CLOUD SHADOW NEON SPIRAL LANCE STARTIP RAINBOW DASHED COMET SPARKS SHARDS RINGS".split(" ");
-    const OK = [ 0, 180, 420 ];
-    const PK = (_, B) => !B || OG.o >> _ * 3 + B & 1;
-    const QK = QJ(0, 0, 100);
-    const RK = QJ(0, 0, 100, .62);
-    const SK = QJ(0, 0, 100, .34);
-    const TK = QJ(282, 40, 15, .88);
-    const UK = QJ(290, 55, 50);
-    const VK = QJ(48, 100, 66);
-    let WK = 1;
-    let XK = [];
-    const YK = (_, B, C, D, E) => {
-        SJ();
-        FF.roundRect(_, B, C, D, E);
+    const EK = [ 0, -6, -3, 5, 7, -8, -4 ];
+    const FK = [ [ 276, 40, 7, 60, 26 ], [ 18, 74, 42, 100, 66 ], [ 292, 60, 30, 100, 74 ], [ 200, 80, 40, 100, 76 ], [ 140, 70, 34, 100, 70 ], [ 46, 38, 22, 90, 60 ], [ 46, 100, 60, 100, 92 ] ];
+    const GK = JJ(0, 0, 100);
+    const HK = JJ(0, 0, 100, .62);
+    const IK = JJ(0, 0, 100, .34);
+    const JK = JJ(282, 40, 15, .88);
+    const KK = JJ(290, 55, 50);
+    const LK = JJ(48, 100, 66);
+    let MK = 1;
+    let NK = [];
+    const OK = (_, B, C, D, E) => {
+        LJ();
+        YE.roundRect(_, B, C, D, E);
     };
-    const ZK = (_, B, C, D) => PG > _ - C / 2 && PG < _ + C / 2 && QG > B - D / 2 && QG < B + D / 2;
-    const _L = () => {
-        JF = OG.b || ZF ? 3 : 0;
-    };
-    let BL = -1, CL = -1;
-    let DL = 0, EL = 0, FL = 0, GL = 0;
-    const HL = 1 / 120;
+    const PK = (_, B, C, D) => IG > _ - C / 2 && IG < _ + C / 2 && JG > B - D / 2 && JG < B + D / 2;
+    let QK = 0, RK = 0, SK = 0, TK = 0;
+    const UK = 1 / 120;
     (() => {
         try {
-            const _ = (localStorage[DF] || "").split(",").map(Number);
+            const _ = (localStorage[WE] || "").split(",").map(Number);
             if (_.length < 3 || _.some(isNaN)) {
                 return;
             }
-            OG.b = HJ(_[0] | 0, 0, 1e12);
-            OG.d = HJ(_[1] | 0, 0, 1e12);
-            OG.m = _[2] ? 1 : 0;
-            if (_.length > 8) {
-                OG.c = HJ(_[3] | 0, 0, 1e9);
-                OG.o = _[4] | 0;
-                for (let B = 0; B < 4; B++) {
-                    const C = _[5 + B] | 0;
-                    OG.e[B] = C > 0 && C < 3 && PK(B, C) ? C : 0;
-                }
-            }
+            HG.b = _J(_[0] | 0, 0, 1e12);
+            HG.d = _J(_[1] | 0, 0, 1e12);
+            HG.m = _[2] ? 1 : 0;
         } catch (_) {}
     })();
-    SD();
-    LD();
-    JF = 0;
-    PF.al = 1;
+    PD();
+    ID();
+    CF = 0;
+    IF.al = 1;
     requestAnimationFrame(function _(B) {
         requestAnimationFrame(_);
-        const C = HJ((B - EL) / 1e3, 0, .05);
-        EL = B;
+        const C = _J((B - RK) / 1e3, 0, .05);
+        RK = B;
         let D = C;
-        if (OF > 0) {
-            OF -= C;
+        if (HF > 0) {
+            HF -= C;
             D *= .12;
         }
-        KF += D;
-        JF == 1 || JF == 0 ? OD(D) : JF == 3 && HC(D);
+        DF += D;
+        CF == 1 || CF == 0 ? LD(D) : CF == 3 && GC(D);
+        HC(C);
         IC(C);
-        JC(C);
-        UB();
-        QD();
+        TB();
+        ND();
     });
-    EF.style.cssText = "position:fixed;inset:0;width:100%;height:100%";
-    addEventListener("resize", SD);
+    XE.style.cssText = "position:fixed;inset:0;width:100%;height:100%";
+    addEventListener("resize", PD);
     addEventListener("contextmenu", _ => _.preventDefault());
     addEventListener("pointermove", _ => {
-        TD(_);
-        TG && C();
+        QD(_);
+        MG && C();
     });
     addEventListener("pointerdown", _ => {
         V_();
-        TD(_);
-        _.button || ZC() || JF != 1 || B();
+        QD(_);
+        _.button || YC() || CF != 1 || B();
     });
     addEventListener("pointerup", () => {
-        TG = 0;
+        MG = 0;
     });
     addEventListener("blur", () => {
-        TG = 0;
-        JF == 1 && (JF = 2);
+        MG = 0;
+        CF == 1 && (CF = 2);
     });
     addEventListener("wheel", _ => {
-        JF == 1 && RD(UF + (_.deltaY > 0 ? 1 : -1));
+        CF == 1 && OD(NF + (_.deltaY > 0 ? 1 : -1));
     });
     addEventListener("keydown", _ => {
         V_();
         const B = _.key, C = B.toLowerCase();
         if (B > "0" && B < "8") {
-            RD(+B - 1);
+            OD(+B - 1);
         } else {
-            B != "Escape" && C != "p" || (JF = JF == 1 ? 2 : JF == 2 ? 1 : JF == 4 ? (_L(), 
-            JF) : JF);
-            C == "r" && JF > 1 && LD();
-            C == "m" && ED();
-            C == "x" && (PF.ra ? K(1) : PF.te && M());
-            B != " " && B != "Enter" || (JF == 2 ? JF = 1 : JF < 4 && LD());
+            B != "Escape" && C != "p" || (CF = CF == 1 ? 2 : CF == 2 ? 1 : CF);
+            C == "r" && CF > 1 && ID();
+            C == "m" && DD();
+            C == "x" && (IF.ra ? K(1) : IF.te && M());
+            B != " " && B != "Enter" || (CF == 2 ? CF = 1 : CF < 4 && ID());
         }
     });
     addEventListener("visibilitychange", () => {
-        JF == 1 && (JF = 2);
+        CF == 1 && (CF = 2);
     });
-    const IL = () => typeof Wavedash != "undefined" ? Wavedash : 0;
-    let JL = null;
-    let KL = null;
-    let LL = 0;
-    let ML = 0;
-    let NL = [];
-    let OL = 0;
-    let PL = "";
-    let QL = 0;
-    let RL = 0;
+    const VK = () => typeof Wavedash != "undefined" ? Wavedash : 0;
+    let WK = null;
+    let XK = 0;
+    let YK = 0;
+    let ZK = 0;
+    let _L = "";
+    let BL = 0;
     !function _() {
-        const B = IL();
+        const B = VK();
         if (B) {
             try {
                 B.init({
@@ -2618,23 +2445,22 @@
                 B.updateLoadProgressZeroToOne && B.updateLoadProgressZeroToOne(1);
                 B.loadComplete && B.loadComplete();
             } catch (_) {
-                PL = "init failed: " + String(_ && _.message).slice(0, 60);
+                _L = "init failed: " + String(_ && _.message).slice(0, 60);
                 return;
             }
             try {
-                JL = B.getUser && B.getUser();
-                JL && JL.avatarUrl && WD(JL.userId);
+                WK = B.getUser && B.getUser();
             } catch (_) {}
-            PL = "connected" + (JL ? " as " + (JL.username || "?") : ", no user");
-            VD();
-            ZD("In the shaft");
+            _L = "connected" + (WK ? " as " + (WK.username || "?") : ", no user");
+            SD();
+            UD("In the shaft");
         } else {
-            if (++RL < 40) {
-                PL = "waiting for the Wavedash SDK...";
+            if (++BL < 40) {
+                _L = "waiting for the Wavedash SDK...";
                 setTimeout(_, 250);
                 return;
             }
-            PL = "no SDK on this page - scores stay local";
+            _L = "no SDK on this page - scores stay local";
         }
     }();
 })();</script></html>

@@ -73,7 +73,7 @@ if (isMainThread) {
 
   // The bundle is rebuilt from parts so a candidate is always the real thing
   // the build would compile, header line included.
-  const head = 'const DEBUG=0,WD=0;\n';
+  const head = 'const DEBUG=0,WD=0,WDX=0;\n';
   const asBundle = (parts) => head + parts.map((f) => '// ==== ' + f.name + ' ====\n' + f.code).join('\n') + '\n';
 
   const base = await submit(full);

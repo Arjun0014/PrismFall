@@ -21,6 +21,7 @@ if (!args.includes('--no-browser')) {
   // off disk, so without this the suite happily certifies whatever was there
   // from a previous session -- which it did, once.
   spawnSync(process.execPath, [join(ROOT, 'tools/build.mjs'), '--wavedash'], { cwd: ROOT, stdio: 'ignore' });
+  spawnSync(process.execPath, [join(ROOT, 'tools/build.mjs'), '--wavedash', '--full'], { cwd: ROOT, stdio: 'ignore' });
 }
 
 let failed = 0;
