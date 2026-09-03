@@ -10,12 +10,13 @@ const approach = (a, b, r, h) => lerp(a, b, 1 - M.exp(-r * h));
 // mulberry32 - 3 lines, good enough, fully seedable for regression replays.
 let _rs = 1;
 function srnd(s) { _rs = s >>> 0; }
-function rr() {
-  _rs = (_rs + 0x6d2b79f5) | 0;
-  let t = M.imul(_rs ^ (_rs >>> 15), 1 | _rs);
+// mulberry32's output stage, on its own so hsh() can hash through it too.
+function mix(s) {
+  let t = M.imul(s ^ (s >>> 15), 1 | s);
   t = (t + M.imul(t ^ (t >>> 7), 61 | t)) ^ t;
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
+function rr() { return mix(_rs = (_rs + 0x6d2b79f5) | 0); }
 const rf = (a, b) => a + rr() * (b - a);
 const ri = (a, b) => flr(a + rr() * (b - a + 1));
 const rp = (p) => rr() < p;
@@ -24,11 +25,7 @@ const pick = (a) => a[flr(rr() * a.length)];
 const rs = () => (rr() < .5 ? -1 : 1);
 
 // Stateless hash for background motifs - infinite scenery with zero storage.
-function hsh(x, y) {
-  let h = M.imul(x | 0, 374761393) + M.imul(y | 0, 668265263);
-  h = M.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
+function hsh(x, y) { return mix(x * 1000003 + y | 0); }
 
 // Closest point on segment (ax,ay)-(bx,by) to (px,py). Returns param 0..1.
 function segT(ax, ay, bx, by, px, py) {
