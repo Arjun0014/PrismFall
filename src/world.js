@@ -77,8 +77,8 @@ const mkChunk = (y, h, l, r, pl, pr) => ({ y, h, l, r, pl, pr, o: [], i: [], rg:
 // One shape record covers both primitives: t 0 is a circle of radius r, t 1 is
 // a segment of half-length r at angle g. Sharing the field means the collision
 // probe, the renderer and the placement test all read the same two numbers.
-const ci = (x, y, r, m, e) => Object.assign({ t: 0, x, y, r, g: 0, m: m | 0 }, e);
-const sg = (x, y, r, g, m, e) => Object.assign({ t: 1, x, y, r, g, m: m | 0 }, e);
+const ci = (x, y, r, m, e) => ({ t: 0, x, y, r, g: 0, m: m | 0, ...e });
+const sg = (x, y, r, g, m, e) => ({ t: 1, x, y, r, g, m: m | 0, ...e });
 // segment from A to B
 const sgAB = (ax, ay, bx, by, m, e) =>
   sg((ax + bx) / 2, (ay + by) / 2, hyp(bx - ax, by - ay) / 2, at2(by - ay, bx - ax), m, e);
