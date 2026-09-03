@@ -65,7 +65,7 @@ function hud() {
   CIR(p, p, 9 * U, UG);
   // Coins stay as in-run reward feedback in both builds; only the banked
   // total beside them is a store thing.
-  txt(coins + (WD && SAVE.c ? ' (' + (SAVE.c + coins) + ')' : ''), p + 16 * U, p, 16, UG, 1, 'left');
+  txt(WD && SAVE.c ? coins + ' (' + (SAVE.c + coins) + ')' : coins, p + 16 * U, p, 16, UG, 1, 'left');
   txt(score | 0, W - p, p, 19, W9, 1, 'right');
   if (mult > 1.05) txt('x' + mult.toFixed(1), W - p, p + 22 * U, 15, chsl(2, 70), 1, 'right');
   if (combo > 3) {
