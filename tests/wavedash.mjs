@@ -32,6 +32,13 @@ const SDK = () => {
   const calls = [];
   window.__calls = calls;
   const R = (data) => Promise.resolve({ success: true, data });
+  // The real SDK (@wvdsh/sdk-js) validates every argument and answers
+  // { success: false, message } on a mismatch. The one that bit: Terser's
+  // booleans_as_integers made keepBest a 1, and the platform rejected every
+  // upload. So this stub is exactly as strict as the real one for the
+  // arguments the game sends.
+  const F = (m) => { calls.push(['REJECTED', m]); return Promise.resolve({ success: false, data: null, message: m }); };
+  const isId = (v) => typeof v === 'string' && v.length > 0;
   window.Wavedash = {
     LeaderboardSortOrder: { ASC: 0, DESC: 1 },
     LeaderboardDisplayType: { NUMERIC: 0 },
@@ -43,12 +50,25 @@ const SDK = () => {
     getUser: () => ({ userId: 'u1', username: 'testrider', avatarUrl: '' }),
     getUserAvatarUrl: () => '',
     updateUserPresence: (p) => calls.push(['presence', p.status]),
-    getOrCreateLeaderboard: (n) => { calls.push(['getOrCreate', n]); return R({ id: 'lb-' + n }); },
+    getOrCreateLeaderboard: (n, so, dt) => {
+      if (typeof n !== 'string') return F('getOrCreateLeaderboard.name: expected string');
+      if (![0, 1].includes(so)) return F('getOrCreateLeaderboard.sortOrder: expected LeaderboardSortOrder, got ' + so);
+      if (![0, 1, 2, 3].includes(dt)) return F('getOrCreateLeaderboard.displayType: expected LeaderboardDisplayType, got ' + dt);
+      calls.push(['getOrCreate', n]); return R({ id: 'lb-' + n });
+    },
     listLeaderboardEntries: () => R([
       { globalRank: 1, username: 'ada', score: 99999 },
       { globalRank: 2, username: 'testrider', score: 4242 }]),
     getMyLeaderboardEntries: () => R([{ globalRank: 2, score: 4242 }]),
-    uploadLeaderboardScore: (id, sc) => { calls.push(['upload', id, sc]); return R({ globalRank: 2, submittedRank: 7 }); },
+    uploadLeaderboardScore: (id, sc, keep, ugc, meta) => {
+      if (!isId(id)) return F('uploadLeaderboardScore.leaderboardId: expected Id, got ' + typeof id);
+      if (typeof sc !== 'number') return F('uploadLeaderboardScore.score: expected number, got ' + typeof sc);
+      if (typeof keep !== 'boolean') return F('uploadLeaderboardScore.keepBest: expected boolean, got ' + typeof keep + ' ' + keep);
+      if (ugc !== undefined && !isId(ugc)) return F('uploadLeaderboardScore.ugcId: expected Id');
+      if (meta !== undefined && (typeof meta !== 'object' || Object.values(meta).some((v) => !['string', 'number'].includes(typeof v))))
+        return F('uploadLeaderboardScore.metadata: values must be strings or numbers');
+      calls.push(['upload', id, sc]); return R({ globalRank: 2, submittedRank: 7 });
+    },
   };
 };
 
@@ -101,6 +121,8 @@ for (const withSdk of [0, 1]) {
     const ups = calls.filter((c) => c[0] === 'upload');
     ok(ups.some((c) => c[1] === 'lb-prismfall-score' && c[2] > 0), 'the run\'s score was uploaded to the score board', ups.map((c) => c[1] + ':' + c[2]).join(' '));
     ok(ups.some((c) => c[1] === 'lb-prismfall-depth'), 'and its depth to the depth board');
+    const rej = calls.filter((c) => c[0] === 'REJECTED');
+    ok(rej.length === 0, 'no SDK call was rejected by argument validation', rej.map((c) => c[1]).join(' | '));
   }
   await page.mouse.click(640, 474);      // MENU
   await page.waitForTimeout(600);

@@ -1123,7 +1123,7 @@
         const I = H || WI();
         const J = GI.createBufferSource();
         J.buffer = LI;
-        J.loop = 1;
+        J.loop = !0;
         J.playbackRate.value = .7 + GE() * .6;
         const K = GI.createBiquadFilter();
         K.type = C;
@@ -2117,13 +2117,13 @@
             depth: B / 10 | 0,
             laps: _I(B)
         };
-        RD(C.uploadLeaderboardScore(XK, _, 1, void 0, D), "upload").then(_ => {
+        RD(C.uploadLeaderboardScore(XK, _, !0, void 0, D), "upload").then(_ => {
             if (_) {
                 ZK = _.globalRank | 0;
                 _L = "rank #" + ZK;
             }
         });
-        YK && RD(C.uploadLeaderboardScore(YK, B | 0, 1));
+        YK && RD(C.uploadLeaderboardScore(YK, B | 0, !0));
         UD("Run over", "Scored " + _);
     }
     function UD(_, B) {
@@ -2454,7 +2454,7 @@
         }
         try {
             B.init({
-                deferEvents: 1
+                deferEvents: !0
             });
             B.readyForEvents();
             B.updateLoadProgressZeroToOne && B.updateLoadProgressZeroToOne(1);

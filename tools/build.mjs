@@ -144,7 +144,15 @@ export const TERSER_OPTS = {
 // same scope as the platform's.
 async function terse(js, wrap) {
   const src = wrap ? '(()=>{\n' + js + '\n})()' : js;
-  const opts = wrap ? TERSER_OPTS
+  // The Wavedash build must keep real booleans. `booleans_as_integers` turns
+  // `true` into `1`, and the platform SDK validates every argument strictly:
+  // uploadLeaderboardScore(id, score, 1) is rejected with "keepBest: expected
+  // boolean, got number 1" -- silently, unless you read the console -- and
+  // the live leaderboard stayed empty for a week because of it. That build
+  // has no size limit, so the option is simply off there.
+  const opts = wrap ? Object.assign({}, TERSER_OPTS, {
+    compress: Object.assign({}, TERSER_OPTS.compress, { booleans_as_integers: false }),
+  })
     : Object.assign({}, TERSER_OPTS, {
       compress: Object.assign({}, TERSER_OPTS.compress, { toplevel: true }),
       mangle: Object.assign({}, TERSER_OPTS.mangle, { properties: OWN_PROPS }),
